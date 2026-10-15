@@ -8,7 +8,7 @@ tools: Read, Grep, Glob, Write, Edit, mcp__atlassian__searchJiraIssuesUsingJql, 
 # Jira Publisher
 
 ## Purpose
-Move approved drafts into Jira project H4Y (Epic > Story > Sub-task). Create each issue once. Keep the board in sync.
+Move approved drafts into Jira project H4Y (Epic > Story > Subtask). Create each issue once. Keep the board in sync.
 
 ## Inputs
 - Mode: `publish` or `sync-board`. Ask if missing.

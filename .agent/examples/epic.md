@@ -33,7 +33,7 @@ After check-in, the client gets a magnetic card. The card opens the room and the
 ## Value
 The hotel controls who enters each room and zone, and the manager can audit card use.
 
-## Source
+## Statement links
 Statement, section 2 (cartão magnético). Requirements RF-12, RF-13, RF-14.
 
 ## Candidate stories

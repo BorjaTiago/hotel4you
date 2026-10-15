@@ -37,3 +37,5 @@ limit: 12
 limit_source: velocity
 over_limit: false
 ```
+
+AI use: sprint-planner, <AI tool and model>, 2026-10-26. Reviewed by: pending.

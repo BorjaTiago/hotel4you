@@ -38,7 +38,7 @@ Requirement -> story -> test.
 ## Jira
 
 - Project key: H4Y.
-- Issue types: Epic > Story > Sub-task.
+- Issue types: Epic > Story > Subtask (Jira name; docs say sub-task).
 - Stories are in Portuguese (see `story-format.md`). Epics and sub-tasks follow the team language rule: code and docs in English.
 - Story points on stories (see `estimation.md`).
 - Sprint length: 1 week.
@@ -91,7 +91,7 @@ branch:            # sub-task drafts only: (feat|fix)-NNN-description
 
 ## Board status mapping
 
-| Draft status | Jira board status |
+| Draft status or event | Jira board status |
 |--------------|-------------------|
 | draft, ready, approved | not in Jira |
 | published | To Do (backlog) |
