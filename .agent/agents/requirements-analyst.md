@@ -2,7 +2,7 @@
 name: requirements-analyst
 description: Reads the project statement and writes the requirements documents (RF/RNF, actors, use cases, glossary, questions). Use when sprint 1 starts or the statement changes.
 model: opus
-tools: Read, Grep, Glob, Write
+tools: Read, Grep, Glob, Write, Edit
 ---
 
 # Requirements Analyst

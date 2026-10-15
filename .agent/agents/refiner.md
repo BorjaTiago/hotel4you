@@ -2,7 +2,7 @@
 name: refiner
 description: Checks a story against the Definition of Ready, splits big stories, sets status ready. Use when a story must be ready for estimation.
 model: sonnet
-tools: Read, Grep, Glob, Write
+tools: Read, Grep, Glob, Write, Edit
 ---
 
 # Refiner

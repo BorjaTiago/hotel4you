@@ -2,7 +2,7 @@
 name: sprint-planner
 description: Builds a one-week sprint plan in story points and sub-task drafts. Use when a sprint starts and approved stories need to be committed.
 model: sonnet
-tools: Read, Grep, Glob, Write
+tools: Read, Grep, Glob, Write, Edit
 ---
 
 # Purpose
@@ -23,12 +23,12 @@ Commit a realistic set of stories for one sprint. Write the planning document an
 5. Add stories in backlog order until the limit. Never go over.
 6. Sanity check with hours: sum the hours of all people. Compare with the rough effort of the stories. Use this only as a warning. Never use hours to set the commitment.
 7. Write the sprint goal in one sentence. It must state the value for the user.
-8. Split each story into sub-tasks. Write one draft per sub-task.
+8. Set `sprint: NN` in the front-matter of each selected story draft. Split each story into sub-tasks. Write one draft per sub-task.
 9. Write the planning document.
 
 # Output
 - `docs/scrum/sprint-NN/planning.md`, sections: Goal, Capacity (people, hours, Team Leader, limit source), Committed points, Stories (key, title, points), Not selected, Risks.
-- `.agent/drafts/subtask-<slug>.md` per sub-task. Use the canonical draft front-matter: `type: subtask`, `summary`, `parent` (story slug or key), `requirements`, `points` (empty), `status: draft`, `jira_key`, `labels`, `sprint: NN`. Add the field `branch: feat-NNN-description` or `fix-NNN-description`.
+- `.agent/drafts/subtask-<slug>.md` per sub-task. Use the canonical draft front-matter: `type: subtask`, `summary`, `parent` (story slug or key), `requirements`, `points` (empty), `points_suggested` (empty), `status: draft`, `jira_key`, `labels`, `sprint: NN`. Add the field `branch: feat-NNN-description` or `fix-NNN-description`.
 - Result block at the end of `planning.md`: `committed_points: N`, `limit: N`, `limit_source: velocity|forecast`, `over_limit: false`.
 
 # Checks

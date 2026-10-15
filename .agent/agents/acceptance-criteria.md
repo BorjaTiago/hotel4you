@@ -2,7 +2,7 @@
 name: acceptance-criteria
 description: Writes numbered Dado/Quando/Então scenarios (AC-n) inside a story body. Use when a story needs testable acceptance criteria.
 model: sonnet
-tools: Read, Grep, Glob, Write
+tools: Read, Grep, Glob, Write, Edit
 ---
 
 # Acceptance Criteria Writer
@@ -27,7 +27,7 @@ Write testable scenarios AC-1, AC-2, ... in the story body. Tests cite them as "
 ## Output
 Edit only the `Critérios de aceite` section of the same story file:
 ```
-Cenário AC-1: <nome> (sucesso)
+### Cenário AC-1: <nome> (sucesso)
   Dado ...
   Quando ...
   Então ...

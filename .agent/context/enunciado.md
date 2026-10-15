@@ -184,7 +184,7 @@ Cases of use of code without the author's cooperation are reported to the ISEP P
 4. Sprint count. 16 weeks are said to be 13 sprints. With 1-week sprints this does not match 16. What are the exact sprint dates? Which weeks are not sprints?
 5. Reservation deletion. The text says only managers can delete reservations (only before check-in). Can reception staff only cancel? What is the difference between "cancel" (reception) and "delete" (manager)? Who is not allowed to delete: reception, clients, restaurant staff, suppliers?
 6. Dates. Confirm the 1st delivery (2026-12-01 23:55) and the final delivery (2027-01-31 23:55). What must the 1st delivery contain as scope of "first phase"?
-7. "Sprint 1 has no responsibility assignment". Does the Team Leader role start in sprint 2?
+7. "Sprint 1 has no responsibility assignment". Does the Team Leader role start in sprint 2? Who holds the Team Leader role for the sprint 1 documents?
 8. Staff access. "Staff only access floors 0 and 1". Does this apply to the reception staff only, or also to cleaning and other staff? Can staff enter guest rooms for room service?
 9. Card rules. Is a card valid only for the reserved places (restaurant, pool)? Does each room entry need a log entry? Can a client have more than one card?
 10. Stock. What does the XML file look like exactly (the example file is not in this text)? What happens when the XML has an unknown item?
@@ -194,5 +194,3 @@ Cases of use of code without the author's cooperation are reported to the ISEP P
 14. External libraries. What is the approval process to justify a library?
 15. AI use. What is the exact reference format for AI-generated code or diagrams?
 16. Chore and docs branches. The branch rule is `(feat|fix)-NNN-description`. Which prefix do docs and chore work use? The team uses `feat-NNN-...` for them.
-17. Sprint length. Confirm that 1-week sprints are accepted (the statement says one to two weeks).
-18. Team Leader in sprint 1. Sprint 1 has no roles. Who holds the Team Leader role for the sprint 1 documents, and does the rotation start in sprint 2?

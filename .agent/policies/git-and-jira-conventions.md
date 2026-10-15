@@ -66,7 +66,8 @@ points_suggested:  # written by the estimator
 status: draft | ready | approved | published
 jira_key:          # empty until published, for example H4Y-12
 labels: []
-sprint:            # for example 3; empty until planned
+sprint:            # for example 3; empty until planned (written by the sprint planner)
+branch:            # sub-task drafts only: (feat|fix)-NNN-description
 ---
 ```
 

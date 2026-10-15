@@ -79,6 +79,7 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 | Output | Path |
 |--------|------|
 | Drafts (epic, story, subtask) | `.agent/drafts/<type>-<slug>.md` |
+| Backlog order | `.agent/drafts/backlog-order.md` |
 | Requirements | `docs/requirements/{requirements,actors,use-cases,glossary,questions}.md` |
 | Sprint planning | `docs/scrum/sprint-NN/planning.md` |
 | Sprint review | `docs/scrum/sprint-NN/review.md` |

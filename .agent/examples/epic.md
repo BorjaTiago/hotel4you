@@ -2,7 +2,7 @@
 
 ---
 type: epic
-summary: Controlo de acesso por cartão magnético
+summary: Magnetic card access control
 parent:
 requirements: [RF-12, RF-13, RF-14]
 points:
@@ -13,7 +13,7 @@ labels: [access-control, reservation]
 sprint:
 ---
 
-# Epic: Controlo de acesso por cartão magnético
+# Epic: Magnetic card access control
 
 ## Goal
 After check-in, the client gets a magnetic card. The card opens the room and the places in the reservation. The system saves every card entry.
@@ -26,6 +26,12 @@ After check-in, the client gets a magnetic card. The card opens the room and the
 
 ## Out of scope
 - Physical card reader hardware.
+
+## Actors
+- Receptionist, client, manager.
+
+## Value
+The hotel controls who enters each room and zone, and the manager can audit card use.
 
 ## Source
 Statement, section 2 (cartão magnético). Requirements RF-12, RF-13, RF-14.

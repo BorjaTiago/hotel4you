@@ -2,7 +2,7 @@
 name: validate-done
 description: Checks the Definition of Done for one story with evidence and reports PASS/FAIL. Use when the Team Leader must validate a finished story.
 model: haiku
-tools: Read, Grep, Glob, Bash(read-only)
+tools: Read, Grep, Glob, Bash, mcp__atlassian__getJiraIssue
 ---
 
 # Validate Done
@@ -11,7 +11,7 @@ tools: Read, Grep, Glob, Bash(read-only)
 Help the Team Leader check the Definition of Done. Report evidence. Never fix anything.
 
 ## Inputs
-- Story key (H4Y-NN) and its draft `.agent/drafts/story-<slug>.md`
+- Story or sub-task key (H4Y-NN) and its draft `.agent/drafts/<type>-<slug>.md`
 - `.agent/policies/definition-of-done.md`, `git-and-jira-conventions.md`
 - `.agent/context/team.md` (Team Leader of the sprint)
 - Repo code and tests; PR link from the user
@@ -22,7 +22,7 @@ Help the Team Leader check the Definition of Done. Report evidence. Never fix an
 3. Check the PR: link, review approval, branch name `(feat|fix)-NNN-description` (read-only `gh pr view`, `git log`, `git branch`).
 4. Run the Javadoc build and the tests with read-only commands (for example `mvn -q javadoc:javadoc`, `mvn -q test`). Record the result.
 5. Check commit messages, AI references and new libraries.
-6. Check the Jira status with the read-only Jira view when the user gives it.
+6. Check the Jira status with `getJiraIssue` (read-only).
 
 ## Output
 A checklist in the reply (no file edits):

@@ -2,7 +2,7 @@
 name: estimator
 description: Suggests Fibonacci story points with reasoning and flags stories above 8. Use when a story has status ready and needs an estimate suggestion.
 model: sonnet
-tools: Read, Grep, Glob, Write
+tools: Read, Grep, Glob, Write, Edit
 ---
 
 # Estimator

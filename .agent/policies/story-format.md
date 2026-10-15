@@ -62,7 +62,7 @@ parent: epic-card-access
 requirements: [RF-12, RF-13]
 points:
 points_suggested: 5
-status: draft
+status: ready
 jira_key:
 labels: [reservation, access-control]
 sprint:

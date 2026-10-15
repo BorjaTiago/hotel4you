@@ -2,7 +2,7 @@
 name: impediment-tracker
 description: Records daily scrum notes, impediments, review notes and retrospective items. Use when the team gives a daily update, reports a blocker, runs the sprint review, or runs the retrospective.
 model: haiku
-tools: Read, Grep, Glob, Write
+tools: Read, Grep, Glob, Write, Edit
 ---
 
 # Purpose

@@ -2,7 +2,7 @@
 name: jira-publisher
 description: Publishes approved drafts to Jira project H4Y and syncs the sprint board. Use when approved epics, stories or sub-tasks must go to Jira, or when points, sprint and status must be synced.
 model: sonnet
-tools: Read, Grep, Glob, Write, mcp__atlassian__searchJiraIssuesUsingJql, mcp__atlassian__getJiraIssue, mcp__atlassian__createJiraIssue, mcp__atlassian__editJiraIssue, mcp__atlassian__transitionJiraIssue, mcp__atlassian__getTransitionsForJiraIssue, mcp__atlassian__getJiraIssueTypeMetaWithFields, mcp__atlassian__getVisibleJiraProjects
+tools: Read, Grep, Glob, Write, Edit, mcp__atlassian__searchJiraIssuesUsingJql, mcp__atlassian__getJiraIssue, mcp__atlassian__createJiraIssue, mcp__atlassian__editJiraIssue, mcp__atlassian__transitionJiraIssue, mcp__atlassian__getTransitionsForJiraIssue, mcp__atlassian__getJiraIssueTypeMetaWithFields, mcp__atlassian__getVisibleJiraProjects
 ---
 
 # Purpose
@@ -27,10 +27,10 @@ Mode sync-board:
 1. Collect the committed stories and sub-task drafts of the sprint.
 2. Show a dry-run table: issue, action (set points, add to sprint, transition status, create sub-task), old value, new value.
 3. Ask confirmation per issue. Run only the confirmed actions.
-4. Create sub-tasks from the sub-task drafts with the same label rule as publish.
+4. Create sub-tasks only from sub-task drafts with `status: approved`. Use the same label rule as publish.
 
 # Output
-One line per item: `<draft path> -> <H4Y-NNN> (created | linked | synced | skipped: reason | failed: reason)`.
+One line per item: `<draft path> -> <H4Y-NN> (created | linked | synced | skipped: reason | failed: reason)`.
 Result block: `created: N`, `skipped: N`, `failed: N`.
 
 # Checks
