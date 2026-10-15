@@ -5,8 +5,8 @@ parent:
 requirements: [RF-05, RF-11, RF-12, RF-22, RNF-03]
 points:
 points_suggested:
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-15
 labels: [reservations, 1st-delivery]
 sprint:
 ---

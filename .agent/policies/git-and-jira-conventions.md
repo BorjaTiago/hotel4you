@@ -120,6 +120,7 @@ Check real names with getTransitionsForJiraIssue before a transition.
 
 ## Jira project facts (read-only lookup, 2026-10-15)
 
+- Site: https://isep-team-p95gzvlc.atlassian.net, cloudId `39370aab-c7dc-4646-8b3c-de5de4443cdd`.
 - Project H4Y, team-managed. Issue types: Epic, Story, Task, Subtask. Hierarchy: Epic > Story > Subtask.
 - Required to create a Story: project, issue type, summary. The reporter has a default.
 - Other fields: Rank `customfield_10019`, Flagged `customfield_10021` (option "Impediment"), Labels, Priority, Assignee, Due date.

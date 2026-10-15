@@ -5,8 +5,8 @@ parent:
 requirements: [RF-13, RF-14]
 points:
 points_suggested:
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-16
 labels: [check-in, check-out, 1st-delivery]
 sprint:
 ---

@@ -5,8 +5,8 @@ parent:
 requirements: [RNF-04, RNF-05, RNF-06, RNF-07, RNF-08, RNF-12]
 points:
 points_suggested:
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-11
 labels: [foundation, 1st-delivery]
 sprint:
 ---
