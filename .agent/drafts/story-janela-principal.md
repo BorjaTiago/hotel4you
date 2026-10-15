@@ -5,8 +5,8 @@ parent: epic-foundation-architecture
 requirements: [RNF-06, RNF-07]
 points: 3
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-24
 labels: [foundation, gui, 1st-delivery]
 sprint:
 ---

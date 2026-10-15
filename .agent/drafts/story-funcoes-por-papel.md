@@ -5,8 +5,8 @@ parent: epic-authentication-users
 requirements: [RF-02]
 points: 3
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-23
 labels: [security, login, 1st-delivery]
 sprint:
 ---
