@@ -13,7 +13,7 @@ sprint:
 
 # Título: Registar saída de stock
 
-Como rececionista,
+Como funcionário do hotel ou gestor,
 Eu quero registar a saída (descarte, devolução ou perda) de um item do stock,
 Para que o stock reflita o material removido.
 
@@ -21,24 +21,24 @@ Para que o stock reflita o material removido.
 
 ### Cenário AC-1: Saída registada
   Dado que o item "lençóis" tem stock 20
-  Quando o rececionista regista uma saída de 6 unidades por descarte na data de hoje
+  Quando o funcionário do hotel ou o gestor regista uma saída de 6 unidades por descarte na data de hoje
   Então o movimento fica guardado como "saída" com quantidade 6, motivo "descarte" e a data
   E o stock de "lençóis" passa a 14
 
 ### Cenário AC-2: Saída maior que o stock
   Dado que o item "lençóis" tem stock 2
-  Quando o rececionista regista uma saída de 6 unidades
+  Quando o funcionário do hotel ou o gestor regista uma saída de 6 unidades
   Então o sistema recusa o registo
   E o stock continua 2
 
 ### Cenário AC-3: Item inexistente
   Dado que o item "foguetes" não existe
-  Quando o rececionista regista uma saída desse item
+  Quando o funcionário do hotel ou o gestor regista uma saída desse item
   Então o sistema recusa o registo
 
 ### Cenário AC-4: Motivo da saída
   Dado que o item "lençóis" existe com stock suficiente
-  Quando o rececionista regista uma saída sem motivo, ou com motivo diferente de descarte, devolução ou perda
+  Quando o funcionário do hotel ou o gestor regista uma saída sem motivo, ou com motivo diferente de descarte, devolução ou perda
   Então o sistema recusa o registo
 
 ## Notas
@@ -54,4 +54,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.

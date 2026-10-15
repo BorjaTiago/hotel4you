@@ -41,6 +41,6 @@ Section 2. RF-13, RF-14. Q-06.
 - Impedir apagar reservas após check-in (actor: manager; RF-13, RF-22)
 
 ## Open questions
-- Card state at check-out: not answered (Q-09). Ask in the card epic before the final delivery.
+- Card state at check-out: answered by Q-30 (the card stops working, no door opens, the log is kept).
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; stale note fix by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.

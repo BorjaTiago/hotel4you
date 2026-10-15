@@ -13,7 +13,7 @@ sprint:
 
 # Título: Registar entrada de stock
 
-Como rececionista,
+Como funcionário do hotel ou gestor,
 Eu quero registar a entrada de um item no stock,
 Para que o hotel saiba o material que tem.
 
@@ -21,19 +21,19 @@ Para que o hotel saiba o material que tem.
 
 ### Cenário AC-1: Entrada registada
   Dado que o item "toalhas" existe com stock 10
-  Quando o rececionista regista uma entrada de 5 unidades na data de hoje
+  Quando o funcionário do hotel ou o gestor regista uma entrada de 5 unidades na data de hoje
   Então o movimento fica guardado com quantidade 5 e a data
   E o stock de "toalhas" passa a 15
 
 ### Cenário AC-2: Quantidade inválida
   Dado que o item "toalhas" existe
-  Quando o rececionista regista uma entrada com quantidade 0 ou negativa
+  Quando o funcionário do hotel ou o gestor regista uma entrada com quantidade 0 ou negativa
   Então o sistema recusa o registo
   E o stock não muda
 
 ### Cenário AC-3: Item inexistente
   Dado que o item "foguetes" não existe
-  Quando o rececionista regista uma entrada desse item
+  Quando o funcionário do hotel ou o gestor regista uma entrada desse item
   Então o sistema recusa o registo
 
 ## Notas
@@ -49,4 +49,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
