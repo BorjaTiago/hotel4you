@@ -78,14 +78,14 @@ branch:            # sub-task drafts only: (feat|fix)-NNN-description
 
 | Draft field | Jira field |
 |-------------|------------|
-| type | Issue type (Epic, Story, Sub-task) |
+| type | Issue type: Epic, Story, Subtask (the Jira name has no hyphen) |
 | summary | Summary |
 | body | Description (story layout and all AC scenarios) |
-| parent | Parent (epic for a story, story for a sub-task) |
+| parent | `parent` system field, `{key: "H4Y-n"}` (epic for a story, story for a sub-task; no Epic Link field) |
 | requirements | Description line "Requisitos: RF-03" |
-| points | Story points field. ID: TBD: find once with getJiraIssueTypeMetaWithFields and write it here |
+| points | Story point estimate, `customfield_10016` (Story create screen) |
 | labels | Labels, plus `draft-<slug>` |
-| sprint | Sprint (set in sync-board mode) |
+| sprint | Sprint, `customfield_10020` (set in sync-board mode) |
 | status | Board status (see below) |
 | jira_key | Issue key (written back after create) |
 
@@ -108,3 +108,11 @@ Check real names with getTransitionsForJiraIssue before a transition.
 - If an issue exists, do not create a second one. Write its key in `jira_key`.
 - Never edit or delete an existing issue without explicit OK.
 - Sync-board mode (points, sprint, transition, sub-tasks): show a dry-run table, ask confirmation per issue.
+
+## Jira project facts (read-only lookup, 2026-10-15)
+
+- Project H4Y, team-managed. Issue types: Epic, Story, Task, Subtask. Hierarchy: Epic > Story > Subtask.
+- Required to create a Story: project, issue type, summary. The reporter has a default.
+- Other fields: Rank `customfield_10019`, Flagged `customfield_10021` (option "Impediment"), Labels, Priority, Assignee, Due date.
+- Statuses seen: To Do, In Progress. Confirm "In Review" and "Done" with getTransitionsForJiraIssue before the first transition.
+- Existing issues H4Y-5 to H4Y-10 are Tasks for diagram work. Do not duplicate or change them.

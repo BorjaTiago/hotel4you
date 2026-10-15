@@ -5,7 +5,7 @@ description: Plan a sprint from the ready backlog. Use when the user asks for a 
 
 # plan-sprint
 
-Inputs: sprint number NN, team size (3 to 5), and capacity in points if known. Ask the user if missing.
+Inputs: sprint number NN, hours per person this week, and the team forecast in points for sprint 2. Ask the user if missing.
 
 Follow: .agent/agents/sprint-planner.md
 

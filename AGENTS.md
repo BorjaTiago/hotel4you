@@ -19,17 +19,18 @@ This file is for any AI tool. It is plain Markdown.
 
 Run the steps in this order. Each step reads the file of the step before.
 
-1. `requirements-analyst` (skill `requirements-analysis`): statement -> `docs/requirements/*.md`.
-2. `epic-writer` (skill `write-epic`): requirements -> epic drafts.
+1. `requirements-analyst` (skill `requirements-analysis`): statement -> `docs/requirements/*.md`. A human sets `status: approved` in `requirements.md`.
+2. `epic-writer` (skill `write-epic`): requirements -> epic drafts. A human sets `status: approved` on each epic.
 3. `story-writer` (skill `write-story`): epic -> story drafts. `acceptance-criteria` (skill `write-acceptance-criteria`) writes the criteria inside the story body.
 4. `refiner` (skill `refine-story`): checks the Definition of Ready, splits big stories.
 5. `estimator` (skill `estimate-story`): writes `points_suggested`. The team sets `points`.
-6. A human sets `status: approved`.
-7. `jira-publisher` (skill `publish-to-jira`): drafts -> Jira. Sync-board mode after planning.
-8. `sprint-planner` (skill `plan-sprint`): writes `docs/scrum/sprint-NN/planning.md`. `backlog-prioritizer` (skill `prioritize-backlog`) orders the backlog before it.
-9. Sprint runs. `impediment-tracker` (skill `track-impediments`) keeps `impediments.md`.
-10. `validate-done` (skill `validate-done`): checks the Definition of Done.
-11. `impediment-tracker` in review and retro modes: skills `sprint-review` and `run-retro` write `review.md` and `retrospective.md`.
+6. A human sets `status: approved` on each story draft that has `points`.
+7. `jira-publisher` (skill `publish-to-jira`), mode `publish`: approved drafts -> Jira.
+8. `backlog-prioritizer` (skill `prioritize-backlog`): writes `.agent/drafts/backlog-order.md`. The PO approves the order.
+9. `sprint-planner` (skill `plan-sprint`): writes `docs/scrum/sprint-NN/planning.md` and sub-task drafts. A human approves the sub-task drafts. Then `jira-publisher`, mode `sync-board`, sets points and sprint and creates the sub-tasks.
+10. Sprint runs. `impediment-tracker` (skill `track-impediments`) keeps `impediments.md`.
+11. `validate-done` (skill `validate-done`): checks the Definition of Done. On PASS, `jira-publisher` (mode `sync-board`) moves the issue to Done.
+12. `impediment-tracker` in review and retro modes: skills `sprint-review` and `run-retro` write `review.md` and `retrospective.md`.
 
 ## Agents (`.agent/agents/`)
 
@@ -67,12 +68,15 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 
 1. Drafts first. Write local files in `.agent/drafts/`. Do not write to Jira directly.
 2. Human approves. A person must set `status: approved` before any Jira publish.
-3. Never invent requirements that are not in the statement. If unsure, list the question for the teacher in `enunciado.md` ("Ambiguities to ask the teacher") or `docs/requirements/questions.md`.
+3. Never invent requirements that are not in the statement. If unsure, stop and ask the human. Add each question for the teacher to `docs/requirements/questions.md` as a new `Q-NN` with `status: open`. Cite the `Q-NN` in the draft. Do not edit `enunciado.md`.
 4. Points stay empty until the team decides. Agents only write `points_suggested`.
 5. Criteria live only in the story body. No separate criteria or estimate files.
 6. Every requirement has an ID (RF-NN or RNF-NN). Every story cites it. Every test cites "H4Y-NN AC-n".
 7. Never edit or delete an existing Jira issue without explicit OK. No REST or curl fallback. No tokens in files.
 8. Reference every AI use in code, docs and diagrams. Unreferenced AI use is forbidden by the course code of conduct. Tell the team.
+   - Each agent ends every file it creates with this line: `AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or pending>.`
+   - When an agent edits a file, it keeps the line and adds its own agent name.
+9. Sprint numbers in paths have two digits: `sprint-01`, `sprint-02`, ... `sprint-13`.
 
 ## Output paths
 
@@ -80,7 +84,7 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 |--------|------|
 | Drafts (epic, story, subtask) | `.agent/drafts/<type>-<slug>.md` |
 | Backlog order | `.agent/drafts/backlog-order.md` |
-| Requirements | `docs/requirements/{requirements,actors,use-cases,glossary,questions}.md` |
+| Requirements (with the statement coverage matrix in `requirements.md`) | `docs/requirements/{requirements,actors,use-cases,glossary,questions}.md` |
 | Sprint planning | `docs/scrum/sprint-NN/planning.md` |
 | Sprint review | `docs/scrum/sprint-NN/review.md` |
 | Retrospective | `docs/scrum/sprint-NN/retrospective.md` |

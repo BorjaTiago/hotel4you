@@ -5,7 +5,7 @@ description: Record the sprint review. Use when the sprint demo ends and the tea
 
 # sprint-review
 
-Inputs: sprint number NN and the stories shown or not accepted in the demo. Ask the user for them if missing.
+Inputs: sprint number NN, the demo notes, teacher feedback, and the validate-done report of each committed story. Ask the user for them if missing.
 
 Follow: .agent/agents/impediment-tracker.md (mode: review)
 

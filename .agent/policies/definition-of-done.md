@@ -16,4 +16,4 @@ A story is done only when all items are true. Each item needs evidence. `validat
 | No unreferenced AI code or AI diagrams. Every AI use has a reference. | Reference list or "no AI use". |
 | Every new external library is justified in writing. | Justification text or "no new library". |
 | The Team Leader tested and validated the story against the acceptance tests. | Name of the Team Leader and date. |
-| The Jira issue is updated and moved to Done. | Jira status "Done". |
+| The Jira issue is up to date. It is "In Review" during validation and moves to Done after PASS. | Jira status. |

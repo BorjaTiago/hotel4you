@@ -1,5 +1,3 @@
-> EXAMPLE only. Not real backlog. Do not publish.
-
 ---
 type: story
 summary: Realizar check-in com cartão magnético
@@ -12,6 +10,8 @@ jira_key:
 labels: [reservation, access-control]
 sprint:
 ---
+
+> EXAMPLE only. Not real backlog. Do not publish.
 
 # Título: Realizar check-in com cartão magnético
 
@@ -37,3 +37,5 @@ Para que o cliente aceda ao seu quarto e aos locais incluídos na reserva.
 ## Notas
 Depende de "Registar cliente" e "Criar reserva". Enunciado, secção 2 (cartão magnético).
 Test names: "H4Y-NN AC-1 ...", "H4Y-NN AC-2 ...".
+
+AI use: story-writer, acceptance-criteria, <AI tool and model>, 2026-10-15. Reviewed by: pending.

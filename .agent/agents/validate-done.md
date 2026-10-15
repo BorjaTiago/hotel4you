@@ -21,8 +21,9 @@ Help the Team Leader check the Definition of Done. Report evidence. Never fix an
 2. For each AC, search tests for the text "H4Y-NN AC-n" (Grep). Record file and test name.
 3. Check the PR: link, review approval, branch name `(feat|fix)-NNN-description` (read-only `gh pr view`, `git log`, `git branch`).
 4. Run the Javadoc build and the tests with read-only commands (for example `mvn -q javadoc:javadoc`, `mvn -q test`). Record the result.
-5. Check commit messages, AI references and new libraries.
-6. Check the Jira status with `getJiraIssue` (read-only).
+5. Check commit messages, AI references (AI-use lines or a reference list in the PR) and new libraries.
+6. Check the Jira status with `getJiraIssue` (read-only). Expect "In Review". The move to Done comes after PASS.
+7. Ask the Team Leader for the name and date of the manual validation against the acceptance tests. No answer means FAIL for that item.
 
 ## Output
 A checklist in the reply (no file edits):
@@ -32,6 +33,7 @@ AC-1: PASS|FAIL - <test name / evidence>
 DoD <item>: PASS|FAIL - <evidence>
 ```
 End with a list of failed items.
+On PASS, tell the user to run `jira-publisher` (mode `sync-board`) to move the issue to Done, and to give this report to `impediment-tracker` for the sprint review.
 
 ## Checks
 - Every AC has a result.

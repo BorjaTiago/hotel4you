@@ -37,7 +37,9 @@ Para que <benefício>.
   ...
 
 ## Notas
-<dependências, perguntas, referência ao enunciado>
+<dependências, perguntas (Q-NN), referência ao enunciado>
+
+AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or pending>.
 ```
 
 ## Rules
@@ -98,4 +100,7 @@ Para que o cliente aceda ao seu quarto e aos locais incluídos na reserva.
 
 ## Notas
 Depende das histórias "Registar cliente" e "Criar reserva". Enunciado, secção 2 (cartão magnético).
+AC-3 depende da resposta à pergunta Q-09 (regras do cartão). Se a resposta mudar a regra, atualizar AC-3.
+
+AI use: story-writer, acceptance-criteria, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: pending.
 ```

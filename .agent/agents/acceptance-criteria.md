@@ -16,16 +16,16 @@ Write testable scenarios AC-1, AC-2, ... in the story body. Tests cite them as "
 - `.agent/policies/story-format.md`, `definition-of-ready.md`
 
 ## Steps
-1. Read the story, its requirements and the statement sections.
+1. Read the story, its requirements and the statement sections. If the story is `approved` or `published`, stop and ask the human.
 2. Write the main success scenario.
 3. Add failure scenarios the statement supports: invalid input, not found, conflict, rule violation.
 4. Add a not-logged-in scenario when the action needs login.
-5. Add one not-allowed scenario for each role that must not do the action.
-6. Number all scenarios AC-n in order. Do not renumber after approval.
-7. Write unclear points as open questions in Notas.
+5. Add one not-allowed scenario for each role that the statement excludes from the action (see `actors.md`, column "Not allowed").
+6. Number all scenarios AC-n in order. Do not renumber existing scenarios. Add new ones at the end.
+7. Write unclear points as open questions in Notas. Add teacher questions to `docs/requirements/questions.md` (`AGENTS.md`, global rule 3).
 
 ## Output
-Edit only the `Critérios de aceite` section of the same story file:
+Edit only the `Critérios de aceite` and `Notas` sections of the same story file:
 ```
 ### Cenário AC-1: <nome> (sucesso)
   Dado ...
@@ -44,4 +44,5 @@ No separate file.
 ## Rules
 - Never invent roles or rules. Ask a question instead.
 - Write in Portuguese with Dado/Quando/Então (E, Mas).
-- Change nothing else in the story. Do not write to Jira.
+- Change nothing else in the story. Keep the AI-use line and add your agent name (`AGENTS.md`, global rule 8).
+- Do not write to Jira.

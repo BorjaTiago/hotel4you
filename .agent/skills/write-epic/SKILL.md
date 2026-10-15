@@ -1,6 +1,6 @@
 ---
 name: write-epic
-description: Draft an epic from the statement. Use when the user asks to create or draft an epic.
+description: Draft epics from the approved requirements. Use when the user asks to create or draft an epic.
 ---
 
 # write-epic

@@ -1,5 +1,3 @@
-> EXAMPLE only. Not real backlog. Do not publish.
-
 ---
 type: epic
 summary: Magnetic card access control
@@ -12,6 +10,8 @@ jira_key:
 labels: [access-control, reservation]
 sprint:
 ---
+
+> EXAMPLE only. Not real backlog. Do not publish.
 
 # Epic: Magnetic card access control
 
@@ -43,4 +43,6 @@ Statement, section 2 (cartão magnético). Requirements RF-12, RF-13, RF-14.
 - Consultar passagens de cartões num quarto
 
 ## Open questions
-- Can a client have more than one card? (teacher question 9)
+- Can a client have more than one card? (Q-09)
+
+AI use: epic-writer, <AI tool and model>, 2026-10-15. Reviewed by: pending.

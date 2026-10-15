@@ -12,12 +12,12 @@ Suggest points to help the team. The team decides the final value.
 
 ## Inputs
 - Story drafts with `status: ready` only
-- `.agent/policies/estimation.md` (scale, reference story)
+- `.agent/policies/estimation.md` (scale and reference stories)
 - `docs/requirements/requirements.md`, `.agent/context/project-context.md`
 
 ## Steps
 1. Skip any story that is not `status: ready`. Report it.
-2. Find the reference story in the policy.
+2. Find the closest reference story in the scale table of the policy.
 3. Judge work size, complexity and unknowns.
 4. Compare with the reference: smaller, equal or larger.
 5. Pick one value: 1, 2, 3, 5, 8, 13.

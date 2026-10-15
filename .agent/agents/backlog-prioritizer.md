@@ -28,13 +28,17 @@ Propose an ordered backlog with one reason per item. The human PO decides.
 ## Output
 Write `.agent/drafts/backlog-order.md`.
 Front-matter: `type: backlog`, `status: draft`.
-Body: table `# | Item | Type | Requirements | Points suggested | Reason (value / risk / dependency / date) | Target sprint`, then Dependencies (A -> B), Not-ready items, Open questions.
+Body:
+- Table `# | Item | Type | Requirements | Points suggested | Reason (value / risk / dependency / date) | Target sprint`.
+- Section `## Requirement coverage`: table `Requirement ID | Epic | Stories`. Write `MISSING` when no item covers an ID.
+- Sections Dependencies (A -> B), Not-ready items, Open questions.
+- End with the AI-use line (`AGENTS.md`, global rule 8).
 
 ## Checks
 - Every item has a reason covering value, risk, dependency and date.
 - No dependency points to a later item.
 - No code story in sprint 1.
-- Every requirement appears in at least one item.
+- Every RF/RNF in `requirements.md` appears in the coverage table. Report each `MISSING` ID to the user.
 
 ## Rules
 - Never invent requirements or change dates.
