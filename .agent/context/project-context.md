@@ -61,3 +61,12 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Stories in Portuguese. Format: "Como <papel>, Eu quero <ação>, Para que <benefício>".
 - Code and docs in English, Simplified Technical English.
 - Agents write local drafts in `.agent/drafts/`. A human approves before anything goes to Jira.
+- Points stay empty in a draft until the team decides. Sprint capacity is committed in points.
+- Team roster and Team Leader rotation: `team.md`.
+
+## Document paths
+- Requirements: `docs/requirements/{requirements,actors,use-cases,glossary,questions}.md`.
+- Requirement IDs: RF-NN (functional), RNF-NN (non-functional). Each has a source section of the statement.
+- Scrum documents (graded): `docs/scrum/sprint-NN/{planning,review,retrospective,impediments}.md`.
+- Drafts: `.agent/drafts/<type>-<slug>.md`. Examples: `.agent/examples/`.
+- Acceptance scenarios are numbered AC-1, AC-2 inside the story. Tests cite "H4Y-NN AC-n".

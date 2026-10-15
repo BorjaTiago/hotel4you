@@ -5,30 +5,8 @@ description: Estimate a story in story points. Use when a refined story needs an
 
 # estimate-story
 
-Produce drafts only. Never invent requirements outside the statement.
+Inputs: the ready story draft slug. Ask the user to refine the story first if it is not ready.
 
-## When to use
+Follow: .agent/agents/estimator.md
 
-- When a ready story has no estimate.
-
-## Steps
-
-1. Read .agent/context/enunciado.md and .agent/context/project-context.md.
-2. Read .agent/policies/estimation.md and .agent/policies/definition-of-ready.md.
-3. Read the story and its criteria.
-4. Estimate with the scale in the policy. Compare with similar stories.
-5. State assumptions and risks.
-6. If the story is too big, ask for a split.
-
-## Output
-
-Write .agent/drafts/estimate-<slug>.md: points, reason, assumptions. The team sets the final `points` in the story draft.
-
-## Checks
-
-- Value is on the policy scale.
-- Reason is written.
-- Story was ready before estimation.
-- The estimate is a proposal. The team confirms it.
-
-Delegates to agent: .agent/agents/estimator.md
+Output: .agent/drafts/story-<slug>.md (sets points_suggested only; points stay empty for the team)

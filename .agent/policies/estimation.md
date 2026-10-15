@@ -21,3 +21,11 @@ Use Fibonacci story points: 1, 2, 3, 5, 8, 13.
 - If the team cannot estimate, ask a question or add a spike story. Do not guess.
 - Agent suggests, team decides. The agent gives a number and a short reason. The team picks the final value.
 - Record the final value in the draft front-matter field `points`.
+
+## Velocity and capacity
+
+- Velocity is the points the team finished in one sprint (only stories that met the DoD).
+- Velocity is in points per sprint. Use the average of the last sprints.
+- Sprint capacity is committed in points, not hours. The sprint planner commits up to the velocity.
+- Hours are only a sanity check (for example, team availability in the week).
+- Sprint 2 has no history. Commit a small amount and measure.

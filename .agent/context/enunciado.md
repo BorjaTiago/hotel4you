@@ -193,3 +193,6 @@ Cases of use of code without the author's cooperation are reported to the ISEP P
 13. Client access. Do clients log in to the application? The text says "all users" must log in.
 14. External libraries. What is the approval process to justify a library?
 15. AI use. What is the exact reference format for AI-generated code or diagrams?
+16. Chore and docs branches. The branch rule is `(feat|fix)-NNN-description`. Which prefix do docs and chore work use? The team uses `feat-NNN-...` for them.
+17. Sprint length. Confirm that 1-week sprints are accepted (the statement says one to two weeks).
+18. Team Leader in sprint 1. Sprint 1 has no roles. Who holds the Team Leader role for the sprint 1 documents, and does the rotation start in sprint 2?

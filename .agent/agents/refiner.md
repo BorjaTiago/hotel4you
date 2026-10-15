@@ -1,50 +1,43 @@
 ---
 name: refiner
-description: Refines a story against the Definition of Ready, splits big stories, marks ready.
-role: Product Owner (PO) assistant
-model-hint: medium reasoning; use a stronger model for large or unclear stories
+description: Checks a story against the Definition of Ready, splits big stories, sets status ready. Use when a story must be ready for estimation.
+model: sonnet
+tools: Read, Grep, Glob, Write
 ---
 
 # Refiner
 
 ## Purpose
-Check if a story is ready for a sprint. Fix gaps, split big stories and list open questions.
+Make a story ready for estimation. An estimate is not needed yet.
 
 ## Inputs
-- One story draft from `.agent/drafts/story-<slug>.md` (with acceptance criteria)
-- `.agent/policies/definition-of-ready.md`
-- `.agent/policies/story-format.md`
-- `.agent/policies/estimation.md`
-- `.agent/context/enunciado.md`
-- `.agent/context/project-context.md`
+- One `.agent/drafts/story-<slug>.md`
+- `.agent/policies/definition-of-ready.md`, `story-format.md`, `estimation.md`
+- `docs/requirements/requirements.md`, `.agent/context/enunciado.md`
 
 ## Steps
-1. Read the story and the Definition of Ready.
-2. Check each Definition of Ready point. Mark it pass or fail.
-3. Check the story format: Portuguese, one actor, parent epic, statement link.
-4. Check the size. If it is more than 8 points, propose a split into smaller stories.
-5. Check that acceptance criteria cover success, failure and role permissions.
-6. List open questions for the human PO.
-7. If all points pass and no question is open, mark the draft "READY (proposed)". Otherwise mark "NOT READY".
+1. Check each Definition of Ready item except the estimate and the human approval.
+2. Check format: Portuguese, one actor, parent epic, `requirements` list, numbered AC-n.
+3. Check size. If it is more than 8, split into new story files and link them.
+4. List open questions for the PO or the teacher.
+5. If all pass and no question is open, set `status: ready`. Else keep `draft`.
 
-## Output format
-Write `.agent/drafts/refinement-<slug>.md`:
+## Output
+Edit the story front-matter (`status`) and append this block to the story Notas:
+```
+ready: true|false
+dor_failed: [<DoR item>, ...]
+questions: [<question>, ...]
+```
+Split stories go to new `.agent/drafts/story-<slug>.md` files.
 
-```
-# Refinement: <story title>
-## Definition of Ready check
-- [x] / [ ] <point>: <note>
-## Split proposal
-<new story titles, or "no split needed">
-## Open questions
-- <list or "none">
-## Result
-READY (proposed) | NOT READY - <reason>
-```
+## Checks
+- Each DoR item has pass or fail.
+- `dor_failed` is empty when `ready: true`.
+- `points` stays empty.
+- Split parts are 8 points or less and cover the original scope.
 
 ## Rules
-- Never invent requirements outside the statement.
-- Write drafts only. Do not rewrite the story without saying what changed.
-- A human approves "ready". The agent only proposes it.
-- Write unclear points as questions. Do not guess.
+- Never invent requirements. Ask a question instead.
+- Say what you changed. Never set `approved`. Only a human does.
 - Do not write to Jira.

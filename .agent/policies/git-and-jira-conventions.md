@@ -3,43 +3,107 @@
 ## Git (from the course statement)
 
 - Use Git flow.
-- Branch name: `(feat|fix)-NNN-description`. NNN is the task number.
-  - Example: `feat-004-create-database`
+- Branch name: `(feat|fix)-NNN-description`. NNN is the Jira key number, zero-padded to 3 digits.
+- One branch per story or sub-task.
 - Commits have clear and short descriptions.
   - Not allowed: "fix task X", "general fix".
 - Wrong or careless use of the repository gets a penalty.
 - Reference every AI use in code, docs and diagrams.
+
+### Branch cases
+
+| Case | Jira issue | Branch |
+|------|------------|--------|
+| Story | H4Y-4 | `feat-004-create-database` |
+| Sub-task | H4Y-27 | `feat-027-room-table-script` |
+| Bug fix | H4Y-130 | `fix-130-card-already-in-use` |
+| Docs or chore work | H4Y-31 | `feat-031-update-class-diagram` |
+
+Docs and chore work also use `feat-NNN-...`, because the statement allows only feat or fix. This is a teacher question (see `enunciado.md`).
+
+### Commit message rule
+
+- Start with the Jira key: `H4Y-4 create room table`.
+- Use short, imperative text. One change per commit.
+
+### Traceability
+
+Requirement -> story -> test.
+
+- A story lists its requirement IDs (RF-NN, RNF-NN) in `requirements`.
+- Each acceptance scenario has an ID: AC-1, AC-2, and so on.
+- Each test cites the story and scenario, for example in a JUnit `@DisplayName("H4Y-12 AC-1 check-in with valid reservation")`.
+- `validate-done` checks that every AC has a test.
 
 ## Jira
 
 - Project key: H4Y.
 - Issue types: Epic > Story > Sub-task.
 - Stories are in Portuguese (see `story-format.md`). Epics and sub-tasks follow the team language rule: code and docs in English.
-- Estimates: Fibonacci story points on stories (see `estimation.md`).
+- Story points on stories (see `estimation.md`).
 - Sprint length: 1 week.
 - Suggested labels: `requirements`, `backend`, `gui`, `database`, `docs`, `tests`, `diagram`, `stock`, `access-control`, `reservation`, `blocked`.
-- Link the task number in the branch name to the Jira issue number (for example `H4Y-4` and `feat-004-...`).
+- Acceptance criteria always go in the Jira description.
 
 ## Draft files
 
-Agents write drafts first. A human approves. Only then the `jira-publisher` agent publishes.
+Agents write drafts first. A human approves. Only then `jira-publisher` publishes.
 
 - Path: `.agent/drafts/<type>-<slug>.md`
   - Examples: `epic-room-management.md`, `story-check-in-magnetic-card.md`
 - `<type>`: epic, story, subtask.
 - `<slug>`: lowercase words joined by `-`.
-- Front-matter:
+- One canonical front-matter for all types:
 
 ```
 ---
 type: epic | story | subtask
 summary: <short title>
-parent: <draft file name or Jira key, empty for epics>
-points: <1|2|3|5|8, empty for epics>
-status: draft | approved | published
-jira_key: <empty until published, for example H4Y-12>
+parent: <epic or story slug, or Jira key; empty for epics>
+requirements: [RF-03]
+points:            # EMPTY until the team decides
+points_suggested:  # written by the estimator
+status: draft | ready | approved | published
+jira_key:          # empty until published, for example H4Y-12
+labels: []
+sprint:            # for example 3; empty until planned
 ---
 ```
 
-- Status flow: `draft` -> `approved` (human only) -> `published` (after the Jira create succeeds).
+- Status flow: `draft` -> `ready` (refiner, DoR met) -> `approved` (human only) -> `published` (after Jira create succeeds).
 - After publish, write the Jira key in `jira_key`.
+
+## Draft field to Jira field
+
+| Draft field | Jira field |
+|-------------|------------|
+| type | Issue type (Epic, Story, Sub-task) |
+| summary | Summary |
+| body | Description (story layout and all AC scenarios) |
+| parent | Parent (epic for a story, story for a sub-task) |
+| requirements | Description line "Requisitos: RF-03" |
+| points | Story points field. ID: TBD: find once with getJiraIssueTypeMetaWithFields and write it here |
+| labels | Labels, plus `draft-<slug>` |
+| sprint | Sprint (set in sync-board mode) |
+| status | Board status (see below) |
+| jira_key | Issue key (written back after create) |
+
+## Board status mapping
+
+| Draft status | Jira board status |
+|--------------|-------------------|
+| draft, ready, approved | not in Jira |
+| published | To Do (backlog) |
+| sprint started | In Progress |
+| PR open | In Review |
+| validated by Team Leader | Done |
+
+Check real names with getTransitionsForJiraIssue before a transition.
+
+## Idempotency
+
+- On publish, add the label `draft-<slug>` to the issue.
+- Before create, search by that label (JQL: `project = H4Y AND labels = "draft-<slug>"`).
+- If an issue exists, do not create a second one. Write its key in `jira_key`.
+- Never edit or delete an existing issue without explicit OK.
+- Sync-board mode (points, sprint, transition, sub-tasks): show a dry-run table, ask confirmation per issue.
