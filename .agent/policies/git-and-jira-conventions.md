@@ -26,6 +26,15 @@ Docs and chore work also use `feat-NNN-...`, because the statement allows only f
 - Start with the Jira key: `H4Y-4 create room table`.
 - Use short, imperative text. One change per commit.
 
+### Commit and PR rule
+
+Every agent and tool that writes a commit message, a PR title or a PR body follows this rule.
+
+- Write in Simplified Technical English (STE): short sentences, simple words, active voice. Example: `H4Y-8 add check-in sequence diagram`.
+- Never add an AI as co-author or author. Do not add a `Co-Authored-By` line. Do not add a "Generated with ..." line. Tool defaults that add them must be turned off or removed before the commit or PR is created.
+- The AI-use reference stays inside the changed files (AGENTS.md rule 8). It does not go in the commit trailer.
+- Check before you commit: `git log -1 --format=%B` has no `Co-Authored-By`. Check before you open the PR: the body has no "Generated with" line.
+
 ### Traceability
 
 Requirement -> story -> test.

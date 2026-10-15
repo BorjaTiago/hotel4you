@@ -77,6 +77,7 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
    - Each agent ends every file it creates with this line: `AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or pending>.`
    - When an agent edits a file, it keeps the line and adds its own agent name.
 9. Sprint numbers in paths have two digits: `sprint-01`, `sprint-02`, ... `sprint-13`.
+10. Commits, PR titles, PR bodies and docs use Simplified Technical English (STE): short sentences, simple words, active voice. Never add an AI as co-author or author: no `Co-Authored-By` trailer, no "Generated with" line, in any commit or PR, by any agent or tool. The AI-use reference (rule 8) goes inside the files, not in the commit trailer. Read `.agent/policies/git-and-jira-conventions.md`, section "Commit and PR rule", before you write a commit or open a PR.
 
 ## Output paths
 
