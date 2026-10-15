@@ -42,5 +42,5 @@ Body:
 
 ## Rules
 - Never invent requirements or change dates.
-- Write the one file only. A human approves the order.
+- Write only `backlog-order.md` and new Q-NN rows in `questions.md`. A human approves the order.
 - Do not write to Jira.
