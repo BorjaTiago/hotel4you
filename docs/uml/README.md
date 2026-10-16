@@ -5,6 +5,7 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - View the Mermaid diagram on GitHub, or paste it at mermaid.live.
 - [domain-model.md](domain-model.md): domain model with business concepts only.
 - [guide.md](guide.md): guide to defend each class and key flows.
+- [class-diagram.md](class-diagram.md): UML class diagram with types, visibility and multiplicities.
 - [classes.md](classes.md): all classes by layer, with attributes, methods and requirements.
 - [traceability.md](traceability.md): requirements to classes.
 - [use-cases.md](use-cases.md): use-case diagrams for all 19 use cases.
@@ -28,4 +29,4 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - `docs/requirements/use-cases.md`
 - `docs/requirements/questions.md`
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; OpenAI Codex, GPT-6, 2026-10-16. Reviewed by: pending.
+AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; OpenAI Codex, GPT-6, 2026-10-16; class diagram link restored by OpenAI Codex, GPT-6, 2026-10-16. Reviewed by: pending.
