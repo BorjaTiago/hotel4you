@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Staff accounts and floor and zone access limits
+summary: Contas de funcionários e limites de acesso por piso e zona
 parent:
 requirements: [RF-24, RF-25, RF-26]
 points:
@@ -11,39 +11,39 @@ labels: [staff, access-control]
 sprint:
 ---
 
-# Epic: Staff management and access limits
+# Epic: Gestão de funcionários e limites de acesso
 
-## Goal
-The manager manages staff accounts. Reception sees only floors 0 and 1. Restaurant staff see only the kitchen and restaurant.
+## Objetivo
+O gestor gere as contas dos funcionários. A receção vê apenas os pisos 0 e 1. O pessoal do restaurante vê apenas a cozinha e o restaurante.
 
-## Delivery
-Planned by the prioritizer (Q-25).
+## Entrega
+Planeada pelo priorizador (Q-25).
 
-## Scope
-- Create, edit, remove staff accounts (no schedules, Q-18).
-- Reception limited to floors 0 and 1 services (Q-08).
-- Restaurant staff limited to kitchen and restaurant.
+## Âmbito
+- Criar, editar e remover contas de funcionários (sem horários, Q-18).
+- Receção limitada aos serviços dos pisos 0 e 1 (Q-08).
+- Pessoal do restaurante limitado à cozinha e ao restaurante.
 
-## Out of scope
-- Login itself (epic-authentication-users).
+## Fora de âmbito
+- O login em si (epic-authentication-users).
 
-## Actors
-- Manager, receptionist, restaurant staff.
+## Atores
+- Gestor, rececionista, pessoal do restaurante.
 
-## Value
-Each employee has the right access.
+## Valor
+Cada funcionário tem o acesso adequado.
 
-## Statement links
-Section 2. RF-24, RF-25, RF-26. Q-08, Q-18, Q-23.
+## Ligações ao enunciado
+Secção 2. RF-24, RF-25, RF-26. Q-08, Q-18, Q-23.
 
-## Candidate stories
+## Histórias candidatas
 - Criar uma conta de funcionário (actor: manager; RF-26)
 - Editar uma conta de funcionário (actor: manager; RF-26)
 - Remover uma conta de funcionário (actor: manager; RF-26)
 - Limitar a receção aos serviços dos pisos 0 e 1 (actor: receptionist; RF-24)
 - Limitar o restaurante à cozinha e ao restaurante (actor: restaurant staff; RF-25)
 
-## Open questions
-- Other staff such as cleaning are not in the statement (actors.md notes).
+## Questões em aberto
+- Outro pessoal, como a limpeza, não consta do enunciado (notas de actors.md).
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

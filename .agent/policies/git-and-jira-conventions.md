@@ -48,7 +48,7 @@ Requirement -> story -> test.
 
 - Project key: H4Y.
 - Issue types: Epic > Story > Subtask (Jira name; docs say sub-task).
-- Stories are in Portuguese (see `story-format.md`). Epics and sub-tasks follow the team language rule: code and docs in English.
+- Stories are in Portuguese (see `story-format.md`). All Jira text is in Portuguese (Portugal). Only code-specific terms stay in English: class, interface, method, package, table and column names, file names, tools and libraries, branch names, IDs and Jira keys (user decision 2026-10-16). Code and docs in the repository stay in English.
 - Story points on stories (see `estimation.md`).
 - Sprint length: 1 week.
 - Suggested labels: `requirements`, `backend`, `gui`, `database`, `docs`, `tests`, `diagram`, `stock`, `access-control`, `reservation`, `blocked`.

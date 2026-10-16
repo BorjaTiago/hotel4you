@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Stock movements and supplier XML import
+summary: Movimentos de stock e importação XML de fornecedor
 parent:
 requirements: [RF-28, RF-29]
 points:
@@ -11,34 +11,34 @@ labels: [stock, xml, final-delivery]
 sprint:
 ---
 
-# Epic: Stock management and XML import
+# Epic: Gestão de stock e importação XML
 
-## Goal
-Staff and managers record stock entry, use and exit. A supplier XML file gives the entry.
+## Objetivo
+Os funcionários e os gestores registam a entrada, o uso e a saída de stock. Um ficheiro XML do fornecedor dá a entrada.
 
-## Delivery
-Final delivery (Q-06).
+## Entrega
+Entrega final (Q-06).
 
-## Scope
-- Stock movements with quantity and date (Q-21).
-- XML load by staff or manager; supplier does not log in (Q-17).
-- Unknown items rejected and listed in an import report; valid items imported (Q-10).
-- Team defines the XML format.
-- Manager creates and edits stock items (name, unit). Team decision, 2026-10-16. No remove story.
+## Âmbito
+- Movimentos de stock com quantidade e data (Q-21).
+- Carregamento de XML por funcionário ou gestor; o fornecedor não faz login (Q-17).
+- Itens desconhecidos rejeitados e listados num relatório de importação; itens válidos importados (Q-10).
+- A equipa define o formato XML.
+- O gestor cria e edita itens de stock (nome, unidade). Decisão da equipa, 2026-10-16. Sem história de remoção.
 
-## Out of scope
-- Supplier access to the system.
+## Fora de âmbito
+- Acesso do fornecedor ao sistema.
 
-## Actors
-- Receptionist (as staff), manager.
+## Atores
+- Rececionista (como funcionário), gestor.
 
-## Value
-The hotel knows its material in stock.
+## Valor
+O hotel conhece o material que tem em stock.
 
-## Statement links
-Section 2. RF-28, RF-29. Q-10, Q-17, Q-21.
+## Ligações ao enunciado
+Secção 2. RF-28, RF-29. Q-10, Q-17, Q-21.
 
-## Candidate stories
+## Histórias candidatas
 - Cadastrar item de stock (actor: manager; RF-28, RF-29)
 - Editar item de stock (actor: manager; RF-28, RF-29)
 - Definir o formato XML de entrega (actor: manager; RF-28)
@@ -48,7 +48,7 @@ Section 2. RF-28, RF-29. Q-10, Q-17, Q-21.
 - Registar uso de stock (actor: receptionist; RF-29)
 - Registar saída de stock (actor: receptionist; RF-29)
 
-## Open questions
-- XML example file is not in the statement. Q-10 is a team decision.
+## Questões em aberto
+- O ficheiro XML de exemplo não consta do enunciado. Q-10 é uma decisão da equipa.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

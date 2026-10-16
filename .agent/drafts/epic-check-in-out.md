@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Client check-in and check-out
+summary: Check-in e check-out de clientes
 parent:
 requirements: [RF-13, RF-14]
 points:
@@ -11,36 +11,36 @@ labels: [check-in, check-out, 1st-delivery]
 sprint:
 ---
 
-# Epic: Check-in and check-out
+# Épica: Check-in e check-out
 
-## Goal
-Reception checks the client in and out of a reservation.
+## Objetivo
+A receção faz o check-in e o check-out do cliente numa reserva.
 
-## Delivery
-1st delivery. The card issue part of RF-13 is in epic-magnetic-card-access (final).
+## Entrega
+1.ª entrega. A parte de emissão de cartão do RF-13 está em epic-magnetic-card-access (entrega final).
 
-## Scope
-- Check-in of a reservation (state change; blocks manager delete).
-- Check-out of a stay.
+## Âmbito
+- Check-in de uma reserva (mudança de estado; bloqueia o apagar pelo gestor).
+- Check-out de uma estadia.
 
-## Out of scope
-- Card issue and card state at check-out (final delivery; Q-09 does not answer card state at check-out).
+## Fora do âmbito
+- Emissão de cartão e estado do cartão no check-out (entrega final; Q-09 não responde ao estado do cartão no check-out).
 
-## Actors
-- Receptionist.
+## Atores
+- Rececionista.
 
-## Value
-The stay life cycle works end to end for the 1st delivery demo.
+## Valor
+O ciclo de vida da estadia funciona de ponta a ponta para a demo da 1.ª entrega.
 
-## Statement links
-Section 2. RF-13, RF-14. Q-06.
+## Ligações ao enunciado
+Secção 2. RF-13, RF-14. Q-06.
 
-## Candidate stories
-- Fazer check-in de uma reserva (actor: receptionist; RF-13)
-- Fazer check-out de uma estadia (actor: receptionist; RF-14)
-- Impedir apagar reservas após check-in (actor: manager; RF-13, RF-22)
+## Histórias candidatas
+- Fazer check-in de uma reserva (ator: rececionista; RF-13)
+- Fazer check-out de uma estadia (ator: rececionista; RF-14)
+- Impedir apagar reservas após check-in (ator: gestor; RF-13, RF-22)
 
-## Open questions
-- Card state at check-out: answered by Q-30 (the card stops working, no door opens, the log is kept).
+## Perguntas em aberto
+- Estado do cartão no check-out: respondido por Q-30 (o cartão deixa de funcionar, nenhuma porta abre, o registo é mantido).
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; stale note fix by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; stale note fix by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

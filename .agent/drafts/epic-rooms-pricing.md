@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Building model, rooms, room types, base prices and room items
+summary: Modelo do edifício, quartos, tipos de quarto, preços base e itens do quarto
 parent:
 requirements: [RF-03, RF-04, RF-06, RF-08]
 points:
@@ -11,41 +11,41 @@ labels: [rooms, 1st-delivery]
 sprint:
 ---
 
-# Epic: Rooms and base pricing
+# Épica: Quartos e preços base
 
-## Goal
-The system knows the building and the 20 rooms. The manager sets base prices and room items.
+## Objetivo
+O sistema conhece o edifício e os 20 quartos. O gestor define os preços base e os itens dos quartos.
 
-## Delivery
-1st delivery (rooms). Zone use by card is in epic-magnetic-card-access (final).
+## Entrega
+1.ª entrega (quartos). O uso de zonas por cartão está em epic-magnetic-card-access (entrega final).
 
-## Scope
-- Floor model: -1, 0, 1, 2, 3.
-- 20 rooms: 10 on floor 2, 10 on floor 3; 7 single, 10 double, 3 family (Q-01).
-- Base price per night by room type (manager, Q-11).
-- Manager configures room items.
+## Âmbito
+- Modelo de pisos: -1, 0, 1, 2, 3.
+- 20 quartos: 10 no piso 2, 10 no piso 3; 7 individuais, 10 duplos, 3 familiares (Q-01).
+- Preço base por noite por tipo de quarto (gestor, Q-11).
+- O gestor configura os itens do quarto.
 
-## Out of scope
-- Extra prices (view, drinks, laundry) - epic-extra-services-pricing.
-- Availability and booking - epic-reservations.
+## Fora do âmbito
+- Preços de extras (vista, bebidas, lavandaria) - epic-extra-services-pricing.
+- Disponibilidade e reserva - epic-reservations.
 
-## Actors
-- Manager, receptionist.
+## Atores
+- Gestor, rececionista.
 
-## Value
-Rooms and prices exist before any reservation.
+## Valor
+Os quartos e os preços existem antes de qualquer reserva.
 
-## Statement links
-Section 2. RF-03, RF-04, RF-06, RF-08. Q-01, Q-11.
+## Ligações ao enunciado
+Secção 2. RF-03, RF-04, RF-06, RF-08. Q-01, Q-11.
 
-## Candidate stories
-- Modelar os pisos do hotel (actor: manager; RF-03)
-- Registar os 20 quartos por tipo e piso (actor: manager; RF-04)
-- Definir o preço base por noite de cada tipo de quarto (actor: manager; RF-06)
-- Configurar os itens de um quarto (actor: manager; RF-08)
-- Consultar a lista de quartos (actor: receptionist; RF-04)
+## Histórias candidatas
+- Modelar os pisos do hotel (ator: gestor; RF-03)
+- Registar os 20 quartos por tipo e piso (ator: gestor; RF-04)
+- Definir o preço base por noite de cada tipo de quarto (ator: gestor; RF-06)
+- Configurar os itens de um quarto (ator: gestor; RF-08)
+- Consultar a lista de quartos (ator: rececionista; RF-04)
 
-## Open questions
-- Q-01 and Q-11 are team decisions, not confirmed by the teacher.
+## Perguntas em aberto
+- Q-01 e Q-11 são decisões da equipa, não confirmadas pelo professor.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
