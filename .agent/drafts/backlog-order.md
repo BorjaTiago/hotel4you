@@ -296,7 +296,7 @@ None by the Definition of Ready. Notes for the PO:
   - Free weeks: Q-04 (team decision, user, 2026-10-16). The 3 free weeks are Christmas and New Year (2026-12-21, 2026-12-28, 2027-01-04).
   - Developer as story actor: Q-28, closed by Q-35. Technical work is a task, not a story.
   - Master card for a manager created later: Q-44. The story "emitir novo cartão mestre" issues it. The seed gives the first card to the initial manager (Q-46).
-  - Zone flags: Q-45. `guest_card_access` (0 = client card never opens the place, Q-20) and `requires_reservation` (1 = card opens only if the reservation lists the place). See docs/H4Y-10.
+  - Zone flags: Q-45. `guest_card_access` (0 = client card never opens the place, Q-20) and `requires_reservation` (1 = card opens only if the reservation lists the place). See docs/database.
 - Accepted (user, 2026-10-16, Q-43): cadastrar-item-stock in sprint 4 (1st delivery). Seeding room items is not needed.
 
 AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
