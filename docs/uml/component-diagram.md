@@ -27,10 +27,10 @@ flowchart TB
             direction TB
             FAC(("HotelFacade"))
             SVC["«component»<br/>service<br/>HotelFacade and services"]
-            REPO(("Repositories"))
             DOM["«component»<br/>domain<br/>Domain classes and enums"]
         end
-        DATA["«component»<br/>data<br/>JDBC repositories"]
+        REPO(("Repositories"))
+        DATA["«component»<br/>data<br/>Repository interfaces,<br/>JDBC and in-memory versions"]
         CFG["«component»<br/>config<br/>Settings and start-up"]
         SET(("AppConfig"))
     end
@@ -39,7 +39,7 @@ flowchart TB
     JDBC["«external library»<br/>Microsoft JDBC Driver<br/>for SQL Server"]
     DB[("«external system»<br/>SQL Server")]
     XML["«external system»<br/>Supplier XML stock file"]
-    JDK["«platform»<br/>Java SE: java.sql, javax.xml,<br/>javax.crypto, java.time"]
+    JDK["«platform»<br/>Java SE: java.sql, javax.xml,<br/>java.time, javax.crypto (proposed)"]
 
     GUI -.->|uses| FAC
     GUI -.->|reads| DOM
@@ -66,9 +66,9 @@ flowchart TB
 | Component (package) | Content | Provides | Uses | Requirement IDs |
 |---------------------|---------|----------|------|-----------------|
 | `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | Screens for the actors. | `HotelFacade`, `domain` (read only), JavaFX. | RNF-06, RNF-07 |
-| `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. Declares the repository interfaces. | `domain`, repository interfaces, Java SE. | RNF-07, RNF-08 |
+| `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, Java SE. | RNF-07, RNF-08 |
 | `domain` | Domain classes and enums (`User`, `Room`, `Reservation`, `MagneticCard`, `StockItem`, `Role` and the others). No SQL and no JavaFX. | Data types for the other packages. | Java SE only. | RNF-07, RNF-08 |
-| `data` | Repository implementations with JDBC, for example `UserRepository`. Maps table rows to domain objects. | The repository interfaces that `service` declares. | `domain`, `AppConfig`, `java.sql`, JDBC driver. | RNF-01, RNF-12 |
+| `data` | Repository interfaces, for example `UserRepository`, with one JDBC version for SQL Server and one in-memory version for tests (T0, H4Y-32). The JDBC version maps table rows to domain objects. | The repository interfaces. | `domain`, `AppConfig`, `java.sql`, JDBC driver. | RNF-01, RNF-10, RNF-12 |
 | `config` | Reads the database settings from a local file or the environment. Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. | `AppConfig`. | `gui`, `service`, `data`. | RNF-08, RNF-12 |
 
 ## Interfaces
@@ -76,7 +76,7 @@ flowchart TB
 | Interface | Provided by | Required by | Requirement IDs |
 |-----------|-------------|-------------|-----------------|
 | `HotelFacade` | `service` | `gui` | RNF-07 |
-| Repositories (`UserRepository` and one for each other aggregate) | Declared in `service`, implemented in `data` | `service` | RNF-08, RNF-10, RNF-12 |
+| Repositories (`UserRepository` and one for each other aggregate) | Declared and implemented in `data` (T0, H4Y-32) | `service` | RNF-08, RNF-10, RNF-12 |
 | `AppConfig` | `config` | `data` | RNF-12 |
 
 ## External systems and libraries
@@ -87,10 +87,10 @@ flowchart TB
 | Microsoft JDBC Driver for SQL Server (mssql-jdbc) | External library | `data`, loaded by `java.sql` | RNF-11, RNF-12 |
 | JavaFX | External library | `gui` | RNF-06, RNF-11 |
 | Supplier XML stock file | External system (file) | `service` (`StockService`) | RF-28 |
-| Java SE (`java.sql`, `javax.xml`, `javax.crypto`, `java.time`) | Platform | `service`, `data`, `domain` | RNF-02, RNF-05 |
+| Java SE (`java.sql`, `javax.xml`, `java.time`; `javax.crypto` proposed for password hashing until H4Y-29 decides) | Platform | `service`, `data`, `domain` | RNF-02, RNF-05 |
 | JUnit | External library (tests only) | Test code. Not in the diagram: not part of the running application. | RNF-10, RNF-11 |
 
-The justification of each library is in [component-guide.md](component-guide.md).
+The justification of each library is in [component-guide.md](component-guide.md) and [libraries.md](../libraries.md).
 
 ## Gaps
 
@@ -99,7 +99,8 @@ These gaps need team review. They are not approved requirements.
 | ID | Gap | Effect and next step |
 |----|-----|----------------------|
 | C-01 | The class diagram has no repository classes (G-01 in the sequence guide). | This diagram adds the `data` package and the repository interfaces from H4Y-32. Update the class diagram when H4Y-32 adds the repositories. |
-| C-02 | The password hash method is open (H4Y-29). | The diagram uses `javax.crypto` from Java SE. If the team picks a library, add it to the external table and to `docs/libraries.md`. |
+| C-02 | The password hash method is open (H4Y-29). | `javax.crypto` from Java SE is only a proposal. If H4Y-29 picks a library, add it to the external table and to `docs/libraries.md`. |
+| C-04 | There is no Java code yet. | The package-to-code check is pending. Do it when H4Y-32 adds the Java files. |
 | C-03 | The package of `HotelFacade` is not named in H4Y-32. | The diagram puts it in `service`. Confirm in H4Y-32. |
 
-AI use: Cursor agent, Claude Opus 5.5, 2026-10-16. Reviewed by: pending.
+AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16. Reviewed by: pending.
