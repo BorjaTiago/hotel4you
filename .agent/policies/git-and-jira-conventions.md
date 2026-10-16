@@ -3,7 +3,7 @@
 ## Git (from the course statement)
 
 - Use Git flow.
-- Branch name: `(feat|fix)-NNN-description`. NNN is the Jira key number, zero-padded to 3 digits.
+- Branch name: `(feat|fix|chore)/H4Y-N-description`. N is the Jira key number, not zero-padded. Team decision (user, 2026-10-16).
 - One branch per story or sub-task. The branch name carries the ticket number.
 - Never commit to `main`. No exception. Always create a branch for the ticket, then open a pull request.
 - Commits have clear and short descriptions.
@@ -15,12 +15,12 @@
 
 | Case | Jira issue | Branch |
 |------|------------|--------|
-| Story | H4Y-4 | `feat-004-create-database` |
-| Sub-task | H4Y-27 | `feat-027-room-table-script` |
-| Bug fix | H4Y-130 | `fix-130-card-already-in-use` |
-| Docs or chore work | H4Y-31 | `feat-031-update-class-diagram` |
+| Story | H4Y-4 | `feat/H4Y-4-create-database` |
+| Sub-task | H4Y-27 | `feat/H4Y-27-room-table-script` |
+| Bug fix | H4Y-130 | `fix/H4Y-130-card-already-in-use` |
+| Docs or chore work | H4Y-31 | `chore/H4Y-31-update-class-diagram` |
 
-Docs and chore work also use `feat-NNN-...`, because the statement allows only feat or fix. This is a teacher question (see `enunciado.md`).
+Docs and chore work use `chore/H4Y-N-...`. The statement (`enunciado.md`) allows only feat or fix. The team rule differs from the statement. This is a teacher question (see `enunciado.md`).
 
 ### Commit message rule
 
@@ -77,7 +77,7 @@ status: draft | ready | approved | published
 jira_key:          # empty until published, for example H4Y-12
 labels: []
 sprint:            # for example 3; empty until planned (written by the sprint planner)
-branch:            # sub-task drafts only: (feat|fix)-NNN-description
+branch:            # sub-task drafts only: (feat|fix|chore)/H4Y-N-description
 ---
 ```
 
