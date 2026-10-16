@@ -12,6 +12,7 @@ This file is for any AI tool. It is plain Markdown.
    - `definition-of-ready.md`, `definition-of-done.md`
    - `story-format.md`, `estimation.md`
    - `git-and-jira-conventions.md`
+   - `diagrams.md`: Mermaid rules for diagrams.
 3. Pick an agent from `.agent/agents/` or a skill from `.agent/skills/`.
 4. See `.agent/examples/` for one sample of each document. Samples are EXAMPLES, not real backlog.
 
