@@ -61,4 +61,13 @@ Decisão da equipa (2026-10-16): trabalho técnico sem ator de negócio é taref
 - [ ] O gestor, ao consultar um utilizador, não vê a palavra-passe (confirmar no refinamento).
 - [ ] Se usar biblioteca externa, justificar em docs/libraries.md (RNF-11).
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+### T2: Dados iniciais: 5 papéis e a conta do primeiro gestor (RF-02, RF-01, RNF-02)
+Sprint 2, depois de epic-foundation-architecture T0 e T2 e depois de T1 (cifra). Antes das histórias de login. Decisão do utilizador (2026-10-16).
+- [ ] Com a base vazia, o script cria os 5 papéis do RF-02: cliente, rececionista, gestor, funcionário do restaurante, fornecedor. Cliente e fornecedor não recebem conta (Q-13, Q-17).
+- [ ] O script cria 1 conta de gestor. O nome de utilizador e a palavra-passe vêm da configuração local ou de variáveis de ambiente, nunca do código, do Git ou da documentação.
+- [ ] A palavra-passe fica guardada só como hash (T1). O valor em texto não aparece em logs.
+- [ ] Sem configuração da conta inicial, o script para com uma mensagem clara e não cria uma conta com palavra-passe por omissão.
+- [ ] O script corre duas vezes sem duplicar papéis nem a conta.
+- [ ] O gestor inicial cria as outras contas com story-create-staff-account (sprint 2).
+
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; task T2 by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16. Reviewed by: pending.
