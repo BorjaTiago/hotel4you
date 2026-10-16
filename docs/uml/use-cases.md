@@ -1,6 +1,6 @@
 # Use-case diagrams
 
-The diagrams show the actors and their associations with the 19 use cases in the requirements. Permission details and short descriptions are in the [catalogue](use-case-catalog.md).
+The diagrams show every project actor and all 19 use cases from the requirements. Each use case links to at least one actor. Use the [catalogue](use-case-catalog.md) for the short description, permission rules, and requirement references for each use case.
 
 ## Reservations and guest services
 
