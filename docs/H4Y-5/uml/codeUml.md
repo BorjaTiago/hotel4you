@@ -3,212 +3,198 @@
 ```mermaid
 classDiagram
     %% ==========================================
-    %% LAYER 1: INTERFACE (JavaFX)
+    %% LAYER 1: INTERFACE (JavaFX Controllers)
     %% ==========================================
-    class ReservationController {
-        +onConfirmClicked() void
+    class LoginController {
+        +onLoginClicked() void
     }
-    class CheckInController {
+    class RoomController {
+        +onSearchClicked() void
+        +onSaveRoomClicked() void
+    }
+    class ReservationController {
+        +onCreateReservationClicked() void
+        +onCancelReservationClicked() void
+    }
+    class CheckInOutController {
         +onCheckInClicked() void
+        +onCheckOutClicked() void
+    }
+    class StaffController {
+        +onCreateStaffClicked() void
+    }
+    class CardController {
+        +onIssueCardClicked() void
+        +onBlockMasterCardClicked() void
     }
     class StockController {
         +onImportXmlClicked() void
     }
-    class HotelFacade {
-        +createReservation(customer: Customer, room: Room, start: LocalDate, end: LocalDate) Reservation
-        +checkIn(reservation: Reservation, card: KeyCard) Stay
-        +importStock(file: String) void
+    class FeedbackController {
+        +onSaveFeedbackClicked() void
     }
 
     %% ==========================================
-    %% LAYER 2: BUSINESS LOGIC (Services)
+    %% LAYER 2: BUSINESS - FACADE
     %% ==========================================
-    class ReservationService {
-        +createReservation(...) Reservation
+    class HotelFacade {
+        +login(username: String, password: String) User
+        +createReservation(client: Client, room: Room, start: LocalDate, end: LocalDate) Reservation
         +cancelReservation(reservation: Reservation) void
+        +checkIn(reservation: Reservation) void
+        +checkOut(reservation: Reservation) void
+        +issueCard(reservation: Reservation) MagneticCard
+        +issueMasterCard(user: User) MagneticCard
+        +blockMasterCard(card: MagneticCard) void
+        +importStock(file: String) StockImport
+        +saveFeedback(client: Client, type: FeedbackType, description: String) Feedback
     }
-    class StayService {
-        +checkIn(reservation: Reservation, card: KeyCard) Stay
-        +checkOut(stay: Stay) void
+
+    %% ==========================================
+    %% LAYER 2: BUSINESS - SERVICES
+    %% ==========================================
+    class AuthService {
+        +login(username: String, password: String) User
+        +hashPassword(password: String) String
+    }
+    class RoomService {
+        +isAvailable(room: Room, start: LocalDate, end: LocalDate) boolean
+    }
+    class ReservationService {
+        +create(client: Client, room: Room, start: LocalDate, end: LocalDate) Reservation
+        +cancel(reservation: Reservation) void
+        +checkIn(reservation: Reservation) void
+        +checkOut(reservation: Reservation) void
+    }
+    class StaffService {
+        +createStaff(user: User) void
+    }
+    class CardAccessService {
+        +issueCard(reservation: Reservation) MagneticCard
+        +issueMasterCard(user: User) MagneticCard
+        +blockCard(card: MagneticCard) void
+        +canOpen(card: MagneticCard, location: Location) boolean
+        +register(card: MagneticCard, room: Room, location: Location) CardAccessRecord
     }
     class StockService {
-        +importDelivery(delivery: SupplierDelivery) void
+        +importStock(file: String) StockImport
+        +applyMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
     }
-    class BillingService {
-        +processPayment(reservation: Reservation, amount: BigDecimal, method: PaymentMethod) Invoice
+    class FeedbackService {
+        +save(client: Client, type: FeedbackType, description: String) Feedback
     }
 
     %% ==========================================
-    %% LAYER 2: BUSINESS LOGIC (Domain - Users)
+    %% LAYER 3: DOMAIN - USERS
     %% ==========================================
     class User {
         <<abstract>>
         -id: Long
+        -name: String
         -username: String
         -passwordHash: String
         -role: Role
         -active: boolean
         +checkPassword(password: String) boolean
     }
-    class Employee {
-        <<abstract>>
-        -name: String
-        -contact: String
-        -employeeNumber: String
-    }
     class Receptionist
     class Manager
-    class RestaurantEmployee
-    class Customer {
-        -id: Long
+    class RestaurantStaff
+    class Client {
         -name: String
-        -email: String
-        -phone: String
-        -taxId: String
-        -address: String
+        -document: String
+        -birthday: LocalDate
     }
 
     %% ==========================================
-    %% LAYER 2: BUSINESS LOGIC (Domain - Hotel)
+    %% LAYER 3: DOMAIN - HOTEL
     %% ==========================================
     class Floor {
         -number: int
         -description: String
     }
     class Location {
-        <<abstract>>
         -id: Long
         -name: String
+        -floor: int
+        -guestCardAccess: boolean
+        -requiresReservation: boolean
     }
     class Room {
         -number: int
-        -type: RoomType
-        -view: ViewType
-        -status: RoomStatus
-        -basePrice: BigDecimal
-        -capacity: int
-        +pricePerNight() BigDecimal
+        -floor: int
         +isAvailable(start: LocalDate, end: LocalDate) boolean
     }
-    class Pool
-    class Restaurant
-    class Bar
-    class ConferenceRoom
-    class Spa
-    class Kitchen
-    class Warehouse
-    class Garage
-    class Reception
-    
+    class RoomType {
+        -name: String
+        -capacity: int
+        -basePrice: BigDecimal
+    }
+    class RoomItem {
+        -quantity: int
+    }
     class Reservation {
         -startDate: LocalDate
         -endDate: LocalDate
-        -creationDate: LocalDate
         -status: ReservationStatus
-        -totalPrice: BigDecimal
-        +calculateTotal() BigDecimal
-        +confirm() void
-        +cancel() void
-        +overlaps(start: LocalDate, end: LocalDate) boolean
-    }
-    class ReservationService {
-        -quantity: int
-        -unitPrice: BigDecimal
-    }
-    class Stay {
-        -checkInDate: LocalDateTime
-        -checkOutDate: LocalDateTime
+        -checkedInAt: LocalDateTime
+        -checkedOutAt: LocalDateTime
         +checkIn() void
         +checkOut() void
+        +cancel() void
+        +overlaps(start: LocalDate, end: LocalDate) boolean
+        +calculateTotal() BigDecimal
     }
-    class KeyCard {
+    class ReservationExtra {
+        -quantity: int
+        -unitPrice: BigDecimal
+        -usedAt: LocalDateTime
+    }
+    class MagneticCard {
         -number: String
         -type: CardType
         -active: boolean
         +canOpen(location: Location) boolean
     }
-    class AccessLog {
-        -dateTime: LocalDateTime
+    class CardAccessRecord {
+        -entryDateTime: LocalDateTime
     }
 
     %% ==========================================
-    %% LAYER 2: BUSINESS LOGIC (Domain - Services)
+    %% LAYER 3: DOMAIN - EXTRAS
     %% ==========================================
-    class Service {
+    class ExtraService {
         -name: String
-        -description: String
         -price: BigDecimal
     }
-    class RoomService
-    class LaundryService
-    class Catering
-    class CulturalEvent
-    class PoolAccess
-    class SpaService
-    class RoomRental
-    
-    class Consumption {
-        -description: String
-        -quantity: int
-        -unitPrice: BigDecimal
-        -date: LocalDate
-    }
-    class BeverageConsumption
-    class LaundryConsumption
-    
-    class Feedback {
-        -date: LocalDate
-        -description: String
-        -type: FeedbackType
-        -response: String
-        +reply(text: String) void
-    }
 
     %% ==========================================
-    %% LAYER 2: BUSINESS LOGIC (Domain - Stock)
+    %% LAYER 3: DOMAIN - STOCK
     %% ==========================================
     class StockItem {
         -name: String
-        -category: String
-        -quantity: int
-        -minStock: int
-        -price: BigDecimal
-        +applyMovement(movement: StockMovement) void
-        +isBelowMinimum() boolean
+        -unit: String
+        -stockQuantity: int
     }
     class StockMovement {
-        -date: LocalDate
         -type: MovementType
         -quantity: int
+        -dateTime: LocalDateTime
+        -exitReason: ExitReason
     }
-    class Supplier {
-        -name: String
-        -taxId: String
-        -contact: String
-    }
-    class SupplierDelivery {
-        -date: LocalDate
-        -xmlFile: String
-        +importFromXml(file: String) void
-    }
-    class DeliveryItem {
-        -quantity: int
-        -unitPrice: BigDecimal
+    class StockImport {
+        -supplierName: String
+        -importedAt: LocalDateTime
+        -rejectedItems: List~StockItem~
     }
 
     %% ==========================================
-    %% LAYER 2: BUSINESS LOGIC (Domain - Billing)
+    %% LAYER 3: DOMAIN - FEEDBACK
     %% ==========================================
-    class Payment {
-        -date: LocalDate
-        -amount: BigDecimal
-        -method: PaymentMethod
-        +generateInvoice() Invoice
-    }
-    class Invoice {
-        -number: String
-        -date: LocalDate
-        -totalAmount: BigDecimal
+    class Feedback {
+        -type: FeedbackType
+        -description: String
+        -createdAt: LocalDateTime
     }
 
     %% ==========================================
@@ -216,41 +202,22 @@ classDiagram
     %% ==========================================
     class Role {
         <<enumeration>>
+        CLIENT
         RECEPTIONIST
         MANAGER
-        RESTAURANT_EMPLOYEE
-        CUSTOMER
-    }
-    class RoomType {
-        <<enumeration>>
-        SINGLE
-        DOUBLE
-        FAMILY
-    }
-    class ViewType {
-        <<enumeration>>
-        NORMAL
-        SEA
-        MOUNTAIN
-    }
-    class RoomStatus {
-        <<enumeration>>
-        FREE
-        OCCUPIED
-        MAINTENANCE
-        CLEANING
+        RESTAURANT
+        SUPPLIER
     }
     class ReservationStatus {
         <<enumeration>>
-        PENDING
-        CONFIRMED
+        RESERVED
         CANCELLED
-        CHECKIN
-        CHECKOUT
+        CHECKED_IN
+        CHECKED_OUT
     }
     class CardType {
         <<enumeration>>
-        CUSTOMER
+        CLIENT
         MASTER
     }
     class FeedbackType {
@@ -261,83 +228,72 @@ classDiagram
     class MovementType {
         <<enumeration>>
         ENTRY
+        USE
         EXIT
-        USAGE
     }
-    class PaymentMethod {
+    class ExitReason {
         <<enumeration>>
-        CASH
-        CREDIT_CARD
-        DEBIT_CARD
-        TRANSFER
+        DISCARD
+        RETURN
+        LOSS
     }
 
     %% ==========================================
-    %% RELATIONSHIPS
+    %% INHERITANCES
     %% ==========================================
-    %% Users
-    User <|-- Employee
-    Employee <|-- Receptionist
-    Employee <|-- Manager
-    Employee <|-- RestaurantEmployee
-    User <|-- Customer
+    User <|-- Receptionist
+    User <|-- Manager
+    User <|-- RestaurantStaff
 
-    %% Hotel
-    Location <|-- Room
-    Location <|-- Pool
-    Location <|-- Restaurant
-    Location <|-- Bar
-    Location <|-- ConferenceRoom
-    Location <|-- Spa
-    Location <|-- Kitchen
-    Location <|-- Warehouse
-    Location <|-- Garage
-    Location <|-- Reception
-
-    %% Services
-    Service <|-- RoomService
-    Service <|-- LaundryService
-    Service <|-- Catering
-    Service <|-- CulturalEvent
-    Service <|-- PoolAccess
-    Service <|-- SpaService
-    Service <|-- RoomRental
-
-    Consumption <|-- BeverageConsumption
-    Consumption <|-- LaundryConsumption
-
-    %% Associations
-    Customer "1" --> "*" Reservation : makes
+    %% ==========================================
+    %% ASSOCIATIONS
+    %% ==========================================
+    Client "1" --> "*" Reservation : makes
     Room "1" --> "*" Reservation : reserved for
-    Reservation "*" --> "*" Service : includes
-    ReservationService ..> Reservation : links
-    ReservationService ..> Service : links
-    Reservation "1" --> "0..1" Stay : originates
-    Stay "*" --> "1" KeyCard : uses
-    KeyCard "1" --> "*" AccessLog : generates
-    AccessLog "*" --> "1" Location : at
+    User "1" --> "*" Reservation : created by
+    Reservation "1" *-- "*" ReservationExtra : includes
+    ReservationExtra "*" --> "1" ExtraService : refers to
+    Reservation "1" --> "0..*" MagneticCard : has
+    User "1" --> "*" MagneticCard : owns
+    MagneticCard "1" --> "*" CardAccessRecord : generates
+    CardAccessRecord "*" --> "0..1" Room : at
+    CardAccessRecord "*" --> "0..1" Location : at
     Floor "1" --> "*" Location : contains
-    Manager "1" --> "1" KeyCard : uses (master)
-    Room "1" --> "*" Consumption : has
-    Reservation "0..1" --> "*" Consumption : includes
-    Customer "1" --> "*" Feedback : leaves
-    Manager "0..1" --> "*" Feedback : replies to
-    Supplier "1" --> "*" SupplierDelivery : sends
-    SupplierDelivery "1" --> "*" DeliveryItem : contains
-    DeliveryItem "*" --> "1" StockItem : refers to
+    Floor "1" --> "*" Room : contains
+    Room "*" --> "1" RoomType : has
+    Room "1" --> "*" RoomItem : has
+    RoomItem "*" --> "1" StockItem : refers to
+    Reservation "*" --> "*" Location : includes
+    Client "1" --> "*" Feedback : leaves
     StockItem "1" --> "*" StockMovement : has
-    User "1" --> "*" StockMovement : responsible for
-    Reservation "1" --> "*" Payment : pays
-    Payment "1" --> "1" Invoice : generates
+    User "1" --> "*" StockMovement : records
+    StockMovement "*" --> "0..1" StockImport : from
+    StockImport "0..1" --> "1" User : imported by
 
-    %% Dependencies (Interface -> Business)
+    %% ==========================================
+    %% DEPENDENCIES (Controllers -> Facade)
+    %% ==========================================
+    LoginController ..> HotelFacade : uses
+    RoomController ..> HotelFacade : uses
     ReservationController ..> HotelFacade : uses
-    CheckInController ..> HotelFacade : uses
+    CheckInOutController ..> HotelFacade : uses
+    StaffController ..> HotelFacade : uses
+    CardController ..> HotelFacade : uses
     StockController ..> HotelFacade : uses
-    HotelFacade ..> ReservationService : uses
-    HotelFacade ..> StayService : uses
-    HotelFacade ..> StockService : uses
-    HotelFacade ..> BillingService : uses
+    FeedbackController ..> HotelFacade : uses
 
-    %% Note
-    note for Business "The business layer does not use JavaFX."
+    %% ==========================================
+    %% DEPENDENCIES (Facade -> Services)
+    %% ==========================================
+    HotelFacade ..> AuthService : uses
+    HotelFacade ..> RoomService : uses
+    HotelFacade ..> ReservationService : uses
+    HotelFacade ..> StaffService : uses
+    HotelFacade ..> CardAccessService : uses
+    HotelFacade ..> StockService : uses
+    HotelFacade ..> FeedbackService : uses
+
+    %% ==========================================
+    %% NOTE
+    %% ==========================================
+    note for HotelFacade "The business layer does not use JavaFX."
