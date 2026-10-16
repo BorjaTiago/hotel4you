@@ -34,7 +34,7 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
 | StaffService | Business - Services | - | createStaff(), editStaff(), removeStaff(), listUsers() | RF-26, RNF-01 |
 | CardAccessService | Business - Services | - | issueCard(), issueMasterCard(), blockCard(), canOpen(), register(), getPlacesByCard(), getPassesByRoom(), canOpenRoom() (access rules in the diagram note) | RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-24, RF-25, RF-30 |
-| StockService | Business - Services | - | importStock(), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
+| StockService | Business - Services | - | importStock() (upsert, Q-48), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
 | FeedbackService | Business - Services | - | save(), list() | RF-27 |
 
 ## Domain
@@ -56,9 +56,9 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 | ExtraService | Domain | id, name, price | - | RF-07, RF-09 |
 | MagneticCard | Domain | id, number, type, active, blockedAt | - | RF-16, RF-17, RF-23, RF-30 |
 | CardAccessRecord | Domain | entryDateTime | - | RF-19, RF-20, RF-21 |
-| StockItem | Domain | id, name, unit, stockQuantity | - | RF-28, RF-29 |
-| StockMovement | Domain | type, quantity, dateTime, exitReason | - | RF-29 |
-| StockImport | Domain | supplierName, importedAt, rejectedItems | getRejectedItems() | RF-28 |
+| StockItem | Domain | id, name, unit, stockQuantity, price | - | RF-28, RF-29 |
+| StockMovement | Domain | type, quantity, dateTime, exitReason, unitPrice | - | RF-29 |
+| StockImport | Domain | supplierName, importedAt, fileHash, createdCount, updatedCount, invalidCount, invalidItems | getInvalidItems() | RF-28 |
 | Feedback | Domain | type, description, createdAt (client may be null: anonymous) | - | RF-27 |
 
 ## Enums
@@ -72,4 +72,4 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Also edited by doc-updater, Claude Sonnet 5.5, 2026-10-16. Reviewed by: pending.

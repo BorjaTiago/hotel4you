@@ -184,10 +184,12 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Main flow:
   1. The supplier delivers goods and sends the XML file.
   2. Staff or the manager loads the XML file into the system (Q-17, team decision).
-  3. The system reads the file and records the stock entry.
+  3. The system reads the file. For each item it updates the catalogue item with the same name (trimmed, case-insensitive) and records the stock entry with the new price. If no catalogue item has that name, it creates one with the XML unit (Q-48, team decision). Each item has a mandatory name, quantity, unit and price.
 - Alternative flows:
-  - 3a. The file is not valid XML. The system refuses it and records nothing.
-  - 3b. The file has an unknown item. The system rejects that item and lists it in the import report. Valid items are imported (Q-10, team decision). An unknown item is an item not in the stock catalogue (UC-19, Q-38, team decision).
+  - 3a. The file breaks the XML format. The system refuses the whole file, records nothing, and shows an error message. There is no import report and no `stock_imports` row.
+  - 3b. An item breaks the XML format (for example: missing or invalid unit or price, or a unit that differs from the catalogue item). The system lists that item and the reason in the import report. The other valid items are imported (Q-10, updated by Q-48).
+  - 3c. The same file (same hash) was already imported. The system refuses the file, records nothing, and shows an error message (Q-48, team decision).
+  - Nothing is rejected as unknown. An item not in the catalogue is created (Q-48). Whether the XML creates items, the match key, and whether unit and price are mandatory, are open: Q-49.
 
 ## UC-16 Record stock use and exit
 - Actors: hotel staff, manager.
@@ -230,12 +232,13 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Phase: final delivery (Q-06).
 - Main flow:
   1. The manager opens the stock catalogue.
-  2. The manager creates or edits a stock item with its name and unit.
-  3. The system saves the item in the catalogue.
+  2. The manager creates or edits a stock item with its name, unit and price.
+  3. The system saves the item in the catalogue. Item name is UNIQUE.
 - Alternative flows:
   - 2a. Data is not valid. The system shows the error and does not save.
-  - The XML file (UC-15) accepts only catalogue items (Q-38, team decision; Q-10 unchanged).
+  - The XML file (UC-15) creates or updates catalogue items. Nothing is rejected as unknown (Q-48, team decision; updates Q-38). The price from the XML overwrites the item price (Q-48).
+  - The manager can still create and edit items by hand after an XML import (Q-48).
   - Stock use and exit (UC-16) use catalogue items (Q-38, team decision).
   - Removal of a catalogue item is not in the team decision (Q-38). If it is added, Q-36 applies.
 
-AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-15 and UC-19 for Q-48 (upsert) and Q-49 (open) by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16. XML unit/price rule by docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.

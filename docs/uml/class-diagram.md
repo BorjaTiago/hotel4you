@@ -256,18 +256,24 @@ classDiagram
         -name: String
         -unit: String
         -stockQuantity: int
+        -price: BigDecimal
     }
     class StockMovement {
         -type: MovementType
         -quantity: int
         -dateTime: LocalDateTime
         -exitReason: ExitReason
+        -unitPrice: BigDecimal
     }
     class StockImport {
         -supplierName: String
         -importedAt: LocalDateTime
-        -rejectedItems: List~String~
-        +getRejectedItems() List~String~
+        -fileHash: String
+        -createdCount: int
+        -updatedCount: int
+        -invalidCount: int
+        -invalidItems: List~String~
+        +getInvalidItems() List~String~
     }
 
     %% ==========================================
@@ -351,6 +357,7 @@ classDiagram
     User "1" --> "*" StockMovement : records
     StockMovement "*" --> "0..1" StockImport : from
     StockImport "*" --> "1" User : imported by
+    StockItem "*" --> "0..1" StockImport : created by
 
     %% ==========================================
     %% DEPENDENCIES (Controllers -> Facade)
@@ -390,4 +397,4 @@ classDiagram
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
 ```
 
-AI use: Claude Code, claude-sonnet-5-5, 2026-10-16. Reviewed by: pending.
+AI use: Claude Code, claude-sonnet-5-5, 2026-10-16. Also edited by doc-updater, Claude Sonnet 5.5, 2026-10-16. Reviewed by: pending.

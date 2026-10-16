@@ -79,17 +79,23 @@ classDiagram
         name: String
         unit: String
         stockQuantity: int
+        price: BigDecimal
     }
     class StockMovement {
         type: MovementType
         quantity: int
         dateTime: LocalDateTime
         exitReason: ExitReason
+        unitPrice: BigDecimal
     }
     class StockImport {
         supplierName: String
         importedAt: LocalDateTime
-        rejectedItems: List~String~
+        fileHash: String
+        createdCount: int
+        updatedCount: int
+        invalidCount: int
+        invalidItems: List~String~
     }
     class Feedback {
         type: FeedbackType
@@ -158,6 +164,7 @@ classDiagram
     StockItem "1" --> "*" StockMovement : has
     User "1" --> "*" StockMovement : records
     StockMovement "*" --> "0..1" StockImport : from
+    StockItem "*" --> "0..1" StockImport : created by
     StockImport "*" --> "1" User : imported by
 ```
 
@@ -180,9 +187,9 @@ classDiagram
 | ReservationExtra | Use of an extra service in a reservation. It keeps the price at the time. | quantity, unitPrice, usedAt |
 | MagneticCard | Magnetic card with a number. Type CLIENT or MASTER (Master magnetic card). | number, type, active, blockedAt |
 | CardAccessRecord | Saved record of a card entry (Card access record). | entryDateTime |
-| StockItem | Material stored in the hotel (Stock). | name, unit, stockQuantity |
-| StockMovement | Entry, use or exit of a stock item. | type, quantity, dateTime, exitReason |
-| StockImport | Import of a supplier XML file. | supplierName, importedAt, rejectedItems |
+| StockItem | Material stored in the hotel (Stock). | name, unit, stockQuantity, price |
+| StockMovement | Entry, use or exit of a stock item. | type, quantity, dateTime, exitReason, unitPrice |
+| StockImport | Import of a supplier XML file. | supplierName, importedAt, fileHash, createdCount, updatedCount, invalidCount, invalidItems |
 | Feedback | Suggestion or complaint of a client. | type, description, createdAt |
 | Role | Enum: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER. | - |
 | ReservationStatus | Enum: RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT. | - |
@@ -202,7 +209,7 @@ classDiagram
 - A room has one room type. The base price comes from the room type. Extras add to it.
 - A card access record points to a room or a location (each 0..1).
 - A stock movement of type EXIT has an exit reason (DISCARD, RETURN or LOSS).
-- A stock movement from an XML import points to its stock import. Rejected items stay in the stock import.
+- A stock movement from an XML import points to its stock import. The entry copies the unit price at that time. The stock import keeps the counters and the format-invalid items. A stock item made by an import points to it. The same file (same hash) cannot be imported twice: the system refuses it, records nothing, and shows an error message (no stock import). The import is an upsert (Q-48). Each XML item has a mandatory name, quantity, unit and price. An existing item (same name, trimmed, case-insensitive) with the same unit gets an entry and a new price. A different unit is format-invalid. A new item is created with the XML unit. A missing or invalid unit or price is format-invalid.
 - A client may leave many feedbacks. The client link is 0..1.
 
-AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16. Reviewed by: pending.
+AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16. Also edited by doc-updater, Claude Sonnet 5.5, 2026-10-16. XML unit/price rule by docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
