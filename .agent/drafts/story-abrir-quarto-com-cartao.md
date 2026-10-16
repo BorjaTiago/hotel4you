@@ -1,0 +1,50 @@
+---
+type: story
+summary: Abrir o quarto com o cartão
+parent: epic-magnetic-card-access
+requirements: [RF-17]
+points: 3
+points_suggested: 3
+status: approved
+jira_key:
+labels: [access-control, final-delivery]
+sprint:
+---
+
+# Título: Abrir o quarto com o cartão
+
+Como cliente,
+Eu quero abrir o meu quarto com o meu cartão magnético,
+Para que eu entre no quarto da minha reserva.
+
+## Critérios de aceite
+
+### Cenário AC-1: Cartão abre o quarto da reserva
+  Dado que o cliente tem um cartão associado a uma reserva com check-in efetuado no quarto 202
+  Quando o cliente passa o cartão na porta do quarto 202 (entrada simulada na aplicação)
+  Então o sistema permite a entrada
+
+### Cenário AC-2: Cartão não abre outro quarto
+  Dado que o cliente tem um cartão associado ao quarto 202
+  Quando o cliente passa o cartão na porta do quarto 203
+  Então o sistema recusa a entrada
+
+### Cenário AC-3: Cartão desconhecido
+  Dado que o número do cartão não existe no sistema
+  Quando o cliente passa o cartão na porta de um quarto
+  Então o sistema recusa a entrada
+
+## Notas
+Leitores físicos fora de âmbito: entrada simulada na GUI. Entrega final (Q-06). Q-09 (decisão da equipa). Depende da história "Emitir cartão com número ao fazer check-in". Estado do cartão após check-out: Q-30 (decisão da equipa), o cenário está em story-check-out (AC-4).
+
+points_suggested: 3
+reference: Registar um cliente (3)
+compared: equal
+reasoning: Procura o cartão, compara o quarto da reserva e decide. Inclui o ecrã de passagem simulada. Lógica curta, uma ou duas camadas.
+split_needed: no
+
+ready: true
+dor_failed: []
+questions: []
+
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

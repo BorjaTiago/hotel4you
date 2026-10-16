@@ -56,7 +56,7 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 
 ## Team decisions
 - Jira key: H4Y. Hierarchy: Epic > Story > Subtask (Jira issue type name).
-- Sprint length: 1 week. Team size: 3 to 5 people.
+- Sprint length: 1 week. Team size: 5 members, all developers (Q-02, team decision, user, 2026-10-16). The Team Leader also develops.
 - Estimation: Fibonacci story points (1, 2, 3, 5, 8, 13). Stories above 8 are split.
 - Stories in Portuguese. Format: "Como <papel>, Eu quero <ação>, Para que <benefício>".
 - Code and docs in English, Simplified Technical English.
