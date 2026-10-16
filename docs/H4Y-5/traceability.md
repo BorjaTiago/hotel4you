@@ -1,0 +1,51 @@
+# H4Y-5 - Traceability
+
+Requirements from [../requirements/requirements.md](../requirements/requirements.md) to the classes and methods of [uml/codeUml.md](uml/codeUml.md). "Not covered" means no class or method in the diagram. Guide: [classes.md](classes.md).
+
+## Functional requirements
+
+| Requirement | Classes and methods that cover it |
+|-------------|-----------------------------------|
+| RF-01 Login with user name and password | LoginController.onLoginClicked, HotelFacade.login, AuthService.login, User.checkPassword |
+| RF-02 Five actor types | Role (enum), User, Receptionist, Manager, RestaurantStaff, Client |
+| RF-03 Building floors and zones | Floor, Location, LocationController.onSaveLocationClicked, LocationService.createLocation |
+| RF-04 Three room types, 20 rooms | Room, RoomType, RoomController.onSaveRoomClicked |
+| RF-05 Client chooses a free room | RoomController.onListFreeRoomsClicked, HotelFacade.listFreeRooms, RoomService.isAvailable, RoomService.listFree, Reservation.overlaps, ReservationService.create |
+| RF-06 Price per room type | RoomType.basePrice, RoomService.setBasePrice, HotelFacade.setBasePrice, RoomController.onSavePriceClicked, Reservation.calculateTotal |
+| RF-07 Extra costs (view, drinks, laundry) | ExtraService.price, ReservationExtra, ReservationService.addExtra, RoomService.setExtraPrice, ReservationController.onAddExtraClicked |
+| RF-08 Room items set by manager | RoomItem.quantity, RoomService.configureItem, HotelFacade.configureRoomItem, RoomController.onConfigureRoomItemClicked |
+| RF-09 Other paid services | ExtraService, ReservationService.addExtra, RoomService.setExtraPrice |
+| RF-10 Reception registers clients | ClientController.onRegisterClientClicked, ClientService.register, HotelFacade.registerClient, Client |
+| RF-11 Reception makes reservations | ReservationController.onCreateReservationClicked, ReservationService.create, HotelFacade.createReservation, Reservation |
+| RF-12 Reception cancels reservations | ReservationController.onCancelReservationClicked, ReservationService.cancel, Reservation.cancel, ReservationStatus.CANCELLED |
+| RF-13 Check-in | CheckInOutController.onCheckInClicked, ReservationService.checkIn, Reservation.checkIn, ReservationStatus.CHECKED_IN |
+| RF-14 Check-out | CheckInOutController.onCheckOutClicked, ReservationService.checkOut, Reservation.checkOut, ReservationStatus.CHECKED_OUT |
+| RF-15 Room services (food, drink, laundry) | ReservationController.onAddExtraClicked, ReservationService.addExtra, ReservationExtra.usedAt |
+| RF-16 Card given at check-in, one per reservation | CardController.onIssueCardClicked, HotelFacade.issueCard, CardAccessService.issueCard, MagneticCard, CardType.CLIENT |
+| RF-17 Card opens client room | CardAccessService.register (room entry), CardAccessRecord.room, MagneticCard. Note: canOpen checks a location only. No room method in the diagram. |
+| RF-18 Card opens restaurant and pool only with reservation | Location.guestCardAccess, Location.requiresReservation, Reservation (includes Location), CardAccessService.canOpen, LocationController.onSaveLocationClicked |
+| RF-19 Card entry log (place, time) | CardAccessService.register, CardAccessRecord.entryDateTime |
+| RF-20 Places of one card | CardController.onShowPlacesByCardClicked, HotelFacade.getPlacesByCard, CardAccessService.getPlacesByCard |
+| RF-21 Passes of one room (with master card) | CardController.onShowPassesByRoomClicked, HotelFacade.getPassesByRoom, CardAccessService.getPassesByRoom |
+| RF-22 Only manager deletes, before check-in | ReservationController.onDeleteReservationClicked, ReservationService.delete(reservation, user), HotelFacade.deleteReservation, Manager. Note: the role check is not shown in the diagram. |
+| RF-23 Master card for all rooms and zones | CardAccessService.issueMasterCard(manager), HotelFacade.issueMasterCard, CardType.MASTER, Manager, MagneticCard. Note: the access rule for the master card is not shown in the diagram. |
+| RF-24 Reception access only floors 0 and 1 | Receptionist, Floor. Partial: no method shows the floor rule. |
+| RF-25 Restaurant staff access only kitchen and restaurant | RestaurantStaff, Location. Partial: no method shows the access rule. |
+| RF-26 Manager manages staff accounts | StaffController.onCreateStaffClicked, onEditStaffClicked, onRemoveStaffClicked, StaffService.createStaff, editStaff, removeStaff, HotelFacade.createStaff |
+| RF-27 Suggestions and complaints | FeedbackController.onSaveFeedbackClicked, onListFeedbackClicked, FeedbackService.save, FeedbackService.list, Feedback, FeedbackType |
+| RF-28 Stock import from supplier XML | StockController.onImportXmlClicked, StockService.importStock, HotelFacade.importStock, StockImport.rejectedItems, StockItem |
+| RF-29 Entry, use and exit of stock | StockController.onRegisterMovementClicked, StockService.registerMovement, StockService.applyMovement, StockMovement, MovementType, ExitReason, StockItem.stockQuantity |
+| RF-30 Block lost master card, issue new one | CardController.onBlockMasterCardClicked, CardAccessService.blockCard, HotelFacade.blockMasterCard, MagneticCard.active. Note: the log of the block is not shown in the diagram. |
+
+## Non-functional requirements
+
+| Requirement | Classes and methods that cover it |
+|-------------|-----------------------------------|
+| RNF-05 Software in Java | Not covered. The diagram shows no class for a language rule. |
+| RNF-06 JavaFX GUI | All Interface classes (LoginController to FeedbackController) |
+| RNF-07 Business logic separate from GUI | HotelFacade (note: "The business layer does not use JavaFX"), Interface layer calls only the facade |
+| RNF-08 Maintainable class structure | Layers: Interface, Facade, Services, Domain, Enums. Facade and services split by topic. |
+| RNF-09 Javadoc | Not covered. The diagram shows no class for documentation. |
+| RNF-10 JUnit unit tests | Not covered. The diagram shows no test classes. |
+
+AI use: Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.

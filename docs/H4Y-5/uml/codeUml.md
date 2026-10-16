@@ -11,10 +11,23 @@ classDiagram
     class RoomController {
         +onSearchClicked() void
         +onSaveRoomClicked() void
+        +onListFreeRoomsClicked() void
+        +onConfigureRoomItemClicked() void
+        +onSavePriceClicked() void
+    }
+    class ClientController {
+        +onRegisterClientClicked() void
+        +onSearchClientClicked() void
     }
     class ReservationController {
         +onCreateReservationClicked() void
         +onCancelReservationClicked() void
+        +onDeleteReservationClicked() void
+        +onAddExtraClicked() void
+    }
+    class LocationController {
+        +onSaveLocationClicked() void
+        +onRemoveLocationClicked() void
     }
     class CheckInOutController {
         +onCheckInClicked() void
@@ -22,16 +35,24 @@ classDiagram
     }
     class StaffController {
         +onCreateStaffClicked() void
+        +onEditStaffClicked() void
+        +onRemoveStaffClicked() void
+        +onListUsersClicked() void
     }
     class CardController {
         +onIssueCardClicked() void
         +onBlockMasterCardClicked() void
+        +onShowPlacesByCardClicked() void
+        +onShowPassesByRoomClicked() void
     }
     class StockController {
         +onImportXmlClicked() void
+        +onSaveItemClicked() void
+        +onRegisterMovementClicked() void
     }
     class FeedbackController {
         +onSaveFeedbackClicked() void
+        +onListFeedbackClicked() void
     }
 
     %% ==========================================
@@ -41,13 +62,34 @@ classDiagram
         +login(username: String, password: String) User
         +createReservation(client: Client, room: Room, start: LocalDate, end: LocalDate) Reservation
         +cancelReservation(reservation: Reservation) void
+        +deleteReservation(reservation: Reservation, user: User) void
+        +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
+        +registerClient(name: String, document: String, birthday: LocalDate) Client
+        +findClient(document: String) Client
         +checkIn(reservation: Reservation) void
         +checkOut(reservation: Reservation) void
         +issueCard(reservation: Reservation) MagneticCard
-        +issueMasterCard(user: User) MagneticCard
+        +issueMasterCard(manager: Manager) MagneticCard
         +blockMasterCard(card: MagneticCard) void
-        +importStock(file: String) StockImport
+        +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
+        +getPassesByRoom(room: Room) List~CardAccessRecord~
+        +createStaff(user: User) void
+        +editStaff(user: User) void
+        +removeStaff(user: User) void
+        +listUsers() List~User~
+        +listFreeRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +configureRoomItem(room: Room, item: StockItem, quantity: int) void
+        +setBasePrice(type: RoomType, price: BigDecimal) void
+        +setExtraPrice(service: ExtraService, price: BigDecimal) void
+        +createLocation(location: Location) void
+        +editLocation(location: Location) void
+        +removeLocation(location: Location) void
+        +importStock(file: String, user: User) StockImport
+        +createItem(name: String, unit: String) StockItem
+        +editItem(item: StockItem) void
+        +registerMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
         +saveFeedback(client: Client, type: FeedbackType, description: String) Feedback
+        +listFeedback() List~Feedback~
     }
 
     %% ==========================================
@@ -57,31 +99,55 @@ classDiagram
         +login(username: String, password: String) User
         +hashPassword(password: String) String
     }
+    class ClientService {
+        +register(name: String, document: String, birthday: LocalDate) Client
+        +find(document: String) Client
+    }
+    class LocationService {
+        +createLocation(location: Location) void
+        +editLocation(location: Location) void
+        +removeLocation(location: Location) void
+    }
     class RoomService {
         +isAvailable(room: Room, start: LocalDate, end: LocalDate) boolean
+        +listFree(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +configureItem(room: Room, item: StockItem, quantity: int) void
+        +setBasePrice(type: RoomType, price: BigDecimal) void
+        +setExtraPrice(service: ExtraService, price: BigDecimal) void
     }
     class ReservationService {
         +create(client: Client, room: Room, start: LocalDate, end: LocalDate) Reservation
         +cancel(reservation: Reservation) void
+        +delete(reservation: Reservation, user: User) void
+        +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
         +checkIn(reservation: Reservation) void
         +checkOut(reservation: Reservation) void
     }
     class StaffService {
         +createStaff(user: User) void
+        +editStaff(user: User) void
+        +removeStaff(user: User) void
+        +listUsers() List~User~
     }
     class CardAccessService {
         +issueCard(reservation: Reservation) MagneticCard
-        +issueMasterCard(user: User) MagneticCard
+        +issueMasterCard(manager: Manager) MagneticCard
         +blockCard(card: MagneticCard) void
         +canOpen(card: MagneticCard, location: Location) boolean
         +register(card: MagneticCard, room: Room, location: Location) CardAccessRecord
+        +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
+        +getPassesByRoom(room: Room) List~CardAccessRecord~
     }
     class StockService {
-        +importStock(file: String) StockImport
+        +importStock(file: String, user: User) StockImport
+        +createItem(name: String, unit: String) StockItem
+        +editItem(item: StockItem) void
+        +registerMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
         +applyMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
     }
     class FeedbackService {
         +save(client: Client, type: FeedbackType, description: String) Feedback
+        +list() List~Feedback~
     }
 
     %% ==========================================
@@ -94,13 +160,13 @@ classDiagram
         -username: String
         -passwordHash: String
         -role: Role
-        -active: boolean
         +checkPassword(password: String) boolean
     }
     class Receptionist
     class Manager
     class RestaurantStaff
     class Client {
+        -id: Long
         -name: String
         -document: String
         -birthday: LocalDate
@@ -116,16 +182,15 @@ classDiagram
     class Location {
         -id: Long
         -name: String
-        -floor: int
         -guestCardAccess: boolean
         -requiresReservation: boolean
     }
     class Room {
+        -id: Long
         -number: int
-        -floor: int
-        +isAvailable(start: LocalDate, end: LocalDate) boolean
     }
     class RoomType {
+        -id: Long
         -name: String
         -capacity: int
         -basePrice: BigDecimal
@@ -134,6 +199,7 @@ classDiagram
         -quantity: int
     }
     class Reservation {
+        -id: Long
         -startDate: LocalDate
         -endDate: LocalDate
         -status: ReservationStatus
@@ -151,10 +217,10 @@ classDiagram
         -usedAt: LocalDateTime
     }
     class MagneticCard {
+        -id: Long
         -number: String
         -type: CardType
         -active: boolean
-        +canOpen(location: Location) boolean
     }
     class CardAccessRecord {
         -entryDateTime: LocalDateTime
@@ -164,6 +230,7 @@ classDiagram
     %% LAYER 3: DOMAIN - EXTRAS
     %% ==========================================
     class ExtraService {
+        -id: Long
         -name: String
         -price: BigDecimal
     }
@@ -172,6 +239,7 @@ classDiagram
     %% LAYER 3: DOMAIN - STOCK
     %% ==========================================
     class StockItem {
+        -id: Long
         -name: String
         -unit: String
         -stockQuantity: int
@@ -185,7 +253,7 @@ classDiagram
     class StockImport {
         -supplierName: String
         -importedAt: LocalDateTime
-        -rejectedItems: List~StockItem~
+        -rejectedItems: List~String~
     }
 
     %% ==========================================
@@ -268,13 +336,15 @@ classDiagram
     StockItem "1" --> "*" StockMovement : has
     User "1" --> "*" StockMovement : records
     StockMovement "*" --> "0..1" StockImport : from
-    StockImport "0..1" --> "1" User : imported by
+    StockImport "*" --> "1" User : imported by
 
     %% ==========================================
     %% DEPENDENCIES (Controllers -> Facade)
     %% ==========================================
     LoginController ..> HotelFacade : uses
     RoomController ..> HotelFacade : uses
+    ClientController ..> HotelFacade : uses
+    LocationController ..> HotelFacade : uses
     ReservationController ..> HotelFacade : uses
     CheckInOutController ..> HotelFacade : uses
     StaffController ..> HotelFacade : uses
@@ -286,7 +356,9 @@ classDiagram
     %% DEPENDENCIES (Facade -> Services)
     %% ==========================================
     HotelFacade ..> AuthService : uses
+    HotelFacade ..> ClientService : uses
     HotelFacade ..> RoomService : uses
+    HotelFacade ..> LocationService : uses
     HotelFacade ..> ReservationService : uses
     HotelFacade ..> StaffService : uses
     HotelFacade ..> CardAccessService : uses
@@ -297,3 +369,8 @@ classDiagram
     %% NOTE
     %% ==========================================
     note for HotelFacade "The business layer does not use JavaFX."
+    note for CardAccessRecord "Each record has a Room OR a Location, never both."
+    note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
+```
+
+AI use: Claude Code, claude-sonnet-5-5, 2026-10-16. Reviewed by: pending.
