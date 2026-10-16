@@ -38,8 +38,8 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Put it in `ReservationController`. Not done: client work is not reservation work.
 
 ### ReservationController
-- **What:** Create, cancel and delete a reservation. Add and remove an extra.
-- **Why:** RF-11, RF-12, RF-15, RF-22.
+- **What:** Create, cancel and delete a reservation. Add and remove an extra. Add and remove a zone (pool, restaurant).
+- **Why:** RF-11, RF-12, RF-15, RF-18, RF-22.
 - **Why this way:** Reception works on reservations here.
 - **Other option:** Put the delete button in the manager screen only. Not done: the role check is in the service, not the screen.
 
@@ -118,10 +118,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put rules in `Room`. Not done: `Room` would need reservation data.
 
 ### ReservationService
-- **What:** Create, cancel, delete a reservation. Add and remove an extra. Check-in and check-out.
-- **Why:** RF-05, RF-11 to RF-15, RF-22.
+- **What:** Create, cancel, delete a reservation. Add and remove an extra. Add and remove a zone. Check-in and check-out.
+- **Why:** RF-05, RF-11 to RF-15, RF-18, RF-22.
 - **Why this way:** Main transaction logic. `create` checks the overlap with `Reservation.overlaps()`. Delete only works for a manager and before check-in.
-- **Rules:** `addExtra` refuses a second view (sea or mountain, Q-37). `removeExtra` works only before check-in (Q-40). `checkOut` sets `MagneticCard.active = false` (Q-30).
+- **Rules:** `addExtra` refuses a second view (sea or mountain, Q-37). `removeExtra` works only before check-in (Q-40). `addLocation` and `removeLocation` accept only zones with `guestCardAccess = true` and `requiresReservation = true`, and only before check-in. `checkOut` sets `MagneticCard.active = false` (Q-30).
 - **Other option:** Put the logic only in `Reservation`. Not done: one reservation cannot see the others.
 
 ### StaffService
@@ -131,14 +131,14 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
-- **What:** Issue a card. Issue and block the master card. Check if a card opens a location or a room. Log an entry. Give the reports.
-- **Why:** RF-16 to RF-23, RF-30.
+- **What:** Issue a card. Issue and block the master card. Check if a card opens a location (`canOpen`) or a room (`canOpenRoom`). Log an entry. Give the reports.
+- **Why:** RF-16 to RF-25, RF-30.
 - **Why this way:** The access check needs the card, the zone and the reservation. Only a service has all three.
-- **Rules:** The old master card is blocked first (sets `blockedAt`). Then the new one is issued (Q-31, Q-26). `canOpenRoom`: a client card opens only its own room. A master card opens all rooms (RF-17, RF-23).
+- **Rules:** The access rules are in the table in the MagneticCard section. The old master card is blocked first (sets `blockedAt`). Then the new one is issued (Q-31, Q-26).
 - **Other option:** Put `canOpen` in `MagneticCard`. Not done: `MagneticCard` would need reservation and location data.
 
 ### StockService
-- **What:** Import the XML file. Create and edit items. Register and apply a movement.
+- **What:** Import the XML file. Create and edit items. Register and apply a movement. Each movement takes an exit reason (`ExitReason`) and the user.
 - **Why:** RF-28, RF-29.
 - **Why this way:** One import is one transaction. Stock changes follow the movement rules.
 - **Other option:** Put the import in `StockImport`. Not done: the import has many items and rules.
@@ -239,9 +239,22 @@ Services hold the rules. Each service works on the domain classes.
 
 ### MagneticCard
 - **What:** A card with a number, a type (client or master), an active flag and `blockedAt` (time of a block).
-- **Why:** RF-16, RF-17, RF-23, RF-30.
-- **Why this way:** One class for all cards. Rule: a card belongs to a reservation OR a staff user. `blockedAt` keeps the time a master card was blocked (RF-30).
+- **Why:** RF-16, RF-17, RF-18, RF-23, RF-24, RF-25, RF-30.
+- **Why this way:** One class for all cards. `blockedAt` keeps the time a master card was blocked (RF-30).
+- **Owner:** A client card belongs to a `Reservation` (`0..1`). A master card or a staff card belongs to a `User` (`0..1`). A card has a reservation OR a user, never both (XOR).
 - **Other option:** Separate classes for client and master cards. Not done: same fields, one class is simpler.
+
+**Access rules by card:**
+
+| Card (owner) | Opens | Does not open |
+|--------------|-------|---------------|
+| Master (Manager) | All rooms and all zones | - |
+| Client (Reservation) | Its own room. Zones with `guestCardAccess = true`. If `requiresReservation = true`, only zones in its reservation. | Other rooms. Zones with `guestCardAccess = false`. |
+| Receptionist (User) | Zones on floors 0 and 1 | Any guest room. Zones on other floors. |
+| Restaurant staff (User) | Kitchen and restaurant | Any guest room. Other zones. |
+| Blocked or inactive (any) | Nothing | Everything |
+
+A staff card never opens a guest room. Only the master card does.
 
 ### CardAccessRecord
 - **What:** One entry in the card log. Time and a room OR a location.

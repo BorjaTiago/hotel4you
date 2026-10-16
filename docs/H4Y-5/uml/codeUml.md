@@ -24,6 +24,8 @@ classDiagram
         +onDeleteReservationClicked() void
         +onAddExtraClicked() void
         +onRemoveExtraClicked() void
+        +onAddLocationClicked() void
+        +onRemoveLocationClicked() void
     }
     class LocationController {
         +onSaveLocationClicked() void
@@ -66,6 +68,8 @@ classDiagram
         +deleteReservation(reservation: Reservation, user: User) void
         +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
         +removeExtra(reservation: Reservation, extra: ReservationExtra) void
+        +addLocation(reservation: Reservation, location: Location) void
+        +removeLocation(reservation: Reservation, location: Location) void
         +registerClient(name: String, document: String, birthday: LocalDate) Client
         +findClient(document: String) Client
         +checkIn(reservation: Reservation) void
@@ -90,7 +94,7 @@ classDiagram
         +importStock(file: String, user: User) StockImport
         +createItem(name: String, unit: String) StockItem
         +editItem(item: StockItem) void
-        +registerMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
+        +registerMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
         +saveFeedback(client: Client, type: FeedbackType, description: String) Feedback
         +listFeedback() List~Feedback~
     }
@@ -125,6 +129,8 @@ classDiagram
         +delete(reservation: Reservation, user: User) void
         +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
         +removeExtra(reservation: Reservation, extra: ReservationExtra) void
+        +addLocation(reservation: Reservation, location: Location) void
+        +removeLocation(reservation: Reservation, location: Location) void
         +checkIn(reservation: Reservation) void
         +checkOut(reservation: Reservation) void
     }
@@ -148,8 +154,8 @@ classDiagram
         +importStock(file: String, user: User) StockImport
         +createItem(name: String, unit: String) StockItem
         +editItem(item: StockItem) void
-        +registerMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
-        +applyMovement(item: StockItem, type: MovementType, quantity: int, user: User) StockMovement
+        +registerMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
+        +applyMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
     }
     class FeedbackService {
         +save(client: Client, type: FeedbackType, description: String) Feedback
@@ -329,8 +335,8 @@ classDiagram
     User "1" --> "*" Reservation : creates
     Reservation "1" *-- "*" ReservationExtra : includes
     ReservationExtra "*" --> "1" ExtraService : refers to
-    Reservation "1" --> "0..1" MagneticCard : has
-    User "1" --> "*" MagneticCard : owns
+    Reservation "0..1" --> "0..1" MagneticCard : has
+    User "0..1" --> "*" MagneticCard : owns
     MagneticCard "1" --> "*" CardAccessRecord : generates
     CardAccessRecord "*" --> "0..1" Room : at
     CardAccessRecord "*" --> "0..1" Location : at
@@ -379,6 +385,8 @@ classDiagram
     note for HotelFacade "The business layer does not use JavaFX."
     note for FeedbackService "client may be null (anonymous feedback)"
     note for CardAccessRecord "Each record has a Room OR a Location, never both."
+    note for ReservationService "addLocation and removeLocation accept only locations with guestCardAccess = true and requiresReservation = true. Allowed only before check-in."
+    note for CardAccessService "Master card opens every room and every zone.<br/>Client card opens only its own room and zones with guestCardAccess = true. If requiresReservation = true, only zones included in its reservation.<br/>A blocked or inactive card opens nothing.<br/>Receptionist card opens only zones on floors 0 and 1 and no guest room.<br/>Restaurant staff card opens only the kitchen and the restaurant and no guest room.<br/>A staff card never opens a guest room. Only the master card does."
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
 ```
 
