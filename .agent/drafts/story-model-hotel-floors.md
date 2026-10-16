@@ -5,8 +5,8 @@ parent: epic-rooms-pricing
 requirements: [RF-03]
 points: 2
 points_suggested: 2
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-28
 labels: [rooms, 1st-delivery]
 sprint:
 ---

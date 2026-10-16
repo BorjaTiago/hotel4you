@@ -50,7 +50,8 @@ Para que apenas utilizadores conhecidos usem as funções da receção.
 - [ ] AC-4: Campos vazios são recusados com mensagem de validação.
 
 ## Notas
-Fase: 1.ª entrega (Q-06). Clientes e fornecedor não iniciam sessão (Q-13, Q-17). Erro igual para palavra-passe errada e conta desconhecida (epic). Contas criadas aqui por dados iniciais; gestão de contas está em epic-staff-management-access.
+Fase: 1.ª entrega (Q-06). Clientes e fornecedor não iniciam sessão (Q-13, Q-17). Erro igual para palavra-passe errada e conta desconhecida (epic). Gestão de contas está em epic-staff-management-access.
+Dependências (auditoria 2026-10-16): o primeiro gestor vem dos dados iniciais (seed). As outras contas vêm de "Criar uma conta de funcionário" (create-staff-account).
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -62,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

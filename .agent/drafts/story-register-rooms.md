@@ -50,7 +50,8 @@ Para que o hotel tenha os 20 quartos disponíveis para reserva.
 - [ ] AC-4: Exceder o limite de quartos por piso é recusado.
 
 ## Notas
-Q-01 (decisão da equipa, não confirmada pelo professor): 20 quartos, 10 por piso, divisão 7/10/3 para o hotel inteiro. Quarto familiar: 3 ou 4 pessoas. Depende da história story-model-hotel-floors.
+Q-01 (decisão da equipa, não confirmada pelo professor): 20 quartos, 10 por piso, divisão 7/10/3 para o hotel inteiro. Quarto familiar: 3 ou 4 pessoas.
+Dependências (auditoria 2026-10-16): depende da tarefa T5 (pisos e tipos de quarto). Não depende de story-model-hotel-floors.
 
 points_suggested: 3
 reference: Registar um cliente (validação de dados e gravação) (3)
@@ -62,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

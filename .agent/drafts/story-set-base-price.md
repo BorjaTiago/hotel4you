@@ -49,7 +49,8 @@ Para que as reservas usem o preço correto do quarto.
 - [ ] AC-4: Um papel sem permissão é recusado ao definir preços.
 
 ## Notas
-Q-11 (decisão da equipa, não confirmada pelo professor): o gestor define o preço base por tipo. Preços extra (vista, bebidas, lavandaria) ficam em epic-extra-services-pricing. Depende de story-register-rooms (tipos).
+Q-11 (decisão da equipa, não confirmada pelo professor): o gestor define o preço base por tipo. Preços extra (vista, bebidas, lavandaria) ficam em epic-extra-services-pricing.
+Dependências (auditoria 2026-10-16): depende da tarefa T5 (tipos de quarto). Não depende de story-register-rooms.
 
 points_suggested: 3
 reference: Registar um cliente (validação de dados e gravação) (3)
@@ -61,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

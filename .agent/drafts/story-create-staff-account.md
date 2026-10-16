@@ -5,8 +5,8 @@ parent: epic-staff-management-access
 requirements: [RF-26, RF-01]
 points: 3
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-27
 labels: [staff]
 sprint:
 ---

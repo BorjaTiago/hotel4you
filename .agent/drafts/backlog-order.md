@@ -14,11 +14,11 @@ Revision 2026-10-16: full dependency audit. The status goes back to `draft` beca
 - Sprint 1 (2026-10-12): requirements only. No story.
 - Sprints 2 to 13: 12 sprints of 1 week. Sprint 2 starts 2026-10-19.
 - 1st delivery 2026-12-01 23:55. Final delivery 2027-01-31 23:55. Dates are fixed.
-- Weeks 2026-10-19 to 2027-01-31 = 15 weeks = 12 sprints + 3 free weeks. Which weeks are free is open (Q-04).
+- Weeks 2026-10-19 to 2027-01-31 = 15 weeks = 12 sprints + 3 free weeks. Free weeks: 2026-12-21, 2026-12-28, 2027-01-04 (Christmas and New Year, Q-04, team decision, user, 2026-10-16).
 - Total story points: 180 (57 stories). Technical tasks have no points. They run inside each sprint.
 - Velocity is a GUESS. No history. Proposed: 13 to 15 points in sprints 2 to 6, 12 to 18 later. Average 15. The team confirms it in sprint planning.
-- Nominal dates count 12 consecutive weeks (sprint 2 = week of 10-19 ... sprint 13 = week of 2027-01-04). Each free week moves later sprints by 1 week.
-- 1st delivery scope ends in sprint 6 (week of 11-16, ends 11-22). Up to 2 free weeks before 12-01 still keep it before the deadline.
+- Nominal dates: sprint 2 = week of 10-19, sprint 10 = week of 12-14, sprint 11 = week of 2027-01-11, sprint 13 = week of 2027-01-25 (ends 2027-01-31). The 3 free weeks are fixed (Q-04), so no sprint moves.
+- 1st delivery scope ends in sprint 6 (week of 11-16, ends 11-22). The zip is made in sprint 7 (week of 11-23), before 12-01.
 - No-blocking rule (user, 2026-10-16): one card must not block another. Every story builds and tests alone with its own test data (foundation T4), stubs from the skeleton (foundation T0) and reference data (foundation T5, auth T2). A hard dependency stays only when it cannot be removed. The reason is written below.
 
 ## Dependency audit result
@@ -48,12 +48,12 @@ Revision 2026-10-16: full dependency audit. The status goes back to `draft` beca
 | 5 | 11-09 | 14 | create-reservation, cancel-reservation, delete-reservation, registar-cliente-rapido | Full reservation life cycle. RNF-03 (30 s, registration + reservation) measured. |
 | 6 | 11-16 | 15 | check-in, check-out, block-delete-after-check-in, refuse-delete-reservation, configure-room-items | Check-in and check-out. Delete rules complete. Room items configured. 1st delivery scope complete. |
 | 7 | 11-23 | 12 | consultar-utilizadores, edit-staff-account, remove-staff-account, criar-zona | 1st delivery freeze and zip. Manager edits and removes accounts, lists users, creates zones. |
-| 8 | 11-30 | 14 | editar-zona, remover-zona, reservation-restaurant-pool, limit-reception-floors, limit-restaurant-staff-zones | 1st delivery due 12-01. Zones complete. Restaurant and pool in the reservation. Role limits. |
+| 8 | 11-30 | 14 | editar-zona, remover-zona, reservation-restaurant-pool, limit-reception-floors, limit-restaurant-staff-zones | 1st delivery was due 12-01 (sent at the end of sprint 7). Zones complete. Restaurant and pool in the reservation. Role limits. |
 | 9 | 12-07 | 17 | emitir-cartao-check-in, registar-passagens-cartao, abrir-quarto-com-cartao, abrir-restaurante-piscina-reservados, recusar-cartao-locais-nao-permitidos | The client card is issued, opens the room and the reserved places, and every pass is logged. |
 | 10 | 12-14 | 18 | desativar-cartao-check-out, abrir-tudo-cartao-mestre, bloquear-cartao-mestre, emitir-novo-cartao-mestre, consultar-locais-cartao, consultar-passagens-quarto | Card off at check-out, master card, block and new card, card and room logs. |
-| 11 | 12-21 | 16 | editar-item-stock, carregar-xml-fornecedor-gestor, registar-entrada-stock, ver-relatorio-importacao | The manager loads the supplier XML with an import report. Stock entry. |
-| 12 | 12-28 | 17 | registar-uso-stock, registar-saida-stock, carregar-xml-fornecedor-rececionista, definir-precos-extra, adicionar-extras-quarto-reserva | Stock use and exit. Reception loads XML. Extra prices. Extras on the reservation. |
-| 13 | 2027-01-04 | 17 | adicionar-servicos-extra-reserva, calcular-preco-total-reserva, register-room-service-request, record-suggestion-complaint, list-suggestions-complaints | Paid services, total price, room service, suggestions and complaints. Final zip. |
+| 11 | 2027-01-11 | 16 | editar-item-stock, carregar-xml-fornecedor-gestor, registar-entrada-stock, ver-relatorio-importacao | The manager loads the supplier XML with an import report. Stock entry. |
+| 12 | 2027-01-18 | 17 | registar-uso-stock, registar-saida-stock, carregar-xml-fornecedor-rececionista, definir-precos-extra, adicionar-extras-quarto-reserva | Stock use and exit. Reception loads XML. Extra prices. Extras on the reservation. |
+| 13 | 2027-01-25 | 17 | adicionar-servicos-extra-reserva, calcular-preco-total-reserva, register-room-service-request, record-suggestion-complaint, list-suggestions-complaints | Paid services, total price, room service, suggestions and complaints. Final zip. |
 
 Check: 13+13+14+14+15+12+14+17+18+16+17+17 = 180. 1st delivery scope (sprints 2 to 6) = 69 points.
 
@@ -272,6 +272,7 @@ All other links of the old list. Examples: register-rooms -> room stories (test 
 - Test data must never run in production. The first manager password must never be in Git or docs.
 - The 1st delivery is 35% of the grade. Sprint 7 holds the zip; no sprint 7 story may touch the frozen delivery branch before the zip is tagged.
 - Card chain (sprints 9 and 10, 35 points) has high risk. T6 in sprint 8 makes all 11 card stories parallel.
+- Sprint 13 (week of 2027-01-25) ends on 2027-01-31, the final delivery day. No slack. The final zip (LP3-GY.zip) must be ready before the last day.
 
 ## Not-ready items
 
@@ -290,12 +291,12 @@ None by the Definition of Ready. Notes for the PO:
 
 ## Open questions
 
-- Q-04 (open): which 3 weeks have no sprint.
 - Q-15 (open): AI reference format.
-- Q-28 (open): developer as story actor. Not blocking (technical work is tasks, Q-35).
 - Answered, removed from the open list:
+  - Free weeks: Q-04 (team decision, user, 2026-10-16). The 3 free weeks are Christmas and New Year (2026-12-21, 2026-12-28, 2027-01-04).
+  - Developer as story actor: Q-28, closed by Q-35. Technical work is a task, not a story.
   - Master card for a manager created later: Q-44. The story "emitir novo cartão mestre" issues it. The seed gives the first card to the initial manager (Q-46).
   - Zone flags: Q-45. `guest_card_access` (0 = client card never opens the place, Q-20) and `requires_reservation` (1 = card opens only if the reservation lists the place). See docs/H4Y-10.
 - Accepted (user, 2026-10-16, Q-43): cadastrar-item-stock in sprint 4 (1st delivery). Seeding room items is not needed.
 
-AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.

@@ -33,6 +33,7 @@ Short facts sheet. Full source: `enunciado.md`. Never add a requirement that is 
 
 ## Scrum rules
 - 16 weeks, 13 sprints. Sprint 1 = read the statement and write the Requirements Engineering documents. No roles in sprint 1.
+- Sprint weeks: 2026-10-12 to 2027-01-31. No sprint in the weeks of 2026-12-21, 2026-12-28, 2027-01-04 (Christmas and New Year, Q-04, team decision, user, 2026-10-16). Sprint 13 ends on the final delivery day.
 - Team Leader = Scrum Master + Product Owner. The role rotates every sprint.
 - Team Leader: updates and validates docs (JavaDoc, UML, Scrum), creates user stories, tests and validates tasks against acceptance tests, runs the ceremonies.
 - Developers: develop and test stories, update diagrams.
@@ -70,3 +71,5 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Scrum documents (graded): `docs/scrum/sprint-NN/{planning,review,retrospective,impediments}.md`.
 - Drafts: `.agent/drafts/<type>-<slug>.md`. Examples: `.agent/examples/`.
 - Acceptance scenarios are numbered AC-1, AC-2 inside the story. Tests cite "H4Y-NN AC-n".
+
+AI use: doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04). Reviewed by: pending.

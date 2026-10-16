@@ -49,7 +49,8 @@ Para que encontre e abra cada função da receção.
 - [ ] AC-4: Sem sessão iniciada, a janela principal não é acessível.
 
 ## Notas
-RNF-06: interface JavaFX desde a 1.ª entrega (Q-22). RNF-07: a janela só mostra e navega, a lógica fica separada. Depende de "Iniciar sessão como rececionista" e "Mostrar apenas as funções permitidas ao papel". Sem desenho de ecrãs aqui.
+RNF-06: interface JavaFX desde a 1.ª entrega (Q-22). RNF-07: a janela só mostra e navega, a lógica fica separada. Sem desenho de ecrãs aqui.
+Dependências (auditoria 2026-10-16): não depende de "Iniciar sessão como rececionista" nem de "Mostrar apenas as funções permitidas ao papel". Usa uma sessão simulada (stub).
 
 points_suggested: 3
 reference: Registar um cliente (validação de dados e gravação) (3)
@@ -61,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

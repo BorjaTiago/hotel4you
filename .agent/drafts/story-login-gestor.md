@@ -45,6 +45,7 @@ Para que apenas eu aceda às funções de gestão.
 
 ## Notas
 Fase: 1.ª entrega (Q-06). Reutiliza o mecanismo de "Iniciar sessão como rececionista"; esta história confirma o papel gestor. Funções exclusivas do gestor (por exemplo apagar reservas, RF-22) ficam nas respetivas épicas.
+Dependências (auditoria 2026-10-16): "existe um gestor" significa o gestor inicial criado pelos dados iniciais (seed). Reutiliza o mecanismo de início de sessão de "Iniciar sessão como rececionista".
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -56,4 +57,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -43,6 +43,7 @@ Para que não aceda a funções de outros papéis.
 
 ## Notas
 Cada tipo de ator tem o seu acesso (RF-02). Esta história cria a regra geral por papel. Limites por piso (RF-24) e do restaurante (RF-25) ficam em epic-staff-management-access. A lista exata de funções por papel vem das épicas de funcionalidade. Nenhuma pergunta nova.
+Dependências (auditoria 2026-10-16): implementa a política de permissões da tarefa T0 (foundation).
 
 points_suggested: 3
 reference: Registar um cliente (validação de dados e gravação) (3)
@@ -54,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
