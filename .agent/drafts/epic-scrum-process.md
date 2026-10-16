@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Scrum process, ceremonies and Team Leader rotation
+summary: Processo Scrum, cerimónias e rotação do Team Leader
 parent:
 requirements: [RNF-13, RNF-14, RNF-15, RNF-16, RNF-17, RNF-18, RNF-19, RNF-27]
 points:
@@ -11,44 +11,44 @@ labels: [scrum, process, 1st-delivery, final-delivery]
 sprint:
 ---
 
-# Epic: Scrum process and ceremonies
+# Épica: Processo Scrum e cerimónias
 
-## Goal
-The team runs Scrum in 13 one-week sprints and documents every ceremony.
+## Objetivo
+A equipa aplica o Scrum em 13 sprints de uma semana e documenta todas as cerimónias.
 
-## Delivery
-Both deliveries. Scrum documents are graded 20% in each (RNF-27).
+## Entrega
+As duas entregas. Os documentos Scrum valem 20% em cada uma (RNF-27).
 
-## Scope
-- Sprint 1 requirements; no roles in sprint 1 (Q-24).
-- Planning, daily scrum, review (demo), retrospective, refinement per sprint.
-- Team Leader rotation and duties (`team.md`).
-- Documents in `docs/scrum/sprint-NN/`.
+## Âmbito
+- Requisitos no sprint 1; sem papéis no sprint 1 (Q-24).
+- Planning, daily scrum, review (demo), retrospetiva e refinamento em cada sprint.
+- Rotação e deveres do Team Leader (`team.md`).
+- Documentos em `docs/scrum/sprint-NN/`.
 
-## Out of scope
-- Product features.
+## Fora do âmbito
+- Funções do produto.
 
-## Actors
-- Team Leader, developer.
+## Atores
+- Team Leader, programador.
 
-## Value
-Good Scrum score and a steady delivery pace.
+## Valor
+Boa nota de Scrum e um ritmo de entrega estável.
 
-## Statement links
-Sections 1, 4, 6. RNF-13 to RNF-19, RNF-27. Q-03, Q-04, Q-07, Q-24.
+## Ligações ao enunciado
+Secções 1, 4, 6. RNF-13 a RNF-19, RNF-27. Q-03, Q-04, Q-07, Q-24.
 
-## Candidate stories
-- Planear cada sprint e registar o planeamento (actor: Team Leader; RNF-13, RNF-15)
-- Registar o Daily Scrum de cada aula prática (actor: developer; RNF-16)
-- Fazer e registar a Sprint Review com demo (actor: Team Leader; RNF-15)
-- Fazer e registar a retrospetiva keep/stop/start (actor: Team Leader; RNF-15)
-- Refinar o backlog (actor: Team Leader; RNF-15, RNF-18)
-- Rodar o Team Leader em cada sprint (actor: Team Leader; RNF-17)
-- Validar tarefas contra testes de aceitação (actor: Team Leader; RNF-18)
-- Desenvolver, testar e atualizar diagramas das histórias (actor: developer; RNF-19)
+## Histórias candidatas
+- Planear cada sprint e registar o planeamento (ator: Team Leader; RNF-13, RNF-15)
+- Registar o Daily Scrum de cada aula prática (ator: programador; RNF-16)
+- Fazer e registar a Sprint Review com demo (ator: Team Leader; RNF-15)
+- Fazer e registar a retrospetiva keep/stop/start (ator: Team Leader; RNF-15)
+- Refinar o backlog (ator: Team Leader; RNF-15, RNF-18)
+- Rodar o Team Leader em cada sprint (ator: Team Leader; RNF-17)
+- Validar tarefas contra testes de aceitação (ator: Team Leader; RNF-18)
+- Desenvolver, testar e atualizar diagramas das histórias (ator: programador; RNF-19)
 
-## Open questions
-- Q-04 (answered): which 3 weeks have no sprint. Answer: 2026-12-21, 2026-12-28, 2027-01-04 (team decision, not confirmed by the teacher).
+## Perguntas em aberto
+- Q-04 (respondida): quais as 3 semanas sem sprint. Resposta: 2026-12-21, 2026-12-28, 2027-01-04 (decisão da equipa, não confirmada pelo professor).
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): processo Scrum é tarefa, não história. Todas ficam ligadas a esta épica. Esta épica não tem histórias. Q-28 (atores) fica sem efeito para estas tarefas.
@@ -92,4 +92,4 @@ Decisão da equipa (2026-10-16): processo Scrum é tarefa, não história. Todas
 - [ ] Alteração sem testes não é aceite.
 - [ ] Sem impacto na estrutura: nota "sem impacto".
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

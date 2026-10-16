@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Deliverables, diagrams and delivery zip
+summary: Entregáveis, diagramas e zip de entrega
 parent:
 requirements: [RNF-22, RNF-23, RNF-24]
 points:
@@ -11,41 +11,41 @@ labels: [delivery, documentation, 1st-delivery, final-delivery]
 sprint:
 ---
 
-# Epic: Delivery packaging and diagrams
+# Épica: Empacotamento da entrega e diagramas
 
-## Goal
-Each delivery is a complete `LP3-GY.zip` on Moodle on time.
+## Objetivo
+Cada entrega é um `LP3-GY.zip` completo, submetido no Moodle a tempo.
 
-## Delivery
-1st delivery (2026-12-01 23:55) and final delivery (2027-01-31 23:55).
+## Entrega
+1.ª entrega (2026-12-01 23:55) e entrega final (2027-01-31 23:55).
 
-## Scope
-- Domain model, class diagram, use case diagram, sequence diagrams (one general, one detailed).
-- Executables, Scrum documents, Javadoc output, unit tests, source code.
-- Zip naming and Moodle upload.
+## Âmbito
+- Modelo de domínio, diagrama de classes, diagrama de casos de uso, diagramas de sequência (um geral, um detalhado).
+- Executáveis, documentos Scrum, saída Javadoc, testes unitários, código-fonte.
+- Nome do zip e submissão no Moodle.
 
-## Out of scope
-- Writing Javadoc and tests (epic-engineering-quality).
+## Fora do âmbito
+- Escrever Javadoc e testes (epic-engineering-quality).
 
-## Actors
-- Team Leader, developer.
+## Atores
+- Team Leader, programador.
 
-## Value
-Complete deliveries. Documentation scores 20% each delivery.
+## Valor
+Entregas completas. A documentação vale 20% em cada entrega.
 
-## Statement links
-Sections 5, 6. RNF-22, RNF-23, RNF-24.
+## Ligações ao enunciado
+Secções 5, 6. RNF-22, RNF-23, RNF-24.
 
-## Candidate stories
-- Criar o modelo de domínio e o diagrama de casos de uso (actor: developer; RNF-24)
-- Criar o diagrama de classes (actor: developer; RNF-24)
-- Criar os diagramas de sequência geral e detalhado (actor: developer; RNF-24)
-- Gerar executáveis e saída Javadoc (actor: developer; RNF-24)
-- Montar e validar o zip LP3-GY.zip da 1.ª entrega (actor: Team Leader; RNF-22, RNF-23, RNF-24)
-- Montar e submeter o zip da entrega final (actor: Team Leader; RNF-22, RNF-23, RNF-24)
+## Histórias candidatas
+- Criar o modelo de domínio e o diagrama de casos de uso (ator: programador; RNF-24)
+- Criar o diagrama de classes (ator: programador; RNF-24)
+- Criar os diagramas de sequência geral e detalhado (ator: programador; RNF-24)
+- Gerar executáveis e saída Javadoc (ator: programador; RNF-24)
+- Montar e validar o zip LP3-GY.zip da 1.ª entrega (ator: Team Leader; RNF-22, RNF-23, RNF-24)
+- Montar e submeter o zip da entrega final (ator: Team Leader; RNF-22, RNF-23, RNF-24)
 
-## Open questions
-- None new. Group number Y: team fills in.
+## Perguntas em aberto
+- Nenhuma nova. Número do grupo Y: a equipa preenche.
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): entregáveis são tarefas, não histórias. Todas ficam ligadas a esta épica. Esta épica não tem histórias.
@@ -80,4 +80,4 @@ Decisão da equipa (2026-10-16): entregáveis são tarefas, não histórias. Tod
 - [ ] Item em falta: validação falha e indica o item.
 - [ ] Submissão fora de prazo: fica registada a penalização possível.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

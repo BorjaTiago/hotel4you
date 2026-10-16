@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Technical foundation - Java, JavaFX, SQL Server, layered architecture
+summary: Base técnica - Java, JavaFX, SQL Server, arquitetura em camadas
 parent:
 requirements: [RNF-04, RNF-05, RNF-06, RNF-07, RNF-08, RNF-12]
 points:
@@ -11,42 +11,42 @@ labels: [foundation, 1st-delivery]
 sprint:
 ---
 
-# Epic: Foundation and architecture
+# Épica: Fundação e arquitetura
 
-## Goal
-Build the technical base. Every other epic adds features on top of it in small increments.
+## Objetivo
+Construir a base técnica. Todas as outras épicas acrescentam funções por cima dela, em pequenos incrementos.
 
-## Delivery
-1st delivery (needed by login, rooms, reservations, check-in/out). Sprint placement: backlog prioritizer.
+## Entrega
+1.ª entrega (necessária para o login, quartos, reservas, check-in/out). Colocação em sprint: backlog prioritizer.
 
-## Scope
-- Java project, build, and package layout.
-- SQL Server database and connection layer.
-- JavaFX shell (main window, navigation by role).
-- Separation of business logic and GUI logic.
-- Extensible class structure.
-- GUI usability checks (simple and intuitive).
+## Âmbito
+- Projeto Java, build e organização de pacotes.
+- Base de dados SQL Server e camada de ligação.
+- Estrutura JavaFX (janela principal, navegação por papel).
+- Separação entre lógica de negócio e lógica da interface.
+- Estrutura de classes extensível.
+- Verificações de usabilidade da interface (simples e intuitiva).
 
-## Out of scope
-- Feature screens (they belong to the feature epics).
+## Fora do âmbito
+- Ecrãs de funções (pertencem às épicas de cada função).
 
-## Actors
-- Developer (team). End users: all actors who use the GUI.
+## Atores
+- Programador (equipa). Utilizadores finais: todos os atores que usam a interface.
 
-## Value
-Features can grow sprint by sprint without rework. The 1st delivery runs on SQL Server with a JavaFX GUI.
+## Valor
+As funções podem crescer sprint a sprint sem retrabalho. A 1.ª entrega corre em SQL Server com interface JavaFX.
 
-## Statement links
-Sections 1, 2, 3c. RNF-04, RNF-05, RNF-06, RNF-07, RNF-08, RNF-12. Q-22.
+## Ligações ao enunciado
+Secções 1, 2, 3c. RNF-04, RNF-05, RNF-06, RNF-07, RNF-08, RNF-12. Q-22.
 
-## Candidate stories
-- Criar projeto Java com camadas de negócio e GUI separadas (actor: developer; RNF-05, RNF-07, RNF-08)
-- Configurar ligação à base de dados SQL Server e esquema inicial (actor: developer; RNF-12)
-- Criar a janela principal JavaFX com navegação (actor: receptionist; RNF-06)
+## Histórias candidatas
+- Criar projeto Java com camadas de negócio e GUI separadas (ator: programador; RNF-05, RNF-07, RNF-08)
+- Configurar ligação à base de dados SQL Server e esquema inicial (ator: programador; RNF-12)
+- Criar a janela principal JavaFX com navegação (ator: rececionista; RNF-06)
 - (Usabilidade RNF-04: tarefa técnica T3, ver abaixo)
 
-## Open questions
-- None new. The "simple and intuitive" test method is a team choice (RNF-04).
+## Perguntas em aberto
+- Nenhuma nova. O método de teste de "simples e intuitivo" é escolha da equipa (RNF-04).
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): trabalho técnico sem ator de negócio é tarefa, não história. Fica ligado a esta épica. História mantida: janela principal. O teste de usabilidade (T3) é tarefa técnica.
@@ -124,4 +124,4 @@ Dados fixos do enunciado que nenhuma história de ator cria.
 - [ ] `CardNumberGenerator` dá sempre um número novo e único (RF-16, Q-26).
 - [ ] O gestor inicial (epic-authentication-users T2) recebe um cartão mestre ativo (Q-19: um cartão mestre por gestor). Ver pergunta nova no backlog sobre gestores criados depois.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

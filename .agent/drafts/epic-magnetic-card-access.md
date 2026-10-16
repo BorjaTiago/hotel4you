@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Client magnetic card, door access and access log
+summary: Cartão magnético do cliente, acesso às portas e registo de acessos
 parent:
 requirements: [RF-03, RF-13, RF-16, RF-17, RF-18, RF-19]
 points:
@@ -11,35 +11,35 @@ labels: [access-control, final-delivery]
 sprint:
 ---
 
-# Epic: Client magnetic card and access log
+# Epic: Cartão magnético do cliente e registo de acessos
 
-## Goal
-After check-in, the client gets a card. It opens the room, and the restaurant and pool if in the reservation. The system logs each entry.
+## Objetivo
+Após o check-in, o cliente recebe um cartão. O cartão abre o quarto e, se constarem da reserva, o restaurante e a piscina. O sistema regista cada entrada.
 
-## Delivery
-Final delivery (Q-06).
+## Entrega
+Entrega final (Q-06).
 
-## Scope
-- Card issue at check-in; one card per reservation (Q-09).
-- Card opens the room; restaurant and pool only if reserved.
-- No access to bar, conference rooms, garage, storeroom, private pools, spa (Q-20).
-- Log: place and entry time, including room entries.
-- Zone use of the floor model (RF-03).
+## Âmbito
+- Emissão do cartão no check-in; um cartão por reserva (Q-09).
+- O cartão abre o quarto; restaurante e piscina apenas se reservados.
+- Sem acesso ao bar, salas de conferência, garagem, arrecadação, piscinas privadas e spa (Q-20).
+- Registo: local e hora de entrada, incluindo as entradas nos quartos.
+- Zonas do modelo de pisos (RF-03).
 
-## Out of scope
-- Physical readers (simulated entry in the app).
-- Master card (epic-master-card-audit).
+## Fora de âmbito
+- Leitores físicos (entrada simulada na aplicação).
+- Cartão mestre (epic-master-card-audit).
 
-## Actors
-- Receptionist, client.
+## Atores
+- Rececionista, cliente.
 
-## Value
-The hotel controls and records who enters each place.
+## Valor
+O hotel controla e regista quem entra em cada local.
 
-## Statement links
-Section 2. RF-03, RF-13, RF-16, RF-17, RF-18, RF-19. Q-09, Q-20.
+## Ligações ao enunciado
+Secção 2. RF-03, RF-13, RF-16, RF-17, RF-18, RF-19. Q-09, Q-20.
 
-## Candidate stories
+## Histórias candidatas
 - Emitir um cartão com número ao fazer check-in (actor: receptionist; RF-13, RF-16)
 - Abrir o quarto com o cartão (actor: client; RF-17)
 - Abrir restaurante e piscina só se estiverem na reserva (actor: client; RF-18)
@@ -49,9 +49,9 @@ Section 2. RF-03, RF-13, RF-16, RF-17, RF-18, RF-19. Q-09, Q-20.
 - Editar uma zona de um piso (actor: manager; RF-03)
 - Remover uma zona de um piso (actor: manager; RF-03)
 
-## Open questions
-- Card state at check-out: decided 2026-10-16. The card stops working and the access log stays (see story-check-out AC-4).
-- Zones: decided 2026-10-16. The manager creates, edits and removes zones per floor and marks if a zone needs a reservation.
-- How is a door entry entered without hardware? Team choice: GUI simulation.
+## Questões em aberto
+- Estado do cartão no check-out: decidido em 2026-10-16. O cartão deixa de funcionar e o registo de acessos mantém-se (ver story-check-out AC-4).
+- Zonas: decidido em 2026-10-16. O gestor cria, edita e remove zonas por piso e indica se uma zona exige reserva.
+- Como se introduz uma entrada de porta sem hardware? Escolha da equipa: simulação na GUI.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
