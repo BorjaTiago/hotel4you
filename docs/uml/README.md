@@ -2,22 +2,12 @@
 
 This folder holds the Hotel4You UML diagrams and supporting documents.
 
-## Diagrams and catalogue
-
-- [Class diagram](class-diagram.md): Mermaid class diagram for the proposed design.
-- [Use-case diagrams](use-cases.md): Mermaid UML use-case diagrams for all 19 use cases, grouped by workflow.
-- [Use-case catalogue](use-case-catalog.md): actors, descriptions, permissions, and requirement references for all 19 use cases.
-
-The use-case diagrams use Mermaid's `usecase-beta` syntax and need Mermaid 12 or later. GitHub's renderer may use a different Mermaid version. If a diagram does not render there, paste its Mermaid block into the [Mermaid Live Editor](https://mermaid.live/).
-
-## Class model documents
-
-- [guide.md](guide.md): explanation of classes and key flows.
-- [classes.md](classes.md): classes by layer, with attributes, methods, and requirements.
-- [traceability.md](traceability.md): requirements mapped to classes.
-- Database model: [schema](../database/schema.md) and [ER diagram](../database/erd.md).
-
-## Class model notes
+- View the Mermaid diagram on GitHub, or paste it at mermaid.live.
+- [domain-model.md](domain-model.md): domain model with business concepts only.
+- [guide.md](guide.md): guide to defend each class and key flows.
+- [classes.md](classes.md): all classes by layer, with attributes, methods and requirements.
+- [traceability.md](traceability.md): requirements to classes.
+- Database: [../database/schema.md](../database/schema.md), [../database/erd.md](../database/erd.md).
 
 - `RoomType` class vs `room_types` table.
 - `ReservationExtra` vs `reservation_services`.
