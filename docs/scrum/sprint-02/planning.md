@@ -114,4 +114,6 @@ limit_source: forecast
 over_limit: false
 ```
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Note: the Jira text (epics, stories, sub-tasks) is in Portuguese (user decision 2026-10-16).
+
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Note line by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

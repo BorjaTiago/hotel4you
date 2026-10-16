@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Login, user roles and secure user storage
+summary: Login, papéis de utilizador e armazenamento seguro de utilizadores
 parent:
 requirements: [RF-01, RF-02, RNF-01, RNF-02]
 points:
@@ -11,45 +11,45 @@ labels: [security, login, 1st-delivery]
 sprint:
 ---
 
-# Epic: Authentication, roles and users
+# Épica: Autenticação, papéis e utilizadores
 
-## Goal
-Hotel staff, restaurant staff and managers log in with user name and password. Each role has its own access.
+## Objetivo
+O pessoal do hotel, o pessoal do restaurante e os gestores iniciam sessão com nome de utilizador e palavra-passe. Cada papel tem o seu próprio acesso.
 
-## Delivery
-1st delivery (login).
+## Entrega
+1.ª entrega (login).
 
-## Scope
-- Login for receptionist, manager and restaurant staff (Q-23).
-- Five actor types and their access rules.
-- All users saved and readable at any time.
-- Passwords saved encrypted.
-- Same error for wrong password and unknown account.
+## Âmbito
+- Login do rececionista, do gestor e do pessoal do restaurante (Q-23).
+- Cinco tipos de ator e as suas regras de acesso.
+- Todos os utilizadores guardados e consultáveis a qualquer momento.
+- Palavras-passe guardadas cifradas.
+- Mesmo erro para palavra-passe errada e conta desconhecida.
 
-## Out of scope
-- Client and supplier login (they do not log in, Q-13, Q-17).
-- Staff account management screens (epic-staff-management).
-- Floor and zone limits (epic-staff-access-rules).
+## Fora do âmbito
+- Login de clientes e fornecedores (não iniciam sessão, Q-13, Q-17).
+- Ecrãs de gestão de contas do pessoal (epic-staff-management).
+- Limites por piso e zona (epic-staff-access-rules).
 
-## Actors
-- Receptionist, manager, restaurant staff.
+## Atores
+- Rececionista, gestor, pessoal do restaurante.
 
-## Value
-Only known users enter the system. Passwords are safe.
+## Valor
+Só utilizadores conhecidos entram no sistema. As palavras-passe estão seguras.
 
-## Statement links
-Section 2, 3a, 3b. RF-01, RF-02, RNF-01, RNF-02.
+## Ligações ao enunciado
+Secções 2, 3a, 3b. RF-01, RF-02, RNF-01, RNF-02.
 
-## Candidate stories
-- Iniciar sessão com utilizador e palavra-passe (actor: receptionist; RF-01)
-- Iniciar sessão como gestor (actor: manager; RF-01)
-- Iniciar sessão como pessoal do restaurante (actor: restaurant staff; RF-01)
-- Guardar palavras-passe cifradas (actor: manager; RNF-02)
-- Guardar e consultar todos os utilizadores (actor: manager; RNF-01)
-- Mostrar apenas as funções permitidas a cada papel (actor: receptionist; RF-02)
+## Histórias candidatas
+- Iniciar sessão com utilizador e palavra-passe (ator: rececionista; RF-01)
+- Iniciar sessão como gestor (ator: gestor; RF-01)
+- Iniciar sessão como pessoal do restaurante (ator: pessoal do restaurante; RF-01)
+- Guardar palavras-passe cifradas (ator: gestor; RNF-02)
+- Guardar e consultar todos os utilizadores (ator: gestor; RNF-01)
+- Mostrar apenas as funções permitidas a cada papel (ator: rececionista; RF-02)
 
-## Open questions
-- None new. Q-13, Q-17, Q-23 are team decisions, not confirmed by the teacher.
+## Perguntas em aberto
+- Nenhuma nova. Q-13, Q-17 e Q-23 são decisões da equipa, não confirmadas pelo professor.
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): trabalho técnico sem ator de negócio é tarefa, não história. Fica ligado a esta épica.
@@ -70,4 +70,4 @@ Sprint 2, depois de epic-foundation-architecture T0 e T2 e depois de T1 (cifra).
 - [ ] O script corre duas vezes sem duplicar papéis nem a conta.
 - [ ] O gestor inicial cria as outras contas com story-create-staff-account (sprint 2).
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; task T2 by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; task T2 by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

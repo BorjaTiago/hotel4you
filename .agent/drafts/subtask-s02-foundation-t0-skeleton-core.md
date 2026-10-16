@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: T0a - Java project skeleton, domain classes and core interfaces
+summary: T0a - Esqueleto do projeto Java, classes de domínio e interfaces base
 parent: H4Y-11
 requirements: [RNF-05, RNF-07, RNF-08, RNF-12]
 points:
@@ -12,19 +12,19 @@ sprint: 02
 branch: feat-032-project-skeleton-core
 ---
 
-# T0a: Project skeleton, domain classes and core interfaces
+# T0a: Esqueleto do projeto, classes de domínio e interfaces base
 
-Source: `epic-foundation-architecture.md`, task T0, items 1 to 3. First card of sprint 2. Every other card waits only for the end of this card (target: end of day 2). Branch key NNN: the Jira key does not exist yet. Write the real number after publish.
-Proposed owner: Lukas Sperandio (the team decides).
+Origem: `epic-foundation-architecture.md`, tarefa T0, pontos 1 a 3. Primeiro cartão do sprint 2. Todos os outros cartões esperam só pelo fim deste cartão (objetivo: fim do dia 2). Chave NNN do ramo: a chave Jira ainda não existe. Escrever o número real depois de publicar.
+Responsável proposto: Lukas Sperandio (a equipa decide).
 
 ## Checklist
 
-- [ ] Build file and package layout exist: `domain`, `service`, `data`, `gui`, `config`. The project compiles.
-- [ ] Domain classes and enums exist: `Role` (5 types), `User`, `Session`, `Floor`, `Location`, `RoomType`, `Room`, `Customer`, `Reservation`, `AccessCard`, `AccessLog`, `Item`, `StockMovement`, and the others of T0. No SQL and no JavaFX in `domain`.
-- [ ] Service interfaces exist: `AuthenticationService`, `PasswordHasher`, `PermissionPolicy`, `UserService`, and the others of T0. Signatures only.
-- [ ] Repository interfaces exist with an in-memory version for tests (`UserRepository` first).
-- [ ] `config` reads database and first-manager values from local config or environment. No credential in Git.
-- [ ] Short Javadoc on every public class (RNF-09).
-- [ ] Merge to the shared branch by end of day 2. Tell the team.
+- [ ] Existem o ficheiro de build e a organização de pacotes: `domain`, `service`, `data`, `gui`, `config`. O projeto compila.
+- [ ] Existem as classes de domínio e os enums: `Role` (5 tipos), `User`, `Session`, `Floor`, `Location`, `RoomType`, `Room`, `Customer`, `Reservation`, `AccessCard`, `AccessLog`, `Item`, `StockMovement` e as outras de T0. Sem SQL e sem JavaFX em `domain`.
+- [ ] Existem as interfaces de serviço: `AuthenticationService`, `PasswordHasher`, `PermissionPolicy`, `UserService` e as outras de T0. Só assinaturas.
+- [ ] Existem as interfaces de repositório com uma versão em memória para testes (`UserRepository` primeiro).
+- [ ] `config` lê os valores da base de dados e do primeiro gestor da configuração local ou do ambiente. Nenhuma credencial no Git.
+- [ ] Javadoc curto em todas as classes públicas (RNF-09).
+- [ ] Integrar no ramo partilhado até ao fim do dia 2. Avisar a equipa.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Client registration by reception
+summary: Registo de clientes pela receção
 parent:
 requirements: [RF-10, RNF-03]
 points:
@@ -11,37 +11,37 @@ labels: [clients, 1st-delivery]
 sprint:
 ---
 
-# Epic: Client registration
+# Épica: Registo de clientes
 
-## Goal
-Reception registers a client fast: registration plus reservation in 30 seconds or less.
+## Objetivo
+A receção regista um cliente depressa: registo mais reserva em 30 segundos ou menos.
 
-## Delivery
-1st delivery (Q-27, team decision, user, 2026-10-16). Reservations need a client. Sprint placement: backlog prioritizer.
+## Entrega
+1.ª entrega (Q-27, decisão da equipa, utilizador, 2026-10-16). As reservas precisam de um cliente. Colocação em sprint: backlog prioritizer.
 
-## Scope
-- Register a client.
-- Find a registered client.
-- Fast, short form.
+## Âmbito
+- Registar um cliente.
+- Procurar um cliente registado.
+- Formulário curto e rápido.
 
-## Out of scope
-- Client login (clients do not log in, Q-13).
+## Fora do âmbito
+- Login de clientes (os clientes não iniciam sessão, Q-13).
 
-## Actors
-- Receptionist.
+## Atores
+- Rececionista.
 
-## Value
-Reservations and check-in have client data.
+## Valor
+As reservas e o check-in têm os dados do cliente.
 
-## Statement links
-Section 2, 3c. RF-10, RNF-03. Q-12, Q-25.
+## Ligações ao enunciado
+Secções 2, 3c. RF-10, RNF-03. Q-12, Q-25.
 
-## Candidate stories
-- Registar um novo cliente (actor: receptionist; RF-10)
-- Procurar um cliente já registado (actor: receptionist; RF-10)
-- Registar cliente em formulário rápido (actor: receptionist; RNF-03)
+## Histórias candidatas
+- Registar um novo cliente (ator: rececionista; RF-10)
+- Procurar um cliente já registado (ator: rececionista; RF-10)
+- Registar cliente em formulário rápido (ator: rececionista; RNF-03)
 
-## Open questions
-- None. Q-27 answered: RF-10 is in the 1st delivery.
+## Perguntas em aberto
+- Nenhuma. Q-27 respondida: o RF-10 está na 1.ª entrega.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Tests, Javadoc and diagram update for the main window
+summary: Testes, Javadoc e atualização do diagrama da janela principal
 parent: H4Y-24
 requirements: [RNF-06, RNF-07]
 points:
@@ -12,16 +12,16 @@ sprint: 02
 branch: feat-024-main-window-tests-docs
 ---
 
-# janela-principal: tests, Javadoc, diagram
+# janela-principal: testes, Javadoc, diagrama
 
-Parent story H4Y-24. Branch key 024 is the story key.
-Proposed owner: Pedro Costa (the team decides).
+História pai H4Y-24. A chave 024 do ramo é a chave da história.
+Responsável proposto: Pedro Costa (a equipa decide).
 
 ## Checklist
 
-- [ ] One JUnit test per AC-1 to AC-4. Names cite "H4Y-24 AC-n". Tests use the navigation model, not a screen.
-- [ ] Javadoc on the new public classes. The Javadoc builds.
-- [ ] Class diagram updated (navigation registry, session) with the AI-use reference.
-- [ ] No new library, or it is in `docs/libraries.md`.
+- [ ] Um teste JUnit por cada AC-1 a AC-4. Os nomes citam "H4Y-24 AC-n". Os testes usam o modelo de navegação, não um ecrã.
+- [ ] Javadoc nas novas classes públicas. O Javadoc compila.
+- [ ] Diagrama de classes atualizado (registo de navegação, sessão) com a referência de uso de IA.
+- [ ] Nenhuma biblioteca nova, ou está em `docs/libraries.md`.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

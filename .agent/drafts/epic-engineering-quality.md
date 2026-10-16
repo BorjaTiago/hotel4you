@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Javadoc, JUnit, Git flow, libraries and AI references
+summary: Javadoc, JUnit, Git flow, bibliotecas e referências de IA
 parent:
 requirements: [RNF-09, RNF-10, RNF-11, RNF-20, RNF-21, RNF-25, RNF-26]
 points:
@@ -11,44 +11,44 @@ labels: [quality, documentation, 1st-delivery, final-delivery]
 sprint:
 ---
 
-# Epic: Engineering quality and conduct
+# Épica: Qualidade de engenharia e conduta
 
-## Goal
-The code is documented and tested. The repository and AI use follow the course rules.
+## Objetivo
+O código está documentado e testado. O repositório e o uso de IA seguem as regras da unidade curricular.
 
-## Delivery
-Both deliveries. Ongoing in every sprint.
+## Entrega
+As duas entregas. Contínuo em todos os sprints.
 
-## Scope
-- Javadoc on code.
-- JUnit tests for main functions.
-- Library justification in `docs/libraries.md` (Q-14).
-- Git flow branch and commit rules.
-- AI-use reference on code, docs and diagrams (Q-15).
-- No code sharing between groups.
+## Âmbito
+- Javadoc no código.
+- Testes JUnit das funções principais.
+- Justificação das bibliotecas em `docs/libraries.md` (Q-14).
+- Regras de ramos e commits do Git flow.
+- Referência de uso de IA em código, documentos e diagramas (Q-15).
+- Sem partilha de código entre grupos.
 
-## Out of scope
-- Delivery packaging (epic-delivery-packaging).
+## Fora do âmbito
+- Empacotamento da entrega (epic-delivery-packaging).
 
-## Actors
-- Developer, Team Leader.
+## Atores
+- Programador, Team Leader.
 
-## Value
-Avoids penalties and raises documentation and source code scores.
+## Valor
+Evita penalizações e melhora as notas de documentação e de código-fonte.
 
-## Statement links
-Sections 3c, 4, 7. RNF-09, RNF-10, RNF-11, RNF-20, RNF-21, RNF-25, RNF-26.
+## Ligações ao enunciado
+Secções 3c, 4, 7. RNF-09, RNF-10, RNF-11, RNF-20, RNF-21, RNF-25, RNF-26.
 
-## Candidate stories
-- Configurar a geração de Javadoc (actor: developer; RNF-09)
-- Configurar JUnit e testes das funções principais (actor: developer; RNF-10)
-- Criar docs/libraries.md e justificar bibliotecas (actor: developer; RNF-11)
-- Aplicar a regra de ramos e commits Git flow (actor: developer; RNF-20, RNF-21)
-- Referenciar todo o uso de IA (actor: Team Leader; RNF-25)
-- Rever o cumprimento do código de conduta (actor: Team Leader; RNF-26)
+## Histórias candidatas
+- Configurar a geração de Javadoc (ator: programador; RNF-09)
+- Configurar JUnit e testes das funções principais (ator: programador; RNF-10)
+- Criar docs/libraries.md e justificar bibliotecas (ator: programador; RNF-11)
+- Aplicar a regra de ramos e commits Git flow (ator: programador; RNF-20, RNF-21)
+- Referenciar todo o uso de IA (ator: Team Leader; RNF-25)
+- Rever o cumprimento do código de conduta (ator: Team Leader; RNF-26)
 
-## Open questions
-- Q-15 (open): exact AI reference format.
+## Perguntas em aberto
+- Q-15 (em aberto): formato exato da referência de IA.
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): qualidade e conduta são tarefas, não histórias. Todas ficam ligadas a esta épica. Esta épica não tem histórias.
@@ -81,4 +81,4 @@ Decisão da equipa (2026-10-16): qualidade e conduta são tarefas, não históri
 - [ ] Código copiado ou sem autoria fica registado e é removido antes da entrega.
 - [ ] Prazo em risco (7 dias, tarefas obrigatórias por fechar) fica em `impediments.md`.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

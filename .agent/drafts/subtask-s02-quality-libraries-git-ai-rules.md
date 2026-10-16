@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Create docs/libraries.md and write the branch, commit and AI-use rules
+summary: Criar docs/libraries.md e escrever as regras de ramos, commits e uso de IA
 parent: H4Y-18
 requirements: [RNF-11, RNF-20, RNF-21, RNF-25]
 points:
@@ -12,18 +12,18 @@ sprint: 02
 branch: feat-036-libraries-git-ai-rules
 ---
 
-# Engineering quality T3, T4 and T5: libraries, Git rule, AI-use reference
+# Qualidade de engenharia T3, T4 e T5: bibliotecas, regra Git, referência de uso de IA
 
-Source: `epic-engineering-quality.md`, tasks T3, T4 and T5. Docs only. No dependency on other cards. Q-15 (AI reference format) is still open.
-Proposed owner: Tiago Borja, Team Leader (the team decides).
+Origem: `epic-engineering-quality.md`, tarefas T3, T4 e T5. Só documentação. Sem dependência de outros cartões. Q-15 (formato da referência de IA) ainda está em aberto.
+Responsável proposto: Tiago Borja, Team Leader (a equipa decide).
 
 ## Checklist
 
-- [ ] `docs/libraries.md` exists with columns: name, version, reason, rejected alternative (RNF-11).
-- [ ] A short team guide states the branch rule `(feat|fix)-NNN-description` and the commit rule (start with the Jira key, STE, no AI co-author line). Link `git-and-jira-conventions.md`.
-- [ ] A PR check list item asks for a valid branch name and clear commits.
-- [ ] The AI-use rule is written for the team: the line "AI use: ..." ends each file made with AI (RNF-25). Diagrams have a reference too.
-- [ ] Ask the teacher or the team to close Q-15, or note the team format used until then.
-- [ ] Every team member reads the rules. The Team Leader notes it in the daily note.
+- [ ] `docs/libraries.md` existe com as colunas: nome, versão, motivo, alternativa rejeitada (RNF-11).
+- [ ] Um guia curto da equipa indica a regra de ramos `(feat|fix)-NNN-description` e a regra de commits (começar com a chave Jira, STE, sem linha de coautor de IA). Ligar `git-and-jira-conventions.md`.
+- [ ] Um item da lista de verificação do PR pede um nome de ramo válido e commits claros.
+- [ ] A regra de uso de IA está escrita para a equipa: a linha "AI use: ..." termina cada ficheiro feito com IA (RNF-25). Os diagramas também têm referência.
+- [ ] Pedir ao professor ou à equipa que feche Q-15, ou anotar o formato da equipa usado até lá.
+- [ ] Cada membro da equipa lê as regras. O Team Leader regista-o na nota diária.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

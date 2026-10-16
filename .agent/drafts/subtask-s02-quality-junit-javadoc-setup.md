@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Set up JUnit and Javadoc generation with one command each
+summary: Configurar JUnit e a geração de Javadoc com um comando cada
 parent: H4Y-18
 requirements: [RNF-09, RNF-10]
 points:
@@ -12,19 +12,19 @@ sprint: 02
 branch: feat-035-junit-javadoc-setup
 ---
 
-# Engineering quality T1 and T2: Javadoc and JUnit setup
+# Qualidade de engenharia T1 e T2: configuração de Javadoc e JUnit
 
-Source: `epic-engineering-quality.md`, tasks T1 and T2. Needs the build file of T0a. Starts after day 1.
-Proposed owner: Pedro Costa (the team decides).
+Origem: `epic-engineering-quality.md`, tarefas T1 e T2. Precisa do ficheiro de build de T0a. Começa depois do dia 1.
+Responsável proposto: Pedro Costa (a equipa decide).
 
 ## Checklist
 
-- [ ] One command builds the Javadoc without errors.
-- [ ] A public class without Javadoc fails the check and names the class.
-- [ ] One command runs all JUnit tests.
-- [ ] A failing test ends with an error and names the test.
-- [ ] Rule written in `docs/`: each test cites "H4Y-NN AC-n" in `@DisplayName`.
-- [ ] A short check or script lists any AC-n without a test.
-- [ ] Any new library is listed in `docs/libraries.md`.
+- [ ] Um comando gera o Javadoc sem erros.
+- [ ] Uma classe pública sem Javadoc faz a verificação falhar e indica a classe.
+- [ ] Um comando corre todos os testes JUnit.
+- [ ] Um teste a falhar termina com erro e indica o teste.
+- [ ] Regra escrita em `docs/`: cada teste cita "H4Y-NN AC-n" em `@DisplayName`.
+- [ ] Uma verificação ou script curto lista qualquer AC-n sem teste.
+- [ ] Qualquer biblioteca nova está listada em `docs/libraries.md`.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

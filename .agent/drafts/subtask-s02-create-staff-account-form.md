@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: JavaFX form to create a staff account
+summary: Formulário JavaFX para criar uma conta de pessoal
 parent: H4Y-27
 requirements: [RF-26, RF-01]
 points:
@@ -12,16 +12,16 @@ sprint: 02
 branch: feat-027-create-staff-form
 ---
 
-# create-staff-account: form
+# create-staff-account: formulário
 
-Parent story H4Y-27. Uses the navigation registry of T0b. Register the form for the manager role only. Branch key 027 is the story key.
-Proposed owner: Tiago Borja (the team decides).
+História pai H4Y-27. Usa o registo de navegação de T0b. Registar o formulário só para o papel de gestor. A chave 027 do ramo é a chave da história.
+Responsável proposto: Tiago Borja (a equipa decide).
 
 ## Checklist
 
-- [ ] The form has user name, password and type (receptionist, restaurant staff, manager).
-- [ ] The form shows the service refusals: name exists, missing data, no permission.
-- [ ] A success message shows after creation. The password is not shown again.
-- [ ] The entry appears in the navigation for the manager only.
+- [ ] O formulário tem nome de utilizador, palavra-passe e tipo (rececionista, pessoal do restaurante, gestor).
+- [ ] O formulário mostra as recusas do serviço: nome já existe, dados em falta, sem permissão.
+- [ ] Após a criação aparece uma mensagem de sucesso. A palavra-passe não é mostrada outra vez.
+- [ ] A entrada aparece na navegação só para o gestor.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

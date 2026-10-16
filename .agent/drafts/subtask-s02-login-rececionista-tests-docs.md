@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Tests, Javadoc and diagram update for the login
+summary: Testes, Javadoc e atualização do diagrama do login
 parent: H4Y-22
 requirements: [RF-01, RF-02]
 points:
@@ -12,17 +12,17 @@ sprint: 02
 branch: feat-022-login-tests-docs
 ---
 
-# login-rececionista: tests, Javadoc, diagram
+# login-rececionista: testes, Javadoc, diagrama
 
-Parent story H4Y-22. Branch key 022 is the story key.
-Proposed owner: Antonio Martinho (the team decides).
+História pai H4Y-22. A chave 022 do ramo é a chave da história.
+Responsável proposto: Antonio Martinho (a equipa decide).
 
 ## Checklist
 
-- [ ] One JUnit test per AC-1 to AC-4. Names cite "H4Y-22 AC-n".
-- [ ] A test proves AC-2 and AC-3 give an identical response.
-- [ ] Javadoc on the new public classes. The Javadoc builds.
-- [ ] Class and sequence diagram of the login updated, with the AI-use reference.
-- [ ] One end-to-end check on SQL Server with the seed manager, after auth T2 (not a blocker for the unit tests).
+- [ ] Um teste JUnit por cada AC-1 a AC-4. Os nomes citam "H4Y-22 AC-n".
+- [ ] Um teste prova que AC-2 e AC-3 dão uma resposta idêntica.
+- [ ] Javadoc nas novas classes públicas. O Javadoc compila.
+- [ ] Diagramas de classes e de sequência do login atualizados, com a referência de uso de IA.
+- [ ] Uma verificação de ponta a ponta em SQL Server com o gestor do seed, depois de auth T2 (não bloqueia os testes unitários).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Sprint 2 review, retrospective, story validation, diagram update and conduct check
+summary: Review e retrospetiva do sprint 2, validação das histórias, atualização de diagramas e verificação de conduta
 parent: H4Y-17
 requirements: [RNF-15, RNF-17, RNF-18, RNF-19, RNF-26]
 points:
@@ -12,18 +12,18 @@ sprint: 02
 branch: feat-038-sprint-02-review-retro
 ---
 
-# Scrum T3, T4, T6, T7, T8 and quality T6: end of sprint
+# Scrum T3, T4, T6, T7, T8 e qualidade T6: fim do sprint
 
-Source: `epic-scrum-process.md` tasks T3, T4, T6, T7, T8, and `epic-engineering-quality.md` task T6. Runs at the end of the sprint.
-Proposed owner: Tiago Borja, Team Leader (the team decides).
+Origem: `epic-scrum-process.md` tarefas T3, T4, T6, T7, T8, e `epic-engineering-quality.md` tarefa T6. Corre no fim do sprint.
+Responsável proposto: Tiago Borja, Team Leader (a equipa decide).
 
 ## Checklist
 
-- [ ] The Team Leader tests each story against its AC and records name and date (RNF-18). A failed AC goes back to development.
-- [ ] `docs/scrum/sprint-02/review.md` lists demonstrated stories and not finished ones with the reason.
-- [ ] `docs/scrum/sprint-02/retrospective.md` has Keep, Stop, Start. Each Start has an owner. It has the `velocity` value for sprint 3.
-- [ ] `team.md` and the sprint 3 planning name the next Team Leader: Lukas Sperandio.
-- [ ] Diagrams affected by the 4 stories are updated, or "sem impacto" is noted (RNF-19).
-- [ ] Code-of-conduct check recorded: no code shared between groups, every AI use referenced, deadlines (RNF-26).
+- [ ] O Team Leader testa cada história contra os seus AC e regista nome e data (RNF-18). Um AC que falha volta ao desenvolvimento.
+- [ ] `docs/scrum/sprint-02/review.md` lista as histórias demonstradas e as não concluídas com o motivo.
+- [ ] `docs/scrum/sprint-02/retrospective.md` tem Keep, Stop, Start. Cada Start tem um responsável. Tem o valor de `velocity` para o sprint 3.
+- [ ] `team.md` e a planning do sprint 3 indicam o próximo Team Leader: Lukas Sperandio.
+- [ ] Os diagramas afetados pelas 4 histórias são atualizados, ou é anotado "sem impacto" (RNF-19).
+- [ ] Verificação do código de conduta registada: sem código partilhado entre grupos, todo o uso de IA referenciado, prazos (RNF-26).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

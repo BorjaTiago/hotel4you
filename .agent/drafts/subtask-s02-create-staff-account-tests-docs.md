@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Tests, Javadoc and diagram update for create staff account
+summary: Testes, Javadoc e atualização do diagrama de criar conta de pessoal
 parent: H4Y-27
 requirements: [RF-26, RF-01, RNF-02]
 points:
@@ -12,18 +12,18 @@ sprint: 02
 branch: feat-027-create-staff-tests-docs
 ---
 
-# create-staff-account: tests, Javadoc, diagram
+# create-staff-account: testes, Javadoc, diagrama
 
-Parent story H4Y-27. Branch key 027 is the story key.
-Proposed owner: Tiago Borja (the team decides).
+História pai H4Y-27. A chave 027 do ramo é a chave da história.
+Responsável proposto: Tiago Borja (a equipa decide).
 
 ## Checklist
 
-- [ ] One JUnit test per AC-1 to AC-4. Names cite "H4Y-27 AC-n".
-- [ ] A test shows the stored password differs from the input (AC-1).
-- [ ] Test data: empty base and one existing user "ana" (T4).
-- [ ] Javadoc on the new public classes. The Javadoc builds.
-- [ ] Class diagram updated (`UserService`), with the AI-use reference.
-- [ ] Manual check: the manager creates a receptionist and a restaurant account that log in (sprint 3 login-restaurante uses it).
+- [ ] Um teste JUnit por cada AC-1 a AC-4. Os nomes citam "H4Y-27 AC-n".
+- [ ] Um teste mostra que a palavra-passe guardada difere da introduzida (AC-1).
+- [ ] Dados de teste: base vazia e um utilizador existente "ana" (T4).
+- [ ] Javadoc nas novas classes públicas. O Javadoc compila.
+- [ ] Diagrama de classes atualizado (`UserService`), com a referência de uso de IA.
+- [ ] Verificação manual: o gestor cria uma conta de rececionista e uma do restaurante que iniciam sessão (o login-restaurante do sprint 3 usa-a).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

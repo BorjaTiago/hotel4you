@@ -1,6 +1,6 @@
 ---
 type: epic
-summary: Room services help and client suggestions and complaints
+summary: Apoio de serviços de quarto e sugestões e reclamações de clientes
 parent:
 requirements: [RF-15, RF-27]
 points:
@@ -11,37 +11,37 @@ labels: [guest-support]
 sprint:
 ---
 
-# Epic: Guest support
+# Epic: Apoio ao cliente
 
-## Goal
-Reception helps clients with room services and records suggestions and complaints. The manager receives them.
+## Objetivo
+A receção apoia os clientes com serviços de quarto e regista sugestões e reclamações. O gestor recebe-as.
 
-## Delivery
-Planned by the prioritizer (Q-25).
+## Entrega
+Planeada pelo priorizador (Q-25).
 
-## Scope
-- Record a room service request.
-- Record a suggestion or complaint (Q-18).
-- Manager list of suggestions and complaints.
+## Âmbito
+- Registar um pedido de serviço de quarto.
+- Registar uma sugestão ou reclamação (Q-18).
+- Lista de sugestões e reclamações para o gestor.
 
-## Out of scope
-- Entry to guest rooms without a manager master card (Q-08).
+## Fora de âmbito
+- Entrada nos quartos dos hóspedes sem cartão mestre do gestor (Q-08).
 
-## Actors
-- Receptionist, manager.
+## Atores
+- Rececionista, gestor.
 
-## Value
-Clients are served and the manager sees feedback.
+## Valor
+Os clientes são atendidos e o gestor vê o feedback.
 
-## Statement links
-Section 2. RF-15, RF-27. Q-08, Q-18.
+## Ligações ao enunciado
+Secção 2. RF-15, RF-27. Q-08, Q-18.
 
-## Candidate stories
+## Histórias candidatas
 - Registar um pedido de serviço de quarto (actor: receptionist; RF-15)
 - Registar uma sugestão ou reclamação de um cliente (actor: receptionist; RF-27)
 - Consultar sugestões e reclamações (actor: manager; RF-27)
 
-## Open questions
-- The statement does not list room services. Team defines the list from RF-07 and RF-09 items. Ask the teacher if needed.
+## Questões em aberto
+- O enunciado não lista os serviços de quarto. A equipa define a lista a partir dos itens de RF-07 e RF-09. Perguntar ao professor se necessário.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

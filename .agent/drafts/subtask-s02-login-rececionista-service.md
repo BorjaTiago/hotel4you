@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: Login service - check credentials, create session, generic error
+summary: Serviço de login - verificar credenciais, criar sessão, erro genérico
 parent: H4Y-22
 requirements: [RF-01, RF-02]
 points:
@@ -12,17 +12,17 @@ sprint: 02
 branch: feat-022-login-service
 ---
 
-# login-rececionista: login service
+# login-rececionista: serviço de login
 
-Parent story H4Y-22 (5 points). Needs T0a, auth T1 (hash) and `UserRepository`. Tests use T4 test users, so the card does not wait for the seed. Branch key 022 is the story key.
-Proposed owner: Antonio Martinho (the team decides).
+História pai H4Y-22 (5 pontos). Precisa de T0a, auth T1 (hash) e `UserRepository`. Os testes usam os utilizadores de teste de T4, por isso o cartão não espera pelo seed. A chave 022 do ramo é a chave da história.
+Responsável proposto: Antonio Martinho (a equipa decide).
 
 ## Checklist
 
-- [ ] `AuthenticationService.login` checks the user name and the hashed password (AC-1). It returns a `Session` with the role.
-- [ ] A wrong password and an unknown user give the same error "Credenciais inválidas" (AC-2, AC-3).
-- [ ] Empty user name or password is refused before any lookup (AC-4).
-- [ ] The service has no JavaFX code. The manager and restaurant logins reuse it.
-- [ ] A test data file with one receptionist (T4).
+- [ ] `AuthenticationService.login` verifica o nome de utilizador e a palavra-passe com hash (AC-1). Devolve uma `Session` com o papel.
+- [ ] Uma palavra-passe errada e um utilizador desconhecido dão o mesmo erro "Credenciais inválidas" (AC-2, AC-3).
+- [ ] Nome de utilizador ou palavra-passe vazios são recusados antes de qualquer pesquisa (AC-4).
+- [ ] O serviço não tem código JavaFX. Os logins do gestor e do restaurante reutilizam-no.
+- [ ] Um ficheiro de dados de teste com um rececionista (T4).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
