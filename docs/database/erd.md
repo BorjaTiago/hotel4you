@@ -15,6 +15,7 @@ erDiagram
     locations ||--o{ reservation_locations : "location_id"
     users ||--o{ stock_imports : "user_id"
     stock_imports |o--o{ stock_movements : "import_id"
+    stock_imports |o--o{ items : "created_by_import_id"
     users ||--o{ reservations : "created_by_user_id"
     users ||--o{ stock_movements : "user_id"
     users |o--o{ access_cards : "user_id"
@@ -60,6 +61,8 @@ erDiagram
         VARCHAR100 name UK
         VARCHAR20 unit
         INT stock_quantity
+        DECIMAL82 price "nullable"
+        INT created_by_import_id FK "nullable"
     }
     room_items {
         SMALLINT room_id PK,FK
@@ -71,7 +74,11 @@ erDiagram
         DATETIME2 loaded_at
         SMALLINT user_id FK
         VARCHAR100 supplier_name
-        VARCHAR_MAX rejected_items "nullable"
+        CHAR64 file_hash UK
+        INT created_count
+        INT updated_count
+        INT invalid_count
+        VARCHAR4000 invalid_items "nullable"
     }
     stock_movements {
         INT id PK
@@ -81,6 +88,7 @@ erDiagram
         SMALLINT quantity
         DATETIME2 moved_at
         SMALLINT user_id FK
+        DECIMAL82 unit_price "nullable"
         INT import_id FK
     }
     customers {

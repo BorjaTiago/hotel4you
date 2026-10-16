@@ -68,7 +68,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Separate report screens. Not done: few reports, one controller is enough.
 
 ### StockController
-- **What:** Import the XML file. Save an item. Register a movement.
+- **What:** Import the XML file as an upsert (Q-48): an existing item gets an entry and a new price, a new item is created with the XML unit. Unit and price are mandatory. A different unit for an existing item is format-invalid. Save an item. Register a movement.
 - **Why:** RF-28, RF-29.
 - **Why this way:** One screen group for stock.
 - **Other option:** Separate import screen. Not done: same data and same user.
@@ -277,9 +277,9 @@ A staff card never opens a guest room. Only the master card does.
 - **Other option:** Change the quantity only. Not done: no history.
 
 ### StockImport
-- **What:** One XML load: supplier, time and rejected items.
-- **Why:** RF-28. The report lists the rejected items.
-- **Why this way:** Each movement from the file points to its import.
+- **What:** One XML load: supplier, time, file hash, counters (created, updated, invalid) and the format-invalid items.
+- **Why:** RF-28, Q-48. The report shows the counters and the invalid items. The hash blocks a reimport of the same file: the system refuses it with an error message and records nothing.
+- **Why this way:** Each movement from the file points to its import. A new item points to it too. The movement copies the unit price, so old prices stay in the history.
 - **Other option:** No import record. Not done: the manager needs the report.
 
 ## Feedback
@@ -353,8 +353,10 @@ Order: check-in first, then the card (RF-13, RF-16).
 ### 3. XML stock import
 ```java
 StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
-List<String> rejected = report.getRejectedItems(); // unknown items
-// Known items: StockMovement with type ENTRY, linked to the import.
+List<String> invalid = report.getInvalidItems(); // format-invalid items only
+// Every valid item: StockMovement with type ENTRY and unitPrice, linked to the import.
+// Existing item (same name, same unit): stock and price updated. New item: created with the XML unit.
+// Missing or invalid unit or price, or a different unit: format-invalid item. A refused file gives an error, no report.
 ```
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Also edited by doc-updater, Claude Sonnet 5.5, 2026-10-16. XML unit/price rule by docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.

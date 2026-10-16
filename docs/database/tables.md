@@ -22,6 +22,9 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
   - `items.unit` (Q-38).
   - `stock_movements.exit_reason`: discard, return, loss (Q-34).
   - `stock_imports` and `stock_movements.import_id`. `supplier_name` moves to `stock_imports` (RF-28, Q-10).
+  - `items.price` (set by every XML line; NULL only for old, seed or manual items; CHECK >= 0) and `items.created_by_import_id` (Q-48).
+  - `stock_movements.unit_price`: price copied at entry time (Q-48).
+  - `stock_imports.file_hash` (UNIQUE) and the counters `created_count`, `updated_count`, `invalid_count` (Q-48).
 - **Changed:**
   - `roles` has 5 rows, the actor types of RF-02: client, receptionist, manager, restaurant, supplier.
   - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
@@ -129,14 +132,15 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 ### items
 **What:** The warehouse list (towel, shampoo, sheet).
 **Why:** The hotel must know what it has in stock.
-**Why this way:** `stock_quantity` is saved in the row, so a read is fast. A CHECK blocks negative stock. `name` is UNIQUE, so one item has one row. `unit` says how we count the item (Q-38).
+**Why this way:** `stock_quantity` is saved in the row, so a read is fast. A CHECK blocks negative stock. `name` is UNIQUE, so one item has one row. `unit` says how we count the item (Q-38). `price` is the current unit price. An XML line always sets the price (it is mandatory in the XML). NULL only covers old, seed or manual items. A CHECK blocks a negative price. `0` is a real free price. The XML also gives the unit: a new item gets the XML unit. A different unit for an existing item is format-invalid, so the unit never changes silently. `created_by_import_id` is set when an XML import creates the item, so the manager can find these items. It is NULL for an item made by hand. The XML import is an upsert (Q-48): an item with the same `name` is updated, a new one is created. The backend trims the name and collapses inner spaces. The database collation of `name` is case-insensitive (`Latin1_General_CI_AI`). Two imports at the same time are safe: the backend locks the row with `UPDLOCK, HOLDLOCK`, processes items in `ORDER BY name`, and adds stock with `stock_quantity = stock_quantity + @q` (decision 13). Two filtered indexes help the import report: `ix_items_created_by_import` and `ix_stock_movements_import`.
 **Other option:** Calculate the stock from `stock_movements` each time. This is always correct, but slow when there are many movements. We keep both and change both in one transaction.
 
-| id | name | unit | stock_quantity |
-|---|---|---|---|
-| 1 | towel | unit | 120 |
-| 2 | shampoo | bottle | 300 |
-| 3 | sheet | unit | 80 |
+| id | name | unit | stock_quantity | price | created_by_import_id |
+|---|---|---|---|---|---|
+| 1 | towel | unit | 120 | 3.50 | NULL |
+| 2 | shampoo | bottle | 300 | 1.20 | NULL |
+| 3 | sheet | unit | 80 | NULL | NULL |
+| 4 | soap | unit | 200 | 0.40 | 1 |
 
 ### room_items
 **What:** The items each room must have, and how many.
@@ -153,24 +157,25 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 ### stock_movements
 **What:** The history of every stock change.
 **Why:** The manager must see who changed the stock, when, and why.
-**Why this way:** `quantity` is always positive. `type` says the effect: `in` adds, `use` and `out` subtract. This avoids sign errors. `exit_reason` (discard, return, loss) only exists for `out` (CHECK, Q-34). `import_id` links a movement to the XML load that created it. It is NULL for a movement entered by hand.
-**Other option:** Negative numbers for `use` and `out`. We did not, because a wrong sign gives wrong stock and the type is already clear.
+**Why this way:** `quantity` is always positive. `type` says the effect: `in` adds, `use` and `out` subtract. This avoids sign errors. `exit_reason` (discard, return, loss) only exists for `out` (CHECK, Q-34). `import_id` links a movement to the XML load that created it. It is NULL for a movement entered by hand. `unit_price` is the price at entry time, copied like `reservation_services.unit_price`. A later price change does not change old rows, so the price history stays. It is NULL for `use` and `out`.
+**Other option:** Negative numbers for `use` and `out`. We did not, because a wrong sign gives wrong stock and the type is already clear. Another option is to read the price only from `items.price`. We did not, because the history of prices would be lost.
 
-| id | item_id | type | exit_reason | quantity | moved_at | user_id | import_id |
-|---|---|---|---|---|---|---|---|
-| 1 | 1 | in | NULL | 50 | 2026-10-01 09:00 | 2 | 1 |
-| 2 | 1 | use | NULL | 4 | 2026-10-12 10:30 | 3 | NULL |
-| 3 | 2 | out | discard | 10 | 2026-10-13 08:00 | 2 | NULL |
+| id | item_id | type | exit_reason | quantity | unit_price | moved_at | user_id | import_id |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1 | in | NULL | 50 | 3.50 | 2026-10-01 09:00 | 2 | 1 |
+| 2 | 1 | use | NULL | 4 | NULL | 2026-10-12 10:30 | 3 | NULL |
+| 3 | 2 | out | discard | 10 | NULL | 2026-10-13 08:00 | 2 | NULL |
+| 4 | 4 | in | NULL | 200 | 0.40 | 2026-10-01 09:00 | 2 | 1 |
 
 ### stock_imports
 **What:** One row for each XML file that the manager loads.
-**Why:** The hotel must know who loaded a delivery, when, from which supplier, and what the backend rejected (RF-28, Q-10).
-**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. `rejected_items` is free text, because we only show it to the manager.
-**Other option:** `supplier_name` in each movement. We did not, because it repeats and it does not record the load itself.
+**Why:** The hotel must know who loaded a delivery, when, from which supplier, and what the import did (RF-28, Q-10, Q-48).
+**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. `file_hash` (SHA-256 of the file) is UNIQUE, so the same file cannot be loaded twice. The counters `created_count`, `updated_count` and `invalid_count` give the manager a fast report. The import is a dynamic upsert (Q-48): nothing is rejected as unknown. `invalid_items` holds only the format-invalid items. It is free text, because we only show it to the manager. It is cut at 4000 characters. The backend inserts this row first. A duplicate `file_hash` gives `409`. If the import fails, the backend does a rollback, so the file can be retried. The XML reader is safe: no DTD, no external entities, maximum 5 MB and 5000 items (decision 14). A missing unit, a missing price, a price above `999999.99` or with more than 2 decimals, and a quantity above `32767` or not positive, are format-invalid. They go to `invalid_items` and never abort the transaction.
+**Other option:** `supplier_name` in each movement. We did not, because it repeats and it does not record the load itself. Another option is to compute the counters from the movements. We did not, because invalid items have no movement.
 
-| id | loaded_at | user_id | supplier_name | rejected_items |
-|---|---|---|---|---|
-| 1 | 2026-10-01 09:00 | 2 | TextilPT | NULL |
+| id | loaded_at | user_id | supplier_name | file_hash | created_count | updated_count | invalid_count | invalid_items |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 2026-10-01 09:00 | 2 | TextilPT | 9f86d0...0a08 | 1 | 1 | 0 | NULL |
 
 ---
 

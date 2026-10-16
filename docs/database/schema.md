@@ -36,9 +36,11 @@ reservation_locations
 
 items
   id                    SMALLINT IDENTITY PK            -- Internal item ID.
-  name                  VARCHAR(100) NOT NULL UNIQUE    -- Item name (e.g. towel, shampoo, sheet). No repeated names.
-  unit                  VARCHAR(20) NOT NULL            -- Unit of the item (e.g. unit, kg, litre, box).
+  name                  VARCHAR(100) NOT NULL UNIQUE    -- Item name (e.g. towel, shampoo, sheet). No repeated names. Case-insensitive collation (see decision 13).
+  unit                  VARCHAR(20) NOT NULL            -- Unit of the item (e.g. unit, kg, litre, box). An XML line sets it for a new item. A different unit for an existing item is format-invalid.
   stock_quantity        INT NOT NULL DEFAULT 0          -- Current quantity in the warehouse. Changes with each stock movement.
+  price                 DECIMAL(8,2) NULL               -- Current unit price. An XML line always sets it (price is mandatory in the XML). NULL only for old, seed or manual items without a price (Q-48, decision 13).
+  created_by_import_id  INT NULL FK stock_imports       -- Import that created the item. NULL = created by hand. Lets the manager find items made by an import.
 
 room_items
   room_id               SMALLINT NOT NULL FK rooms      -- Room that holds the item. Part of the PK.
@@ -51,7 +53,11 @@ stock_imports
   loaded_at             DATETIME2(0) NOT NULL           -- Date and time of the load.
   user_id               SMALLINT NOT NULL FK users      -- User who loaded the file.
   supplier_name         VARCHAR(100) NOT NULL           -- Supplier that delivered (comes from the XML).
-  rejected_items        VARCHAR(MAX) NULL               -- Items of the file that the backend rejected, as text. NULL = none.
+  file_hash             CHAR(64) NOT NULL UNIQUE        -- SHA-256 of the file (hex). Blocks a reimport of the same file (Q-48).
+  created_count         INT NOT NULL DEFAULT 0          -- Items created by this import.
+  updated_count         INT NOT NULL DEFAULT 0          -- Existing items updated (stock entry and new price).
+  invalid_count         INT NOT NULL DEFAULT 0          -- Items with an invalid format. They are not imported.
+  invalid_items         VARCHAR(4000) NULL              -- The format-invalid items, as text. NULL = none. Unknown items are not rejected (Q-48). The backend cuts the text to 4000 characters (decision 14).
 
 stock_movements
   id                    INT IDENTITY PK                 -- Internal movement ID.
@@ -61,6 +67,7 @@ stock_movements
   quantity              SMALLINT NOT NULL               -- Quantity moved. Always positive. The type says add or subtract.
   moved_at              DATETIME2(0) NOT NULL           -- Date and time of the movement.
   user_id               SMALLINT NOT NULL FK users      -- Staff member or manager who recorded the movement.
+  unit_price            DECIMAL(8,2) NULL               -- Unit price copied at entry time. NULL for "use" and "out". An XML entry always sets it.
   import_id             INT NULL FK stock_imports       -- XML load that created this movement. NULL = entered by hand.
 
 customers
@@ -136,10 +143,10 @@ feedback
 - `reservation_locations`: locations included in a reservation. Composite PK (`reservation_id`, `location_id`).
 
 ### Inventory
-- `items`: stock items (towel, shampoo, sheet). `unit` is the unit of the item. `stock_quantity` is the current stock.
-- `stock_imports`: one row per XML file load. Holds the supplier, the user, the time and the rejected items.
+- `items`: stock items (towel, shampoo, sheet). `unit` is the unit of the item. `stock_quantity` is the current stock. `price` is the current unit price (NULL = not set). `created_by_import_id` points to the import that created the item.
+- `stock_imports`: one row per XML file load. Holds the supplier, the user, the time, the file hash and the counters (created, updated, invalid). `invalid_items` lists the format-invalid items.
 - `room_items`: how many units of each item a room has. Composite PK (`room_id`, `item_id`). Set by the manager.
-- `stock_movements`: every stock change. `type` is `in`, `use` or `out`. `quantity` is always positive. `exit_reason` (discard, return, loss) is only for `out`. `import_id` links to the XML load. Linked to the user who recorded it.
+- `stock_movements`: every stock change. `type` is `in`, `use` or `out`. `quantity` is always positive. `exit_reason` (discard, return, loss) is only for `out`. `unit_price` is the price copied at entry time. `import_id` links to the XML load. Linked to the user who recorded it.
 
 ### People and security
 - `customers`: hotel guests. `document` is unique to avoid duplicates.
@@ -173,6 +180,7 @@ feedback
 | locations | reservation_locations | location_id | yes | NO ACTION |
 | users | stock_imports | user_id | yes | NO ACTION |
 | stock_imports | stock_movements | import_id | no | NO ACTION |
+| stock_imports | items | created_by_import_id | no | NO ACTION |
 | users | reservations | created_by_user_id | yes | NO ACTION |
 | users | stock_movements | user_id | yes | NO ACTION |
 | users | access_cards | user_id | no | NO ACTION |
@@ -197,15 +205,15 @@ T-SQL has no boolean type. Do not compare two conditions with `=` or `<>`. Use A
 | room_types | `capacity > 0`, `base_price IS NULL OR base_price >= 0` |
 | locations | `UNIQUE (floor_id, name)`; `guest_card_access` default 0; `requires_reservation` default 0 |
 | reservation_locations | PK (`reservation_id`, `location_id`) |
-| items | `name` UNIQUE; `stock_quantity >= 0` |
+| items | `name` UNIQUE; `stock_quantity >= 0`; `price IS NULL OR price >= 0` |
 | room_items | PK (`room_id`, `item_id`); `quantity > 0` |
 | additional_services | `name` UNIQUE; `price IS NULL OR price >= 0` |
 | reservations | `end_date > start_date`; `status` in the 4 values, default `'reserved'`; check-in and check-out dates match the status (see below); `checked_out_at >= checked_in_at` |
 | reservation_services | all FKs NO ACTION; `unit_price IS NULL OR unit_price >= 0` |
 | access_cards | card belongs to a reservation OR a user; `is_master = 0 OR user_id IS NOT NULL`; `card_number` UNIQUE |
 | access_logs | entry is in a location OR a room |
-| stock_movements | `type IN ('in','use','out')`; `quantity > 0`; `exit_reason IN ('discard','return','loss')` or NULL; `type = 'out' OR exit_reason IS NULL` |
-| stock_imports | `supplier_name` NOT NULL |
+| stock_movements | `type IN ('in','use','out')`; `quantity > 0`; `exit_reason IN ('discard','return','loss')` or NULL; `type = 'out' OR exit_reason IS NULL`; `unit_price IS NULL OR unit_price >= 0` |
+| stock_imports | `supplier_name` NOT NULL; `file_hash` UNIQUE; the 3 counters `>= 0` |
 | feedback | `type IN ('suggestion','complaint')` |
 
 CHECK constraints that need AND/OR:
@@ -246,6 +254,10 @@ CREATE INDEX ix_access_cards_reservation         ON access_cards (reservation_id
 
 -- Stock history per item
 CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at);
+
+-- Import report and FK scans (Q-48): items created by an import, and movements of an import
+CREATE INDEX ix_items_created_by_import ON items (created_by_import_id) WHERE created_by_import_id IS NOT NULL;
+CREATE INDEX ix_stock_movements_import  ON stock_movements (import_id) WHERE import_id IS NOT NULL;
 ```
 
 ## Decisions
@@ -263,3 +275,10 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 10. **Room service**: a request for food, drink or laundry is a `reservation_services` row. `used_at` is the request time (Q-33).
 11. **Zones and the client card**: the backend decides in this order. (a) `guest_card_access = 0`: refuse the client card (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). (b) `guest_card_access = 1` and `requires_reservation = 0`: open. (c) `guest_card_access = 1` and `requires_reservation = 1`: open only if `reservation_locations` lists the place for that reservation (restaurant and pool; Q-09, Q-32, RF-18). We chose one extra BIT column because it is the simplest way to say "never". The default is 0, so a new zone is closed to client cards until the manager opens it. Staff and master cards do not use these two flags.
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
+13. **Dynamic XML upsert (Q-48)**: the backend matches each XML item to `items.name`. The name is trimmed and inner spaces are collapsed by the backend. The column uses a case-insensitive collation (`Latin1_General_CI_AI`), so the comparison and the UNIQUE index ignore case. Each XML item has mandatory `name`, `quantity`, `unit` and `price`. A missing or invalid unit or price makes the item format-invalid. If the item exists and the XML unit equals `items.unit`, it adds a stock entry (`in` movement with `unit_price`) and updates the price. A different unit is format-invalid: the backend never changes the unit silently. If the item does not exist, it creates the item with the XML unit (with `created_by_import_id`) and its first entry. Nothing is rejected as unknown. Only format-invalid items go to `invalid_items` and `invalid_count`. A format-invalid item never aborts the transaction.
+    - **Order and file lock**: the backend inserts the `stock_imports` row first. A duplicate `file_hash` gives error 2627/2601, and the backend answers `409`. If any later step fails, the backend does a rollback, so the row is removed and the file can be retried. `unit_price` is a copy, like `reservation_services.unit_price`, so old prices stay in the history.
+    - **Race**: the backend processes the items in `ORDER BY name`, so two imports lock in the same order and do not deadlock. It looks up each item with `SELECT ... FROM items WITH (UPDLOCK, HOLDLOCK) WHERE name = @name` (same pattern as decision 2). If the INSERT of a new item fails with error 2627 or 2601 (another import created it first), the backend retries it as an UPDATE.
+    - **Stock**: the backend updates with `stock_quantity = stock_quantity + @q`. It never writes a value it read before.
+    - **Price**: the XML always sets `items.price` and `stock_movements.unit_price`. `0` is a real free price. A missing or negative price is format-invalid. NULL price only covers old, seed or manual items.
+    - **Range limits**: these values are format-invalid: a missing unit, a missing price, a price above `999999.99` or with more than 2 decimals, and a quantity above `32767` or not positive. They go to `invalid_items` and `invalid_count`.
+14. **XML reader safety (Q-48)**: the backend reads the XML with a safe parser. It disables DOCTYPE and DTD (`disallow-doctype-decl`), sets `FEATURE_SECURE_PROCESSING`, and allows no external entities and no external schemas. The backend checks the limits before it parses: maximum file size 5 MB, and maximum 5000 items. A file over a limit is refused: the backend records nothing, shows an error, and writes no `stock_imports` row. The backend computes the SHA-256 (`file_hash`) over the bytes after the size check. The backend caps `invalid_items` at 4000 characters and each reason at 200 characters, so a bad file cannot fill the database.

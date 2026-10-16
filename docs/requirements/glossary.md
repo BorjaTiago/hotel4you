@@ -35,7 +35,11 @@ sprint: 1
 | Floor 1 | Restaurant and swimming pool. | 2 |
 | Floors 2 and 3 | Sleeping rooms. | 2 |
 | Stock | Material stored in the hotel. Entry, use and exit are recorded. | 2 |
-| XML file | File from the supplier with the material that enters the stock. | 2 |
+| XML file | File from the supplier with the material that enters the stock. Every valid item is created or updated (upsert, Q-48). | 2, Q-48 |
+| Stock catalogue item | Stock item with name, unit and price. Created by the manager or by a valid XML item. Match key: name, trimmed and case-insensitive. Name is UNIQUE (Q-38, Q-48). | 2, Q-38, Q-48 |
+| Upsert (XML import) | Update the catalogue item if its name exists. Create it if it does not (Q-48). | Q-48 |
+| Invalid XML item | Item that breaks the XML format (for example a missing unit or price, or a unit that differs from the catalogue). It is listed in the import report with the reason. A whole file that breaks the format is refused with an error message and has no report. Replaces the former "unknown item" term, which is withdrawn (Q-10, Q-48). | Q-10, Q-48 |
+| Import report | List of invalid items, with the reason, after an XML import. | Q-10, Q-48 |
 | Login | Access with user name and password. All users use it. | 2 |
 | Scrum | Agile method used in the project. | 1 |
 | Sprint | Work period of one to two weeks. The team uses 1 week (team decision). The project has 13 sprints. | 1, 4 |
@@ -65,4 +69,4 @@ sprint: 1
 | Final delivery | Due 2027-01-31 at 23:55. 65% of the final grade. | 5, 6 |
 | Code of conduct | Rules: no claim of others' work, no use of code (AI included) or diagrams without reference, no code sharing between groups. | 7 |
 
-AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15. Reviewed by: pending.
+AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; XML file row and new terms Stock catalogue item, Upsert, Invalid XML item, Import report for Q-48 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16. XML unit/price rule by docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
