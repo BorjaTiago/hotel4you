@@ -16,12 +16,15 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 
 - **Added:**
   - `reservation_locations`: locations of a reservation (Q-09, RF-18).
-  - `locations.requires_reservation` (Q-32, Q-20).
+  - `locations.requires_reservation` (Q-32): 1 = the zone needs a reservation to open with the client card. Used for restaurant and pool.
+  - `locations.guest_card_access` (Q-20): 0 = a client card never opens the place (bar, conference rooms, garage, storeroom, private pools, spa). We chose one BIT column, the simplest way to say "never". Default 0.
   - `access_cards.blocked_at`: block record, the card row is never deleted (RF-30, Q-26, Q-31).
   - `items.unit` (Q-38).
   - `stock_movements.exit_reason`: discard, return, loss (Q-34).
   - `stock_imports` and `stock_movements.import_id`. `supplier_name` moves to `stock_imports` (RF-28, Q-10).
 - **Changed:**
+  - `roles` has 5 rows, the actor types of RF-02: client, receptionist, manager, restaurant, supplier.
+  - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
   - The view is a service: "sea view" and "mountain view" are rows of `additional_services`. One view per reservation (Q-37, Q-11).
   - Room service requests (food, drink, laundry) use `reservation_services`. `used_at` is the request time (Q-33).
   - `room_types.base_price` and `additional_services.price` allow NULL.
@@ -48,7 +51,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 ## Building and rooms
 
 ### floors
-**What:** The floors of the hotel (-1 to 3).
+**What:** The floors of the hotel (-1 to 3): -1 garage and storeroom; 0 reception, bar, conference rooms; 1 restaurant and pool; 2 and 3 rooms (RF-03).
 **Why:** Rooms and locations need a floor. Staff access uses the floor.
 **Why this way:** `number` is `SMALLINT` because `TINYINT` cannot store -1. `id` is separate from `number`, so a renumbering does not break FKs. There is no description column: it was not needed.
 **Other option:** Store the floor number inside `rooms`. We did not, because `locations` also needs floors, and the number would repeat.
@@ -57,14 +60,15 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 |---|---|
 | 1 | -1 |
 | 2 | 0 |
-| 3 | 2 |
-| 4 | 3 |
+| 3 | 1 |
+| 4 | 2 |
+| 5 | 3 |
 
 ### room_types
-**What:** The kinds of room: individual, double, family.
+**What:** The kinds of room: individual, double, family. The hotel has 20 rooms: 7 individual, 10 double, 3 family (RF-04).
 **Why:** All rooms of one kind have the same capacity and base price.
 **Why this way:** We store capacity and price once. To change a price, we edit one row. `base_price` can be NULL (price not set yet).
-**Other option:** Put `capacity` and `base_price` in `rooms`. We did not, because 40 rooms would repeat the same values, and one edit could be forgotten.
+**Other option:** Put `capacity` and `base_price` in `rooms`. We did not, because 20 rooms would repeat the same values, and one edit could be forgotten.
 
 | id | name | capacity | base_price |
 |---|---|---|---|
@@ -80,28 +84,32 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 
 | id | number | floor_id | room_type_id |
 |---|---|---|---|
-| 12 | 201 | 3 | 2 |
-| 13 | 202 | 3 | 2 |
-| 14 | 301 | 4 | 3 |
+| 12 | 201 | 4 | 2 |
+| 13 | 202 | 4 | 2 |
+| 14 | 301 | 5 | 3 |
 
 Room 202 is a double room: 90.00 per night.
 
 ### locations
-**What:** Places with a card reader that are not rooms (pool, restaurant, kitchen).
+**What:** Places with a card reader that are not rooms (pool, restaurant, bar, garage...).
 **Why:** The access log must say where a card entered. Staff may enter only some places.
 **Why this way:** A separate table, because a pool is not a room (no type, no price, no reservation).
-- `requires_reservation = 1` marks a zone that is controlled by the reservation, such as bar or garage. These zones are never added to a reservation, so the backend refuses the customer card there (Q-32, Q-20).
+- `guest_card_access` says if a client card can open the place. `0` = never (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). `1` = can open.
+- `requires_reservation = 1` means the zone needs a reservation to open with the client card (restaurant, pool; Q-32). The reservation lists the place in `reservation_locations`. It counts only when `guest_card_access = 1`.
+- Rule: `guest_card_access = 0` refuse; `guest_card_access = 1` and `requires_reservation = 0` open; both 1: open only if the reservation lists the place.
 - `name` is unique per floor: `UNIQUE (floor_id, name)`.
 
 **Other option:** Put places in `rooms`. We did not, because it would mix two different things and leave many empty columns.
 
-| id | name | floor_id | requires_reservation |
-|---|---|---|---|
-| 1 | pool | 1 | 0 |
-| 2 | restaurant | 2 | 0 |
-| 3 | kitchen | 2 | 0 |
-| 4 | bar | 2 | 1 |
-| 5 | garage | 1 | 1 |
+| id | name | floor_id | guest_card_access | requires_reservation |
+|---|---|---|---|---|
+| 1 | pool | 3 | 1 | 1 |
+| 2 | restaurant | 3 | 1 | 1 |
+| 3 | kitchen | 3 | 0 | 0 |
+| 4 | bar | 2 | 0 | 0 |
+| 5 | garage | 1 | 0 | 0 |
+
+Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 
 ### reservation_locations
 **What:** The locations that a reservation includes.
@@ -180,16 +188,20 @@ Room 202 is a double room: 90.00 per night.
 | 2 | John Müller | X9876543 |
 
 ### roles
-**What:** The permission groups: reception, manager, restaurant.
+**What:** The permission groups: the 5 actor types of RF-02 (client, receptionist, manager, restaurant, supplier).
 **Why:** The role of the user decides what the API allows.
 **Why this way:** A table, not free text, so a typo cannot make a new role.
-**Other option:** A text column in `users` with a CHECK. It works for 3 roles, but the table is easier to extend.
+**Other option:** A text column in `users` with a CHECK. It works for a few roles, but the table is easier to extend.
 
 | id | name |
 |---|---|
-| 1 | reception |
-| 2 | manager |
-| 3 | restaurant |
+| 1 | client |
+| 2 | receptionist |
+| 3 | manager |
+| 4 | restaurant |
+| 5 | supplier |
+
+Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 roles.
 
 ### users
 **What:** The staff accounts. Customers do not log in.
@@ -199,9 +211,9 @@ Room 202 is a double room: 90.00 per night.
 
 | id | name | username | password_hash | role_id |
 |---|---|---|---|---|
-| 1 | Rita Costa | rita | `$2b$12$...` | 1 |
-| 2 | Pedro Lima | manager | `$2b$12$...` | 2 |
-| 3 | Joana Reis | joana | `$2b$12$...` | 3 |
+| 1 | Rita Costa | rita | `$2b$12$...` | 2 |
+| 2 | Pedro Lima | manager | `$2b$12$...` | 3 |
+| 3 | Joana Reis | joana | `$2b$12$...` | 4 |
 
 ---
 
