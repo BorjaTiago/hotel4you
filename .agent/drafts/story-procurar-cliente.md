@@ -36,8 +36,14 @@ Para que não o registe duas vezes e possa usar os seus dados numa reserva.
   Então o sistema recusa a pesquisa
   E pede um dado de identificação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Procurar um cliente existente devolve os seus dados.
+- [ ] AC-2: Procurar um cliente inexistente devolve uma resposta de não encontrado.
+- [ ] AC-3: Uma pesquisa vazia é recusada.
+
 ## Notas
-Depende de "Registar um novo cliente". Fase: 1.ª entrega (Q-27). O enunciado não define o dado de pesquisa; a equipa escolhe-o na implementação (detalhe negociável).
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: clientes de teste próprios (foundation T4). O AC-2 abre o ecrã de registo (mesmo sprint); a ligação ao ecrã faz-se no fim do sprint. Fase: 1.ª entrega (Q-27). O enunciado não define o dado de pesquisa; a equipa escolhe-o na implementação (detalhe negociável).
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -49,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

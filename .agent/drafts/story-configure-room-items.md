@@ -48,8 +48,16 @@ Para que cada quarto tenha o equipamento e o material corretos.
   Quando o rececionista tenta alterar os itens de um quarto
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Um item pode ser adicionado a um quarto.
+- [ ] AC-2: Um item pode ser removido de um quarto.
+- [ ] AC-3: Configurar um quarto inexistente é recusado.
+- [ ] AC-4: A remoção de um item com associações é recusada.
+- [ ] AC-5: Um papel sem permissão é recusado ao configurar itens.
+
 ## Notas
-Itens do enunciado: toalhas, condicionador, champô, secador, televisão, ar condicionado, cama, sofá, lençóis, cofre e outros. O enunciado diz que o gestor pode configurar todos. Depende de story-register-rooms.
+Itens do enunciado: toalhas, condicionador, champô, secador, televisão, ar condicionado, cama, sofá, lençóis, cofre e outros. O enunciado diz que o gestor pode configurar todos. Dependências (auditoria 2026-10-16): nenhuma forte. Bloqueio escondido corrigido: os itens do quarto usam o catálogo de itens (esquema H4Y-10, `room_items` -> `items`), que só existia no sprint 11; story-cadastrar-item-stock passa para o sprint 4. Construir e testar sozinha: quartos e itens de teste próprios (foundation T4). Na demo: quartos de story-register-rooms (sprint 3) e itens do catálogo (sprint 4).
 
 Q-36 (decisão do utilizador, 2026-10-16): nada com associações se remove; AC-4 acrescentado pelo refinador.
 points_suggested: 5
@@ -62,4 +70,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

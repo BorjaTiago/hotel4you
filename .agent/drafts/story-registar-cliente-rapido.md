@@ -38,8 +38,14 @@ Para que o atendimento demore no máximo 30 segundos.
   Então o sistema indica o dado inválido
   E mantém os restantes dados já preenchidos
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O cliente fica registado e a reserva criada dentro do limite de interações definido.
+- [ ] AC-2: O formulário pede apenas os dados necessários.
+- [ ] AC-3: Um erro de preenchimento é corrigido sem repetir os campos já preenchidos.
+
 ## Notas
-Âmbito dos 30 s (decisão da equipa, 2026-10-16): desde a abertura do registo de cliente até à reserva criada (Q-12). Esta história é a dona do RNF-03 (Q-29: o tempo de escolha do quarto não conta). Depende de "Registar um novo cliente" e da história de criar reserva (epic-reservations). Como medir o tempo (cronómetro em teste de utilização) é decisão da equipa. AC-1 só é testável quando a reserva existir.
+Âmbito dos 30 s (decisão da equipa, 2026-10-16): desde a abertura do registo de cliente até à reserva criada (Q-12). Esta história é a dona do RNF-03 (Q-29: o tempo de escolha do quarto não conta). Dependências (auditoria 2026-10-16): duas fortes, story-registar-cliente e story-create-reservation. O AC-1 mede o fluxo real dos dois ecrãs; um stub não mede os 30 s. Por isso fica no sprint 5, depois das duas (antes estava no sprint 4, antes da reserva). AC-2 e AC-3 testam-se sozinhos com dados de teste (foundation T4). Como medir o tempo (cronómetro em teste de utilização) é decisão da equipa. AC-1 só é testável quando a reserva existir.
 
 points_suggested: 3
 reference: Registar um cliente (validação de dados e gravação) (3)
@@ -51,4 +57,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

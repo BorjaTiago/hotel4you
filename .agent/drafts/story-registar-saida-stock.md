@@ -41,8 +41,15 @@ Para que o stock reflita o material removido.
   Quando o funcionário do hotel ou o gestor regista uma saída sem motivo, ou com motivo diferente de descarte, devolução ou perda
   Então o sistema recusa o registo
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A saída fica guardada como "saída" com quantidade, motivo e data, e o stock do item baixa em conformidade.
+- [ ] AC-2: Uma saída maior que o stock é recusada e o stock não muda.
+- [ ] AC-3: Uma saída de um item inexistente é recusada.
+- [ ] AC-4: Uma saída sem motivo, ou com motivo fora de descarte, devolução ou perda, é recusada.
+
 ## Notas
-Q-21 (decisão da equipa). Decisão da equipa (2026-10-16): saída = remoção do material (descarte, devolução ou perda); uso = consumo no hotel, ver "Registar uso de stock". Entrega final (Q-06). Depende de "Cadastrar item de stock" e "Editar item de stock".
+Q-21 (decisão da equipa). Decisão da equipa (2026-10-16): saída = remoção do material (descarte, devolução ou perda); uso = consumo no hotel, ver "Registar uso de stock". Entrega final (Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: itens de teste com stock conhecido (foundation T4), sem depender de story-registar-entrada-stock.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -54,4 +61,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

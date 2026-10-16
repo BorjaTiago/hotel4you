@@ -37,8 +37,14 @@ Para que o cliente não abra portas depois de sair.
   Então o sistema recusa a ação
   E o cartão, se existir, mantém o seu estado
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O cartão do cliente fica desativado no check-out.
+- [ ] AC-2: A porta recusa o cartão desativado.
+- [ ] AC-3: Um check-out recusado não altera o estado do cartão.
+
 ## Notas
-Entrega final (Q-06). Q-30 (decisão da equipa): no check-out o cartão deixa de funcionar, nenhuma porta abre, o registo fica guardado. Depende de story-check-out e da emissão do cartão em epic-magnetic-card-access.
+Entrega final (Q-06). Q-30 (decisão da equipa): no check-out o cartão deixa de funcionar, nenhuma porta abre, o registo fica guardado. Dependências (auditoria 2026-10-16): uma forte, story-check-out (o cartão é desativado dentro do mesmo fluxo; sprint 6 antes do sprint 10). O cartão vem de dados de teste (foundation T4), sem depender de story-emitir-cartao-check-in. O AC-2 usa o leitor simulado (T6).
 points_suggested: 3
 reference: Realizar check-in com cartão magnético (5)
 compared: smaller
@@ -49,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: refiner (split from story-check-out), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: refiner (split from story-check-out), Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

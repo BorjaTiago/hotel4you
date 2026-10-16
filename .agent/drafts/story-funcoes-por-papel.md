@@ -35,6 +35,12 @@ Para que não aceda a funções de outros papéis.
   Quando alguém tenta usar uma função da aplicação
   Então o sistema pede o início de sessão
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O rececionista consegue executar as funções do seu papel.
+- [ ] AC-2: Uma função de gestor é recusada ao rececionista.
+- [ ] AC-3: Sem sessão, qualquer função protegida é recusada.
+
 ## Notas
 Cada tipo de ator tem o seu acesso (RF-02). Esta história cria a regra geral por papel. Limites por piso (RF-24) e do restaurante (RF-25) ficam em epic-staff-management-access. A lista exata de funções por papel vem das épicas de funcionalidade. Nenhuma pergunta nova.
 
@@ -48,4 +54,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

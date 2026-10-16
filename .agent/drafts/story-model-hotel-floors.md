@@ -34,8 +34,13 @@ Para que os quartos e os serviços fiquem associados ao piso correto.
   Então o sistema recusa o pedido
   E informa que o piso não existe
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A estrutura do hotel por pisos pode ser consultada.
+- [ ] AC-2: Consultar um piso inexistente devolve uma resposta de não encontrado.
+
 ## Notas
-Enunciado, secção 2. A criação, edição e remoção de zonas pelo gestor está em epic-magnetic-card-access (criar, editar e remover zona). O uso das zonas pelo cartão fica na épica epic-magnetic-card-access (entrega final, Q-06). Depende do login (RF-01).
+Enunciado, secção 2. A criação, edição e remoção de zonas pelo gestor está em epic-magnetic-card-access (criar, editar e remover zona). O uso das zonas pelo cartão fica na épica epic-magnetic-card-access (entrega final, Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Os pisos e os locais do enunciado vêm dos dados de referência (foundation T5); esta história só os mostra. Construir e testar sozinha: sessão de gestor simulada (T0).
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -47,4 +52,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

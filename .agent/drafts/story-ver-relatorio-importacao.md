@@ -36,8 +36,14 @@ Para que eu saiba que itens entraram e que itens foram rejeitados.
   Quando o gestor tenta abrir o relatório
   Então o sistema indica que a importação não existe
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O relatório lista os itens importados e os itens rejeitados com o motivo.
+- [ ] AC-2: Sem rejeitados, o relatório mostra os itens importados e indica que não há itens rejeitados.
+- [ ] AC-3: Para uma importação inexistente, o sistema indica que a importação não existe.
+
 ## Notas
-Q-10 (decisão da equipa). Depende de "Carregar um ficheiro XML de fornecedor". Entrega final (Q-06).
+Q-10 (decisão da equipa). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: importações de teste próprias, com e sem rejeitados (foundation T4, tabela `stock_imports` do esquema H4Y-10). Entrega final (Q-06).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -49,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -42,6 +42,13 @@ Para que o hotel tenha os 20 quartos disponíveis para reserva.
   Quando o gestor tenta registar mais um quarto no piso 3
   Então o sistema recusa o registo
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Um quarto válido fica registado.
+- [ ] AC-2: A distribuição completa dos quartos do hotel pode ser registada.
+- [ ] AC-3: Registar um quarto num piso que não é de quartos é recusado.
+- [ ] AC-4: Exceder o limite de quartos por piso é recusado.
+
 ## Notas
 Q-01 (decisão da equipa, não confirmada pelo professor): 20 quartos, 10 por piso, divisão 7/10/3 para o hotel inteiro. Quarto familiar: 3 ou 4 pessoas. Depende da história story-model-hotel-floors.
 
@@ -55,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

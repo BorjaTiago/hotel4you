@@ -45,8 +45,17 @@ Para que o preço da reserva use valores corretos.
   Quando tenta alterar um preço extra
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O gestor consegue definir e guardar o preço extra por noite de um extra de quarto (vista mar a 15,00).
+- [ ] AC-2: O gestor consegue definir e guardar o preço extra por noite de um serviço pago (spa a 40,00).
+- [ ] AC-3: A lista de preços extra permite definir vista (mar ou montanha), bebidas, lavandaria, comida, eventos culturais, piscinas privadas, spa e salas de conferências.
+- [ ] AC-4: Um preço negativo ou não numérico é recusado e o preço anterior mantém-se.
+- [ ] AC-5: O rececionista não consegue alterar preços extra.
+
 ## Notas
 Preços fixos por noite definidos pelo gestor (Q-11, decisão da equipa). Piscinas privadas, spa e salas são extras pagos sem acesso por cartão (Q-20). Fase pelo priorizador (Q-25).
+Dependências (auditoria 2026-10-16): nenhuma forte (antes ligada a story-set-base-price sem razão de código). A lista de extras e serviços pagos, sem preço, vem dos dados de referência (foundation T5). Construir e testar sozinha: essa lista e sessões simuladas (T0, T4).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -58,4 +67,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

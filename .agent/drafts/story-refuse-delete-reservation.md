@@ -42,8 +42,15 @@ Para que só o gestor remova reservas de forma definitiva.
   Quando tenta apagar uma reserva
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O rececionista que tenta apagar uma reserva é recusado.
+- [ ] AC-2: O rececionista continua a poder cancelar reservas.
+- [ ] AC-3: Um utilizador sem autenticação é recusado.
+- [ ] AC-4: Um funcionário do restaurante é recusado ao apagar reservas.
+
 ## Notas
-Enunciado: só os gestores apagam reservas (RF-22). Q-05 (decisão da equipa). A mensagem de recusa não revela dados da reserva. Depende de story-delete-reservation.
+Enunciado: só os gestores apagam reservas (RF-22). Q-05 (decisão da equipa). A mensagem de recusa não revela dados da reserva. Dependências (auditoria 2026-10-16): uma forte, story-delete-reservation (acrescenta a guarda de papel à mesma ação de apagar; sprint 5 antes do sprint 6). Construir e testar: sessões simuladas de rececionista e restaurante (foundation T0), reservas de teste (T4).
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -55,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

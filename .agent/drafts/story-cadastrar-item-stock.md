@@ -7,7 +7,7 @@ points: 2
 points_suggested: 2
 status: approved
 jira_key:
-labels: [stock, final-delivery]
+labels: [stock, 1st-delivery]
 sprint:
 ---
 
@@ -43,8 +43,16 @@ Para que o item possa ser carregado por XML e ter movimentos de stock.
   Quando tenta cadastrar um item de stock
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O item cadastrado com nome e unidade fica no catálogo de stock e pode receber movimentos.
+- [ ] AC-2: Cadastrar um item sem nome ou sem unidade é recusado e o sistema indica o campo em falta.
+- [ ] AC-3: Cadastrar um item com nome já existente é recusado e o catálogo não muda.
+- [ ] AC-4: Quem não é gestor não consegue cadastrar itens de stock.
+
 ## Notas
 Decisão da equipa (2026-10-16): o gestor cria e edita os itens de stock (nome, unidade). RF-28 usa itens conhecidos (Q-10); RF-29 regista movimentos de itens. Não há história de remover item. Dependência para: "Carregar um ficheiro XML de fornecedor" (gestor e rececionista), "Registar entrada de stock", "Registar uso de stock", "Registar saída de stock". Entrega final (Q-06).
+Dependências (auditoria 2026-10-16): nenhuma forte. Proposta de ordem: passa para o sprint 4 (1.ª entrega), porque story-configure-room-items (RF-08, 1.ª entrega) usa o mesmo catálogo de itens (esquema H4Y-10). O PO decide. As outras histórias de stock já não dependem desta: usam itens de teste (foundation T4). Construir e testar sozinha: base de teste vazia e um item para o duplicado (T4), sessões simuladas (T0).
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -52,4 +60,4 @@ compared: equal
 reasoning: Criar item com nome e unidade, validar campos e nome único. Cria a tabela base do stock, mas a lógica é simples.
 split_needed: no
 
-AI use: story-writer, estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

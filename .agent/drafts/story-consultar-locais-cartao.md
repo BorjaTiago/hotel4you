@@ -40,8 +40,15 @@ Para que eu audite o uso desse cartão.
   Quando tenta consultar os locais de um cartão
   Então o sistema recusa a consulta
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A consulta de um cartão mostra cada local por onde passou, com a hora da entrada.
+- [ ] AC-2: Um cartão sem passagens mostra uma lista vazia.
+- [ ] AC-3: Consultar um cartão inexistente mostra que o cartão não existe.
+- [ ] AC-4: O rececionista não consegue consultar os locais de um cartão.
+
 ## Notas
-Exemplo do enunciado: cartão 12345. Cartões antigos (bloqueados) continuam consultáveis (Q-26). Depende de "Guardar cada passagem do cartão com local e hora". Entrega final (Q-06).
+Exemplo do enunciado: cartão 12345. Cartões antigos (bloqueados) continuam consultáveis (Q-26). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: cartões e passagens de teste próprios, incluindo um cartão sem passagens (foundation T4). Entrega final (Q-06).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -53,4 +60,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

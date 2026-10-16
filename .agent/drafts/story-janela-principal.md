@@ -41,6 +41,13 @@ Para que encontre e abra cada função da receção.
   Então o sistema mostra o ecrã de início de sessão
   E não mostra a janela principal
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Após iniciar sessão, a janela principal abre com as funções do papel do utilizador.
+- [ ] AC-2: O utilizador navega entre as funções disponíveis a partir da janela principal.
+- [ ] AC-3: Uma função não permitida ao papel não aparece na janela.
+- [ ] AC-4: Sem sessão iniciada, a janela principal não é acessível.
+
 ## Notas
 RNF-06: interface JavaFX desde a 1.ª entrega (Q-22). RNF-07: a janela só mostra e navega, a lógica fica separada. Depende de "Iniciar sessão como rececionista" e "Mostrar apenas as funções permitidas ao papel". Sem desenho de ecrãs aqui.
 
@@ -54,4 +61,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

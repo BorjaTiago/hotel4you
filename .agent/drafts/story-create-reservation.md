@@ -43,8 +43,15 @@ Para que o cliente fique com o quarto garantido nas noites escolhidas.
   Quando o rececionista cria a reserva para 2 noites
   Então o sistema mostra o preço base por noite do tipo do quarto
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Um quarto livre pode ser reservado.
+- [ ] AC-2: Reservar um quarto já reservado no período é recusado.
+- [ ] AC-3: Dados em falta são recusados com indicação dos campos.
+- [ ] AC-4: O preço da reserva é mostrado ao rececionista.
+
 ## Notas
-Q-27 (respondida, decisão da equipa): RF-10 está na 1.ª entrega, a reserva usa o cliente registado. Depende de story-registar-cliente, story-query-free-rooms e story-set-base-price. O total com extras fica em epic-extra-services-pricing.
+Q-27 (respondida, decisão da equipa): RF-10 está na 1.ª entrega, a reserva usa o cliente registado. Dependências (auditoria 2026-10-16): uma forte, story-query-free-rooms (reutiliza a mesma regra de sobreposição, `RoomAvailability`; sprint 4 antes do sprint 5). Clientes, quartos e preço base: dados de teste próprios (foundation T4), sem depender das outras histórias. O total com extras fica em epic-extra-services-pricing.
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -56,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

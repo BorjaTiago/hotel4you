@@ -47,8 +47,17 @@ Para que ninguém o use para entrar nos locais do hotel.
   Quando tenta bloquear um cartão mestre
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O cartão mestre bloqueado fica bloqueado de imediato e não abre nenhuma porta.
+- [ ] AC-2: O bloqueio fica registado e o gestor passa a poder emitir um novo cartão mestre.
+- [ ] AC-3: Bloquear um cartão já bloqueado é recusado com mensagem a indicar que já está bloqueado.
+- [ ] AC-4: Bloquear um cartão mestre inexistente é recusado.
+- [ ] AC-5: O rececionista não consegue bloquear cartões mestre.
+
 ## Notas
 Decisão da equipa (2026-10-16): o bloqueio é o passo obrigatório antes de emitir um novo cartão mestre; a emissão está em "Emitir um novo cartão mestre com novo número" e recusa-se se o cartão antigo estiver ativo. Q-19 e Q-26 (decisão da equipa, não confirmada pelo professor). Entrega final (Q-06).
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: cartões mestre de teste ativo e bloqueado (foundation T4). O AC-1 ("não abre nenhuma porta") usa `AccessService` e o leitor simulado (T0, T6), não a história do cartão mestre.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -60,4 +69,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

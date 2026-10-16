@@ -42,8 +42,15 @@ Para que o cliente fique instalado no quarto reservado.
   Quando o rececionista tenta fazer o check-in
   Então o sistema informa que a reserva não existe
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O check-in de uma reserva ativa é registado.
+- [ ] AC-2: Um check-in duplicado é recusado.
+- [ ] AC-3: O check-in de uma reserva cancelada é recusado.
+- [ ] AC-4: O check-in de uma reserva inexistente devolve uma resposta de não encontrado.
+
 ## Notas
-Entrega 1 (Q-06). A entrega do cartão magnético (RF-13, RF-16) fica na entrega final (epic-magnetic-card-access). Depois do check-in o gestor deixa de poder apagar a reserva (RF-22). Depende de story-create-reservation.
+Entrega 1 (Q-06). A entrega do cartão magnético (RF-13, RF-16) fica na entrega final (epic-magnetic-card-access). Depois do check-in o gestor deixa de poder apagar a reserva (RF-22). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste próprias (ativa, cancelada, com check-in) (foundation T4).
 
 points_suggested: 3
 reference: Realizar check-in com cartão magnético (5)
@@ -55,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

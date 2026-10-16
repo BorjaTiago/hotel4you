@@ -59,8 +59,18 @@ Para que o preço por noite inclua estes extras.
   Então o sistema recusa a operação
   E a reserva mantém os extras anteriores
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A vista especial adicionada aparece na reserva e o preço por noite aumenta o valor do seu preço extra.
+- [ ] AC-2: Bebidas e lavandaria adicionadas aparecem na reserva e o preço por noite soma os dois preços extra.
+- [ ] AC-3: Ao remover um extra, o preço por noite volta ao valor sem esse extra.
+- [ ] AC-4: Um extra sem preço definido é recusado com uma mensagem a indicar que falta o preço.
+- [ ] AC-5: Numa reserva cancelada, adicionar um extra é recusado.
+- [ ] AC-6: Ao escolher uma segunda vista, a reserva fica só com a nova vista e o preço usa só o extra dela.
+- [ ] AC-7: Depois do check-in, adicionar ou remover extras é recusado e a reserva mantém os extras anteriores.
+
 ## Notas
-Q-11, Q-25. Depende de "Definir os preços extra por noite" e de reservas (1.ª entrega). Decisões da equipa (2026-10-16): a vista especial é escolha única (mar ou montanha) por reserva; os extras podem ser alterados até ao check-in; datas e quarto não são editáveis; cancelar não é possível depois do check-in (ver story-cancel-reservation).
+Q-11, Q-25. Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste (ativa, cancelada, com check-in) e preços extra de teste, um sem preço (foundation T4). Partilha `ReservationExtrasService` (T0) com story-adicionar-servicos-extra-reserva: cada história tem a sua classe. Decisões da equipa (2026-10-16): a vista especial é escolha única (mar ou montanha) por reserva; os extras podem ser alterados até ao check-in; datas e quarto não são editáveis; cancelar não é possível depois do check-in (ver story-cancel-reservation).
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -72,4 +82,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

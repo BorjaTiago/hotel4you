@@ -37,8 +37,14 @@ Para que o stock reflita o material gasto no hotel.
   Quando o funcionário do hotel ou o gestor regista um uso com quantidade 0 ou negativa
   Então o sistema recusa o registo
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O uso fica guardado como "uso" com quantidade e data, e o stock do item baixa em conformidade.
+- [ ] AC-2: Um uso maior que o stock é recusado e o stock não muda.
+- [ ] AC-3: Um uso com quantidade 0 ou negativa é recusado.
+
 ## Notas
-Q-21 (decisão da equipa): uso e saída são movimentos com quantidade e data. Decisão da equipa (2026-10-16): uso = consumo no hotel; saída = remoção do material (descarte, devolução ou perda), ver "Registar saída de stock". Entrega final (Q-06). Depende de "Cadastrar item de stock" e "Editar item de stock".
+Q-21 (decisão da equipa): uso e saída são movimentos com quantidade e data. Decisão da equipa (2026-10-16): uso = consumo no hotel; saída = remoção do material (descarte, devolução ou perda), ver "Registar saída de stock". Entrega final (Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: itens de teste com stock conhecido (foundation T4), sem depender de story-registar-entrada-stock.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -50,4 +56,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

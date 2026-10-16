@@ -39,8 +39,16 @@ Para que eu aceda a qualquer local do hotel.
   Quando o gestor passa o cartão numa porta
   Então o sistema recusa a entrada
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O cartão mestre ativo permite a entrada na porta de um quarto de cliente.
+- [ ] AC-2: O cartão mestre ativo permite a entrada na garagem, armazém, bar, salas de conferências, restaurante e piscina.
+- [ ] AC-3: Cada entrada com o cartão mestre guarda o local e a hora.
+- [ ] AC-4: O cartão mestre bloqueado é recusado em qualquer porta.
+
 ## Notas
 Um cartão mestre por gestor, cada passagem registada (Q-19, decisão da equipa). Entrada simulada na GUI. As zonas abertas são as criadas pelo gestor (ver "Criar uma zona num piso"); zona removida deixa de abrir. Também permite ao pessoal entrar em quartos (Q-08). Entrega final (Q-06). Bloqueio: ver história "Bloquear um cartão mestre perdido".
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: cartão mestre ativo e cartão mestre bloqueado de teste (foundation T4), locais dos dados de referência (T5); regra própria (`AccessRule`, T0), leitor simulado (T6). Bloqueio escondido: nenhuma história dá o primeiro cartão mestre a um gestor; o gestor inicial recebe-o em foundation T6 (ver pergunta nova do backlog para gestores criados depois).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -52,4 +60,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

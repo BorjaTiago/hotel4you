@@ -42,8 +42,15 @@ Para que o cliente seja ajudado com os serviços do quarto.
   Quando tentar registar um pedido de serviço de quarto
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O pedido de comida, bebida ou lavandaria para o quarto com check-in fica registado com quarto, tipo e data e hora, e o rececionista vê a confirmação.
+- [ ] AC-2: O pedido para um quarto sem check-in é recusado com uma mensagem a indicar que o quarto não está ocupado.
+- [ ] AC-3: Um tipo de serviço fora de comida, bebida e lavandaria é recusado e nada é registado.
+- [ ] AC-4: Quem não é rececionista não consegue registar pedidos de serviço de quarto.
+
 ## Notas
-Depende do check-in (epic-check-in-out). Enunciado, secção 2. RF-15. Decisão da equipa (2026-10-16): os serviços de quarto são só comida, bebida e lavandaria (sem lista aberta de serviços). O pessoal só entra em quartos com cartão mestre do gestor (Q-08); esta história não abre portas. Fase: definida pelo priorizador (Q-25).
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reserva de teste com check-in no quarto 202 (foundation T4); tipos comida, bebida e lavandaria dos dados de referência (T5). Enunciado, secção 2. RF-15. Decisão da equipa (2026-10-16): os serviços de quarto são só comida, bebida e lavandaria (sem lista aberta de serviços). O pessoal só entra em quartos com cartão mestre do gestor (Q-08); esta história não abre portas. Fase: definida pelo priorizador (Q-25).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -55,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -41,6 +41,13 @@ Para que as reservas usem o preço correto do quarto.
   Quando o rececionista tenta alterar o preço base de um tipo
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O preço base de um tipo de quarto pode ser definido.
+- [ ] AC-2: O preço base de um tipo de quarto pode ser alterado.
+- [ ] AC-3: Um preço inválido é recusado.
+- [ ] AC-4: Um papel sem permissão é recusado ao definir preços.
+
 ## Notas
 Q-11 (decisão da equipa, não confirmada pelo professor): o gestor define o preço base por tipo. Preços extra (vista, bebidas, lavandaria) ficam em epic-extra-services-pricing. Depende de story-register-rooms (tipos).
 
@@ -54,4 +61,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -36,8 +36,14 @@ Para que reservas indevidas desapareçam do sistema.
   Quando o gestor tenta apagar uma reserva que não existe
   Então o sistema informa que a reserva não existe
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Uma reserva sem check-in pode ser apagada.
+- [ ] AC-2: Depois de apagar a reserva, o quarto volta a ficar livre.
+- [ ] AC-3: Apagar uma reserva inexistente devolve uma resposta de não encontrado.
+
 ## Notas
-Q-05 (decisão da equipa, não confirmada): apagar remove a reserva de vez. Decisão (2026-10-16): a recusa de apagar após check-in (antigo AC-3) fica só em story-block-delete-after-check-in, sem duplicação aqui. Recusa a outros papéis em story-refuse-delete-reservation. Depende de story-create-reservation.
+Q-05 (decisão da equipa, não confirmada): apagar remove a reserva de vez. Decisão (2026-10-16): a recusa de apagar após check-in (antigo AC-3) fica só em story-block-delete-after-check-in, sem duplicação aqui. Recusa a outros papéis em story-refuse-delete-reservation. Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste próprias (foundation T4), sessão de gestor simulada (T0). Esta história é dona da ação de apagar; story-refuse-delete-reservation e story-block-delete-after-check-in acrescentam guardas à mesma ação.
 
 Q-36: exceção RF-22, o gestor apaga a reserva antes do check-in; sem AC extra.
 points_suggested: 3
@@ -50,4 +56,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

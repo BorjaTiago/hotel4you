@@ -43,8 +43,16 @@ Para que zonas que já não existem deixem de ser controladas pelo cartão.
   Então o sistema recusa a operação
   E a zona mantém-se
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A zona removida deixa de aparecer nos pisos e nenhum cartão a abre.
+- [ ] AC-2: Uma zona com associações não é removida, o sistema explica porquê e a zona e as passagens mantêm-se.
+- [ ] AC-3: Remover uma zona inexistente informa que a zona não existe.
+- [ ] AC-4: O rececionista não consegue remover zonas e a zona mantém-se.
+
 ## Notas
 Decisão da equipa (2026-10-16): ver "Criar uma zona num piso". Entrega final (Q-06). Q-36 (decisão da equipa): nada que tenha associações pode ser removido ou apagado; só se remove uma zona sem associações.
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: zonas de teste próprias, uma sem associações e uma com reserva ou passagem associada (foundation T4).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -56,4 +64,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

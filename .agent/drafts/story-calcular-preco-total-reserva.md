@@ -44,8 +44,16 @@ Para que eu diga ao cliente o valor correto da estadia.
   Quando o rececionista consulta o preço total
   Então o sistema indica que não pode calcular o preço
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Uma reserva sem extras mostra o preço total igual ao preço base vezes as noites (240,00 no exemplo).
+- [ ] AC-2: Uma reserva com extras mostra o total por noites vezes a soma do preço base e dos extras (300,00 no exemplo).
+- [ ] AC-3: Uma reserva com serviço pago inclui o custo do serviço no total (240,00 no exemplo).
+- [ ] AC-4: Ao remover um extra, o preço total é recalculado sem esse extra.
+- [ ] AC-5: Sem preço base do tipo de quarto, o sistema indica que não pode calcular o preço.
+
 ## Notas
-Preços fixos por noite (Q-11, decisão da equipa). Valores dos exemplos são só ilustrativos. Depende de "Definir os preços extra por noite" e das histórias de extras. Depende também de "Definir o preço base" (epic-rooms-pricing, RF-06). Fase pelo priorizador (Q-25).
+Preços fixos por noite (Q-11, decisão da equipa). Valores dos exemplos são só ilustrativos. Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste com preço base, extras e serviços já gravados, e um tipo sem preço base (foundation T4). O AC-4 testa o recálculo depois de retirar o extra nos dados de teste; o ecrã de remoção é de story-adicionar-extras-quarto-reserva (sprint 12). Fase pelo priorizador (Q-25).
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -57,4 +65,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

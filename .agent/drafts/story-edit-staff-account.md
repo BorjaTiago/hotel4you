@@ -41,8 +41,15 @@ Para que a conta fique correta quando o funcionário muda.
   Quando tentar editar uma conta de funcionário
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O novo tipo da conta fica guardado e o acesso segue o novo tipo no próximo login.
+- [ ] AC-2: Mudar o nome para um nome já em uso é recusado e a conta não muda.
+- [ ] AC-3: Editar uma conta inexistente mostra que a conta não existe.
+- [ ] AC-4: Quem não é gestor não consegue editar contas de funcionário.
+
 ## Notas
-Depende de "Criar uma conta de funcionário". Só contas, sem horários (Q-18). RF-26. Fase: Q-25.
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: contas de teste próprias "ana" e "rui" (foundation T4), sessões simuladas de gestor e rececionista (T0). Só contas, sem horários (Q-18). RF-26. Fase: Q-25.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -54,4 +61,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

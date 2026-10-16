@@ -42,8 +42,16 @@ Para que o gestor a receba.
   Quando tentar registar uma sugestão ou reclamação
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A sugestão com texto e nome do cliente fica guardada com data e hora e tipo "sugestão", e o gestor consegue vê-la.
+- [ ] AC-2: A reclamação com texto fica guardada com data e hora e tipo "reclamação", e o gestor consegue vê-la.
+- [ ] AC-3: Um registo sem texto é recusado com uma mensagem a pedir o texto.
+- [ ] AC-4: O funcionário do restaurante não consegue registar sugestões nem reclamações.
+
 ## Notas
 Enunciado, secção 2. RF-27. Q-18: a receção regista na aplicação. O cliente não tem login (Q-13). Fase: Q-25.
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: sessões simuladas de rececionista e restaurante (foundation T0), base de teste (T4).
 
 points_suggested: 2
 reference: Registar um cliente (3)
@@ -55,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
