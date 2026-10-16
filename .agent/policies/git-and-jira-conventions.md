@@ -4,7 +4,8 @@
 
 - Use Git flow.
 - Branch name: `(feat|fix)-NNN-description`. NNN is the Jira key number, zero-padded to 3 digits.
-- One branch per story or sub-task.
+- One branch per story or sub-task. The branch name carries the ticket number.
+- Never commit to `main`. No exception. Always create a branch for the ticket, then open a pull request.
 - Commits have clear and short descriptions.
   - Not allowed: "fix task X", "general fix".
 - Wrong or careless use of the repository gets a penalty.
