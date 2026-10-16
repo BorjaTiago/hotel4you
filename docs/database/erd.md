@@ -1,4 +1,4 @@
-# H4Y-10 - ER Diagram
+# Database - ER Diagram
 
 Diagram of the schema in [schema.md](schema.md). View it on GitHub or at mermaid.live.
 

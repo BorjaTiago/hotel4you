@@ -14,13 +14,13 @@ branch: feat-033-sqlserver-schema-scripts
 
 # T2: Ligação SQL Server e scripts do esquema
 
-Origem: `epic-foundation-architecture.md`, tarefa T2. Precisa de T0a (configuração e interfaces de repositório). Usar o esquema do PR #4 já integrado em `docs/H4Y-10/`, não o antigo. Corre em paralelo com auth T1 (hash).
+Origem: `epic-foundation-architecture.md`, tarefa T2. Precisa de T0a (configuração e interfaces de repositório). Usar o esquema do PR #4 já integrado em `docs/database/`, não o antigo. Corre em paralelo com auth T1 (hash).
 Responsável proposto: Lukas Sperandio (a equipa decide).
 
 ## Checklist
 
 - [ ] A ligação JDBC lê as credenciais da configuração local ou do ambiente. Nenhuma credencial no Git (RNF-12).
-- [ ] Os scripts criam o esquema de `docs/H4Y-10/` (versão do PR #4). Verificar primeiro os ficheiros integrados.
+- [ ] Os scripts criam o esquema de `docs/database/` (versão do PR #4). Verificar primeiro os ficheiros integrados.
 - [ ] Com uma base de dados vazia, a primeira preparação cria todas as tabelas.
 - [ ] Um registo guardado continua lá depois de a aplicação fechar e abrir.
 - [ ] Com o SQL Server em baixo, a aplicação mostra uma mensagem clara e nenhum detalhe da ligação.

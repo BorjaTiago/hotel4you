@@ -1,4 +1,4 @@
-# H4Y-10 - Database Schema (SQL Server)
+# Database - Database Schema (SQL Server)
 
 18 tables. All names in English, snake_case, plural. ER diagram: [erd.md](erd.md).
 

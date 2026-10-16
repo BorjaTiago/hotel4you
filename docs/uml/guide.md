@@ -1,6 +1,6 @@
-# H4Y-5 - Class Guide
+# UML - Class Guide
 
-This file explains each class in the class diagram. Use it to defend the design. Diagram: [uml/codeUml.md](uml/codeUml.md). Classes: [classes.md](classes.md). Requirements: [traceability.md](traceability.md).
+This file explains each class in the class diagram. Use it to defend the design. Diagram: [class-diagram.md](class-diagram.md). Classes: [classes.md](classes.md). Requirements: [traceability.md](traceability.md).
 
 ## Main ideas (read first)
 

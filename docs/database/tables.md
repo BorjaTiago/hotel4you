@@ -1,4 +1,4 @@
-# H4Y-10 - Table Guide
+# Database - Table Guide
 
 Use this file to explain and defend the schema. Each table has the same parts:
 

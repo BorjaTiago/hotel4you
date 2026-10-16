@@ -1,6 +1,6 @@
-# H4Y-5 - Traceability
+# UML - Traceability
 
-Requirements from [../requirements/requirements.md](../requirements/requirements.md) to the classes and methods of [uml/codeUml.md](uml/codeUml.md). "Not covered" means no class or method in the diagram. Guide: [guide.md](guide.md).
+Requirements from [../requirements/requirements.md](../requirements/requirements.md) to the classes and methods of [class-diagram.md](class-diagram.md). "Not covered" means no class or method in the diagram. Guide: [guide.md](guide.md).
 
 ## Functional requirements
 

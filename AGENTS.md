@@ -90,6 +90,8 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 | Sprint review | `docs/scrum/sprint-NN/review.md` |
 | Retrospective | `docs/scrum/sprint-NN/retrospective.md` |
 | Impediments and daily notes | `docs/scrum/sprint-NN/impediments.md` |
+| Database schema, ER diagram, table guide | `docs/database/{schema,erd,tables}.md` |
+| Class diagram (Mermaid) and class docs | `docs/uml/{class-diagram,classes,guide,traceability,README}.md` |
 | Team roster and rotation | `.agent/context/team.md` |
 | Examples | `.agent/examples/` |
 
