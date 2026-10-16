@@ -9,7 +9,7 @@
 - Commits have clear and short descriptions.
   - Not allowed: "fix task X", "general fix".
 - Wrong or careless use of the repository gets a penalty.
-- Reference every AI use in code, docs and diagrams.
+- Reference every AI use in docs and diagrams only. Never in source code.
 
 ### Branch cases
 
@@ -33,7 +33,7 @@ Every agent and tool that writes a commit message, a PR title or a PR body follo
 
 - Write in Simplified Technical English (STE): short sentences, simple words, active voice. Example: `H4Y-8 add check-in sequence diagram`.
 - Never add an AI as co-author or author. Do not add a `Co-Authored-By` line. Do not add a "Generated with ..." line. Tool defaults that add them must be turned off or removed before the commit or PR is created.
-- The AI-use reference stays inside the changed files (AGENTS.md rule 8). It does not go in the commit trailer.
+- The AI-use reference stays inside the changed documentation files, never in source code (AGENTS.md rule 8). It does not go in the commit trailer.
 - Check before you commit: `git log -1 --format=%B` has no `Co-Authored-By`. Check before you open the PR: the body has no "Generated with" line.
 
 ### Traceability

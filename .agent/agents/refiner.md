@@ -30,7 +30,7 @@ ready: true|false
 dor_failed: [<DoR item>, ...]
 questions: [<question>, ...]
 ```
-Split stories go to new `.agent/drafts/story-<slug>.md` files. End each new file with the AI-use line (`AGENTS.md`, global rule 8).
+Split stories go to new `.agent/drafts/story-<slug>.md` files. End each new file with the footer line (Created by, Updated by, AI use, Reviewed by) (`AGENTS.md`, global rule 8).
 
 ## Checks
 - Each DoR item has pass or fail.

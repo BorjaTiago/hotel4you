@@ -50,5 +50,5 @@ No separate file.
 ## Rules
 - Never invent roles or rules. Ask a question instead.
 - Write in Portuguese with Dado/Quando/Então (E, Mas).
-- Change nothing else in the story. Keep the AI-use line and add your agent name (`AGENTS.md`, global rule 8).
+- Change nothing else in the story. Keep the footer line, set "Updated by" to the responsible GitHub handle, and add your agent name to the AI-use part (`AGENTS.md`, global rule 8).
 - Do not write to Jira.

@@ -50,7 +50,8 @@ Short facts sheet. Full source: `enunciado.md`. Never add a requirement that is 
 
 ## AI-use rule
 - Code or engineering diagrams from AI without a reference are forbidden (code of conduct).
-- Agents must tell the team to reference every AI use (tool, prompt, where used).
+- Team rule (teacher agreed, 2026-10-16): reference AI use only in documentation files. Never in source code.
+- Agents must tell the team to reference every AI use (tool, prompt, where used) in the doc footer.
 
 ## Tech
 Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
@@ -72,4 +73,4 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Drafts: `.agent/drafts/<type>-<slug>.md`. Examples: `.agent/examples/`.
 - Acceptance scenarios are numbered AC-1, AC-2 inside the story. Tests cite "H4Y-NN AC-n".
 
-AI use: doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04). Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04). Reviewed by: pending.

@@ -29,7 +29,7 @@ Keep a clear record of what happens in a sprint. Produce the graded review and r
 - `docs/scrum/sprint-NN/review.md`: Demo notes, Accepted stories, Rejected stories, Feedback.
 - `docs/scrum/sprint-NN/retrospective.md`: Keep, Stop, Start, Actions (owner, due), Follow-up of last sprint actions, Metrics.
 - Metrics block: `committed_points: N`, `done_points: N`, `velocity: N`.
-- End each new file with the AI-use line (`AGENTS.md`, global rule 8).
+- End each new file with the footer line (Created by, Updated by, AI use, Reviewed by) (`AGENTS.md`, global rule 8).
 
 ## Checks
 - Every action item has an owner.
