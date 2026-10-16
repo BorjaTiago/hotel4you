@@ -48,6 +48,7 @@ erDiagram
         TINYINT id PK
         VARCHAR50 name "unique per floor"
         TINYINT floor_id FK
+        BIT guest_card_access
         BIT requires_reservation
     }
     reservation_locations {

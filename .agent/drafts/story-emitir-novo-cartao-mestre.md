@@ -47,8 +47,17 @@ Para que eu volte a aceder a todos os locais.
   Quando tenta emitir um cartão mestre
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Com o cartão mestre anterior bloqueado, o gestor emite um cartão com número diferente que abre todos os quartos e zonas.
+- [ ] AC-2: As passagens e o bloqueio do cartão antigo continuam no registo.
+- [ ] AC-3: O cartão antigo bloqueado continua a ser recusado nas portas.
+- [ ] AC-4: Com o cartão mestre ainda ativo, a emissão é recusada com mensagem a pedir o bloqueio primeiro e nenhum cartão é criado.
+- [ ] AC-5: O rececionista não consegue emitir cartões mestre.
+
 ## Notas
 Q-26 (decisão da equipa): novo número e número antigo no registo. Decisão da equipa (2026-10-16): um novo cartão mestre só se emite depois de o anterior estar bloqueado (ver "Bloquear um cartão mestre perdido"). Entrega final (Q-06).
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: cartão mestre bloqueado e cartão mestre ativo de teste (foundation T4), sem depender de story-bloquear-cartao-mestre; número novo de `CardNumberGenerator` (T6).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -60,4 +69,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

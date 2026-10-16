@@ -25,16 +25,22 @@ Write testable scenarios AC-1, AC-2, ... in the story body. Tests cite them as "
 7. Write unclear points as open questions in Notas. Add teacher questions to `docs/requirements/questions.md` (`AGENTS.md`, global rule 3).
 
 ## Output
-Edit only the `Critérios de aceite` and `Notas` sections of the same story file:
+Edit only the `Critérios de aceite`, `Critérios de aceite (checklist)` and `Notas` sections of the same story file:
 ```
 ### Cenário AC-1: <nome> (sucesso)
   Dado ...
   Quando ...
   Então ...
 ```
+Also write the section `## Critérios de aceite (checklist)` with one line per AC, in Portuguese, same ids:
+```
+- [ ] AC-1: <resultado verificável, curto>
+```
+The checklist goes to the Jira description. AC-n ids must match in the scenario, the checklist and the test name. Technical tasks use the same `- [ ]` format.
 No separate file.
 
 ## Checks
+- Every scenario AC-n has one checklist line AC-n.
 - Each AC has one clear observable result.
 - Each AC can become one automated test.
 - Scenarios cover success, not-logged-in, not-allowed per role, rule violation (when supported).

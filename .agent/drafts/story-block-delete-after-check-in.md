@@ -36,8 +36,14 @@ Para que o registo de uma estadia em curso ou concluída nunca se perca.
   Quando o gestor apaga a reserva
   Então a reserva é removida
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Apagar uma reserva depois do check-in é recusado.
+- [ ] AC-2: Apagar uma reserva depois do check-out é recusado.
+- [ ] AC-3: Apagar uma reserva antes do check-in continua permitido.
+
 ## Notas
-RF-22: só se apaga se o cliente não fez check-in. Decisão (2026-10-16): esta história é a única dona da recusa de apagar após check-in; o AC-3 de story-delete-reservation foi removido para não duplicar. Apagar antes do check-in está em story-delete-reservation. AC-2: uma reserva com check-out efetuado já teve check-in, logo RF-22 também impede apagá-la. Depende de story-check-in.
+RF-22: só se apaga se o cliente não fez check-in. Decisão (2026-10-16): esta história é a única dona da recusa de apagar após check-in; o AC-3 de story-delete-reservation foi removido para não duplicar. Apagar antes do check-in está em story-delete-reservation. AC-2: uma reserva com check-out efetuado já teve check-in, logo RF-22 também impede apagá-la. Dependências (auditoria 2026-10-16): uma forte, story-delete-reservation (acrescenta a guarda de estado à mesma ação de apagar; sprint 5 antes do sprint 6). Reservas com check-in e com check-out: dados de teste próprios (foundation T4), sem depender de story-check-in.
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -49,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

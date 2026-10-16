@@ -42,8 +42,15 @@ Para que o material da entrega entre no stock.
   Quando tenta carregar um ficheiro XML
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Um XML válido com itens conhecidos regista a entrada de cada item no stock e mostra que a importação terminou.
+- [ ] AC-2: Num XML com item desconhecido, os itens conhecidos são importados e o desconhecido é rejeitado.
+- [ ] AC-3: Um ficheiro inválido ou fora do formato é recusado e o stock não muda.
+- [ ] AC-4: O funcionário do restaurante não consegue carregar ficheiros XML.
+
 ## Notas
-O fornecedor não faz login (Q-17). Item desconhecido rejeitado, válidos importados (Q-10). A equipa define o formato XML (o exemplo do enunciado não está no texto): o formato fica documentado nesta história/entrega, sem história própria. A lista de rejeitados: ver história "Ver o relatório de importação". Entrega final (Q-06). Depende de "Cadastrar item de stock" e "Editar item de stock" (catálogo de itens conhecidos).
+O fornecedor não faz login (Q-17). Item desconhecido rejeitado, válidos importados (Q-10). A equipa define o formato XML (o exemplo do enunciado não está no texto): o formato fica documentado nesta história/entrega, sem história própria. A lista de rejeitados: ver história "Ver o relatório de importação". Entrega final (Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: itens de catálogo de teste e ficheiros XML de teste válido, com item desconhecido e inválido (foundation T4). Esta história é dona do leitor XML (`XmlStockImporter`, T0) e guarda a importação (`stock_imports`); story-carregar-xml-fornecedor-rececionista reutiliza-o.
 
 points_suggested: 8
 reference: Importar ficheiro XML de stock de um fornecedor (8)
@@ -55,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

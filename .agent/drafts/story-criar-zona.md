@@ -47,8 +47,17 @@ Para que o cartão saiba que locais controla e quais só abrem com reserva.
   Quando tenta criar uma zona
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A zona criada com a marca "exige reserva" fica guardada no piso escolhido com essa marca.
+- [ ] AC-2: A zona criada sem a marca fica guardada com "não exige reserva".
+- [ ] AC-3: Criar uma zona com nome já usado no mesmo piso é recusado e nenhuma zona é criada.
+- [ ] AC-4: Criar uma zona num piso inexistente é recusado com a indicação de que o piso não existe.
+- [ ] AC-5: O rececionista não consegue criar zonas.
+
 ## Notas
 Decisão da equipa (2026-10-16): o gestor cria, edita e remove zonas por piso e marca se a zona exige reserva. Pisos fixos do enunciado (RF-03): -1, 0, 1, 2 e 3. Substitui a história "Associar cada local a um piso e zona". Entrega final (Q-06). Ver também "Editar uma zona" e "Remover uma zona".
+Dependências (auditoria 2026-10-16): nenhuma forte, e já não bloqueia outras histórias: os locais do enunciado (restaurante e piscina incluídos) vêm dos dados de referência (foundation T5). Construir e testar sozinha: pisos de T5 e base de teste sem zonas para o AC-1 (T4), sessão simulada (T0). Na base de produção o restaurante já existe; a demo do AC-1 usa outro nome ou a base de teste.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -60,4 +69,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -48,7 +48,7 @@ Sections 1, 4, 6. RNF-13 to RNF-19, RNF-27. Q-03, Q-04, Q-07, Q-24.
 - Desenvolver, testar e atualizar diagramas das histórias (actor: developer; RNF-19)
 
 ## Open questions
-- Q-04 (open): which 3 weeks have no sprint.
+- Q-04 (answered): which 3 weeks have no sprint. Answer: 2026-12-21, 2026-12-28, 2027-01-04 (team decision, not confirmed by the teacher).
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): processo Scrum é tarefa, não história. Todas ficam ligadas a esta épica. Esta épica não tem histórias. Q-28 (atores) fica sem efeito para estas tarefas.

@@ -46,8 +46,17 @@ Para que as zonas reflitam a organização do hotel.
   Quando tenta editar uma zona
   Então o sistema recusa a operação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A marca "exige reserva" alterada fica guardada e o cartão usa a nova regra nas próximas passagens.
+- [ ] AC-2: O novo nome ou piso da zona fica guardado.
+- [ ] AC-3: Mudar para um nome já usado no mesmo piso é recusado e a zona mantém o nome.
+- [ ] AC-4: Editar uma zona inexistente informa que a zona não existe.
+- [ ] AC-5: O rececionista não consegue editar zonas.
+
 ## Notas
 Decisão da equipa (2026-10-16): ver "Criar uma zona num piso". Entrega final (Q-06). As passagens já registadas não mudam (RF-19).
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: zonas de teste próprias (foundation T4). O AC-1 ("o cartão usa a nova regra") testa-se com a regra de acesso quando existir (sprint 9); até lá, teste do valor guardado.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -59,4 +68,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -36,8 +36,15 @@ Para que o material recebido entre no stock sem esperar pelo gestor.
   Então o sistema recusa o ficheiro
   E o stock não muda
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Um XML válido com itens conhecidos regista a entrada de cada item no stock com quantidade e data.
+- [ ] AC-2: Num XML com item desconhecido, os itens conhecidos são importados e o desconhecido é rejeitado.
+- [ ] AC-3: Um ficheiro que não é XML válido é recusado e o stock não muda.
+
 ## Notas
-RF-28: "staff ou o gestor carrega o ficheiro". Mesma regra da história do gestor, outro ator. Depende dela (formato XML). Q-10, Q-17. Entrega final (Q-06). Depende também de "Cadastrar item de stock" e "Editar item de stock" (catálogo de itens conhecidos).
+RF-28: "staff ou o gestor carrega o ficheiro". Mesma regra da história do gestor, outro ator. Q-10, Q-17. Entrega final (Q-06).
+Dependências (auditoria 2026-10-16): uma forte, story-carregar-xml-fornecedor-gestor (reutiliza o leitor XML; os 3 pontos supõem essa reutilização; sprint 11 antes do sprint 12). Itens e ficheiros: dados de teste (foundation T4), sem depender das histórias do catálogo.
 
 points_suggested: 3
 reference: Importar ficheiro XML de stock de um fornecedor (8)
@@ -49,4 +56,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

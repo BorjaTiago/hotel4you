@@ -41,8 +41,15 @@ Para que informe o cliente sobre os quartos do hotel.
   Quando tenta consultar a lista de quartos
   Então o sistema recusa o acesso
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A lista mostra todos os quartos registados.
+- [ ] AC-2: A lista pode ser filtrada por tipo de quarto.
+- [ ] AC-3: Sem quartos registados, a lista vem vazia sem erro.
+- [ ] AC-4: Um pedido sem autenticação é recusado.
+
 ## Notas
-Depende de story-register-rooms e story-set-base-price. O rececionista só consulta, não altera.
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: quartos e preços base de teste próprios (foundation T4). Na demo, os quartos vêm de story-register-rooms e os preços de story-set-base-price (sprint 3). O rececionista só consulta, não altera.
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -54,4 +61,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

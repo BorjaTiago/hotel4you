@@ -35,8 +35,15 @@ Para que o meu acesso corresponda à minha função na empresa externa.
   Quando tentar apagar ou criar uma reserva
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O funcionário do restaurante consegue abrir a cozinha e o restaurante.
+- [ ] AC-2: Qualquer outro local ou serviço é recusado com uma mensagem de acesso não permitido.
+- [ ] AC-3: O funcionário do restaurante não consegue criar nem apagar reservas.
+
 ## Notas
 Login com nome de utilizador e palavra-passe (Q-23). Enunciado, secção 2. RF-25. Fase: Q-25.
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: conta de restaurante e zonas "cozinha" e "restaurante" de teste (foundation T4), sessão simulada (T0). O piso da cozinha não está no enunciado: na demo o gestor cria a cozinha com story-criar-zona (sprint 7). O AC-3 usa o mapa de permissões de story-funcoes-por-papel (sprint 3).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -48,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

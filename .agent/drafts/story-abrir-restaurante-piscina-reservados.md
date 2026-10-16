@@ -43,8 +43,16 @@ Para que eu use os locais que reservei.
   Quando o cliente passa o cartão na porta da piscina
   Então o sistema recusa a entrada
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O cartão abre o restaurante quando a reserva o inclui.
+- [ ] AC-2: O cartão abre a piscina quando a reserva a inclui.
+- [ ] AC-3: O cartão é recusado no restaurante quando a reserva não o inclui.
+- [ ] AC-4: O cartão é recusado na piscina quando a reserva não a inclui.
+
 ## Notas
-Restaurante e piscina estão no piso 1 (RF-03). Depende de "Criar uma zona num piso": a marca "exige reserva" da zona decide o acesso (decisão da equipa, 2026-10-16). Entrega final (Q-06). Q-09 e Q-20 (decisão da equipa). Depende de a reserva guardar restaurante e piscina (RF-11, 1.ª entrega).
+Restaurante e piscina estão no piso 1 (RF-03). A marca "exige reserva" da zona decide o acesso (decisão da equipa, 2026-10-16). Entrega final (Q-06). Q-09 e Q-20 (decisão da equipa).
+Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: zonas com a marca (dados de referência, foundation T5) e reservas de teste com e sem restaurante e piscina (T4), sem depender de story-criar-zona nem de story-reservation-restaurant-pool; regra própria (`AccessRule`, T0) e leitor simulado (T6).
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -56,4 +64,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -44,8 +44,16 @@ Para que eu saiba quem entrou nesse quarto e quando.
   Quando tenta consultar as passagens de um quarto
   Então o sistema recusa a consulta
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A consulta de um quarto mostra o cartão do cliente que entrou com a hora da entrada.
+- [ ] AC-2: A lista de passagens do quarto inclui as passagens de cartão mestre.
+- [ ] AC-3: Um quarto sem passagens mostra uma lista vazia.
+- [ ] AC-4: Consultar um quarto inexistente mostra que o quarto não existe.
+- [ ] AC-5: O rececionista não consegue consultar as passagens de um quarto.
+
 ## Notas
-Exemplo do enunciado: quarto 301. Entrega final (Q-06). Depende de registo de passagens, incluindo cartão mestre (Q-19).
+Exemplo do enunciado: quarto 301. Entrega final (Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: passagens de teste próprias, incluindo uma de cartão mestre (foundation T4, Q-19).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -57,4 +65,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

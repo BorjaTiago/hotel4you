@@ -13,7 +13,7 @@ A story is ready for estimation when all items are true. No estimate is needed y
   - [ ] Estimable: the team understands it enough to estimate.
   - [ ] Small: it looks like 8 points or less.
   - [ ] Testable: a tester can check it.
-- [ ] Acceptance criteria are in Given/When/Then (Dado/Quando/Então), numbered AC-1, AC-2, and so on.
+- [ ] Acceptance criteria are in Given/When/Then (Dado/Quando/Então), numbered AC-1, AC-2, and so on. The story also has a `## Critérios de aceite (checklist)` section with one `- [ ] AC-n` line per AC (same ids).
 - [ ] The story links to a statement requirement (RF-NN or RNF-NN). It adds no new requirement.
 - [ ] Dependencies are listed and linked (stories, data, diagrams).
 - [ ] No open question. Open questions are answered or sent to the teacher.

@@ -45,8 +45,16 @@ Para que ofereça ao cliente apenas quartos disponíveis.
   Quando o rececionista consulta quartos familiares livres
   Então o sistema informa que não há quartos livres
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Um quarto livre no período pedido é oferecido.
+- [ ] AC-2: Um quarto ocupado no período pedido não é oferecido.
+- [ ] AC-3: Um quarto com reserva cancelada volta a ser oferecido.
+- [ ] AC-4: Um período inválido é recusado.
+- [ ] AC-5: Sem quartos livres, a resposta indica que não há disponibilidade.
+
 ## Notas
-AC-3: cancelar liberta o quarto (Q-05: cancelar é mudança de estado; ver story-cancel-reservation AC-2). Depende de story-register-rooms.
+AC-3: cancelar liberta o quarto (Q-05: cancelar é mudança de estado; ver story-cancel-reservation AC-2). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: quartos e reservas de teste próprios, incluindo uma ativa e uma cancelada (foundation T4). Esta história implementa `RoomAvailability` (T0), a regra única de sobreposição de datas; story-create-reservation reutiliza-a.
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -58,4 +66,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

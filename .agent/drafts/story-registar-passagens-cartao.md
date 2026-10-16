@@ -35,8 +35,15 @@ Para que o hotel tenha o registo das minhas entradas.
   Então o sistema recusa a entrada
   E não guarda um registo de entrada nesse local
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Uma entrada permitida no restaurante guarda um registo com o local e a hora da entrada.
+- [ ] AC-2: Uma entrada no quarto do cliente guarda um registo com o quarto e a hora da entrada.
+- [ ] AC-3: Uma entrada recusada no bar é recusada e não guarda nenhum registo de entrada.
+
 ## Notas
 Registo de cada passagem, incluindo quartos (Q-09, decisão da equipa). RF-19 fala só de entradas. Registar tentativas recusadas não está no enunciado: não foi assumido. Entrega final (Q-06).
+Dependências (auditoria 2026-10-16): nenhuma forte. Implementa `AccessLogger` (foundation T0), chamado por `AccessService` só em entradas permitidas. Construir e testar sozinha: cartões de teste (T4) e uma regra de teste que permite ou recusa; leitor simulado (T6). Não precisa das outras histórias de acesso.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -48,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

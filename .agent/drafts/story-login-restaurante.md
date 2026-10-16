@@ -37,8 +37,15 @@ Para que o sistema me reconheça como funcionário da empresa externa do restaur
   Então o sistema recusa o acesso
   E mostra a mesma mensagem do AC-2
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O funcionário do restaurante com credenciais válidas inicia sessão com sucesso.
+- [ ] AC-2: Credenciais inválidas são recusadas sem iniciar sessão.
+- [ ] AC-3: Um utilizador desconhecido é recusado com a mesma resposta das credenciais inválidas.
+
 ## Notas
 Fase: 1.ª entrega (login, Q-06). Início de sessão do restaurante: Q-23 (decisão da equipa). A limitação a cozinha e restaurante (RF-25) fica noutra épica (epic-staff-management-access).
+Dependências (auditoria 2026-10-16): sprint 3. A conta do funcionário do restaurante vem de "Criar uma conta de funcionário" (create-staff-account). Reutiliza o mecanismo de início de sessão do rececionista.
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -50,4 +57,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

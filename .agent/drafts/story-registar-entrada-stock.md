@@ -36,8 +36,14 @@ Para que o hotel saiba o material que tem.
   Quando o funcionário do hotel ou o gestor regista uma entrada desse item
   Então o sistema recusa o registo
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A entrada fica guardada com quantidade e data, e o stock do item sobe em conformidade.
+- [ ] AC-2: Uma entrada com quantidade 0 ou negativa é recusada e o stock não muda.
+- [ ] AC-3: Uma entrada de um item inexistente é recusada.
+
 ## Notas
-Cada movimento tem quantidade e data (Q-21, decisão da equipa). O stock cobre todos os itens de fornecedor. Entrega final (Q-06). Depende de "Cadastrar item de stock" e "Editar item de stock".
+Cada movimento tem quantidade e data (Q-21, decisão da equipa). O stock cobre todos os itens de fornecedor. Entrega final (Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: itens de teste com stock conhecido (foundation T4).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -49,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; actor note edit by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

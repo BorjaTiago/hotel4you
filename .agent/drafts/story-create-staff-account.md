@@ -5,8 +5,8 @@ parent: epic-staff-management-access
 requirements: [RF-26, RF-01]
 points: 3
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-27
 labels: [staff]
 sprint:
 ---
@@ -42,8 +42,16 @@ Para que o funcionário entre na aplicação com o acesso certo.
   Quando tentar criar uma conta de funcionário
   Então o sistema recusa a ação
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: A conta criada fica registada e a palavra-passe fica guardada cifrada.
+- [ ] AC-2: Criar uma conta com nome já existente é recusado com mensagem a indicar que o nome já existe.
+- [ ] AC-3: Criar uma conta sem palavra-passe é recusado.
+- [ ] AC-4: O rececionista não consegue criar contas de funcionário.
+
 ## Notas
 Só contas, sem horários (Q-18). Tipos: rececionista, funcionário do restaurante (Q-23) e gestor; outro pessoal não consta do enunciado. Palavra-passe cifrada: RNF-02. Login: epic-authentication-users. Fase: Q-25.
+Dependências (auditoria 2026-10-16): nenhuma forte. Movida para o sprint 2, com os logins: o gestor inicial (auth T2) cria as contas de rececionista e de restaurante. Construir e testar sozinha: sessão de gestor simulada (foundation T0), cifra da palavra-passe (auth T1), base de teste vazia (T4). Precisa das tarefas T0, T2 (foundation) e T1 (auth) no início do sprint.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -55,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -7,7 +7,7 @@
 ```
 floors
   id                    TINYINT IDENTITY PK             -- Internal floor ID.
-  number                SMALLINT NOT NULL UNIQUE        -- Floor number (-1 to 3). SMALLINT because TINYINT has no negatives.
+  number                SMALLINT NOT NULL UNIQUE        -- Floor number (-1 to 3: -1 garage and storeroom; 0 reception, bar, conference rooms; 1 restaurant and pool; 2 and 3 rooms). SMALLINT because TINYINT has no negatives.
 
 room_types
   id                    TINYINT IDENTITY PK             -- Internal room type ID.
@@ -25,7 +25,8 @@ locations
   id                    TINYINT IDENTITY PK             -- Internal location ID.
   name                  VARCHAR(50) NOT NULL            -- Name of a place with a card reader (pool, restaurant, kitchen...).
   floor_id              TINYINT NOT NULL FK floors      -- Floor of the location. Used to check staff access.
-  requires_reservation  BIT NOT NULL DEFAULT 0          -- 1 = a customer card enters only if the reservation lists the place (see decision 11). 0 = no reservation check.
+  guest_card_access     BIT NOT NULL DEFAULT 0          -- 1 = a client card can open this place. 0 = a client card never opens it (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). See decision 11.
+  requires_reservation  BIT NOT NULL DEFAULT 0          -- 1 = the zone needs a reservation to open with the client card (Q-32). Used only when guest_card_access = 1. See decision 11.
   UNIQUE (floor_id, name)                               -- Same name allowed on different floors.
 
 reservation_locations
@@ -69,7 +70,7 @@ customers
 
 roles
   id                    TINYINT IDENTITY PK             -- Internal role ID.
-  name                  VARCHAR(20) NOT NULL UNIQUE     -- Role name: reception, manager, restaurant.
+  name                  VARCHAR(20) NOT NULL UNIQUE     -- Role name: client, receptionist, manager, restaurant, supplier (the 5 actor types of RF-02).
 
 users
   id                    SMALLINT IDENTITY PK            -- Internal user ID.
@@ -131,7 +132,7 @@ feedback
 - `floors`: floors of the hotel. `number` is `SMALLINT` because it can be negative (-1 to 3).
 - `room_types`: individual, double or family. Holds `capacity` and `base_price` per night.
 - `rooms`: one row per room. Links to one floor and one room type. The view is not here. It is a service of the reservation (see below).
-- `locations`: places with a card reader (pool, restaurant, kitchen). Each one is on one floor. Used to check staff access. `requires_reservation = 1` means a customer card enters only if the reservation lists the place. The name is unique per floor.
+- `locations`: places with a card reader (pool, restaurant, kitchen). Each one is on one floor. Used to check staff access. `guest_card_access = 0` means a client card never opens the place. `requires_reservation = 1` means the zone needs a reservation to open with the client card. The name is unique per floor.
 - `reservation_locations`: locations included in a reservation. Composite PK (`reservation_id`, `location_id`).
 
 ### Inventory
@@ -142,7 +143,7 @@ feedback
 
 ### People and security
 - `customers`: hotel guests. `document` is unique to avoid duplicates.
-- `roles`: reception, manager, restaurant.
+- `roles`: the 5 actor types of RF-02: client, receptionist, manager, restaurant, supplier. The seed creates all 5. Only receptionist, manager and restaurant get accounts (Q-13, Q-17).
 - `users`: staff accounts. Store `password_hash` only. There is no `active` column: a user is not disabled by a flag (Q-36).
 
 ### Reservations and services
@@ -194,7 +195,7 @@ T-SQL has no boolean type. Do not compare two conditions with `=` or `<>`. Use A
 | Table | Constraint |
 |---|---|
 | room_types | `capacity > 0`, `base_price IS NULL OR base_price >= 0` |
-| locations | `UNIQUE (floor_id, name)`; `requires_reservation` default 0 |
+| locations | `UNIQUE (floor_id, name)`; `guest_card_access` default 0; `requires_reservation` default 0 |
 | reservation_locations | PK (`reservation_id`, `location_id`) |
 | items | `name` UNIQUE; `stock_quantity >= 0` |
 | room_items | PK (`room_id`, `item_id`); `quantity > 0` |
@@ -260,5 +261,5 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 8. **Room items per room**: the manager sets items for each room (`room_items` links `rooms` and `items`). This is more flexible than per room type and costs only one extra row per item.
 9. **Views**: "sea view" and "mountain view" are 2 rows in `additional_services`, linked by `reservation_services`. The backend allows one view per reservation (Q-37, Q-11).
 10. **Room service**: a request for food, drink or laundry is a `reservation_services` row. `used_at` is the request time (Q-33).
-11. **Zones by reservation**: `reservation_locations` lists the locations of a reservation (Q-09, RF-18). A location with `requires_reservation = 1` (bar, garage and similar zones, Q-32) is never added to a reservation, so the backend refuses the customer card there (Q-20).
+11. **Zones and the client card**: the backend decides in this order. (a) `guest_card_access = 0`: refuse the client card (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). (b) `guest_card_access = 1` and `requires_reservation = 0`: open. (c) `guest_card_access = 1` and `requires_reservation = 1`: open only if `reservation_locations` lists the place for that reservation (restaurant and pool; Q-09, Q-32, RF-18). We chose one extra BIT column because it is the simplest way to say "never". The default is 0, so a new zone is closed to client cards until the manager opens it. Staff and master cards do not use these two flags.
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).

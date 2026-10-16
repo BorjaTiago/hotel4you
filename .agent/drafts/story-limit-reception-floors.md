@@ -40,8 +40,15 @@ Para que o meu acesso corresponda ao meu papel.
   Quando abrir um serviço de qualquer piso
   Então o sistema não aplica o limite dos pisos 0 e 1
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: O rececionista consegue abrir os serviços dos pisos 0 e 1.
+- [ ] AC-2: Um serviço de outro piso é recusado com uma mensagem de acesso não permitido.
+- [ ] AC-3: O rececionista sem cartão mestre do gestor não consegue entrar num quarto de hóspede.
+- [ ] AC-4: O gestor abre serviços de qualquer piso sem o limite dos pisos 0 e 1.
+
 ## Notas
-O limite aplica-se só à receção (Q-08). Os serviços de cada piso vêm de RF-03. AC-3 depende do cartão mestre (epic-master-card-audit, RF-23). Fase: Q-25.
+O limite aplica-se só à receção (Q-08). Os serviços de cada piso vêm de RF-03. Dependências (auditoria 2026-10-16): nenhuma forte. Antes era um bloqueio escondido: o AC-3 citava o cartão mestre (sprint 10) e a história estava no sprint 8. O AC-3 só testa a recusa sem cartão mestre, por isso não precisa dele. Construir e testar sozinha: locais por piso dos dados de referência (foundation T5), sessões simuladas de rececionista e gestor (T0), regra própria em `PermissionPolicy`/`AccessRule` (T0). Fase: Q-25.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -53,4 +60,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

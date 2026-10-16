@@ -36,11 +36,24 @@ Para que <benefício>.
 ### Cenário AC-2: <nome>
   ...
 
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: <resultado verificável, curto, em português>
+- [ ] AC-2: <...>
+
 ## Notas
 <dependências, perguntas (Q-NN), referência ao enunciado>
 
 AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or pending>.
 ```
+
+## Checklist rule (user decision, 2026-10-16)
+
+- Every story keeps the Dado/Quando/Então scenarios (AC-n) as detail. It also has the section `## Critérios de aceite (checklist)`.
+- The checklist has one line `- [ ] AC-n: ...` per AC, in Portuguese. Each line is short and can be ticked.
+- The checklist goes to the Jira description as a checklist. The doer ticks each line when done.
+- AC-n IDs must match in three places: the scenario heading (`### Cenário AC-n`), the checklist line (`- [ ] AC-n`), and the test name ("H4Y-NN AC-n"). Same number, same meaning.
+- Technical tasks (epic section "Tarefas técnicas", sub-tasks) use the same format: one `- [ ]` line per criterion.
 
 ## Rules
 
@@ -50,7 +63,7 @@ AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or p
 - Number scenarios AC-1, AC-2, and so on. Tests cite "H4Y-NN AC-n".
 - Write at least one success scenario and one failure scenario.
 - Use only rules from the statement. Do not invent requirements. Link the requirement IDs.
-- Criteria use Gherkin keywords in Portuguese: Dado, Quando, Então (E, Mas for extra steps).
+- Criteria use Gherkin keywords in Portuguese: Dado, Quando, Então (E, Mas for extra steps). Add the checklist section (see "Checklist rule"). Gherkin alone is not enough.
 - Do not describe the design (tables, classes, screens) in the story.
 - Leave `points` empty. The team writes it after estimation.
 
@@ -97,6 +110,12 @@ Para que o cliente aceda ao seu quarto e aos locais incluídos na reserva.
   Quando o rececionista tenta associar o cartão 12345
   Então o sistema recusa a associação
   E o estado da reserva não muda
+
+## Critérios de aceite (checklist)
+
+- [ ] AC-1: Check-in com reserva válida associa o cartão e muda o estado
+- [ ] AC-2: Check-in sem reserva é recusado com mensagem
+- [ ] AC-3: Cartão já em uso é recusado e a reserva não muda
 
 ## Notas
 Depende das histórias "Registar cliente" e "Criar reserva". Enunciado, secção 2 (cartão magnético).
