@@ -27,7 +27,7 @@ Split one epic into small stories. One actor each, 8 points or less. Criteria li
 ## Output
 One file per story: `.agent/drafts/story-<slug>.md`. No separate AC or estimate file.
 Front-matter: `type: story`, `summary`, `parent: <epic slug>`, `requirements: [RF-03]`, `points:` (EMPTY), `points_suggested:`, `status: draft`, `jira_key:`, `labels: []`, `sprint:`.
-Body (story-format.md): Título; Como/Eu quero/Para que; Critérios de aceite (Cenário AC-n, Dado/Quando/Então); Notas.
+Body (story-format.md): Título; Como/Eu quero/Para que; Critérios de aceite (Cenário AC-n, Dado/Quando/Então); Critérios de aceite (checklist) with one `- [ ] AC-n: ...` line per AC; Notas.
 End each file with the AI-use line (`AGENTS.md`, global rule 8).
 
 ## Checks
