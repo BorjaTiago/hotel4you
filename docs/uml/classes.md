@@ -1,6 +1,6 @@
-# H4Y-5 - Classes
+# UML - Classes
 
-One table per layer. Every class of [uml/codeUml.md](uml/codeUml.md) appears once. Guide: [guide.md](guide.md). Requirements: RF and RNF from [../requirements/requirements.md](../requirements/requirements.md).
+One table per layer. Every class of [class-diagram.md](class-diagram.md) appears once. Guide: [guide.md](guide.md). Requirements: RF and RNF from [../requirements/requirements.md](../requirements/requirements.md).
 
 ## Interface (JavaFX controllers)
 
