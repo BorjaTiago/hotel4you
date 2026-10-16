@@ -11,7 +11,6 @@ classDiagram
     class RoomController {
         +onSearchClicked() void
         +onSaveRoomClicked() void
-        +onListFreeRoomsClicked() void
         +onConfigureRoomItemClicked() void
         +onSavePriceClicked() void
     }
@@ -24,6 +23,7 @@ classDiagram
         +onCancelReservationClicked() void
         +onDeleteReservationClicked() void
         +onAddExtraClicked() void
+        +onRemoveExtraClicked() void
     }
     class LocationController {
         +onSaveLocationClicked() void
@@ -41,6 +41,7 @@ classDiagram
     }
     class CardController {
         +onIssueCardClicked() void
+        +onIssueMasterCardClicked() void
         +onBlockMasterCardClicked() void
         +onShowPlacesByCardClicked() void
         +onShowPassesByRoomClicked() void
@@ -64,6 +65,7 @@ classDiagram
         +cancelReservation(reservation: Reservation) void
         +deleteReservation(reservation: Reservation, user: User) void
         +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
+        +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +registerClient(name: String, document: String, birthday: LocalDate) Client
         +findClient(document: String) Client
         +checkIn(reservation: Reservation) void
@@ -77,7 +79,8 @@ classDiagram
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
-        +listFreeRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +searchRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +saveRoom(room: Room) Room
         +configureRoomItem(room: Room, item: StockItem, quantity: int) void
         +setBasePrice(type: RoomType, price: BigDecimal) void
         +setExtraPrice(service: ExtraService, price: BigDecimal) void
@@ -110,7 +113,8 @@ classDiagram
     }
     class RoomService {
         +isAvailable(room: Room, start: LocalDate, end: LocalDate) boolean
-        +listFree(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +searchRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +saveRoom(room: Room) Room
         +configureItem(room: Room, item: StockItem, quantity: int) void
         +setBasePrice(type: RoomType, price: BigDecimal) void
         +setExtraPrice(service: ExtraService, price: BigDecimal) void
@@ -120,6 +124,7 @@ classDiagram
         +cancel(reservation: Reservation) void
         +delete(reservation: Reservation, user: User) void
         +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
+        +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +checkIn(reservation: Reservation) void
         +checkOut(reservation: Reservation) void
     }
@@ -134,6 +139,7 @@ classDiagram
         +issueMasterCard(manager: Manager) MagneticCard
         +blockCard(card: MagneticCard) void
         +canOpen(card: MagneticCard, location: Location) boolean
+        +canOpenRoom(card: MagneticCard, room: Room) boolean
         +register(card: MagneticCard, room: Room, location: Location) CardAccessRecord
         +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
         +getPassesByRoom(room: Room) List~CardAccessRecord~
@@ -221,6 +227,7 @@ classDiagram
         -number: String
         -type: CardType
         -active: boolean
+        -blockedAt: LocalDateTime
     }
     class CardAccessRecord {
         -entryDateTime: LocalDateTime
@@ -254,6 +261,7 @@ classDiagram
         -supplierName: String
         -importedAt: LocalDateTime
         -rejectedItems: List~String~
+        +getRejectedItems() List~String~
     }
 
     %% ==========================================
@@ -317,11 +325,11 @@ classDiagram
     %% ASSOCIATIONS
     %% ==========================================
     Client "1" --> "*" Reservation : makes
-    Room "1" --> "*" Reservation : reserved for
-    User "1" --> "*" Reservation : created by
+    Room "1" --> "*" Reservation : reserved in
+    User "1" --> "*" Reservation : creates
     Reservation "1" *-- "*" ReservationExtra : includes
     ReservationExtra "*" --> "1" ExtraService : refers to
-    Reservation "1" --> "0..*" MagneticCard : has
+    Reservation "1" --> "0..1" MagneticCard : has
     User "1" --> "*" MagneticCard : owns
     MagneticCard "1" --> "*" CardAccessRecord : generates
     CardAccessRecord "*" --> "0..1" Room : at
@@ -332,7 +340,7 @@ classDiagram
     Room "1" --> "*" RoomItem : has
     RoomItem "*" --> "1" StockItem : refers to
     Reservation "*" --> "*" Location : includes
-    Client "1" --> "*" Feedback : leaves
+    Client "0..1" --> "*" Feedback : leaves
     StockItem "1" --> "*" StockMovement : has
     User "1" --> "*" StockMovement : records
     StockMovement "*" --> "0..1" StockImport : from
@@ -369,6 +377,7 @@ classDiagram
     %% NOTE
     %% ==========================================
     note for HotelFacade "The business layer does not use JavaFX."
+    note for FeedbackService "client may be null (anonymous feedback)"
     note for CardAccessRecord "Each record has a Room OR a Location, never both."
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
 ```
