@@ -3,6 +3,7 @@
 This folder documents the class diagram in [class-diagram.md](class-diagram.md).
 
 - View the Mermaid diagram on GitHub, or paste it at mermaid.live.
+- [domain-model.md](domain-model.md): domain model with business concepts only.
 - [guide.md](guide.md): guide to defend each class and key flows.
 - [classes.md](classes.md): all classes by layer, with attributes, methods and requirements.
 - [traceability.md](traceability.md): requirements to classes.
