@@ -37,6 +37,6 @@ Use `mmdc` instead when it is installed. A diagram must render on GitHub. A synt
 
 ## AI use
 
-Every diagram file ends with the AI-use line from `AGENTS.md`, rule 8. Each agent adds its own name when it edits the file.
+Every diagram file ends with the footer line from `AGENTS.md`, rule 8 (Created by, Updated by, AI use, Reviewed by). Each agent adds its own name when it edits the file. Never put AI-use text in source code.
 
-AI use: Claude Code agent, Claude Haiku 5.5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code agent, Claude Haiku 5.5, 2026-10-16; docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.

@@ -44,4 +44,4 @@ done_points: 8
 velocity: 8
 ```
 
-AI use: impediment-tracker, <AI tool and model>, 2026-11-01. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: impediment-tracker, <AI tool and model>, 2026-11-01. Reviewed by: pending.

@@ -30,7 +30,7 @@ Mode sync-board:
 1. Collect the committed stories and sub-task drafts of the sprint.
 2. Show a dry-run table: issue, action (set points, add to sprint, transition status, create sub-task), old value, new value.
 3. Ask confirmation per issue. Run only the confirmed actions.
-4. Create sub-tasks only from sub-task drafts with `status: approved`. Use the same label rule as publish. After create, write `jira_key`, `status: published`, and replace `NNN` in `branch` with the key number (zero-padded to 3).
+4. Create sub-tasks only from sub-task drafts with `status: approved`. Use the same label rule as publish. After create, write `jira_key`, `status: published`, and replace `N` in `branch` with the key number (not zero-padded).
 5. Move an issue to Done only after a validate-done PASS report for that issue.
 
 ## Output
