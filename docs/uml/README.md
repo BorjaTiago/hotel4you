@@ -7,7 +7,11 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - [guide.md](guide.md): guide to defend each class and key flows.
 - [classes.md](classes.md): all classes by layer, with attributes, methods and requirements.
 - [traceability.md](traceability.md): requirements to classes.
+- [use-cases.md](use-cases.md): use-case diagrams for all 19 use cases.
+- [use-case-catalog.md](use-case-catalog.md): short descriptions, actors, permissions and requirement links.
 - Database: [../database/schema.md](../database/schema.md), [../database/erd.md](../database/erd.md).
+
+## Differences from the database
 
 - `RoomType` class vs `room_types` table.
 - `ReservationExtra` vs `reservation_services`.
