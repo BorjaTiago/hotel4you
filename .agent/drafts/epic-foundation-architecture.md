@@ -97,7 +97,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
 - [ ] Com o SQL Server indisponível, a aplicação mostra mensagem clara e não mostra dados internos da ligação.
 - [ ] Com a base vazia, a estrutura necessária fica criada na primeira preparação.
 - [ ] Credenciais da base de dados nunca ficam em ficheiros versionados.
-- [ ] Os scripts de criação usam o esquema H4Y-10 do PR #4 (branch `chore/db-schema-update`), não a versão antiga em `main` (o PR #4 remove `users.active`, `reservations.price_per_night`, `rooms.view_*` e acrescenta `reservation_locations`, `stock_imports`, `locations.requires_reservation`, `access_cards.blocked_at`, `items.unit`). Se o PR #4 ainda não estiver em `main`, esta tarefa espera por ele.
+- [ ] Os scripts de criação usam o esquema H4Y-10 do PR #4 (branch `chore/db-schema-update`), não a versão antiga em `main` (o PR #4 remove `users.active`, `reservations.price_per_night`, `rooms.view_*` e acrescenta `reservation_locations`, `stock_imports`, `locations.requires_reservation`, `locations.guest_card_access` (Q-45), `access_cards.blocked_at`, `items.unit`).
 
 ### T3: Rever a usabilidade da interface com teste simples (RNF-04)
 - [ ] Com uma tarefa principal da receção já implementada, um utilizador de teste executa-a sem ajuda e o resultado fica registado.
