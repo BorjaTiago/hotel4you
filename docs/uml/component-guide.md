@@ -58,7 +58,6 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 | Microsoft JDBC Driver for SQL Server (mssql-jdbc) | Official Microsoft driver. Java needs a driver to connect to SQL Server (RNF-12). | jTDS: not maintained. |
 | JavaFX | GUI library recommended by the statement (RNF-06, Q-22). | Swing: older and less flexible. |
 | Supplier XML stock file | The supplier sends one XML file with each delivery (RF-28). | None: the statement sets the format. |
-| Java SE (`javax.xml`, `java.sql`, `java.time`; `javax.crypto` proposed) | Part of the JDK. It parses XML. `javax.crypto` is the proposal for password hashing (RNF-02) until H4Y-29 decides. | XML library: not needed. Hash library: H4Y-29 decides. |
 | JUnit | The statement requires JUnit tests (RNF-10). | None: the statement names JUnit. |
 
 Every external library also goes in [docs/libraries.md](../libraries.md) with its version (RNF-11, H4Y-36). The versions are set when the build file exists (H4Y-32).
@@ -79,4 +78,4 @@ Mermaid CLI 12.0.0 rendered the diagram to a temporary PNG file. The preview was
 
 `git diff --check` passed. There is no Java code yet, so the packages were checked against the H4Y-32 plan only. The package-to-code check stays pending until H4Y-32 adds the Java files (C-04). Human review is still required.
 
-AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16. Reviewed by: pending.
+AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
