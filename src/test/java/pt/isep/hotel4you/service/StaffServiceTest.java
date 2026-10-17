@@ -26,12 +26,14 @@ class StaffServiceTest {
     private static final String PASSWORD = "secret123";
 
     private InMemoryUserRepository repository;
+    private AuthService authService;
     private StaffService staffService;
 
     @BeforeEach
     void setUp() {
         repository = new InMemoryUserRepository();
-        staffService = new StaffService(repository, new AuthService(repository));
+        authService = new AuthService(repository);
+        staffService = new StaffService(repository, authService);
     }
 
     @Test
@@ -61,6 +63,43 @@ class StaffServiceTest {
 
         assertThrows(UsernameTakenException.class,
                 () -> staffService.createFirstManager("rita", PASSWORD));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-7")
+    void onCreateFirstManager_createManagerThatCanLogIn_whenNoManagerExists() {
+        staffService.createFirstManager("rui", PASSWORD);
+
+        assertEquals(Role.MANAGER, authService.login("rui", PASSWORD).getRole());
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-7")
+    void onCreateFirstManager_trimUsername_whenUsernameHasSpaces() {
+        staffService.createFirstManager("  rui  ", PASSWORD);
+
+        User manager = repository.findByUsername("rui").orElseThrow();
+        assertEquals("rui", manager.getUsername());
+        assertEquals("rui", manager.getName());
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-7")
+    void onCreateFirstManager_throw_whenManagerExistsAndUsernameBlank() {
+        repository.save(new Manager(null, "Rui Costa", "rui", HASH));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> staffService.createFirstManager("   ", PASSWORD));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-7")
+    void onCreateFirstManager_throwUsernameTaken_whenUsernameDiffersOnlyInCase() {
+        repository.save(new Receptionist(null, "Rita Lopes", "rita", HASH));
+
+        assertThrows(UsernameTakenException.class,
+                () -> staffService.createFirstManager("RITA", PASSWORD));
+        assertEquals(1, repository.count());
     }
 
     @ParameterizedTest

@@ -36,6 +36,14 @@ class UserTest {
         assertNull(user.getId());
     }
 
+    @Test
+    @Tag("H4Y-32-AC-2")
+    void onCreateUser_trimUsername_whenUsernameHasSpaces() {
+        User user = new Receptionist(1L, "Ana Silva", "  ana  ", HASH);
+
+        assertEquals("ana", user.getUsername());
+    }
+
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
