@@ -38,6 +38,19 @@ public class Database {
     }
 
     /**
+     * Checks that the database can be reached. It opens a connection and closes it.
+     *
+     * @throws IllegalStateException if the database cannot be reached
+     */
+    public void check() {
+        try (Connection connection = connect()) {
+            // The connection opened, so the database works. It closes at the end of the block.
+        } catch (SQLException e) {
+            throw new IllegalStateException(NOT_AVAILABLE);
+        }
+    }
+
+    /**
      * Prepares a SQL statement and fills its {@code ?} values in order.
      *
      * @param connection the open connection

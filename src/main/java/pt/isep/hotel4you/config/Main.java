@@ -1,7 +1,6 @@
 package pt.isep.hotel4you.config;
 
 import java.nio.file.Path;
-import java.sql.SQLException;
 import javafx.application.Application;
 import pt.isep.hotel4you.data.Database;
 import pt.isep.hotel4you.data.JdbcUserRepository;
@@ -20,9 +19,8 @@ public class Main {
      * Builds the objects of the application and opens the window.
      *
      * @param args the command line arguments
-     * @throws SQLException if the test connection cannot be closed
      */
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
         try {
             AppConfig config = AppConfig.load(Path.of("application.properties"));
             Database database = new Database(config);
@@ -31,8 +29,8 @@ public class Main {
             StaffService staffService = new StaffService(userRepository, authService);
             HotelFacade facade = new HotelFacade(authService, staffService);
 
-            // Check now that the database works. Then close the test connection.
-            database.connect().close();
+            // Check now that the database works.
+            database.check();
             HotelApp.facade = facade;
         } catch (IllegalStateException e) {
             // HotelApp shows this error in a popup.

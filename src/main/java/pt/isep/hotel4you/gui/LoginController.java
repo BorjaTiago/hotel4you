@@ -6,6 +6,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import pt.isep.hotel4you.domain.User;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.LoginFailedException;
 
 /** Controller of the login screen. */
 public class LoginController {
@@ -37,9 +38,10 @@ public class LoginController {
             // The real main window comes with H4Y-24.
             messageLabel.setStyle("-fx-text-fill: #1e8449;");
             messageLabel.setText("Welcome, " + user.getName() + " (" + user.getRole() + ")");
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException | LoginFailedException | IllegalStateException e) {
             messageLabel.setStyle("");
             messageLabel.setText(e.getMessage());
         }
+        passwordField.clear();
     }
 }

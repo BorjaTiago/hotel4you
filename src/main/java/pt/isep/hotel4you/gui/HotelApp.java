@@ -25,7 +25,6 @@ public class HotelApp extends Application {
      * Shows the login screen, or a popup if the start failed.
      *
      * @param stage the main window
-     * @throws IOException if the FXML file cannot be loaded
      */
     @Override
     public void start(Stage stage) {

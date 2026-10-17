@@ -18,9 +18,9 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: maven
-      - name: Check that no .env file is tracked
+      - name: Check that no secret file is tracked
         run: |
-          if git ls-files | grep -E '(^|/)\.env$'; then echo "A .env file is tracked." && exit 1; fi
+          if git ls-files | grep -E '(^|/)(\.env|application\.properties)$'; then echo "A secret file is tracked." && exit 1; fi
       - name: Build and test
         run: ./mvnw -B verify
       - name: Generate Javadoc
