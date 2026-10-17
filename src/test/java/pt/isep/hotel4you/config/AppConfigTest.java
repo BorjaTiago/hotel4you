@@ -24,31 +24,31 @@ class AppConfigTest {
         Path configFile = tempDir.resolve("application.properties");
         Files.write(configFile, List.of(
                 "# database",
-                "H4Y_DB_URL=jdbc:sqlserver://localhost:1433",
-                "H4Y_DB_USER=sa",
-                "H4Y_DB_PASSWORD=secret",
-                "H4Y_FIRST_MANAGER_USERNAME=rui",
-                "H4Y_FIRST_MANAGER_PASSWORD=manager-secret"));
+                "db.url=jdbc:sqlserver://localhost:1433",
+                "db.user=sa",
+                "db.password=secret",
+                "manager.username=rui",
+                "manager.password=manager-secret"));
 
         AppConfig config = AppConfig.load(configFile);
 
         assertEquals("jdbc:sqlserver://localhost:1433", config.dbUrl());
         assertEquals("sa", config.dbUser());
         assertEquals("secret", config.dbPassword());
-        assertEquals("rui", config.firstManagerUsername());
-        assertEquals("manager-secret", config.firstManagerPassword());
+        assertEquals("rui", config.managerUsername());
+        assertEquals("manager-secret", config.managerPassword());
     }
 
     @Test
     @Tag("H4Y-32-AC-5")
     void onLoad_throw_whenDbUrlMissing() throws IOException {
         Path configFile = tempDir.resolve("application.properties");
-        Files.write(configFile, List.of("H4Y_DB_USER=sa", "H4Y_DB_PASSWORD=secret"));
+        Files.write(configFile, List.of("db.user=sa", "db.password=secret"));
 
         IllegalStateException error =
                 assertThrows(IllegalStateException.class, () -> AppConfig.load(configFile));
 
-        assertTrue(error.getMessage().contains("H4Y_DB_URL"));
+        assertTrue(error.getMessage().contains("db.url"));
     }
 
     @Test
