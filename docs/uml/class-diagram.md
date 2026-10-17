@@ -5,7 +5,7 @@
 - Constructors and getters are not shown.
 - Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
 - `UserRepository` is now in the data layer. The JDBC version comes in PR 2 of H4Y-32.
-- `actor` in `createStaff` is the logged-in user that `login()` returned. The method checks that the actor is a manager. The rule comes with H4Y-27.
+- `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
 
 ```mermaid
 classDiagram
@@ -86,7 +86,8 @@ classDiagram
         +blockMasterCard(card: MagneticCard) void
         +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
         +getPassesByRoom(room: Room) List~CardAccessRecord~
-        +createStaff(user: User, password: String, actor: User) void
+        +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
+        +canCreateStaff(actor: User) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -143,7 +144,8 @@ classDiagram
         +checkOut(reservation: Reservation) void
     }
     class StaffService {
-        +createStaff(user: User, password: String, actor: User) void
+        +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
+        +canCreateStaff(actor: User) boolean
         +createFirstManager(username: String, password: String) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
@@ -421,4 +423,4 @@ classDiagram
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
