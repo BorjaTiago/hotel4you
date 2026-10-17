@@ -179,6 +179,14 @@ Services hold the rules. Each service works on the domain classes.
 - **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
 
+### Main
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
+- **Why:** RF-01, RNF-12. One place builds the objects.
+
+### FirstManagerCommand
+- **What:** Command line tool. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService` and `StaffService`. Then it calls `createFirstManager`.
+- **Why:** RF-01, RNF-12. The first manager must exist before the first login.
+
 ## Data
 
 Data holds the storage interfaces and the SQL Server version. Services use the interfaces.
@@ -188,7 +196,7 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version.
 
 ### Database
-- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `prepare` fills the `?` values of a SQL text.
+- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `prepare` (static) fills the `?` values of a SQL text.
 - **Why:** RNF-12. One place holds the connection code.
 - **Why this way:** The values go in with `prepare`, not in the SQL text. This stops SQL injection.
 - **Other option:** Each repository opens its own connection. Not done: the same code many times.

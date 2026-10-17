@@ -5,6 +5,7 @@
 - Constructors and getters are not shown.
 - Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
 - `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
+- `$` marks a static member.
 - `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
 
 ```mermaid
@@ -16,9 +17,9 @@ classDiagram
         -onLoginClicked() void
     }
     class HotelApp {
-        +facade: HotelFacade
-        +currentUser: User
-        +startError: String
+        +facade: HotelFacade$
+        +currentUser: User$
+        +startError: String$
         +start(stage: Stage) void
     }
     class ScreenLoader {
@@ -199,6 +200,7 @@ classDiagram
         +managerUsername: String
         +managerPassword: String
         +load(file: Path) AppConfig
+        +toString() String
     }
     class Main {
         +main(args: String[]) void
@@ -219,7 +221,7 @@ classDiagram
     }
     class Database {
         +connect() Connection
-        +prepare(connection: Connection, sql: String, values: String[]) PreparedStatement
+        +prepare(connection: Connection, sql: String, values: String...) PreparedStatement$
     }
     class JdbcUserRepository
 
@@ -453,7 +455,16 @@ classDiagram
     %% ==========================================
     Main ..> AppConfig : uses
     Main ..> HotelApp : starts
+    Main ..> Database : creates
+    Main ..> JdbcUserRepository : creates
+    Main ..> AuthService : creates
+    Main ..> StaffService : creates
+    Main ..> HotelFacade : creates
     FirstManagerCommand ..> StaffService : uses
+    FirstManagerCommand ..> AppConfig : uses
+    FirstManagerCommand ..> Database : creates
+    FirstManagerCommand ..> JdbcUserRepository : creates
+    FirstManagerCommand ..> AuthService : creates
     HotelApp ..> ScreenLoader : uses
     ScreenLoader ..> HotelFacade : gives to controllers
 

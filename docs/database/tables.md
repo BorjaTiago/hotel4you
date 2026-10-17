@@ -207,7 +207,7 @@ Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 r
 **What:** The staff accounts. Customers do not log in.
 **Why:** Staff must log in, and the system must know who did each action.
 **Why this way:** The backend hashes the password. The database stores only `password_hash`. There is no `active` column (Q-36). Old reservations and stock movements point to the user, so the hotel does not delete a user who has history.
-**Login names:** Usernames are not case sensitive (the default SQL Server collation), and the application trims spaces.
+**Login names:** The database `hotel4you` is created with the collation `SQL_Latin1_General_CP1_CI_AS` (script `database/v1-create-database.sql`). So usernames are not case sensitive. The application trims spaces.
 **Other option:** Delete the user who leaves. We did not, because the FKs would break or we would lose history.
 
 | id | name | username | password_hash | role_id |

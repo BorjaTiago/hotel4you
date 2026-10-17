@@ -75,7 +75,8 @@ roles
 users
   id                    SMALLINT IDENTITY PK            -- Internal user ID.
   name                  NVARCHAR(100) NOT NULL          -- Staff name. The manager uses it to manage the team.
-  username              VARCHAR(50) NOT NULL UNIQUE     -- Login name.
+  username              VARCHAR(50) NOT NULL UNIQUE     -- Login name. Not case sensitive. The app trims spaces.
+  -- The database hotel4you uses the collation SQL_Latin1_General_CP1_CI_AS (database/v1-create-database.sql).
   password_hash         VARCHAR(255) NOT NULL           -- Password hash. Hashed in the backend. Never stores plain text.
   role_id               TINYINT NOT NULL FK roles       -- User role. Sets the permissions.
 
@@ -264,4 +265,4 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 11. **Zones and the client card**: the backend decides in this order. (a) `guest_card_access = 0`: refuse the client card (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). (b) `guest_card_access = 1` and `requires_reservation = 0`: open. (c) `guest_card_access = 1` and `requires_reservation = 1`: open only if `reservation_locations` lists the place for that reservation (restaurant and pool; Q-09, Q-32, RF-18). We chose one extra BIT column because it is the simplest way to say "never". The default is 0, so a new zone is closed to client cards until the manager opens it. Staff and master cards do not use these two flags.
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

@@ -6,7 +6,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 
 | Requirement | Classes and methods that cover it |
 |-------------|-----------------------------------|
-| RF-01 Login with user name and password | Main, HotelApp, LoginController.onLoginClicked, HotelFacade.login, AuthService.login, AuthService.isValidPassword, UserRepository.findByUsername, JdbcUserRepository.findByUsername, LoginFailedException |
+| RF-01 Login with user name and password | Main, FirstManagerCommand, HotelApp, LoginController.onLoginClicked, HotelFacade.login, AuthService.login, AuthService.isValidPassword, UserRepository.findByUsername, JdbcUserRepository.findByUsername, LoginFailedException |
 | RF-02 Five actor types | Role (enum), User, Receptionist, Manager, RestaurantStaff, Client, StaffService.createFirstManager |
 | RF-03 Building floors and zones | Floor, Location, LocationController.onSaveLocationClicked, LocationService.createLocation |
 | RF-04 Three room types, 20 rooms | Room, RoomType, RoomController.onSaveRoomClicked |
@@ -41,7 +41,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 
 | Requirement | Classes and methods that cover it |
 |-------------|-----------------------------------|
-| RNF-01 All users saved and accessible | StaffController.onListUsersClicked, HotelFacade.listUsers, StaffService.listUsers |
+| RNF-01 All users saved and accessible | StaffController.onListUsersClicked, HotelFacade.listUsers, StaffService.listUsers, UserRepository, JdbcUserRepository |
 | RNF-02 Passwords saved encrypted | AuthService.hashPassword (BCrypt, `at.favre.lib:bcrypt`), User.passwordHash, AuthService.isValidPassword (BCrypt check) |
 | RNF-03 Client registration and reservation in 30 seconds | Not covered by a class (process and usability test) |
 | RNF-04 Simple and intuitive GUI | Not covered by a class (process and usability test) |
@@ -52,6 +52,6 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RNF-09 Javadoc | Not covered. The diagram shows no class for documentation. |
 | RNF-10 JUnit unit tests | Not covered. The diagram shows no test classes. |
 | RNF-11 Libraries documented | Not covered by a class. See [docs/libraries.md](../libraries.md). |
-| RNF-12 SQL Server database | AppConfig, Database, JdbcUserRepository |
+| RNF-12 SQL Server database | Main, FirstManagerCommand, AppConfig, Database, UserRepository, JdbcUserRepository |
 
 Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

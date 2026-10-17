@@ -12,7 +12,7 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | LoginController | Interface | - | onLoginClicked() (private) | RF-01 |
-| HotelApp | Interface | facade, currentUser, startError | start() | RNF-06, RNF-07 |
+| HotelApp | Interface | facade (static), currentUser (static), startError (static) | start() | RNF-06, RNF-07 |
 | ScreenLoader | Interface | - | load() | RNF-06, RNF-07 |
 | RoomController | Interface | - | onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() | RF-04, RF-05, RF-06, RF-08 |
 | ClientController | Interface | - | onRegisterClientClicked(), onSearchClientClicked() | RF-10 |
@@ -50,16 +50,16 @@ Notes:
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load() | RNF-12 |
-| Main | Config | - | main() | RF-01, RNF-12 |
-| FirstManagerCommand | Config | - | main() | RF-01, RNF-12 |
+| AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load(), toString() (hides the passwords) | RNF-12 |
+| Main | Config | - | main(). Uses AppConfig. Creates Database, JdbcUserRepository, AuthService, StaffService, HotelFacade. Starts HotelApp | RF-01, RNF-12 |
+| FirstManagerCommand | Config | - | main(). Uses AppConfig and StaffService. Creates Database, JdbcUserRepository, AuthService | RF-01, RNF-12 |
 
 ## Data
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), existsByRole(), save() | RF-01, RNF-01, RNF-12 |
-| Database | Data | - | connect(), prepare() | RNF-12 |
+| Database | Data | - | connect(), prepare() (static) | RNF-12 |
 | JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), existsByRole(), save() | RNF-01, RNF-12 |
 
 ## Domain
