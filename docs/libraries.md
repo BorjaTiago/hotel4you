@@ -2,7 +2,7 @@
 
 Every external library that the application or its tests use is listed here (RNF-11, Q-14). Add a row before you add a library to the build file.
 
-The versions are not set yet. Write each version when the build file exists (H4Y-32).
+The versions match `pom.xml`. The `mssql-jdbc` version comes with H4Y-32 PR 2.
 
 | Name | Version | Used by | Reason | Rejected option |
 |------|---------|---------|--------|-----------------|
