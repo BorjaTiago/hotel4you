@@ -1,7 +1,7 @@
 package pt.isep.hotel4you.domain;
 
 /** A restaurant employee. */
-public class RestaurantStaff extends User {
+public final class RestaurantStaff extends User {
 
     /**
      * Creates a restaurant staff member.

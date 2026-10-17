@@ -7,3 +7,8 @@ target/
 .vscode/
 .DS_Store
 *.log
+application*.properties
+*.pem
+*.key
+*.p12
+*.jks

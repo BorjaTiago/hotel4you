@@ -1,7 +1,7 @@
 package pt.isep.hotel4you.domain;
 
 /** A front desk employee. */
-public class Receptionist extends User {
+public final class Receptionist extends User {
 
     /**
      * Creates a receptionist.

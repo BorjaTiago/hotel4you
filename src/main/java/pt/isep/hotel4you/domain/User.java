@@ -16,7 +16,7 @@ public abstract class User {
      *
      * @param id the identifier, or null if the user is not saved yet
      * @param name the full name, not blank
-     * @param username the login name, not blank
+     * @param username the login name, not blank; spaces at the start and end are removed
      * @param passwordHash the hash of the password, not blank
      * @param role the role, not null
      * @throws IllegalArgumentException if name, username or passwordHash is blank
@@ -25,7 +25,7 @@ public abstract class User {
     protected User(Long id, String name, String username, String passwordHash, Role role) {
         this.id = id;
         this.name = requireNotBlank(name, "name");
-        this.username = requireNotBlank(username, "username");
+        this.username = requireNotBlank(username, "username").trim();
         this.passwordHash = requireNotBlank(passwordHash, "passwordHash");
         this.role = Objects.requireNonNull(role, "role must not be null");
     }

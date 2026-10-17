@@ -1,7 +1,7 @@
 package pt.isep.hotel4you.domain;
 
 /** A hotel manager. */
-public class Manager extends User {
+public final class Manager extends User {
 
     /**
      * Creates a manager.
