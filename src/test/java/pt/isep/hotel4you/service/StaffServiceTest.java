@@ -137,4 +137,22 @@ class StaffServiceTest {
     void onCanCreateStaff_returnFalse_whenActorIsNull() {
         assertFalse(staffService.canCreateStaff(null));
     }
+
+    @Test
+    @Tag("H4Y-32-AC-3")
+    void onCreateStaff_throwUnsupported_always() {
+        User manager = new Manager(1L, "Rui Costa", "rui", HASH);
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> staffService.createStaff(
+                        "Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-7")
+    void onCreateFirstManager_returnFalse_whenManagerExistsAndUsernameTaken() {
+        repository.save(new Manager(null, "Rui Costa", "rui", HASH));
+
+        assertFalse(staffService.createFirstManager("rui", PASSWORD));
+    }
 }

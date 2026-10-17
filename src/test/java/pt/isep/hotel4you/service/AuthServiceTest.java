@@ -144,4 +144,16 @@ class AuthServiceTest {
     void onLogin_throw_whenPasswordBlank(String password) {
         assertThrows(IllegalArgumentException.class, () -> authService.login("ana", password));
     }
+
+    @Test
+    @Tag("H4Y-32-AC-8")
+    void onLogin_returnRightUser_whenSeveralUsersExist() {
+        String biaPassword = "other-pass-456";
+        saveAna();
+        repository.save(new Receptionist(
+                null, "Bia Neves", "bia", authService.hashPassword(biaPassword)));
+
+        assertEquals("bia", authService.login("bia", biaPassword).getUsername());
+        assertThrows(LoginFailedException.class, () -> authService.login("ana", biaPassword));
+    }
 }

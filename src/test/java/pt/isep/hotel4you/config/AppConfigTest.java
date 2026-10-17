@@ -2,6 +2,7 @@ package pt.isep.hotel4you.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -66,7 +67,34 @@ class AppConfigTest {
 
         String text = config.toString();
 
+        assertTrue(text.contains("jdbc:sqlserver://localhost:1433"));
         assertFalse(text.contains("secret-db"));
         assertFalse(text.contains("secret-manager"));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-5")
+    void onLoad_throw_whenDbPasswordBlank() throws IOException {
+        Path configFile = tempDir.resolve("application.properties");
+        Files.write(configFile, List.of(
+                "db.url=jdbc:sqlserver://localhost:1433", "db.user=sa", "db.password=   "));
+
+        IllegalStateException error =
+                assertThrows(IllegalStateException.class, () -> AppConfig.load(configFile));
+
+        assertTrue(error.getMessage().contains("db.password"));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-5")
+    void onLoad_returnNullManager_whenManagerKeysMissing() throws IOException {
+        Path configFile = tempDir.resolve("application.properties");
+        Files.write(configFile, List.of(
+                "db.url=jdbc:sqlserver://localhost:1433", "db.user=sa", "db.password=secret"));
+
+        AppConfig config = AppConfig.load(configFile);
+
+        assertNull(config.managerUsername());
+        assertNull(config.managerPassword());
     }
 }
