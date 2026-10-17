@@ -70,7 +70,7 @@ customers
 
 roles
   id                    TINYINT IDENTITY PK             -- Internal role ID.
-  name                  VARCHAR(20) NOT NULL UNIQUE     -- Role name: client, receptionist, manager, restaurant, supplier (the 5 actor types of RF-02).
+  name                  VARCHAR(20) NOT NULL UNIQUE     -- Role name: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER (the 5 actor types of RF-02).
 
 users
   id                    SMALLINT IDENTITY PK            -- Internal user ID.
@@ -143,7 +143,7 @@ feedback
 
 ### People and security
 - `customers`: hotel guests. `document` is unique to avoid duplicates.
-- `roles`: the 5 actor types of RF-02: client, receptionist, manager, restaurant, supplier. The seed creates all 5. Only receptionist, manager and restaurant get accounts (Q-13, Q-17).
+- `roles`: the 5 actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER. The seed creates all 5. Only receptionist, manager and restaurant get accounts (Q-13, Q-17).
 - `users`: staff accounts. Store `password_hash` only. There is no `active` column: a user is not disabled by a flag (Q-36).
 
 ### Reservations and services
@@ -263,3 +263,5 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 10. **Room service**: a request for food, drink or laundry is a `reservation_services` row. `used_at` is the request time (Q-33).
 11. **Zones and the client card**: the backend decides in this order. (a) `guest_card_access = 0`: refuse the client card (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). (b) `guest_card_access = 1` and `requires_reservation = 0`: open. (c) `guest_card_access = 1` and `requires_reservation = 1`: open only if `reservation_locations` lists the place for that reservation (restaurant and pool; Q-09, Q-32, RF-18). We chose one extra BIT column because it is the simplest way to say "never". The default is 0, so a new zone is closed to client cards until the manager opens it. Staff and master cards do not use these two flags.
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
+
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17. Reviewed by: pending.

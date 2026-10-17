@@ -23,7 +23,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
   - `stock_movements.exit_reason`: discard, return, loss (Q-34).
   - `stock_imports` and `stock_movements.import_id`. `supplier_name` moves to `stock_imports` (RF-28, Q-10).
 - **Changed:**
-  - `roles` has 5 rows, the actor types of RF-02: client, receptionist, manager, restaurant, supplier.
+  - `roles` has 5 rows, the actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER (upper case, the same as the Java `Role` enum).
   - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
   - The view is a service: "sea view" and "mountain view" are rows of `additional_services`. One view per reservation (Q-37, Q-11).
   - Room service requests (food, drink, laundry) use `reservation_services`. `used_at` is the request time (Q-33).
@@ -188,18 +188,18 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 | 2 | John Müller | X9876543 |
 
 ### roles
-**What:** The permission groups: the 5 actor types of RF-02 (client, receptionist, manager, restaurant, supplier).
+**What:** The permission groups: the 5 actor types of RF-02 (CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER).
 **Why:** The role of the user decides what the API allows.
 **Why this way:** A table, not free text, so a typo cannot make a new role.
 **Other option:** A text column in `users` with a CHECK. It works for a few roles, but the table is easier to extend.
 
 | id | name |
 |---|---|
-| 1 | client |
-| 2 | receptionist |
-| 3 | manager |
-| 4 | restaurant |
-| 5 | supplier |
+| 1 | CLIENT |
+| 2 | RECEPTIONIST |
+| 3 | MANAGER |
+| 4 | RESTAURANT |
+| 5 | SUPPLIER |
 
 Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 roles.
 
@@ -348,3 +348,5 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why no trigger for overlap? | The backend does it in one transaction with a room lock. It is easier to test and read. |
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
+
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17. Reviewed by: pending.

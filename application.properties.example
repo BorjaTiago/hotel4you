@@ -1,0 +1,13 @@
+# Copy this file to application.properties and set your own values. Never commit application.properties.
+
+# Used by Docker. Must have 8+ characters with upper case, lower case, a digit and a symbol.
+MSSQL_SA_PASSWORD=change-me-Strong1!
+
+# trustServerCertificate=true is for a local server only.
+H4Y_DB_URL=jdbc:sqlserver://localhost:1433;databaseName=hotel4you;encrypt=true;trustServerCertificate=true;loginTimeout=5
+H4Y_DB_USER=sa
+# Same value as MSSQL_SA_PASSWORD.
+H4Y_DB_PASSWORD=change-me-Strong1!
+
+H4Y_FIRST_MANAGER_USERNAME=manager
+H4Y_FIRST_MANAGER_PASSWORD=change-me
