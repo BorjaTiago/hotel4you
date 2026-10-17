@@ -2,16 +2,128 @@
 
 Hotel4You is a desktop application to manage a hotel. ISEP course project.
 
-## Quick start
+## How to start the project
 
-Requirements: JDK 21. You do not need to install Maven. Use the Maven Wrapper.
+### 1. Install
+
+- JDK 21.
+- Git.
+- You do not need to install Maven. Use the Maven Wrapper: `./mvnw` (on Windows: `mvnw.cmd`).
+- Docker (optional, see step 3).
+
+### 2. Create your settings file
 
 ```bash
-./mvnw verify            # build and run the tests
+cp application.properties.example application.properties
+```
+
+Open `application.properties` and write your own values. The file has one `key=value` line for each setting.
+Git ignores this file, so your passwords stay on your PC. Never commit it.
+
+| Key | What it is | Can I change it? |
+|-----|------------|------------------|
+| `MSSQL_SA_PASSWORD` | The SQL Server password. Docker uses it to create the server. | **Yes, write your own.** 8 or more characters, with upper case, lower case, a digit and a symbol. Set it **before** the first `docker compose up`. To change it later, run `docker compose down -v` first (this deletes the data). |
+| `db.url` | The address of the database. | Only if SQL Server uses another port or host. The default works for Docker and for Express on port 1433. |
+| `db.user` | The database user. | Keep `sa`. |
+| `db.password` | The password the app uses to enter the database. | **Yes. It must have the same value as `MSSQL_SA_PASSWORD`.** |
+| `manager.username` | The login name of the first manager. | **Yes, write the name you want.** Set it **before** step 5. |
+| `manager.password` | The password of the first manager. | **Yes, write your own.** Set it **before** step 5. |
+
+Rules for this file:
+
+- Write comments on their own line, starting with `#`. A comment at the end of a value becomes part of the value.
+- Do not put spaces around `=` and do not use quotes.
+- If you change `manager.username` or `manager.password` after step 5, nothing happens. The first manager already exists.
+  To start again, run `docker compose down -v` and repeat steps 3, 4 and 5.
+
+Example:
+
+```properties
+# Used by Docker
+MSSQL_SA_PASSWORD=MyStrong-Password1!
+
+# Used by the app
+db.url=jdbc:sqlserver://localhost:1433;databaseName=hotel4you;encrypt=true;trustServerCertificate=true;loginTimeout=5
+db.user=sa
+db.password=MyStrong-Password1!
+
+# The first manager (step 5)
+manager.username=manager
+manager.password=MyManager-Password1!
+```
+
+### 3. Start SQL Server (choose A or B)
+
+**A. With Docker** (Linux, Mac, Windows):
+
+```bash
+docker compose up -d
+```
+
+Wait about 20 seconds, until `docker compose ps` shows `healthy`.
+
+**B. Without Docker** (Windows):
+
+1. Install SQL Server 2022 Express.
+2. Open SQL Server Configuration Manager. Enable **TCP/IP** on port **1433**.
+3. Enable **SQL Server and Windows Authentication** (mixed mode) and set the `sa` password.
+4. Restart the SQL Server service.
+5. In `application.properties`, set `db.password` to your `sa` password.
+
+### 4. Create the database
+
+Run the scripts in `database/`, in number order. Run each one by hand. You can run them again without error.
+
+In the commands below, replace `MyStrong-Password1!` with your own `MSSQL_SA_PASSWORD`.
+
+With Docker:
+
+```bash
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v1-create-database.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v2-create-roles-users.sql
+```
+
+Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
+
+```bash
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v1-create-database.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v2-create-roles-users.sql
+```
+
+### 5. Create the first manager
+
+Set `manager.username` and `manager.password` in `application.properties`, then run:
+
+```bash
+./mvnw compile exec:java -Dexec.mainClass=pt.isep.hotel4you.config.FirstManagerCommand
+```
+
+It prints `Manager created.` or `A manager already exists.`. You run it once.
+
+### 6. Run the application
+
+```bash
+./mvnw compile javafx:run
+```
+
+Log in with the manager username and password. If SQL Server is not running, the app shows the message
+`Database not available. Check that SQL Server is running.`
+
+### Stop Docker
+
+```bash
+docker compose down        # stop, keep the data
+docker compose down -v     # stop and delete the data
+```
+
+## Build and test
+
+```bash
+./mvnw verify            # build and run the unit tests
 ./mvnw javadoc:javadoc   # build the Javadoc
 ```
 
-On Windows, use `mvnw.cmd`. For more details, see [docs/setup.md](docs/setup.md).
+More details and the build tool versions: [docs/setup.md](docs/setup.md).
 
 ## Documentation
 
