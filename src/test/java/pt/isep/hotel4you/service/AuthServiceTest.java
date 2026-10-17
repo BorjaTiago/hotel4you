@@ -2,7 +2,6 @@ package pt.isep.hotel4you.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -61,22 +60,22 @@ class AuthServiceTest {
 
     @Test
     @Tag("H4Y-32-AC-4")
-    void onHashPassword_throw_whenOver72Bytes() {
-        assertThrows(IllegalArgumentException.class,
-                () -> authService.hashPassword("a".repeat(73)));
+    void onLogin_returnUser_whenPasswordIsLong() {
+        String longPassword = "a".repeat(100);
+        User ana = repository.save(
+                new Receptionist(null, "Ana Silva", "ana", authService.hashPassword(longPassword)));
+
+        assertEquals(ana, authService.login("ana", longPassword));
     }
 
     @Test
     @Tag("H4Y-32-AC-4")
-    void onHashPassword_throw_whenMultibyteOver72Bytes() {
-        assertThrows(IllegalArgumentException.class,
-                () -> authService.hashPassword("€".repeat(25)));
-    }
+    void onLogin_throwLoginFailed_whenLongPasswordDiffersOnlyAtEnd() {
+        String start = "a".repeat(90);
+        repository.save(
+                new Receptionist(null, "Ana Silva", "ana", authService.hashPassword(start + "x")));
 
-    @Test
-    @Tag("H4Y-32-AC-4")
-    void onHashPassword_acceptPassword_whenExactly72Bytes() {
-        assertNotNull(authService.hashPassword("a".repeat(72)));
+        assertThrows(LoginFailedException.class, () -> authService.login("ana", start + "y"));
     }
 
     @Test
@@ -128,15 +127,6 @@ class AuthServiceTest {
                 () -> authService.login("ana", "wrong-pass"));
 
         assertEquals(unknown.getMessage(), wrong.getMessage());
-    }
-
-    @Test
-    @Tag("H4Y-32-AC-8")
-    void onLogin_throwLoginFailed_whenPasswordOver72Bytes() {
-        saveAna();
-
-        assertThrows(LoginFailedException.class,
-                () -> authService.login("ana", "a".repeat(73)));
     }
 
     @ParameterizedTest

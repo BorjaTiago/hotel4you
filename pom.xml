@@ -17,6 +17,7 @@
 
     <javafx.version>21.0.5</javafx.version>
     <junit.version>5.11.3</junit.version>
+    <bcrypt.version>0.10.2</bcrypt.version>
 
     <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
@@ -34,6 +35,11 @@
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>at.favre.lib</groupId>
+      <artifactId>bcrypt</artifactId>
+      <version>${bcrypt.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
