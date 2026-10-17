@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.service;
 
+import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
 /** Single entry point for the GUI. */
@@ -33,14 +34,25 @@ public class HotelFacade {
     }
 
     /**
-     * Creates a staff account. The actor must be a manager.
+     * Tells if the user may create staff accounts.
      *
-     * @param user the staff user to create
-     * @param password the plain password
-     * @param actor the user who asks for the account
-     * @throws UnsupportedOperationException always, until H4Y-27
+     * @param actor the logged-in user, can be null
+     * @return true if the actor is a manager
      */
-    public void createStaff(User user, String password, User actor) {
-        staffService.createStaff(user, password, actor);
+    public boolean canCreateStaff(User actor) {
+        return staffService.canCreateStaff(actor);
+    }
+
+    /**
+     * Creates a staff account.
+     *
+     * @param name the full name of the new user
+     * @param username the login name of the new user
+     * @param password the plain password of the new user
+     * @param role the role of the new user
+     * @param actor the logged-in user who asks for the account
+     */
+    public void createStaff(String name, String username, String password, Role role, User actor) {
+        staffService.createStaff(name, username, password, role, actor);
     }
 }

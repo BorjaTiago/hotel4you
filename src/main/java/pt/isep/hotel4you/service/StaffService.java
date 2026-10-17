@@ -47,14 +47,27 @@ public class StaffService {
     }
 
     /**
-     * Creates a staff account. The actor must be a manager. The rules come with H4Y-27.
+     * Tells if the user may create staff accounts. Only a manager may. The GUI also uses this
+     * method to show or hide the create-staff button.
      *
-     * @param user the staff user to create
-     * @param password the plain password
-     * @param actor the user who asks for the account
+     * @param actor the logged-in user, can be null
+     * @return true if the actor is a manager
+     */
+    public boolean canCreateStaff(User actor) {
+        return actor != null && actor.getRole() == Role.MANAGER;
+    }
+
+    /**
+     * Creates a staff account. The rules come with H4Y-27.
+     *
+     * @param name the full name of the new user
+     * @param username the login name of the new user
+     * @param password the plain password of the new user
+     * @param role the role of the new user
+     * @param actor the logged-in user who asks for the account
      * @throws UnsupportedOperationException always, until H4Y-27
      */
-    public void createStaff(User user, String password, User actor) {
+    public void createStaff(String name, String username, String password, Role role, User actor) {
         throw new UnsupportedOperationException("Not implemented yet. Comes with H4Y-27.");
     }
 }
