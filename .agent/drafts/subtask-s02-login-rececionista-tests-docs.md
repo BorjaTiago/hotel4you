@@ -19,10 +19,10 @@ Responsável proposto: Antonio Martinho (a equipa decide).
 
 ## Checklist
 
-- [ ] Um teste JUnit por cada AC-1 a AC-4. Os nomes citam "H4Y-22 AC-n".
+- [ ] Um teste JUnit por cada AC-1 a AC-4. Os testes têm a tag `@Tag("H4Y-22-AC-n")`.
 - [ ] Um teste prova que AC-2 e AC-3 dão uma resposta idêntica.
 - [ ] Javadoc nas novas classes públicas. O Javadoc compila.
 - [ ] Diagramas de classes e de sequência do login atualizados, com a referência de uso de IA.
 - [ ] Uma verificação de ponta a ponta em SQL Server com o gestor do seed, depois de auth T2 (não bloqueia os testes unitários).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

@@ -15,7 +15,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 | Criterion | How the diagram meets it |
 |-----------|--------------------------|
 | The interface communicates only with the business logic. | `gui` has arrows only to `HotelFacade`, `domain` and JavaFX. `HotelFacade` and `domain` are in the "Business logic" block. |
-| Each component matches a package in the code. | The five components are the five packages planned in H4Y-32, and the five packages exist in the Java code. `HotelFacade` lives in `service`, the repository interfaces in `data`, `AppConfig` in `config`. The check of each class is pending (C-04). |
+| Each component matches a package in the code. | The five components are the five packages planned in H4Y-32, and the five packages exist in the Java code. `HotelFacade` lives in `service`, the repository interfaces in `data`, `AppConfig` in `config`. The check of each class that exists now is done (architecture review, 2026-10-17, C-04). |
 | External systems and libraries appear and are justified. | See "External systems and libraries" below. |
 
 ## Components
@@ -61,7 +61,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 | Supplier XML stock file | The supplier sends one XML file with each delivery (RF-28). | None: the statement sets the format. |
 | JUnit | The statement requires JUnit tests (RNF-10). | None: the statement names JUnit. |
 
-Every external library also goes in [docs/libraries.md](../libraries.md) with its version (RNF-11, H4Y-36). The versions are set when the build file exists (H4Y-32).
+Every external library also goes in [docs/libraries.md](../libraries.md) with its version (RNF-11, H4Y-36). The versions are in `pom.xml` and `docs/libraries.md`.
 
 ## Questions in class
 

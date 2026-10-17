@@ -23,8 +23,8 @@ Responsável proposto: José Cruz (a equipa decide).
 - [ ] AC-2: Uma palavra-passe errada é recusada com "Credenciais inválidas".
 - [ ] AC-3: Um utilizador desconhecido recebe a mesma mensagem de AC-2.
 - [ ] Sem um segundo caminho de código de login. Reutilizar o serviço e o ecrã de H4Y-22.
-- [ ] Dados de teste: um gestor (T4). Os testes citam "H4Y-20 AC-n".
+- [ ] Dados de teste: um gestor (T4). Os testes têm a tag `@Tag("H4Y-20-AC-n")`.
 - [ ] Javadoc em qualquer nova classe pública. O Javadoc compila.
 - [ ] Depois de auth T2: o gestor do seed consegue iniciar sessão (verificação manual, o segredo fica local).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

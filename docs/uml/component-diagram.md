@@ -99,7 +99,7 @@ These gaps need team review. They are not approved requirements.
 |----|-----|----------------------|
 | C-01 | The class diagram had no repository classes (G-01 in the sequence guide). | Partly closed. `UserRepository` exists in `data` and the class diagram shows it. The JDBC version comes in H4Y-32 PR 2. |
 | C-02 | The password hash method was open (H4Y-29). | Closed. BCrypt (`at.favre.lib:bcrypt`) is chosen. It is in the external table and in `docs/libraries.md`. |
-| C-04 | There was no Java code (H4Y-32). | Partly done. The five packages exist in the Java code. The check of each class against the diagram is still pending. |
+| C-04 | There was no Java code (H4Y-32). | Closed for the classes that exist now. The five packages exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17). |
 | C-03 | The package of `HotelFacade` was not named in H4Y-32. | Closed. `HotelFacade` is in `service`, as in the Java code. |
 
 Created by: jmbcruz. Updated by: BorjaTiago. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

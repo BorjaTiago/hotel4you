@@ -51,7 +51,7 @@ Use this guide to defend the [sequence diagrams](sequence-diagrams.md). Methods 
 |----------|--------------|
 | Why two diagrams? | The PR review reduced the scope. One general view and one detailed view meet the statement's minimum. |
 | Which one is general? | SD-05 shows only the card service boundary. SD-04 expands deletion decisions and outcomes. |
-| Where is the database participant? | The class model has no persistence API. SQL Server work appears in notes (G-01). |
+| Where is the database participant? | The class model has no persistence API, except `UserRepository` (H4Y-32). SQL Server work appears in notes (G-01). |
 | Does the reader get a refusal reason? | No. Every refusal returns the same `false` value. The reason stays internal. |
 | Is denied access logged? | The current model cannot store an outcome. Q-49 and G-04 keep this gap explicit. |
 | Does a successful render mean Done? | No. It checks diagram syntax. Human review and model decisions remain. |
@@ -71,4 +71,4 @@ The counts describe the source, not runtime calls. `git diff --check` passed. Th
 
 Use Traceability and Gaps in [sequence-diagrams.md](sequence-diagrams.md) for the method list and class model feedback.
 
-AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: BorjaTiago. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

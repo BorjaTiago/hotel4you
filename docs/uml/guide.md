@@ -13,7 +13,7 @@ This file explains each class in the class diagram. Use it to defend the design.
 
 ## Layers
 
-Interface (JavaFX controllers) calls Business (`HotelFacade`, then services). Services use Domain classes and Enums. Calls go one way only.
+Interface (JavaFX controllers) calls Business (`HotelFacade`, then services). Services use Domain classes, Enums and the repository interfaces in Data. Calls go one way only.
 
 ## Interface
 
@@ -96,6 +96,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Find a user by name. Check the password. Hash the password.
 - **Why:** RF-01, RNF-02. Passwords are never stored in plain text.
 - **Why this way:** One place for login and hashing.
+- **Rules:** `login` trims the username. The lookup ignores case (contract of `UserRepository.findByUsername`). An unknown user and a wrong password throw the same `LoginFailedException`.
 - **Other option:** Hash in `User`. Not done: `User` holds data only. The password check is in `AuthService.isValidPassword`, because the domain uses no external library (BCrypt).
 
 ### ClientService
@@ -128,6 +129,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
+- **Rules:** `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -148,6 +150,22 @@ Services hold the rules. Each service works on the domain classes.
 - **Why:** RF-27.
 - **Why this way:** Small service. Keeps the pattern of the other services.
 - **Other option:** Save in `Feedback` only. Not done: no place for the list query.
+
+### LoginFailedException
+- **What:** Signals a failed login. One fixed message for an unknown user and a wrong password.
+- **Why:** RF-01. The message does not tell which part was wrong.
+
+### UsernameTakenException
+- **What:** Signals that a login name is already in use.
+- **Why:** RF-26. The caller gets a clear error before the save.
+
+## Data
+
+Data holds the storage interfaces. Services use them.
+
+### UserRepository
+- **What:** Interface for user storage. Finds a user by login name, checks if a login name or a role exists, saves a user.
+- **Why:** RNF-08. Services depend on this interface, not on SQL. The JDBC version comes in H4Y-32 PR 2.
 
 ## Users
 

@@ -58,7 +58,7 @@ Decisão da equipa (2026-10-16): qualidade e conduta são tarefas, não históri
 - [ ] Classe pública sem Javadoc faz a verificação falhar e indica a classe.
 
 ### T2: Configurar JUnit e testes das funções principais (RNF-10)
-- [ ] Todos os testes passam com um comando e cada teste cita "H4Y-NN AC-n".
+- [ ] Todos os testes passam com um comando e cada teste tem a tag `@Tag("H4Y-NN-AC-n")`.
 - [ ] Teste a falhar termina com erro e indica o teste.
 - [ ] AC-n sem teste é assinalado.
 
@@ -81,4 +81,4 @@ Decisão da equipa (2026-10-16): qualidade e conduta são tarefas, não históri
 - [ ] Código copiado ou sem autoria fica registado e é removido antes da entrega.
 - [ ] Prazo em risco (7 dias, tarefas obrigatórias por fechar) fica em `impediments.md`.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

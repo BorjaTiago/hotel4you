@@ -10,7 +10,7 @@ Sources: [use cases](../requirements/use-cases.md), [requirements](../requiremen
 - Each actor and participant uses a class name from the class diagram. Short IDs only make the source easier to read.
 - A controller calls `HotelFacade`. The facade calls a service. Services hold business rules. Controllers never call SQL Server.
 - Notes describe checks and data changes within an existing method. They are not new methods. Only call arrows claim method coverage.
-- SQL Server work appears in notes. The class model has no database or repository class with methods. See G-01.
+- SQL Server work appears in notes. The class model has no database or repository class with methods, except `UserRepository` (H4Y-32). See G-01.
 - Each diagram covers one existing use case. SD-04 is detailed. SD-05 is a general view at the service boundary.
 - SD-05 omits internal permission checks and storage steps. Its tables explain the role variants.
 - Denied access audit needs a decision. See Q-49 in [questions.md](../requirements/questions.md) and G-04 below.
@@ -133,7 +133,7 @@ These gaps need class model review. They are not approved methods or new require
 
 | ID | Gap | Effect and next step |
 |----|-----|----------------------|
-| G-01 | No persistence classes or methods | Define read, save, delete and transaction contracts. SD-04 needs a protected delete transaction. SD-05 needs entry storage. SQL Server work appears in notes. |
+| G-01 | No persistence classes or methods, except `UserRepository` (H4Y-32) | Define read, save, delete and transaction contracts. SD-04 needs a protected delete transaction. SD-05 needs entry storage. SQL Server work appears in notes. |
 | G-02 | The current reservation read is not explicit | SD-04 must load the current reservation and check its arrival state in the delete transaction. Define that read contract. No lookup method is invented. |
 | G-03 | No card reader or door adapter | Define the reader event, door command and event after real entry. SD-05 shows only the existing service API. A JavaFX controller must still use the facade. |
 | G-04 | Denied audit has no outcome | `CardAccessRecord` and `access_logs` lack an outcome. `register()` accepts none. Q-49 asks whether denied attempts need audit. An approved contract must distinguish refusals from entries. |
@@ -142,4 +142,4 @@ These gaps need class model review. They are not approved methods or new require
 
 The two diagrams cover one general view and one detailed view. Mermaid and method checks validate the documents. They do not validate an implementation. Error types, persistence and physical reader contracts remain incomplete. Q-49 remains open. Human review is still required.
 
-AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: BorjaTiago. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
