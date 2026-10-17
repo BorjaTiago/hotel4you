@@ -2,6 +2,11 @@
 
 One table per layer. Every class of [class-diagram.md](class-diagram.md) appears once. Guide: [guide.md](guide.md). Requirements: RF and RNF from [../requirements/requirements.md](../requirements/requirements.md).
 
+Notes:
+
+- Constructors and getters are not shown.
+- Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
+
 ## Interface (JavaFX controllers)
 
 | Class | Layer | Main attributes | Main methods | Requirement |
@@ -21,27 +26,35 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
+| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(user, password, actor), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
 
 ## Business - Services
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| AuthService | Business - Services | - | login(), hashPassword() | RF-01, RNF-02 |
+| AuthService | Business - Services | - | login(), hashPassword(), isValidPassword() (private) | RF-01, RNF-02 |
 | ClientService | Business - Services | - | register(), find() | RF-10, RNF-03 |
 | LocationService | Business - Services | - | createLocation(), editLocation(), removeLocation() | RF-03, RF-18 |
 | RoomService | Business - Services | - | isAvailable(), searchRooms(), saveRoom(), configureItem(), setBasePrice(), setExtraPrice() | RF-04, RF-05, RF-06, RF-07, RF-08, RF-09 |
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
-| StaffService | Business - Services | - | createStaff(), editStaff(), removeStaff(), listUsers() | RF-26, RNF-01 |
+| StaffService | Business - Services | - | createStaff(user, password, actor), createFirstManager(), editStaff(), removeStaff(), listUsers() | RF-02, RF-26, RNF-01 |
 | CardAccessService | Business - Services | - | issueCard(), issueMasterCard(), blockCard(), canOpen(), register(), getPlacesByCard(), getPassesByRoom(), canOpenRoom() (access rules in the diagram note) | RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-24, RF-25, RF-30 |
 | StockService | Business - Services | - | importStock(), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
 | FeedbackService | Business - Services | - | save(), list() | RF-27 |
+| LoginFailedException | Business - Exception | - | - (one fixed message for unknown user and wrong password) | RF-01 |
+| UsernameTakenException | Business - Exception | - | - | RF-26 |
+
+## Data
+
+| Class | Layer | Main attributes | Main methods | Requirement |
+|-------|-------|-----------------|--------------|-------------|
+| UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), existsByRole(), save() | RF-01, RNF-01, RNF-12 |
 
 ## Domain
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| User (abstract) | Domain | id, name, username, passwordHash, role | checkPassword() | RF-01, RF-02, RNF-02 |
+| User (abstract) | Domain | id, name, username, passwordHash, role | - | RF-01, RF-02, RNF-02 |
 | Receptionist | Domain | (inherits User) | (inherits User) | RF-02, RF-24 |
 | Manager | Domain | (inherits User) | (inherits User) | RF-02, RF-23, RF-26, RF-30 |
 | RestaurantStaff | Domain | (inherits User) | (inherits User) | RF-02, RF-25 |
@@ -72,4 +85,4 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

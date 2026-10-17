@@ -96,7 +96,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Find a user by name. Check the password. Hash the password.
 - **Why:** RF-01, RNF-02. Passwords are never stored in plain text.
 - **Why this way:** One place for login and hashing.
-- **Other option:** Hash in `User`. Not done: `User` holds data. `User.checkPassword` only compares.
+- **Other option:** Hash in `User`. Not done: `User` holds data only. The password check is in `AuthService.isValidPassword`, because the domain uses no external library (BCrypt).
 
 ### ClientService
 - **What:** Register a client. Find a client by document.
@@ -125,7 +125,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put the logic only in `Reservation`. Not done: one reservation cannot see the others.
 
 ### StaffService
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
@@ -357,4 +357,4 @@ List<String> rejected = report.getRejectedItems(); // unknown items
 // Known items: StockMovement with type ENTRY, linked to the import.
 ```
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

@@ -1,5 +1,12 @@
 # Hotel4You - Class Diagram (Organized)
 
+## Reading notes
+
+- Constructors and getters are not shown.
+- Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
+- `UserRepository` is now in the data layer. The JDBC version comes in PR 2 of H4Y-32.
+- `actor` in `createStaff` is the logged-in user that `login()` returned. The method checks that the actor is a manager. The rule comes with H4Y-27.
+
 ```mermaid
 classDiagram
     %% ==========================================
@@ -79,7 +86,7 @@ classDiagram
         +blockMasterCard(card: MagneticCard) void
         +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
         +getPassesByRoom(room: Room) List~CardAccessRecord~
-        +createStaff(user: User) void
+        +createStaff(user: User, password: String, actor: User) void
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -105,6 +112,7 @@ classDiagram
     class AuthService {
         +login(username: String, password: String) User
         +hashPassword(password: String) String
+        -isValidPassword(password: String, passwordHash: String) boolean
     }
     class ClientService {
         +register(name: String, document: String, birthday: LocalDate) Client
@@ -135,7 +143,8 @@ classDiagram
         +checkOut(reservation: Reservation) void
     }
     class StaffService {
-        +createStaff(user: User) void
+        +createStaff(user: User, password: String, actor: User) void
+        +createFirstManager(username: String, password: String) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -161,6 +170,23 @@ classDiagram
         +save(client: Client, type: FeedbackType, description: String) Feedback
         +list() List~Feedback~
     }
+    class LoginFailedException {
+        <<exception>>
+    }
+    class UsernameTakenException {
+        <<exception>>
+    }
+
+    %% ==========================================
+    %% LAYER: DATA
+    %% ==========================================
+    class UserRepository {
+        <<interface>>
+        +findByUsername(username: String) Optional~User~
+        +existsByUsername(username: String) boolean
+        +existsByRole(role: Role) boolean
+        +save(user: User) User
+    }
 
     %% ==========================================
     %% LAYER 3: DOMAIN - USERS
@@ -172,7 +198,6 @@ classDiagram
         -username: String
         -passwordHash: String
         -role: Role
-        +checkPassword(password: String) boolean
     }
     class Receptionist
     class Manager
@@ -378,6 +403,12 @@ classDiagram
     HotelFacade ..> CardAccessService : uses
     HotelFacade ..> StockService : uses
     HotelFacade ..> FeedbackService : uses
+    StaffService ..> AuthService : uses
+    AuthService ..> UserRepository : uses
+    StaffService ..> UserRepository : uses
+    UserRepository ..> User : stores
+    AuthService ..> LoginFailedException : throws
+    StaffService ..> UsernameTakenException : throws
 
     %% ==========================================
     %% NOTE
@@ -390,4 +421,4 @@ classDiagram
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
 ```
 
-AI use: Claude Code, claude-sonnet-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

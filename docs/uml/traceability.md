@@ -6,7 +6,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 
 | Requirement | Classes and methods that cover it |
 |-------------|-----------------------------------|
-| RF-01 Login with user name and password | LoginController.onLoginClicked, HotelFacade.login, AuthService.login, User.checkPassword |
+| RF-01 Login with user name and password | LoginController.onLoginClicked, HotelFacade.login, AuthService.login, AuthService.isValidPassword |
 | RF-02 Five actor types | Role (enum), User, Receptionist, Manager, RestaurantStaff, Client |
 | RF-03 Building floors and zones | Floor, Location, LocationController.onSaveLocationClicked, LocationService.createLocation |
 | RF-04 Three room types, 20 rooms | Room, RoomType, RoomController.onSaveRoomClicked |
@@ -31,7 +31,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RF-23 Master card for all rooms and zones | CardController.onIssueMasterCardClicked, CardAccessService.issueMasterCard(manager), HotelFacade.issueMasterCard, CardAccessService.canOpenRoom (master card opens all rooms), CardType.MASTER, Manager, MagneticCard. Note: master access to zones is in the CardAccessService note (access rules), not in a method signature. |
 | RF-24 Reception access only floors 0 and 1 | Receptionist, Floor, CardAccessService.canOpen (receptionist card rule in the CardAccessService note: floors 0 and 1, no guest room) |
 | RF-25 Restaurant staff access only kitchen and restaurant | RestaurantStaff, Location, CardAccessService.canOpen (restaurant staff card rule in the CardAccessService note: kitchen and restaurant, no guest room) |
-| RF-26 Manager manages staff accounts | StaffController.onCreateStaffClicked, onEditStaffClicked, onRemoveStaffClicked, StaffService.createStaff, editStaff, removeStaff, HotelFacade.createStaff |
+| RF-26 Manager manages staff accounts | StaffController.onCreateStaffClicked, onEditStaffClicked, onRemoveStaffClicked, StaffService.createStaff(user, password, actor), editStaff, removeStaff, HotelFacade.createStaff |
 | RF-27 Suggestions and complaints | FeedbackController.onSaveFeedbackClicked, onListFeedbackClicked, FeedbackService.save, FeedbackService.list, Feedback, FeedbackType |
 | RF-28 Stock import from supplier XML | StockController.onImportXmlClicked, StockService.importStock, HotelFacade.importStock, StockImport.rejectedItems, StockItem |
 | RF-29 Entry, use and exit of stock | StockController.onRegisterMovementClicked, HotelFacade.registerMovement, StockService.registerMovement, StockService.applyMovement (both take exitReason and user), StockMovement, MovementType, ExitReason, StockItem.stockQuantity |
@@ -42,7 +42,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | Requirement | Classes and methods that cover it |
 |-------------|-----------------------------------|
 | RNF-01 All users saved and accessible | StaffController.onListUsersClicked, HotelFacade.listUsers, StaffService.listUsers |
-| RNF-02 Passwords saved encrypted | AuthService.hashPassword, User.passwordHash, User.checkPassword |
+| RNF-02 Passwords saved encrypted | AuthService.hashPassword (BCrypt, `at.favre.lib:bcrypt`), User.passwordHash, AuthService.isValidPassword (BCrypt check) |
 | RNF-03 Client registration and reservation in 30 seconds | Not covered by a class (process and usability test) |
 | RNF-04 Simple and intuitive GUI | Not covered by a class (process and usability test) |
 | RNF-05 Software in Java | Not covered. The diagram shows no class for a language rule. |
@@ -52,4 +52,4 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RNF-09 Javadoc | Not covered. The diagram shows no class for documentation. |
 | RNF-10 JUnit unit tests | Not covered. The diagram shows no test classes. |
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
