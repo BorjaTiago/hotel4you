@@ -25,6 +25,18 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why this way:** The screen only reads input and shows the result.
 - **Other option:** Check the password in the controller. Not done: the GUI would hold security code.
 
+### HotelApp
+- **What:** The JavaFX application. It opens the login screen. It keeps the facade and the logged-in user.
+- **Why:** RNF-06. JavaFX needs one `Application` class.
+- **Why this way:** `Main` sets the facade first. If the start failed, `HotelApp` shows the error in a popup.
+- **Other option:** Let each screen read the settings. Not done: the screens would know the database.
+
+### ScreenLoader
+- **What:** Opens a screen from an FXML file. It gives the `HotelFacade` to the controller.
+- **Why:** RNF-06, RNF-07. All controllers get the facade in one way.
+- **Why this way:** One class does the loading. A controller never creates services.
+- **Other option:** Each screen loads its own FXML. Not done: the same code many times.
+
 ### RoomController
 - **What:** Room search, room save, room items and prices.
 - **Why:** RF-04 to RF-08.
@@ -159,13 +171,33 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Signals that a login name is already in use.
 - **Why:** RF-26. The caller gets a clear error before the save.
 
+## Config
+
+### AppConfig
+- **What:** A record with the settings from `application.properties`: database url, user, password and the first manager.
+- **Why:** RNF-12. Passwords stay out of the code and out of Git.
+- **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
+- **Other option:** Environment variables. Not done: the team uses one settings file.
+
 ## Data
 
-Data holds the storage interfaces. Services use them.
+Data holds the storage interfaces and the SQL Server version. Services use the interfaces.
 
 ### UserRepository
 - **What:** Interface for user storage. Finds a user by login name, checks if a login name or a role exists, saves a user.
-- **Why:** RNF-08. Services depend on this interface, not on SQL. The JDBC version comes in H4Y-32 PR 2.
+- **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version.
+
+### Database
+- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `prepare` fills the `?` values of a SQL text.
+- **Why:** RNF-12. One place holds the connection code.
+- **Why this way:** The values go in with `prepare`, not in the SQL text. This stops SQL injection.
+- **Other option:** Each repository opens its own connection. Not done: the same code many times.
+
+### JdbcUserRepository
+- **What:** Implements `UserRepository` with SQL on the tables `users` and `roles`.
+- **Why:** RNF-01, RNF-12. Users are saved in SQL Server.
+- **Why this way:** It gives domain objects to the services. Services never see SQL.
+- **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
 
 ## Users
 
@@ -375,4 +407,4 @@ List<String> rejected = report.getRejectedItems(); // unknown items
 // Known items: StockMovement with type ENTRY, linked to the import.
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

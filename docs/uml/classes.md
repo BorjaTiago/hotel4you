@@ -11,7 +11,9 @@ Notes:
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| LoginController | Interface | - | onLoginClicked() | RF-01 |
+| LoginController | Interface | - | onLoginClicked() (private) | RF-01 |
+| HotelApp | Interface | facade, currentUser, startError | start() | RNF-06, RNF-07 |
+| ScreenLoader | Interface | - | load() | RNF-06, RNF-07 |
 | RoomController | Interface | - | onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() | RF-04, RF-05, RF-06, RF-08 |
 | ClientController | Interface | - | onRegisterClientClicked(), onSearchClientClicked() | RF-10 |
 | ReservationController | Interface | - | onCreateReservationClicked(), onCancelReservationClicked(), onDeleteReservationClicked(), onAddExtraClicked(), onRemoveExtraClicked(), onAddLocationClicked(), onRemoveLocationClicked() | RF-11, RF-12, RF-15, RF-18, RF-22 |
@@ -44,11 +46,21 @@ Notes:
 | LoginFailedException | Business - Exception | - | - (one fixed message for unknown user and wrong password) | RF-01 |
 | UsernameTakenException | Business - Exception | - | - | RF-26 |
 
+## Config
+
+| Class | Layer | Main attributes | Main methods | Requirement |
+|-------|-------|-----------------|--------------|-------------|
+| AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load() | RNF-12 |
+| Main | Config | - | main() | RF-01, RNF-12 |
+| FirstManagerCommand | Config | - | main() | RF-01, RNF-12 |
+
 ## Data
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), existsByRole(), save() | RF-01, RNF-01, RNF-12 |
+| Database | Data | - | connect(), prepare() | RNF-12 |
+| JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), existsByRole(), save() | RNF-01, RNF-12 |
 
 ## Domain
 

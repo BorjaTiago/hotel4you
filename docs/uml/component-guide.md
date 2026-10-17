@@ -6,7 +6,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 
 1. One component is one Java package: `gui`, `service`, `domain`, `data`, `config`.
 2. The GUI talks only to the business logic. `gui` calls `HotelFacade` and reads `domain` objects. It never uses `data`, JDBC or SQL Server (RNF-07).
-3. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC (H4Y-32 PR 2). Unit tests use an in-memory repository in `src/test`, not in the application (RNF-08, RNF-10, RNF-12).
+3. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC (`JdbcUserRepository`). Unit tests use an in-memory repository in `src/test`, not in the application (RNF-08, RNF-10, RNF-12).
 4. Only `config` knows all packages. It creates and connects the objects at start-up. It holds no business rule.
 5. External libraries are few. Each one has a reason from the statement (RNF-11).
 
@@ -39,13 +39,13 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 - **Other option:** Separate data objects for the GUI. Not done: more code for little gain.
 
 ### data
-- **What:** Repository interfaces. The JDBC versions for SQL Server come in H4Y-32 PR 2.
+- **What:** Repository interfaces and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` from `config` and opens the connections, so `data` depends on `config`.
 - **Why:** The statement requires SQL Server (RNF-12). All users are saved (RNF-01).
 - **Why this way:** T0 (H4Y-32) puts the repository interfaces in `data`. `service` uses only the interfaces, never JDBC. Unit tests use an in-memory repository in `src/test` (RNF-10).
 - **Other option:** SQL inside the services. Not done: rules and SQL would mix, and tests would need a database.
 
 ### config
-- **What:** Reads the database settings. Starts the application.
+- **What:** Reads the settings from the `application.properties` file (`AppConfig`). Starts the application.
 - **Why:** Credentials must not be in the code or in Git (H4Y-33).
 - **Why this way:** One place creates and connects all objects. The other packages do not create each other.
 - **Other option:** Each class reads the settings. Not done: settings code in many places.
@@ -69,7 +69,7 @@ Every external library also goes in [docs/libraries.md](../libraries.md) with it
 |----------|--------|
 | Why does `gui` use `domain`? | `HotelFacade` returns domain objects. The GUI only reads them. `domain` is part of the business logic and has no rules about storage. |
 | Why are the repository interfaces in `data`, not in `service`? | T0 (H4Y-32) puts them in `data`. `service` still depends only on the interfaces, so the unit tests can use the in-memory repository in `src/test`. |
-| Where is the database in the class diagram? | The class diagram has no database class yet (G-01, C-01). It shows `UserRepository`. The JDBC version comes in H4Y-32 PR 2. |
+| Where is the database in the class diagram? | `Database` opens the connection. `JdbcUserRepository` implements `UserRepository` with SQL (G-01, C-01 closed). |
 | Why is JUnit not in the diagram? | The diagram shows the running application. JUnit runs only in tests. |
 | Why `config` uses all packages? | It only creates and connects objects at start-up. No business call goes through it. |
 
@@ -79,4 +79,4 @@ Mermaid CLI 12.0.0 rendered the diagram to a temporary PNG file. The preview was
 
 `git diff --check` passed. The five packages now exist in the Java code. The check of each class against the diagram stays pending (C-04). Human review is still required.
 
-Created by: jmbcruz. Updated by: BorjaTiago. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: jmbcruz. Updated by: BorjaTiago. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

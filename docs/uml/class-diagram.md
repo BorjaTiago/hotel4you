@@ -4,7 +4,7 @@
 
 - Constructors and getters are not shown.
 - Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
-- `UserRepository` is now in the data layer. The JDBC version comes in PR 2 of H4Y-32.
+- `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
 - `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
 
 ```mermaid
@@ -13,7 +13,16 @@ classDiagram
     %% LAYER 1: INTERFACE (JavaFX Controllers)
     %% ==========================================
     class LoginController {
-        +onLoginClicked() void
+        -onLoginClicked() void
+    }
+    class HotelApp {
+        +facade: HotelFacade
+        +currentUser: User
+        +startError: String
+        +start(stage: Stage) void
+    }
+    class ScreenLoader {
+        +load(fxmlName: String) Parent
     }
     class RoomController {
         +onSearchClicked() void
@@ -180,6 +189,25 @@ classDiagram
     }
 
     %% ==========================================
+    %% LAYER: CONFIG
+    %% ==========================================
+    class AppConfig {
+        <<record>>
+        +dbUrl: String
+        +dbUser: String
+        +dbPassword: String
+        +managerUsername: String
+        +managerPassword: String
+        +load(file: Path) AppConfig
+    }
+    class Main {
+        +main(args: String[]) void
+    }
+    class FirstManagerCommand {
+        +main(args: String[]) void
+    }
+
+    %% ==========================================
     %% LAYER: DATA
     %% ==========================================
     class UserRepository {
@@ -189,6 +217,11 @@ classDiagram
         +existsByRole(role: Role) boolean
         +save(user: User) User
     }
+    class Database {
+        +connect() Connection
+        +prepare(connection: Connection, sql: String, values: String[]) PreparedStatement
+    }
+    class JdbcUserRepository
 
     %% ==========================================
     %% LAYER 3: DOMAIN - USERS
@@ -409,8 +442,20 @@ classDiagram
     AuthService ..> UserRepository : uses
     StaffService ..> UserRepository : uses
     UserRepository ..> User : stores
+    JdbcUserRepository ..|> UserRepository : implements
+    JdbcUserRepository ..> Database : uses
+    Database ..> AppConfig : uses
     AuthService ..> LoginFailedException : throws
     StaffService ..> UsernameTakenException : throws
+
+    %% ==========================================
+    %% DEPENDENCIES (Start-up)
+    %% ==========================================
+    Main ..> AppConfig : uses
+    Main ..> HotelApp : starts
+    FirstManagerCommand ..> StaffService : uses
+    HotelApp ..> ScreenLoader : uses
+    ScreenLoader ..> HotelFacade : gives to controllers
 
     %% ==========================================
     %% NOTE

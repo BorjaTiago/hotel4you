@@ -207,6 +207,7 @@ Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 r
 **What:** The staff accounts. Customers do not log in.
 **Why:** Staff must log in, and the system must know who did each action.
 **Why this way:** The backend hashes the password. The database stores only `password_hash`. There is no `active` column (Q-36). Old reservations and stock movements point to the user, so the hotel does not delete a user who has history.
+**Login names:** Usernames are not case sensitive (the default SQL Server collation), and the application trims spaces.
 **Other option:** Delete the user who leaves. We did not, because the FKs would break or we would lose history.
 
 | id | name | username | password_hash | role_id |
@@ -349,4 +350,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

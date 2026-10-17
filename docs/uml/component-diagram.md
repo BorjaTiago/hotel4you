@@ -52,7 +52,7 @@ flowchart TB
     SVC -.->|uses| BCRYPT
     REPO --- DATA
     DOM ~~~ DATA
-    DATA -.->|uses| SET
+    DATA -.->|reads| SET
     DATA -.->|uses| JDBC
     JDBC -.->|connects| DB
     CFG -.->|creates| GUI
@@ -67,16 +67,16 @@ flowchart TB
 | `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | Screens for the actors. | `HotelFacade`, `domain` (read only), JavaFX. | RNF-06, RNF-07 |
 | `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, BCrypt. | RNF-02, RNF-07, RNF-08 |
 | `domain` | Domain classes and enums (`User`, `Room`, `Reservation`, `MagneticCard`, `StockItem`, `Role` and the others). No SQL and no JavaFX. | Data types for the other packages. | None. | RNF-07, RNF-08 |
-| `data` | Repository interfaces, for example `UserRepository`, and the JDBC versions for SQL Server. The JDBC version maps table rows to domain objects. Unit tests use an in-memory repository in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, JDBC driver. | RNF-01, RNF-10, RNF-12 |
-| `config` | Reads the database settings from a local file or the environment. Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. | `AppConfig`. | `gui`, `service`, `data`. | RNF-08, RNF-12 |
+| `data` | Repository interfaces, for example `UserRepository`, and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC version maps table rows to domain objects. Unit tests use an in-memory repository in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, JDBC driver. | RNF-01, RNF-10, RNF-12 |
+| `config` | Reads the settings from the `application.properties` file (`AppConfig`). Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. | `AppConfig`. | `gui`, `service`, `data`. | RNF-08, RNF-12 |
 
 ## Interfaces
 
 | Interface | Provided by | Required by | Requirement IDs |
 |-----------|-------------|-------------|-----------------|
 | `HotelFacade` | `service` | `gui` | RNF-07 |
-| Repositories (`UserRepository` and one for each other aggregate) | Declared in `data` (T0, H4Y-32). The JDBC versions come in H4Y-32 PR 2. | `service` | RNF-08, RNF-10, RNF-12 |
-| `AppConfig` | `config` | `data` | RNF-12 |
+| Repositories (`UserRepository` and one for each other aggregate) | Declared in `data`. `JdbcUserRepository` is the SQL Server version. | `service` | RNF-08, RNF-10, RNF-12 |
+| `AppConfig` | `config` | `data` (`Database` reads it) | RNF-12 |
 
 ## External systems and libraries
 
@@ -97,9 +97,9 @@ These gaps need team review. They are not approved requirements.
 
 | ID | Gap | Effect and next step |
 |----|-----|----------------------|
-| C-01 | The class diagram had no repository classes (G-01 in the sequence guide). | Partly closed. `UserRepository` exists in `data` and the class diagram shows it. The JDBC version comes in H4Y-32 PR 2. |
+| C-01 | The class diagram had no repository classes (G-01 in the sequence guide). | Closed. `UserRepository`, `JdbcUserRepository` and `Database` exist in `data` and the class diagram shows them. |
 | C-02 | The password hash method was open (H4Y-29). | Closed. BCrypt (`at.favre.lib:bcrypt`) is chosen. It is in the external table and in `docs/libraries.md`. |
 | C-04 | There was no Java code (H4Y-32). | Closed for the classes that exist now. The five packages exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17). |
 | C-03 | The package of `HotelFacade` was not named in H4Y-32. | Closed. `HotelFacade` is in `service`, as in the Java code. |
 
-Created by: jmbcruz. Updated by: BorjaTiago. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: jmbcruz. Updated by: BorjaTiago. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
