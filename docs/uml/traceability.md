@@ -33,7 +33,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RF-25 Restaurant staff access only kitchen and restaurant | RestaurantStaff, Location, CardAccessService.canOpen (restaurant staff card rule in the CardAccessService note: kitchen and restaurant, no guest room) |
 | RF-26 Manager manages staff accounts | StaffController.onCreateStaffClicked, onEditStaffClicked, onRemoveStaffClicked, StaffService.createStaff, editStaff, removeStaff, HotelFacade.createStaff |
 | RF-27 Suggestions and complaints | FeedbackController.onSaveFeedbackClicked, onListFeedbackClicked, FeedbackService.save, FeedbackService.list, Feedback, FeedbackType |
-| RF-28 Stock import from supplier XML | StockController.onImportXmlClicked, StockService.importStock, HotelFacade.importStock, StockImport.rejectedItems, StockItem |
+| RF-28 Stock import from supplier XML | StockController.onImportXmlClicked, onConfirmImportClicked; HotelFacade.previewStock, confirmStockImport; StockService.previewStock, confirmStockImport; StockImportPreview; StockImport.getRejectedItems; StockItem. SD-06 shows review, cancel, confirm and report. New review contracts are documented designs (G-05). Existing HotelFacade.importStock and StockService.importStock remain the one-step API, outside this UI flow. |
 | RF-29 Entry, use and exit of stock | StockController.onRegisterMovementClicked, HotelFacade.registerMovement, StockService.registerMovement, StockService.applyMovement (both take exitReason and user), StockMovement, MovementType, ExitReason, StockItem.stockQuantity |
 | RF-30 Block lost master card, issue new one | CardController.onBlockMasterCardClicked, CardAccessService.blockCard, HotelFacade.blockMasterCard, MagneticCard.active, MagneticCard.blockedAt. Note: the log of the block is not shown in the diagram. |
 
@@ -52,4 +52,4 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RNF-09 Javadoc | Not covered. The diagram shows no class for documentation. |
 | RNF-10 JUnit unit tests | Not covered. The diagram shows no test classes. |
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.

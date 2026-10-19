@@ -6,10 +6,10 @@ Use this guide to defend the [sequence diagrams](sequence-diagrams.md). Calls co
 
 1. Read from top to bottom. A solid arrow calls a method of the receiver. A dashed arrow shows data, an error or completion.
 2. A JavaFX controller calls `HotelFacade`. Services check permissions and business rules. Controllers never call SQL Server.
-3. Notes explain internal work. They do not add API methods. G-01 to G-04 identify missing contracts.
+3. Notes explain internal work. They do not add API methods. G-01 to G-05 identify missing or new contracts.
 4. `alt` selects one branch. An activation shows execution, not a database transaction.
-5. SD-04 details deletion decisions. SD-05 shows the service boundary for two access scenarios within UC-09.
-6. A lifeline does not define cardinality. One manager lifeline can use a card with many earlier entry records.
+5. SD-04 details deletion decisions. SD-06 gives a general view of UC-15: review supplier XML, cancel or confirm, then show the report.
+6. A lifeline does not define cardinality. One import can contain many stock movements even when a diagram shows one service lifeline.
 
 ## SD-04 - Detailed: delete a reservation
 
@@ -50,27 +50,35 @@ This describes a required lock or equivalent guarded operation. It does not clai
 
 **Defence point:** A transaction prevents partial deletion. A lock prevents a competing change from invalidating the state check. These are different jobs.
 
-## SD-05 - General: use a magnetic card and log entry
+## SD-06 - General: review and import supplier XML
 
-**What:** UC-09 has a client scenario and a manager master-card scenario. Both show the access decision and a real entry record.
+**What:** UC-15 starts with a selected supplier XML file. The system previews known items for restock and unknown items for rejection. The user confirms or cancels. Confirmation returns an import report.
 
-**Why:** A master card is not tied to the guest's reservation. The second scenario makes that permission difference visible. It also proves that a block or inactive flag overrides master access.
+**Why:** The [PR #20 comment](https://github.com/BorjaTiago/hotel4you/pull/20#issuecomment-6265012673) asks for a more useful flow than the card check. The import has a user decision, validation, stock changes and a report. It still covers one existing use case and supplies the general diagram required by the statement.
 
-**Why this way:** The client calls `canOpenRoom()` for a room or `canOpen()` for a zone. The manager calls `canOpenRoom(masterCard, room202)` for another guest's room. Both receive a boolean. `register()` runs only after access is allowed and entry occurs. It records exactly one target and the entry time.
+**Why this way:** The controller calls the facade for `previewStock()`. The service reads the file and catalogue without saving stock. `StockImportPreview` carries the two review groups. Cancel sends no confirmation call. Confirm uses `confirmStockImport(preview.id, user)`. The service checks permission, preview ownership and current catalogue again. It saves the import, ENTRY movements and balances together. The facade reads `StockImport.getRejectedItems()` for the report. The controller handles no business rule.
 
-**Other option:** Describe the master card only in a table. That does not show its messages. Adding card issue or replacement would cover a different use case. They are not added here.
+**Other option:** Call the old one-step `importStock()` to get a preview, or read the same file path again after confirmation. The first option writes before the user agrees. The second could import different file data from the preview. The new contract keeps the exact file snapshot under a preview ID held by the service for that user. It accepts one successful confirmation only.
 
-**Example:** Ana's card enters room 202 at 09:30. The manager's active, unblocked master card enters the same room at 10:00. The manager has no reservation for room 202. Both entries use the same log contract. If the master card is blocked or inactive, `canOpenRoom()` returns `false` and no entry is recorded.
+**Example:** Soap is in the catalogue with balance 10. Towels are in the catalogue with balance 0. The file supplies soap +5, towels +3 and an unknown item, "Blue gel" +2. The preview lists soap and towels for stock entry. It lists Blue gel as unknown and rejected. Cancel leaves balances 10 and 0, with no saved import or movement. Confirm changes them to 15 and 3 and saves two ENTRY movements linked to one `StockImport`. The report lists Blue gel as rejected. A second confirmation of the same preview adds nothing. If any save fails, both balances stay 10 and 0 and no partial import remains.
 
-**Refusal rule:** Every refused check returns the same `false` value. The reader receives no reason. The internal error labels do not change the response. This applies to guest, staff and master cards.
+### How the review comment maps to the flow
 
-**Role variants:** An active master card opens every room and zone. Reception gets zones on floors 0 and 1. Restaurant staff get only kitchen and restaurant. Blocked or inactive cards open nothing.
+| Review request | Result in SD-06 |
+|----------------|-----------------|
+| Attach the supplier XML | The user selects the file before `onImportXmlClicked()`. The supplier does not log in (Q-17). |
+| Decide to import | The first click requests a preview only. No stock is saved. |
+| Show new items and restock items | Known catalogue items, including zero-balance items, appear for stock entry. Unknown catalogue names appear in a separate rejected group. |
+| Confirm, import and show a report | A separate confirmation calls the facade and service. Success returns `StockImport` and its rejected items. |
+| Cancel and do nothing | No confirmation call, import row, movement or stock change. |
 
-**Boundary point:** The actors stand for the card reader boundary. G-03 identifies the missing reader, door and entry-event contracts. The diagram does not let JavaFX controllers bypass the facade.
+**Catalogue rule:** RF-28, Q-10 and Q-38 reject items outside the catalogue. A catalogue item with zero stock is still known. The import does not create new catalogue items. UC-19 lets the manager create them separately. Q-51 asks whether the review intended a different rule. Until that is answered, the existing rule stays in force.
 
-**Defence point:** This remains a general view. It shows two variants of UC-09 at the existing service API. It does not expand internal checks into invented methods.
+**Error rule:** Invalid XML or an unauthorized caller gives a preview error with no stock changes. Unknown items are rejected by line; known items can still be imported after confirmation. A lost permission, missing, foreign, changed or used preview gives an import error. A changed catalogue requires a fresh preview. Saving is atomic: no partial import remains on failure. If every line is unknown, the report rejects every line and no stock is added.
 
-**Audit gap:** Q-49 and G-04 remain open. `register()` stores an entry and has no outcome argument. Calling it for a refusal would create a false entry record.
+**Model change:** The baseline has only `importStock(file, user)`. It has no preview or confirmation contract. This change explicitly adds `StockImportPreview`, `StockController.onConfirmImportClicked()`, and `previewStock` / `confirmStockImport` on both `HotelFacade` and `StockService`. They appear in [class-diagram.md](class-diagram.md), [classes.md](classes.md), [guide.md](guide.md) and [traceability.md](traceability.md). G-05 records the implementation and H4Y-5 review still needed. No missing method is hidden in a sequence arrow.
+
+**Defence point:** This is a general workflow view. Parsing, matching catalogue items, adding stock and storing movements remain service notes. It does not add parser, SQL or repository classes. SD-05 is replaced, not renumbered: exactly two diagrams remain, SD-04 and SD-06. Card reader and denied-audit gaps remain open outside them.
 
 ## Cardinality review
 
@@ -86,6 +94,9 @@ Multiplicity tells how many objects may be linked. `*` means zero or more (`0..*
 | CardAccessRecord and Room or Location | Each target link is `0..1`. Exactly one is set. One target has `0..*` records. | The existing target XOR CHECK rejects both targets and rejects no target. Use `register(card, room, null)` or `register(card, null, location)`. |
 | Reservation and ReservationExtra | Each extra row belongs to one booking. A booking has `0..*` extra rows. | `reservation_services.reservation_id` is required. Deletion removes these owned rows, not the shared ExtraService catalogue. |
 | Reservation and Location | Each side has `0..*` links. Each link row has one booking and one location. | `reservation_locations` is a join table. Its composite key prevents duplicate links. Delete its rows for the booking, not the locations. |
+| StockItem and StockMovement | Each movement has exactly one item. An item has `0..*` movements. | `stock_movements.item_id` is required. Each accepted XML line creates an ENTRY movement for a catalogue item. |
+| StockImport and StockMovement | A movement has `0..1` import. An import has `0..*` movements. | Manual use or exit has no import link. Accepted XML movements link to one import. A file with only rejected items can have no movements. |
+| User and StockImport | Each saved import has one user. A user can have `0..*` imports. | The existing `StockImport` to `User` association and `stock_imports.user_id` agree. `StockImportPreview` is review data, not another saved import. |
 
 ### Why one booking card does not mean one staff card
 
@@ -106,24 +117,24 @@ This corrects the documentation of an existing team decision. No SQL script was 
 | Feedback | Change |
 |----------|--------|
 | Explain the state check and transaction. | SD-04 shows protection, the current-state decision, deletion, save and undo. This guide separates transaction atomicity from the concurrent check-in guard. |
-| Review cardinality. | The table above checks eight relationships and rules. The ER and schema now match Q-09. Domain prose makes the owner and entry-target XOR rules explicit. |
-| CardAccessService is too simple. | SD-05 adds manager-to-service calls for master-card entry and refusal. It remains UC-09 and stays general. |
+| Review cardinality. | The table above checks the original eight rules and three stock rules. The ER and schema match Q-09. Domain prose makes owner and entry-target XOR rules explicit. |
+| CardAccessService is too simple. | Following PR #20 review, replace SD-05 with SD-06 for supplier XML import. The general workflow has preview, cancel, confirmation, validation and report. |
 
 ## Validation results (2026-10-19)
 
-Mermaid CLI 12.0.0 rendered four blocks to temporary SVG files: the two sequences, the domain model and the ER diagram. Both sequence diagrams also rendered to PNG. Their previews were inspected for clipped text and readability. No rendered file is committed.
+Mermaid CLI 12.0.0 rendered all five blocks in the PR diagram files to temporary SVG files: two sequences, the class diagram, domain model and ER diagram. Both sequences also rendered to PNG and were visually inspected. The XML sequence was rendered and inspected again after shortening clipped notes. No rendered file is committed.
 
-A read-only checker verified participants, receiving classes, public method visibility and argument counts against `classes.md` and `class-diagram.md`. Missing method names: **none**.
+A read-only check verified participants, receiving classes, public method names and argument counts against `class-diagram.md` and the receiving class rows in `classes.md`. Missing method names: **none**. The preview and confirmation methods are explicit additions to the documented class design, not implemented Java methods. The SD-04 Mermaid block is unchanged from the previous PR revision.
 
 | Diagram | Static message arrows, including returns | Method call arrows |
 |---------|------------------------------------------|--------------------|
 | SD-04 | 10 | 3 |
-| SD-05 | 9 | 5 |
+| SD-06 | 18 | 7 |
 
-Eight association rules were checked in both UML models. The review also checked the reservation-card ER correction, filtered unique index and existing owner and target XOR constraints. Links, requirement IDs, use case IDs, question IDs, gap IDs and documentation footers passed the checks. `git diff --check` passed.
+The read-only check verified eleven associations in both UML models: the original eight relations and three stock relations. It also checked the changed document links, requirement IDs, use case IDs, question IDs, gap IDs and all nine updated documentation footers. Q-10 and Q-38 remain unchanged. `git diff --check` passed. The previous review also checked the reservation-card ER correction, filtered unique index and owner and target XOR constraints; those files do not change in this revision.
 
-Exactly two sequence diagrams remain. Only six Markdown files changed against `origin/main`. No Java, test, SQL script, dependency, CI or policy file changed. The application, database scripts, JUnit tests and Javadoc were not run.
+Exactly two sequence diagrams remain. This revision changes nine Markdown documents. No Java, test, SQL script, dependency, CI or policy file changed. The application, database scripts, JUnit tests and Javadoc were not run.
 
-These document checks do not validate the application or establish full Definition of Done approval. Human review and the contracts in G-01 to G-04 remain. The Jira connection was unavailable. Scope and teacher feedback came from the user's supplied ticket text.
+These document checks do not validate the application or establish full Definition of Done approval. Human review and the contracts in G-01 to G-05 remain. Jira was not queried for this revision. Scope comes from the user's supplied ticket text and the PR #20 comment. Q-51 leaves catalogue creation undecided; Q-10 and Q-38 still apply.
 
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.

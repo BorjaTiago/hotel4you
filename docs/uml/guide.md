@@ -68,7 +68,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Separate report screens. Not done: few reports, one controller is enough.
 
 ### StockController
-- **What:** Import the XML file. Save an item. Register a movement.
+- **What:** Preview an XML file and confirm its import. Save an item. Register a movement.
 - **Why:** RF-28, RF-29.
 - **Why this way:** One screen group for stock.
 - **Other option:** Separate import screen. Not done: same data and same user.
@@ -138,9 +138,9 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put `canOpen` in `MagneticCard`. Not done: `MagneticCard` would need reservation and location data.
 
 ### StockService
-- **What:** Import the XML file. Create and edit items. Register and apply a movement. Each movement takes an exit reason (`ExitReason`) and the user.
+- **What:** Preview and confirm the XML import. Create and edit items. Register and apply a movement. Each movement takes an exit reason (`ExitReason`) and the user.
 - **Why:** RF-28, RF-29.
-- **Why this way:** One import is one transaction. Stock changes follow the movement rules.
+- **Why this way:** Preview makes no stock changes. Confirmation saves one import and its movements in one transaction. Stock changes follow the movement rules. The new review contracts are documented under `StockImportPreview` and G-05.
 - **Other option:** Put the import in `StockImport`. Not done: the import has many items and rules.
 
 ### FeedbackService
@@ -282,6 +282,13 @@ A staff card never opens a guest room. Only the master card does.
 - **Why this way:** Each movement from the file points to its import.
 - **Other option:** No import record. Not done: the manager needs the report.
 
+### StockImportPreview (business data, not a stored import)
+- **What:** Read-only review data: an ID, supplier, known items for restock and unknown items for rejection.
+- **Why:** The PR #20 review asks the user to inspect the XML before saving stock (RF-28, RF-29).
+- **Why this way:** `previewStock()` makes no stock change. The service holds the unchanged file snapshot for this preview ID and user. `confirmStockImport()` checks permissions and that saved snapshot again. It saves the import and ENTRY movements together and accepts the preview once only. Cancel sends no confirmation call.
+- **Other option:** Preview with the existing `importStock()`. That method already imports, so cancel would arrive too late. The new contracts are explicit documentation additions. G-05 tracks implementation and class model review.
+- **Example:** Soap is a catalogue item with balance 10. The XML adds 5. The preview shows soap +5 for restock. A new catalogue name is shown as unknown and rejected (Q-10, Q-38). Cancel leaves 10. Confirm saves soap at 15, one ENTRY movement, and a report with the rejected name. Creating that name belongs to UC-19, not this import.
+
 ## Feedback
 
 ### Feedback
@@ -352,9 +359,14 @@ Order: check-in first, then the card (RF-13, RF-16).
 
 ### 3. XML stock import
 ```java
-StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
-List<String> rejected = report.getRejectedItems(); // unknown items
-// Known items: StockMovement with type ENTRY, linked to the import.
+StockImportPreview preview = hotelFacade.previewStock("delivery-0412.xml", user);
+// Show known items for restock and unknown items for rejection. No stock is saved.
+// Only after the user confirms:
+StockImport report = hotelFacade.confirmStockImport(previewId, user);
+// previewId is the ID returned in preview. Cancel sends no confirm call.
+// Known items create ENTRY movements. Unknown catalogue items stay rejected.
 ```
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+These calls describe the new documented design. No Java code implements them in this task. The facade reads `StockImport.getRejectedItems()` for the result. The controller only handles the screen and facade calls. See SD-06 in [sequence-diagrams.md](sequence-diagrams.md).
+
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; PR-20 stock import design by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
