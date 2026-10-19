@@ -190,7 +190,7 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
   - 3b. The file has an unknown item. The system rejects that item and lists it in the import report. Valid items are imported (Q-10, team decision). An unknown item is an item not in the stock catalogue (UC-19, Q-38, team decision).
 
 ## UC-16 Record stock use and exit
-- Actors: hotel staff, manager.
+- Actors: receptionist, manager.
 - RF links: RF-29.
 - Phase: final delivery (Q-06).
 - Main flow:
@@ -238,4 +238,4 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
   - Stock use and exit (UC-16) use catalogue items (Q-38, team decision).
   - Removal of a catalogue item is not in the team decision (Q-38). If it is added, Q-36 applies.
 
-AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16. Reviewed by: pending.

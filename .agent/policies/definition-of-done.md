@@ -11,9 +11,10 @@ A story is done only when all items are true. Each item needs evidence. `validat
 | The code has Javadoc. The Javadoc builds without errors. | Javadoc build command and result. |
 | Diagrams are updated (domain model, class, use case, sequence) when the change affects them. | Diagram file paths in the PR. |
 | The pull request is reviewed and approved by at least one other member. | PR link and reviewer name. |
-| The branch name is `(feat|fix)-NNN-description`. | Branch name. |
+| The branch name is `(feat|fix|chore)/H4Y-N-description`. | Branch name. |
 | Commits are clear and short, written in STE, and start with the Jira key. No AI co-author line in commits or PR. | Commit list. No "fix task X" or "general fix". No `Co-Authored-By`, no "Generated with". |
-| No unreferenced AI code or AI diagrams. Every AI use has a reference. | Reference list or "no AI use". |
+| No unreferenced AI docs or AI diagrams. Every AI use has a reference in the docs. | Footer lines or "no AI use". |
+| No AI-use reference in source code (comment, header, annotation, file, name). Every doc footer has Created by and Updated by. | Grep result on `src` and the footer lines. |
 | Every new external library is justified in writing. | Justification text or "no new library". |
 | The Team Leader tested and validated the story against the acceptance tests. | Name of the Team Leader and date. |
 | The Jira issue is up to date. It is "In Review" during validation and moves to Done after PASS. | Jira status. |

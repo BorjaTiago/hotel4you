@@ -38,4 +38,4 @@ Para que o cliente aceda ao seu quarto e aos locais incluídos na reserva.
 Depende de "Registar cliente" e "Criar reserva". Enunciado, secção 2 (cartão magnético).
 Test names: "H4Y-NN AC-1 ...", "H4Y-NN AC-2 ...".
 
-AI use: story-writer, acceptance-criteria, <AI tool and model>, 2026-10-15. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, <AI tool and model>, 2026-10-15. Reviewed by: pending.

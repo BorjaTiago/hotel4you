@@ -44,7 +44,7 @@ Para que <benefício>.
 ## Notas
 <dependências, perguntas (Q-NN), referência ao enunciado>
 
-AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or pending>.
+Created by: <GitHub name>. Updated by: <GitHub name>. AI use: <agent name>, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: <name or pending>.
 ```
 
 ## Checklist rule (user decision, 2026-10-16)
@@ -121,5 +121,5 @@ Para que o cliente aceda ao seu quarto e aos locais incluídos na reserva.
 Depende das histórias "Registar cliente" e "Criar reserva". Enunciado, secção 2 (cartão magnético).
 AC-3 depende da resposta à pergunta Q-09 (regras do cartão). Se a resposta mudar a regra, atualizar AC-3.
 
-AI use: story-writer, acceptance-criteria, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: pending.
+Created by: <GitHub name>. Updated by: <GitHub name>. AI use: story-writer, acceptance-criteria, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: pending.
 ```

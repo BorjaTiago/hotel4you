@@ -3,24 +3,24 @@
 ## Git (from the course statement)
 
 - Use Git flow.
-- Branch name: `(feat|fix)-NNN-description`. NNN is the Jira key number, zero-padded to 3 digits.
+- Branch name: `(feat|fix|chore)/H4Y-N-description`. N is the Jira key number, not zero-padded. Team decision (user, 2026-10-16).
 - One branch per story or sub-task. The branch name carries the ticket number.
 - Never commit to `main`. No exception. Always create a branch for the ticket, then open a pull request.
 - Commits have clear and short descriptions.
   - Not allowed: "fix task X", "general fix".
 - Wrong or careless use of the repository gets a penalty.
-- Reference every AI use in code, docs and diagrams.
+- Reference every AI use in docs and diagrams only. Never in source code.
 
 ### Branch cases
 
 | Case | Jira issue | Branch |
 |------|------------|--------|
-| Story | H4Y-4 | `feat-004-create-database` |
-| Sub-task | H4Y-27 | `feat-027-room-table-script` |
-| Bug fix | H4Y-130 | `fix-130-card-already-in-use` |
-| Docs or chore work | H4Y-31 | `feat-031-update-class-diagram` |
+| Story | H4Y-4 | `feat/H4Y-4-create-database` |
+| Sub-task | H4Y-27 | `feat/H4Y-27-room-table-script` |
+| Bug fix | H4Y-130 | `fix/H4Y-130-card-already-in-use` |
+| Docs or chore work | H4Y-31 | `chore/H4Y-31-update-class-diagram` |
 
-Docs and chore work also use `feat-NNN-...`, because the statement allows only feat or fix. This is a teacher question (see `enunciado.md`).
+Docs and chore work use `chore/H4Y-N-...`. The statement (`enunciado.md`) allows only feat or fix. The team rule differs from the statement. This is a teacher question (see `enunciado.md`).
 
 ### Commit message rule
 
@@ -33,7 +33,7 @@ Every agent and tool that writes a commit message, a PR title or a PR body follo
 
 - Write in Simplified Technical English (STE): short sentences, simple words, active voice. Example: `H4Y-8 add check-in sequence diagram`.
 - Never add an AI as co-author or author. Do not add a `Co-Authored-By` line. Do not add a "Generated with ..." line. Tool defaults that add them must be turned off or removed before the commit or PR is created.
-- The AI-use reference stays inside the changed files (AGENTS.md rule 8). It does not go in the commit trailer.
+- The AI-use reference stays inside the changed documentation files, never in source code (AGENTS.md rule 8). It does not go in the commit trailer.
 - Check before you commit: `git log -1 --format=%B` has no `Co-Authored-By`. Check before you open the PR: the body has no "Generated with" line.
 
 ### Traceability
@@ -77,7 +77,7 @@ status: draft | ready | approved | published
 jira_key:          # empty until published, for example H4Y-12
 labels: []
 sprint:            # for example 3; empty until planned (written by the sprint planner)
-branch:            # sub-task drafts only: (feat|fix)-NNN-description
+branch:            # sub-task drafts only: (feat|fix|chore)/H4Y-N-description
 ---
 ```
 

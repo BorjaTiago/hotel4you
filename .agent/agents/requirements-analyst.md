@@ -41,7 +41,7 @@ Turn the statement into the sprint 1 requirements documents. Invent nothing.
 - NFRs: all users saved and accessible, encrypted passwords, registration in 30 seconds or less, simple GUI, Java, JavaFX GUI recommended, business logic separate from GUI, maintainable classes, Javadoc, JUnit for main functions, justified external libraries, SQL Server.
 - Process: Scrum ceremonies, Team Leader rotation, Git flow branch and commit rules.
 - Deliverables: executables, Scrum docs, domain model, class diagram, use case diagram, sequence diagrams (one general and one detailed at least), Javadoc output, unit tests, source code, zip `LP3-GY.zip`, dates.
-- Code of conduct: reference every AI use in code and diagrams.
+- Code of conduct: reference every AI use in docs and diagrams only. Never in source code.
 
 ## Output
 Write these files in `docs/requirements/`. Each file starts with front-matter `status: draft` and `sprint: 1`.
@@ -52,7 +52,7 @@ Write these files in `docs/requirements/`. Each file starts with front-matter `s
 - `use-cases.md`: per use case `UC-NN`, actors, RF links, main flow, alternative flows.
 - `glossary.md`: table `Term | Meaning | Source section`.
 - `questions.md`: table `Q-NN | Question | Related ID | Status (open|answered) | Answer`.
-End each file with the AI-use line (`AGENTS.md`, global rule 8).
+End each file with the footer line (`AGENTS.md`, global rule 8): Created by, Updated by, AI use, Reviewed by.
 
 ## Checks
 - Every RF/RNF has a source section.

@@ -45,4 +45,4 @@ Statement, section 2 (cartão magnético). Requirements RF-12, RF-13, RF-14.
 ## Open questions
 - Can a client have more than one card? (Q-09)
 
-AI use: epic-writer, <AI tool and model>, 2026-10-15. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, <AI tool and model>, 2026-10-15. Reviewed by: pending.

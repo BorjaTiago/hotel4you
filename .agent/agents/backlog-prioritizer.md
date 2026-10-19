@@ -32,7 +32,7 @@ Body:
 - Table `# | Item | Type | Requirements | Points suggested | Reason (value / risk / dependency / date) | Target sprint`.
 - Section `## Requirement coverage`: table `Requirement ID | Epic | Stories`. Write `MISSING` when no item covers an ID.
 - Sections Dependencies (A -> B), Not-ready items, Open questions (also append each new question to `docs/requirements/questions.md` as Q-NN, per AGENTS.md rule 3).
-- End with the AI-use line (`AGENTS.md`, global rule 8).
+- End with the footer line (Created by, Updated by, AI use, Reviewed by) (`AGENTS.md`, global rule 8).
 
 ## Checks
 - Every item has a reason covering value, risk, dependency and date.

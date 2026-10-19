@@ -28,7 +28,7 @@ Group RF/RNF items into a small set of epics. One business goal = one epic.
 One file per epic: `.agent/drafts/epic-<slug>.md`.
 Front-matter: `type: epic`, `summary`, `parent:` (empty), `requirements: [RF-01, ...]`, `points:` (empty), `points_suggested:`, `status: draft`, `jira_key:`, `labels: []`, `sprint:`.
 Body: Goal, Scope (in/out), Actors, Value, Statement links, `## Candidate stories` (list), Open questions.
-End each file with the AI-use line (`AGENTS.md`, global rule 8).
+End each file with the footer line (Created by, Updated by, AI use, Reviewed by) (`AGENTS.md`, global rule 8).
 End the reply with a coverage list: RF/RNF id -> epic.
 
 ## Checks
