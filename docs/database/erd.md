@@ -2,6 +2,8 @@
 
 Diagram of the schema in [schema.md](schema.md). View it on GitHub or at mermaid.live.
 
+H4Y-8 cardinality review: RF-16, RF-19, RF-22, RF-23; Q-09, Q-19, Q-26, Q-31. One reservation has at most one card. A staff user can retain several cards across history. The owner and entry-target XOR rules are in [schema.md](schema.md#constraints).
+
 ```mermaid
 erDiagram
     floors ||--o{ rooms : "floor_id"
@@ -23,7 +25,7 @@ erDiagram
     rooms ||--o{ reservations : "room_id"
     reservations ||--o{ reservation_services : "reservation_id"
     additional_services ||--o{ reservation_services : "additional_service_id"
-    reservations |o--o{ access_cards : "reservation_id"
+    reservations |o--o| access_cards : "reservation_id"
     access_cards ||--o{ access_logs : "access_card_id"
     locations |o--o{ access_logs : "location_id"
     rooms |o--o{ access_logs : "room_id"
@@ -146,3 +148,5 @@ erDiagram
         DATETIME2 created_at
     }
 ```
+
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: cardinality review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.

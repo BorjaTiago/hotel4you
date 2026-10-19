@@ -283,6 +283,8 @@ Reservation 2: 3 x 4.50 = 13.50.
 **Why:** Rooms and places open with a card.
 **Why this way:**
 - A card belongs to a reservation OR a user, never both (CHECK).
+- Each owner link is optional on its own. Exactly one must be set. A booking has zero or one card (Q-09). A filtered unique index on non-null `reservation_id` enforces that count.
+- One staff user can retain several card rows across history. A manager's blocked old card and replacement remain linked to that user (Q-19, Q-26, Q-31). Do not make `user_id` unique.
 - A master card needs a user (CHECK).
 - `card_number` is plain UNIQUE. A number is never used twice.
 - The backend creates the card at check-in and sets `active = 0` at check-out.
@@ -299,9 +301,9 @@ Reservation 2: 3 x 4.50 = 13.50.
 Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new card with a new number for reservation 1. If a card is lost, the backend sets `blocked_at`.
 
 ### access_logs
-**What:** Every card swipe.
+**What:** Each recorded card entry.
 **Why:** The manager must see where a card went, and who entered a room.
-**Why this way:** One entry is in a location OR a room (CHECK). Two indexes make the two manager reports fast. Both are plain indexes on (card or room, `entered_at`).
+**Why this way:** Each record has one card and exactly one target: a location OR a room (CHECK). A card can have zero or many records. Two indexes make the two manager reports fast. Both are plain indexes on (card or room, `entered_at`). Denied-attempt audit remains open in Q-49.
 **Other option:** Two log tables (rooms and locations). We did not, because one table is simpler and gives one timeline per card.
 
 | id | access_card_id | location_id | room_id | entered_at |
@@ -348,3 +350,5 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why no trigger for overlap? | The backend does it in one transaction with a room lock. It is easier to test and read. |
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
+
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: cardinality review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
