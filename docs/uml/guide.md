@@ -196,7 +196,7 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version.
 
 ### Database
-- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `prepare` (static) fills the `?` values of a SQL text.
+- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `connect` opens a connection. `check` opens and closes one to test that the database works. `prepare` (static) fills the `?` values of a SQL text.
 - **Why:** RNF-12. One place holds the connection code.
 - **Why this way:** The values go in with `prepare`, not in the SQL text. This stops SQL injection.
 - **Other option:** Each repository opens its own connection. Not done: the same code many times.
@@ -415,4 +415,4 @@ List<String> rejected = report.getRejectedItems(); // unknown items
 // Known items: StockMovement with type ENTRY, linked to the import.
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19. Reviewed by: pending.

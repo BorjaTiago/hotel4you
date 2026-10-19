@@ -199,14 +199,14 @@ classDiagram
         +dbPassword: String
         +managerUsername: String
         +managerPassword: String
-        +load(file: Path) AppConfig
+        +load(file: Path) AppConfig$
         +toString() String
     }
     class Main {
-        +main(args: String[]) void
+        +main(args: String[]) void$
     }
     class FirstManagerCommand {
-        +main(args: String[]) void
+        +main(args: String[]) void$
     }
 
     %% ==========================================
@@ -220,7 +220,9 @@ classDiagram
         +save(user: User) User
     }
     class Database {
+        +NOT_AVAILABLE String$
         +connect() Connection
+        +check() void
         +prepare(connection: Connection, sql: String, values: String...) PreparedStatement$
     }
     class JdbcUserRepository
@@ -479,4 +481,4 @@ classDiagram
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19. Reviewed by: pending.

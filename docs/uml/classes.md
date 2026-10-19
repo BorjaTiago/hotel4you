@@ -50,16 +50,16 @@ Notes:
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load(), toString() (hides the passwords) | RNF-12 |
-| Main | Config | - | main(). Uses AppConfig. Creates Database, JdbcUserRepository, AuthService, StaffService, HotelFacade. Starts HotelApp | RF-01, RNF-12 |
-| FirstManagerCommand | Config | - | main(). Uses AppConfig and StaffService. Creates Database, JdbcUserRepository, AuthService | RF-01, RNF-12 |
+| AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load() (static), toString() (hides the passwords) | RNF-12 |
+| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, AuthService, StaffService, HotelFacade. Starts HotelApp | RF-01, RNF-12 |
+| FirstManagerCommand | Config | - | main() (static). Uses AppConfig and StaffService. Creates Database, JdbcUserRepository, AuthService | RF-01, RNF-12 |
 
 ## Data
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), existsByRole(), save() | RF-01, RNF-01, RNF-12 |
-| Database | Data | - | connect(), prepare() (static) | RNF-12 |
+| Database | Data | NOT_AVAILABLE (static) | connect(), check(), prepare() (static) | RNF-12 |
 | JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), existsByRole(), save() | RNF-01, RNF-12 |
 
 ## Domain
@@ -97,4 +97,4 @@ Notes:
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19. Reviewed by: pending.
