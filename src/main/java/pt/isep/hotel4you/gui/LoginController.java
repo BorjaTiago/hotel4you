@@ -35,6 +35,7 @@ public class LoginController {
     private void onLoginClicked() {
         try {
             User user = facade.login(usernameField.getText(), passwordField.getText());
+            HotelApp.currentUser = user;
             // The real main window comes with H4Y-24.
             messageLabel.setStyle("-fx-text-fill: #1e8449;");
             messageLabel.setText("Welcome, " + user.getName() + " (" + user.getRole() + ")");
