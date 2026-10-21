@@ -3,6 +3,7 @@
 
 # --- Read by Docker ---
 # The SQL Server password. 8+ characters with upper case, lower case, a digit and a symbol.
+# Do not use the $ character in any password. Docker Compose changes it.
 MSSQL_SA_PASSWORD=change-me-Strong1!
 
 # --- Read by the Java app ---

@@ -19,6 +19,7 @@ cp application.properties.example application.properties
 
 Open `application.properties` and write your own values. The file has one `key=value` line for each setting.
 Git ignores this file, so your passwords stay on your PC. Never commit it.
+Do not use the `$` character in any password. Docker Compose reads `$` as a variable, so the password changes and the database login fails.
 
 | Key | What it is | Can I change it? |
 |-----|------------|------------------|
