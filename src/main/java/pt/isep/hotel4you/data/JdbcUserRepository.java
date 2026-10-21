@@ -40,7 +40,7 @@ public class JdbcUserRepository implements UserRepository {
             }
             return Optional.ofNullable(toUser(row));
         } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE);
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 
@@ -52,7 +52,7 @@ public class JdbcUserRepository implements UserRepository {
                 ResultSet row = statement.executeQuery()) {
             return row.next();
         } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE);
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 
@@ -68,7 +68,7 @@ public class JdbcUserRepository implements UserRepository {
                 ResultSet row = statement.executeQuery()) {
             return row.next();
         } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE);
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 
@@ -89,7 +89,7 @@ public class JdbcUserRepository implements UserRepository {
             return createUser(row.getLong("id"), user.getName(), user.getUsername(),
                     user.getPasswordHash(), user.getRole());
         } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE);
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 

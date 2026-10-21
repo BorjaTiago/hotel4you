@@ -33,7 +33,7 @@ public class Database {
         try {
             return DriverManager.getConnection(config.dbUrl(), config.dbUser(), config.dbPassword());
         } catch (SQLException e) {
-            throw new IllegalStateException(NOT_AVAILABLE);
+            throw new IllegalStateException(NOT_AVAILABLE, e);
         }
     }
 
@@ -46,7 +46,7 @@ public class Database {
         try (Connection connection = connect()) {
             // The connection opened, so the database works. It closes at the end of the block.
         } catch (SQLException e) {
-            throw new IllegalStateException(NOT_AVAILABLE);
+            throw new IllegalStateException(NOT_AVAILABLE, e);
         }
     }
 
