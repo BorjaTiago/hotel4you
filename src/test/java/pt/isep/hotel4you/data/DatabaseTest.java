@@ -54,4 +54,18 @@ class DatabaseTest {
 
         assertInstanceOf(SQLException.class, error.getCause());
     }
+
+    @Test
+    @Tag("H4Y-32-AC-9")
+    void onCheck_keepSqlCause_whenServerDown() {
+        AppConfig config = new AppConfig(
+                "jdbc:sqlserver://localhost:1;databaseName=hotel4you;loginTimeout=1",
+                "secret-user", "secret-password", null, null);
+        Database database = new Database(config);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class, database::check);
+
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
+        assertInstanceOf(SQLException.class, error.getCause());
+    }
 }
