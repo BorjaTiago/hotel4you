@@ -7,8 +7,6 @@ sprint: 1
 
 Source: `enunciado.md`, section 2. Flows only use steps the statement supports, or team decisions from `questions.md` (marked, not confirmed by the teacher). Phase: "1st delivery" or "final delivery" (Q-06); phase not named in Q-06 = "planned by the prioritizer; phase set in the backlog order" (Q-25). Open points are in `questions.md`.
 
-UC-15 also includes the XML review workflow requested in [PR #20](https://github.com/BorjaTiago/hotel4you/pull/20#issuecomment-6265012673). It keeps the existing Q-10 and Q-38 catalogue rules. Q-51 records the unclear meaning of "new items".
-
 ## UC-01 Log in
 - Actors: receptionist, manager, restaurant staff.
 - RF links: RF-01, RF-02, RNF-02.
@@ -186,16 +184,10 @@ UC-15 also includes the XML review workflow requested in [PR #20](https://github
 - Main flow:
   1. The supplier delivers goods and sends the XML file.
   2. Staff or the manager loads the XML file into the system (Q-17, team decision).
-  3. The system reads the file without changing stock. It shows known catalogue items for stock entry and unknown items for rejection (PR #20 review, 2026-10-19).
-  4. The user confirms the preview.
-  5. The system checks permission and the stored preview again. It records valid stock entries and shows the import report.
+  3. The system reads the file and records the stock entry.
 - Alternative flows:
   - 3a. The file is not valid XML. The system refuses it and records nothing.
   - 3b. The file has an unknown item. The system rejects that item and lists it in the import report. Valid items are imported (Q-10, team decision). An unknown item is an item not in the stock catalogue (UC-19, Q-38, team decision).
-  - 4a. The user cancels. The system records no import or movement and changes no stock.
-  - 5a. The user is no longer allowed, or the preview is missing, changed, belongs to another user or was already used. The system refuses it and changes no stock. A changed catalogue requires a fresh preview.
-  - 5b. Saving fails. The system undoes all changes for this import and keeps the original stock.
-  - The review does not permit automatic creation of unknown catalogue items. Q-51 records that open question. New preview and confirmation class contracts are in SD-06 and G-05.
 
 ## UC-16 Record stock use and exit
 - Actors: receptionist, manager.
@@ -246,4 +238,4 @@ UC-15 also includes the XML review workflow requested in [PR #20](https://github
   - Stock use and exit (UC-16) use catalogue items (Q-38, team decision).
   - Removal of a catalogue item is not in the team decision (Q-38). If it is added, Q-36 applies.
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
+AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16. Reviewed by: pending.

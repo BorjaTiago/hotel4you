@@ -14,14 +14,14 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 | CheckInOutController | Interface | - | onCheckInClicked(), onCheckOutClicked() | RF-13, RF-14 |
 | StaffController | Interface | - | onCreateStaffClicked(), onEditStaffClicked(), onRemoveStaffClicked(), onListUsersClicked() | RF-26, RNF-01 |
 | CardController | Interface | - | onIssueCardClicked(), onIssueMasterCardClicked(), onBlockMasterCardClicked(), onShowPlacesByCardClicked(), onShowPassesByRoomClicked() | RF-16, RF-20, RF-21, RF-23, RF-30 |
-| StockController | Interface | - | onImportXmlClicked(), onConfirmImportClicked(), onSaveItemClicked(), onRegisterMovementClicked() | RF-28, RF-29 |
+| StockController | Interface | - | onImportXmlClicked(), onSaveItemClicked(), onRegisterMovementClicked() | RF-28, RF-29 |
 | FeedbackController | Interface | - | onSaveFeedbackClicked(), onListFeedbackClicked() | RF-27 |
 
 ## Business - Facade
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), previewStock(), confirmStockImport(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
+| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
 
 ## Business - Services
 
@@ -34,18 +34,8 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
 | StaffService | Business - Services | - | createStaff(), editStaff(), removeStaff(), listUsers() | RF-26, RNF-01 |
 | CardAccessService | Business - Services | - | issueCard(), issueMasterCard(), blockCard(), canOpen(), register(), getPlacesByCard(), getPassesByRoom(), canOpenRoom() (access rules in the diagram note) | RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-24, RF-25, RF-30 |
-| StockService | Business - Services | - | importStock(), previewStock(), confirmStockImport(), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
+| StockService | Business - Services | - | importStock(), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
 | FeedbackService | Business - Services | - | save(), list() | RF-27 |
-
-## Business - Import review data
-
-| Class | Layer | Main attributes | Main methods | Requirement |
-|-------|-------|-----------------|--------------|-------------|
-| StockImportPreview | Business - Data transfer | id, supplierName, restockItems, rejectedItems | - | RF-28, RF-29; PR #20 review |
-
-The PR #20 review adds `previewStock(file: String, user: User): StockImportPreview`, `confirmStockImport(previewId: String, user: User): StockImport` to both the facade and stock service. It also adds `StockController.onConfirmImportClicked()`. These are explicit design additions, not Java implementation. G-05 records the review and implementation work still needed.
-
-`onImportXmlClicked()` requests a preview. It must not import stock. The controller shows known catalogue items for restock and unknown items for rejection. Cancel sends no confirmation call. The service holds the unchanged file snapshot for the preview ID and user. Confirmation checks the role, preview owner, current catalogue and unused state again. It accepts the preview once and saves the import and movements together. The existing one-step `importStock()` is not used in this UI flow.
 
 ## Domain
 
@@ -82,4 +72,4 @@ The PR #20 review adds `previewStock(file: String, user: User): StockImportPrevi
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; PR-20 stock import design by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
+AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.

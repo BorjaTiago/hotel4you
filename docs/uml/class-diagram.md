@@ -1,7 +1,5 @@
 # Hotel4You - Class Diagram (Organized)
 
-H4Y-8 review design (RF-28, RF-29; RNF-07): `previewStock`, `confirmStockImport`, `onConfirmImportClicked` and `StockImportPreview` are new documentation contracts for the XML review flow. They are not implemented code. See [sequence-diagrams.md](sequence-diagrams.md#gaps), G-05. Existing `importStock` remains the one-step contract; the reviewed UI flow does not call it before confirmation.
-
 ```mermaid
 classDiagram
     %% ==========================================
@@ -52,7 +50,6 @@ classDiagram
     }
     class StockController {
         +onImportXmlClicked() void
-        +onConfirmImportClicked() void
         +onSaveItemClicked() void
         +onRegisterMovementClicked() void
     }
@@ -95,8 +92,6 @@ classDiagram
         +editLocation(location: Location) void
         +removeLocation(location: Location) void
         +importStock(file: String, user: User) StockImport
-        +previewStock(file: String, user: User) StockImportPreview
-        +confirmStockImport(previewId: String, user: User) StockImport
         +createItem(name: String, unit: String) StockItem
         +editItem(item: StockItem) void
         +registerMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
@@ -157,8 +152,6 @@ classDiagram
     }
     class StockService {
         +importStock(file: String, user: User) StockImport
-        +previewStock(file: String, user: User) StockImportPreview
-        +confirmStockImport(previewId: String, user: User) StockImport
         +createItem(name: String, unit: String) StockItem
         +editItem(item: StockItem) void
         +registerMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
@@ -167,14 +160,6 @@ classDiagram
     class FeedbackService {
         +save(client: Client, type: FeedbackType, description: String) Feedback
         +list() List~Feedback~
-    }
-
-    class StockImportPreview {
-        <<data transfer object>>
-        +id: String
-        +supplierName: String
-        +restockItems: List~String~
-        +rejectedItems: List~String~
     }
 
     %% ==========================================
@@ -392,7 +377,6 @@ classDiagram
     HotelFacade ..> StaffService : uses
     HotelFacade ..> CardAccessService : uses
     HotelFacade ..> StockService : uses
-    StockService ..> StockImportPreview : returns
     HotelFacade ..> FeedbackService : uses
 
     %% ==========================================
@@ -404,8 +388,6 @@ classDiagram
     note for ReservationService "addLocation and removeLocation accept only locations with guestCardAccess = true and requiresReservation = true. Allowed only before check-in."
     note for CardAccessService "Master card opens every room and every zone.<br/>Client card opens only its own room and zones with guestCardAccess = true. If requiresReservation = true, only zones included in its reservation.<br/>A blocked or inactive card opens nothing.<br/>Receptionist card opens only zones on floors 0 and 1 and no guest room.<br/>Restaurant staff card opens only the kitchen and the restaurant and no guest room.<br/>A staff card never opens a guest room. Only the master card does."
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
-    note for StockImportPreview "Read-only review data. No stock changes.<br/>id refers to an unchanged file snapshot held by the service for this user.<br/>Unknown catalogue items are rejected, not created (Q-10, Q-38)."
-    note for StockService "previewStock reads and validates only.<br/>confirmStockImport checks permissions and the stored preview again, then saves the import and ENTRY movements together.<br/>Accept a preview once only. A failed save changes no stock."
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; PR-20 stock import design by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
+AI use: Claude Code, claude-sonnet-5-5, 2026-10-16. Reviewed by: pending.

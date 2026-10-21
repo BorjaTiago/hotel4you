@@ -105,7 +105,7 @@ reservation_services
 access_cards
   id                    INT IDENTITY PK                 -- Internal card ID.
   card_number           VARCHAR(20) NOT NULL UNIQUE     -- Magnetic card number (e.g. 12345). Never repeats (see decision 7).
-  reservation_id        INT NULL FK reservations        -- Reservation of the customer who uses the card. Unique when not NULL (Q-09). NULL for staff. ON DELETE NO ACTION (see decisions 1 and 13).
+  reservation_id        INT NULL FK reservations        -- Reservation of the customer who uses the card. NULL for staff. ON DELETE NO ACTION (see decision 1).
   user_id               SMALLINT NULL FK users          -- Staff member or manager who uses the card. NULL for customers.
   is_master             BIT NOT NULL DEFAULT 0          -- 1 = manager master card (opens all rooms and zones).
   active                BIT NOT NULL DEFAULT 1          -- 1 = card works; 0 = turned off (e.g. after check-out).
@@ -153,7 +153,7 @@ feedback
 
 ### Access control
 - `access_cards`: a card belongs to a reservation (customer) or to a user (staff). `is_master = 1` opens everything. `blocked_at` records a block.
-- `access_logs`: each recorded card entry. It has one card and exactly one target: a location or a room. Denied-attempt audit remains open in Q-49.
+- `access_logs`: every card swipe. It points to a location or to a room, not both.
 
 ### Feedback
 - `feedback`: suggestion or complaint from a customer, with free text.
@@ -202,7 +202,7 @@ T-SQL has no boolean type. Do not compare two conditions with `=` or `<>`. Use A
 | additional_services | `name` UNIQUE; `price IS NULL OR price >= 0` |
 | reservations | `end_date > start_date`; `status` in the 4 values, default `'reserved'`; check-in and check-out dates match the status (see below); `checked_out_at >= checked_in_at` |
 | reservation_services | all FKs NO ACTION; `unit_price IS NULL OR unit_price >= 0` |
-| access_cards | card belongs to a reservation OR a user; `is_master = 0 OR user_id IS NOT NULL`; `card_number` UNIQUE; `reservation_id` unique where not NULL (Q-09, decision 13) |
+| access_cards | card belongs to a reservation OR a user; `is_master = 0 OR user_id IS NOT NULL`; `card_number` UNIQUE |
 | access_logs | entry is in a location OR a room |
 | stock_movements | `type IN ('in','use','out')`; `quantity > 0`; `exit_reason IN ('discard','return','loss')` or NULL; `type = 'out' OR exit_reason IS NULL` |
 | stock_imports | `supplier_name` NOT NULL |
@@ -242,8 +242,7 @@ CREATE INDEX ix_access_logs_room_time    ON access_logs (room_id, entered_at);
 
 -- FK scans: delete of reservation children, and the "card exists" check on reservation delete
 CREATE INDEX ix_reservation_services_reservation ON reservation_services (reservation_id);
--- One card per reservation (Q-09). Staff cards have NULL reservation_id and are excluded.
-CREATE UNIQUE INDEX ux_access_cards_reservation ON access_cards (reservation_id) WHERE reservation_id IS NOT NULL;
+CREATE INDEX ix_access_cards_reservation         ON access_cards (reservation_id) WHERE reservation_id IS NOT NULL;
 
 -- Stock history per item
 CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at);
@@ -264,6 +263,3 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 10. **Room service**: a request for food, drink or laundry is a `reservation_services` row. `used_at` is the request time (Q-33).
 11. **Zones and the client card**: the backend decides in this order. (a) `guest_card_access = 0`: refuse the client card (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). (b) `guest_card_access = 1` and `requires_reservation = 0`: open. (c) `guest_card_access = 1` and `requires_reservation = 1`: open only if `reservation_locations` lists the place for that reservation (restaurant and pool; Q-09, Q-32, RF-18). We chose one extra BIT column because it is the simplest way to say "never". The default is 0, so a new zone is closed to client cards until the manager opens it. Staff and master cards do not use these two flags.
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
-13. **One card per reservation**: Q-09 and the UML allow `0..1` card per reservation. A plain non-unique FK index did not enforce this. Use the filtered unique index above. It covers only non-null `reservation_id` values, so staff cards can still have null reservation IDs. Keep `user_id` non-unique: a manager can retain blocked old cards and a replacement (Q-19, Q-26, Q-31). The owner XOR CHECK still requires exactly one owner. H4Y-8 corrects the ER and schema documents only; no SQL script or database migration is applied here.
-
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: cardinality review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.

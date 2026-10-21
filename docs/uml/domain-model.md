@@ -193,17 +193,16 @@ classDiagram
 
 ## Business rules
 
-- Each card has exactly one owner: a reservation OR a staff user. Each link is `0..1`. Both links set and both links empty are invalid (owner XOR).
-- One reservation has `0..1` card (Q-09). One staff user can retain `0..*` cards across history. A manager's blocked old master card and replacement remain linked to that user (Q-19, Q-26, Q-31).
+- A card owner is 0..1. A card belongs to a reservation (client card) OR to a staff user (master card), never both.
 - A master magnetic card belongs to a Manager. It opens all client rooms and all zones.
 - A client card opens the room. It opens the restaurant and pool only if the reservation includes them.
 - A reservation belongs to one client, one room and one user who created it.
 - Only the manager deletes a reservation, and only before check-in. Reception cancels a reservation.
 - A reservation extra keeps the unit price at the time of use. Later price changes do not change it.
 - A room has one room type. The base price comes from the room type. Extras add to it.
-- Each card access record has exactly one card. A card can have `0..*` records. Each record has a room OR a location (each link is `0..1`). The target XOR requires exactly one of them.
+- A card access record points to a room or a location (each 0..1).
 - A stock movement of type EXIT has an exit reason (DISCARD, RETURN or LOSS).
 - A stock movement from an XML import points to its stock import. Rejected items stay in the stock import.
 - A client may leave many feedbacks. The client link is 0..1.
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; cardinality review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19. Reviewed by: pending.
+AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16. Reviewed by: pending.
