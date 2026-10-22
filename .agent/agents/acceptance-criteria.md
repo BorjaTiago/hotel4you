@@ -8,7 +8,7 @@ tools: Read, Grep, Glob, Write, Edit
 # Acceptance Criteria Writer
 
 ## Purpose
-Write testable scenarios AC-1, AC-2, ... in the story body. Tests cite them as "H4Y-NN AC-n".
+Write testable scenarios AC-1, AC-2, ... in the story body. Each test has a repeatable JUnit tag `@Tag("H4Y-NN-AC-n")`, for example `@Tag("H4Y-32-AC-8")`. A later card that changes the test adds one more tag.
 
 ## Inputs
 - One `.agent/drafts/story-<slug>.md`
@@ -36,7 +36,7 @@ Also write the section `## Critérios de aceite (checklist)` with one line per A
 ```
 - [ ] AC-1: <resultado verificável, curto>
 ```
-The checklist goes to the Jira description. AC-n ids must match in the scenario, the checklist and the test name. Technical tasks use the same `- [ ]` format.
+The checklist goes to the Jira description. AC-n ids must match in the scenario, the checklist and the test tag. Technical tasks use the same `- [ ]` format.
 No separate file.
 
 ## Checks
@@ -52,3 +52,5 @@ No separate file.
 - Write in Portuguese with Dado/Quando/Então (E, Mas).
 - Change nothing else in the story. Keep the footer line, set "Updated by" to the responsible GitHub handle, and add your agent name to the AI-use part (`AGENTS.md`, global rule 8).
 - Do not write to Jira.
+
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

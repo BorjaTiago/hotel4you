@@ -2,7 +2,7 @@
 
 These diagrams show calls between the classes in [classes.md](classes.md) and [class-diagram.md](class-diagram.md). Read [sequence-guide.md](sequence-guide.md) to defend the flows and their limits.
 
-Sources: [use cases](../requirements/use-cases.md), [requirements](../requirements/requirements.md), [domain model](domain-model.md), [schema](../database/schema.md) and [table guide](../database/tables.md). The source baseline is `origin/main` at `4741c61`. The latest [PR #20 decision](https://github.com/BorjaTiago/hotel4you/pull/20#issuecomment-6322549129), dated 2026-10-21, replaces the earlier preview request: import all items from a valid XML file and create missing catalogue items. SD-06 replaces the simpler SD-05 card flow. Diagram IDs are not reassigned.
+Sources: [use cases](../requirements/use-cases.md), [requirements](../requirements/requirements.md), [domain model](domain-model.md), [schema](../database/schema.md) and [table guide](../database/tables.md). The source baseline is `origin/main` at `80ffa21`. The latest [PR #20 decision](https://github.com/BorjaTiago/hotel4you/pull/20#issuecomment-6322549129), dated 2026-10-21, replaces the earlier preview request: import all items from a valid XML file and create missing catalogue items. SD-06 replaces the simpler SD-05 card flow. Diagram IDs are not reassigned.
 
 ## Reading rules
 
@@ -10,7 +10,7 @@ Sources: [use cases](../requirements/use-cases.md), [requirements](../requiremen
 - Each actor and participant uses a class name from the class diagram. Short IDs only make the source easier to read.
 - A controller calls `HotelFacade`. The facade calls a service. Services hold business rules. Controllers never call SQL Server.
 - Notes describe internal work or an explicitly marked missing contract. They are not new methods. Only call arrows claim method coverage.
-- SQL Server work appears in notes. The class model has no database or repository class with methods. See G-01.
+- SQL Server work appears in notes. The class model includes `Database`, `UserRepository` and `JdbcUserRepository` (H4Y-32). It has no persistence contracts for reservations or stock. See G-01.
 - Each diagram covers one existing use case. SD-04 is detailed. SD-06 is a general view of the import workflow. It keeps parsing and storage details in notes.
 - SD-06 uses the existing one-step `importStock()` API. It has no preview or confirmation stage.
 - The latest PR decision accepts every item from a valid XML file, including items missing from the catalogue. This replaces the earlier unknown-item rejection rule for this flow.
@@ -145,11 +145,11 @@ These persistence contracts need team review. No absent method is used as a call
 
 | ID | Gap | Effect and next step |
 |----|-----|----------------------|
-| G-01 | No persistence classes or methods | Define protected reads, save, delete and transaction contracts. SD-04 needs all deletions saved together or fully undone. Check-in and deletion must respect the same booking lock. SD-06 needs new catalogue items, the import, ENTRY movements and stock balances saved together or fully undone. |
+| G-01 | No reservation or stock persistence contracts | Define protected reads, save, delete and transaction contracts. SD-04 needs all deletions saved together or fully undone. Check-in and deletion must respect the same booking lock. SD-06 needs new catalogue items, the import, ENTRY movements and stock balances saved together or fully undone. |
 | G-02 | The current reservation read is not explicit | Read the booking after acquiring protection. Keep that protection until save or undo finishes. If check-in finishes first, the read must see it and refuse deletion. Do not invent a lookup or lock method. |
 
 ## Validation boundary
 
 There are two diagrams: SD-04 detailed and SD-06 general. SD-05 is replaced after PR review. All call arrows use public methods already in the class model. No new preview or confirmation API is needed. Persistence contracts remain incomplete. Q-49 stays open outside these diagrams. Human review is required.
 
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

@@ -52,7 +52,7 @@ Created by: <GitHub name>. Updated by: <GitHub name>. AI use: <agent name>, <AI 
 - Every story keeps the Dado/Quando/Então scenarios (AC-n) as detail. It also has the section `## Critérios de aceite (checklist)`.
 - The checklist has one line `- [ ] AC-n: ...` per AC, in Portuguese. Each line is short and can be ticked.
 - The checklist goes to the Jira description as a checklist. The doer ticks each line when done.
-- AC-n IDs must match in three places: the scenario heading (`### Cenário AC-n`), the checklist line (`- [ ] AC-n`), and the test name ("H4Y-NN AC-n"). Same number, same meaning.
+- AC-n IDs must match in three places: the scenario heading (`### Cenário AC-n`), the checklist line (`- [ ] AC-n`), and the test tag (`@Tag("H4Y-NN-AC-n")`). Same number, same meaning.
 - Technical tasks (epic section "Tarefas técnicas", sub-tasks) use the same format: one `- [ ]` line per criterion.
 
 ## Rules
@@ -60,7 +60,7 @@ Created by: <GitHub name>. Updated by: <GitHub name>. AI use: <agent name>, <AI 
 - One actor per story. Allowed actors: cliente, rececionista, gestor, funcionário do restaurante, fornecedor.
 - Size 8 points or less. If larger, split the story (see `estimation.md`).
 - Criteria live only in the story body. No separate criteria or estimate file.
-- Number scenarios AC-1, AC-2, and so on. Tests cite "H4Y-NN AC-n".
+- Number scenarios AC-1, AC-2, and so on. Each test has a repeatable JUnit tag `@Tag("H4Y-NN-AC-n")`, for example `@Tag("H4Y-32-AC-8")`. A later card that changes the test adds one more tag. JUnit tags cannot contain spaces. To find the tests of an AC: `grep -rn '@Tag("H4Y-32-AC-8")' src/test`. The AC is not in the method name.
 - Write at least one success scenario and one failure scenario.
 - Use only rules from the statement. Do not invent requirements. Link the requirement IDs.
 - Criteria use Gherkin keywords in Portuguese: Dado, Quando, Então (E, Mas for extra steps). Add the checklist section (see "Checklist rule"). Gherkin alone is not enough.
@@ -123,3 +123,5 @@ AC-3 depende da resposta à pergunta Q-09 (regras do cartão). Se a resposta mud
 
 Created by: <GitHub name>. Updated by: <GitHub name>. AI use: story-writer, acceptance-criteria, <AI tool and model>, <YYYY-MM-DD>. Reviewed by: pending.
 ```
+
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

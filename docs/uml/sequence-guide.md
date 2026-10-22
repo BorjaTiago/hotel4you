@@ -55,7 +55,7 @@ The [sequence file](sequence-diagrams.md#cardinality-review) reviews the existin
 |----------|--------------|
 | Why two diagrams? | The statement asks for at least one general and one detailed diagram. SD-04 and SD-06 cover two existing use cases. |
 | Which one is general? | SD-06 shows the import workflow. SD-04 expands deletion decisions and outcomes. |
-| Where is the database participant? | The class model has no persistence API. Storage work appears in notes (G-01). |
+| Where is the database participant? | The class model includes user persistence (H4Y-32). Reservation and stock persistence contracts are missing. Storage work appears in notes (G-01). |
 | What happens to a new XML item? | Create the catalogue item, add its quantity and record an ENTRY movement in the same import. |
 | Does accept-all mean invalid XML is accepted? | No. Permission and XML validation still apply. |
 | What happens if saving a new item succeeds but a later write fails? | Roll back all writes for the import, including that item. |
@@ -74,4 +74,4 @@ Only Markdown documentation changed. The app, database scripts, JUnit and Javado
 
 Use Traceability and Gaps in [sequence-diagrams.md](sequence-diagrams.md) for the method list and class model feedback.
 
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

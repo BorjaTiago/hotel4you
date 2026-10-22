@@ -1,0 +1,21 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-CU27-GDR1-ubuntu-22.04
+    platform: linux/amd64
+    env_file: application.properties
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - "127.0.0.1:1433:1433"
+    volumes:
+      - h4y-db-data:/var/opt/mssql
+      - ./database:/database:ro
+    healthcheck:
+      test: ["CMD-SHELL", 'SQLCMDPASSWORD="$$MSSQL_SA_PASSWORD" /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -Q "SELECT 1"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+
+volumes:
+  h4y-db-data:

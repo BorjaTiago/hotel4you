@@ -48,7 +48,7 @@ Para que o meu acesso corresponda ao meu papel.
 - [ ] AC-4: O gestor abre serviços de qualquer piso sem o limite dos pisos 0 e 1.
 
 ## Notas
-O limite aplica-se só à receção (Q-08). Os serviços de cada piso vêm de RF-03. Dependências (auditoria 2026-10-16): nenhuma forte. Antes era um bloqueio escondido: o AC-3 citava o cartão mestre (sprint 10) e a história estava no sprint 8. O AC-3 só testa a recusa sem cartão mestre, por isso não precisa dele. Construir e testar sozinha: locais por piso dos dados de referência (foundation T5), sessões simuladas de rececionista e gestor (T0), regra própria em `PermissionPolicy`/`AccessRule` (T0). Fase: Q-25.
+O limite aplica-se só à receção (Q-08). Os serviços de cada piso vêm de RF-03. Dependências (auditoria 2026-10-16): nenhuma forte. Antes era um bloqueio escondido: o AC-3 citava o cartão mestre (sprint 10) e a história estava no sprint 8. O AC-3 só testa a recusa sem cartão mestre, por isso não precisa dele. Construir e testar sozinha: locais por piso dos dados de referência (foundation T5), utilizadores simulados de rececionista e gestor em `HotelApp.currentUser` (H4Y-32), regra própria nos serviços do diagrama (`HotelFacade`, H4Y-32). Fase: Q-25.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -60,4 +60,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.

@@ -5,7 +5,7 @@ parent: H4Y-12
 requirements: [RNF-02]
 points:
 points_suggested:
-status: published
+status: replaced
 jira_key: H4Y-29
 labels: [security, backend, 1st-delivery]
 sprint: 02
@@ -13,6 +13,8 @@ branch: feat-029-password-hasher
 ---
 
 # Auth T1: Palavras-passe cifradas
+
+Substituído por H4Y-32 (hash de palavras-passe em `AuthService.hashPassword`). H4Y-29 está Done e ligado como duplicado de H4Y-32. Estado: `replaced`.
 
 Origem: `epic-authentication-users.md`, tarefa T1. Precisa de T0a (interface `PasswordHasher`). Tem de terminar antes do seed (auth T2). Corre em paralelo com foundation T2.
 Responsável proposto: Antonio Martinho (a equipa decide).
@@ -26,4 +28,4 @@ Responsável proposto: Antonio Martinho (a equipa decide).
 - [ ] Se for usada uma biblioteca externa, acrescentá-la a `docs/libraries.md` com nome, versão, motivo e alternativa rejeitada (RNF-11).
 - [ ] Testes JUnit e Javadoc da classe.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.

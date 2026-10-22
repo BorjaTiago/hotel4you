@@ -1,12 +1,29 @@
 # Hotel4You - Class Diagram (Organized)
 
+## Reading notes
+
+- Constructors and getters are not shown.
+- Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
+- `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
+- `$` marks a static member.
+- `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
+
 ```mermaid
 classDiagram
     %% ==========================================
     %% LAYER 1: INTERFACE (JavaFX Controllers)
     %% ==========================================
     class LoginController {
-        +onLoginClicked() void
+        -onLoginClicked() void
+    }
+    class HotelApp {
+        +facade: HotelFacade$
+        +currentUser: User$
+        +startError: String$
+        +start(stage: Stage) void
+    }
+    class ScreenLoader {
+        +load(fxmlName: String) Parent
     }
     class RoomController {
         +onSearchClicked() void
@@ -79,7 +96,8 @@ classDiagram
         +blockMasterCard(card: MagneticCard) void
         +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
         +getPassesByRoom(room: Room) List~CardAccessRecord~
-        +createStaff(user: User) void
+        +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
+        +canCreateStaff(actor: User) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -105,6 +123,7 @@ classDiagram
     class AuthService {
         +login(username: String, password: String) User
         +hashPassword(password: String) String
+        -isValidPassword(password: String, passwordHash: String) boolean
     }
     class ClientService {
         +register(name: String, document: String, birthday: LocalDate) Client
@@ -135,7 +154,9 @@ classDiagram
         +checkOut(reservation: Reservation) void
     }
     class StaffService {
-        +createStaff(user: User) void
+        +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
+        +canCreateStaff(actor: User) boolean
+        +createFirstManager(username: String, password: String) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -161,6 +182,50 @@ classDiagram
         +save(client: Client, type: FeedbackType, description: String) Feedback
         +list() List~Feedback~
     }
+    class LoginFailedException {
+        <<exception>>
+    }
+    class UsernameTakenException {
+        <<exception>>
+    }
+
+    %% ==========================================
+    %% LAYER: CONFIG
+    %% ==========================================
+    class AppConfig {
+        <<record>>
+        +dbUrl: String
+        +dbUser: String
+        +dbPassword: String
+        +managerUsername: String
+        +managerPassword: String
+        +load(file: Path) AppConfig$
+        +toString() String
+    }
+    class Main {
+        +main(args: String[]) void$
+    }
+    class FirstManagerCommand {
+        +main(args: String[]) void$
+    }
+
+    %% ==========================================
+    %% LAYER: DATA
+    %% ==========================================
+    class UserRepository {
+        <<interface>>
+        +findByUsername(username: String) Optional~User~
+        +existsByUsername(username: String) boolean
+        +existsByRole(role: Role) boolean
+        +save(user: User) User
+    }
+    class Database {
+        +NOT_AVAILABLE String$
+        +connect() Connection
+        +check() void
+        +prepare(connection: Connection, sql: String, values: String...) PreparedStatement$
+    }
+    class JdbcUserRepository
 
     %% ==========================================
     %% LAYER 3: DOMAIN - USERS
@@ -172,7 +237,6 @@ classDiagram
         -username: String
         -passwordHash: String
         -role: Role
-        +checkPassword(password: String) boolean
     }
     class Receptionist
     class Manager
@@ -376,6 +440,33 @@ classDiagram
     HotelFacade ..> CardAccessService : uses
     HotelFacade ..> StockService : uses
     HotelFacade ..> FeedbackService : uses
+    StaffService ..> AuthService : uses
+    AuthService ..> UserRepository : uses
+    StaffService ..> UserRepository : uses
+    UserRepository ..> User : stores
+    JdbcUserRepository ..|> UserRepository : implements
+    JdbcUserRepository ..> Database : uses
+    Database ..> AppConfig : uses
+    AuthService ..> LoginFailedException : throws
+    StaffService ..> UsernameTakenException : throws
+
+    %% ==========================================
+    %% DEPENDENCIES (Start-up)
+    %% ==========================================
+    Main ..> AppConfig : uses
+    Main ..> HotelApp : starts
+    Main ..> Database : creates
+    Main ..> JdbcUserRepository : creates
+    Main ..> AuthService : creates
+    Main ..> StaffService : creates
+    Main ..> HotelFacade : creates
+    FirstManagerCommand ..> StaffService : uses
+    FirstManagerCommand ..> AppConfig : uses
+    FirstManagerCommand ..> Database : creates
+    FirstManagerCommand ..> JdbcUserRepository : creates
+    FirstManagerCommand ..> AuthService : creates
+    HotelApp ..> ScreenLoader : uses
+    ScreenLoader ..> HotelFacade : gives to controllers
 
     %% ==========================================
     %% NOTE
@@ -389,4 +480,4 @@ classDiagram
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
