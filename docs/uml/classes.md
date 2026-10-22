@@ -83,8 +83,10 @@ Notes:
 | CardAccessRecord | Domain | entryDateTime | - | RF-19, RF-20, RF-21 |
 | StockItem | Domain | id, name, unit, stockQuantity | - | RF-28, RF-29 |
 | StockMovement | Domain | type, quantity, dateTime, exitReason | - | RF-29 |
-| StockImport | Domain | supplierName, importedAt, rejectedItems | getRejectedItems() | RF-28 |
+| StockImport | Domain | supplierName, importedAt | - | RF-28 |
 | Feedback | Domain | type, description, createdAt (client may be null: anonymous) | - | RF-27 |
+
+`StockService.importStock(file, user)` imports every item from a valid XML file. It creates missing catalogue items and records ENTRY movements. `StockImport` keeps supplier and time; its linked movements identify items and quantities. The PR #20 decision of 2026-10-21 removes the rejected-item field and getter. It does not add a preview API (Q-10, Q-38).
 
 ## Enums
 
@@ -97,4 +99,4 @@ Notes:
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

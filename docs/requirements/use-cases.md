@@ -184,10 +184,13 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Main flow:
   1. The supplier delivers goods and sends the XML file.
   2. Staff or the manager loads the XML file into the system (Q-17, team decision).
-  3. The system reads the file and records the stock entry.
+  3. The system checks permission and validates the XML. For every item in a valid file, it finds or creates the catalogue item and adds the delivered quantity to stock (Q-10, Q-38; PR #20 decision, 2026-10-21).
+  4. The system saves the import, catalogue changes, ENTRY movements and balances together. It shows the import report.
 - Alternative flows:
   - 3a. The file is not valid XML. The system refuses it and records nothing.
-  - 3b. The file has an unknown item. The system rejects that item and lists it in the import report. Valid items are imported (Q-10, team decision). An unknown item is an item not in the stock catalogue (UC-19, Q-38, team decision).
+  - 3b. The caller has no permission. The system refuses the import and changes no data.
+  - 4a. A save fails. The system undoes the whole import, including new catalogue items, and keeps the original stock.
+  - A missing catalogue item is created, not rejected. There is no preview, cancellation or confirmation stage in this flow (PR #20 decision, 2026-10-21, confirmed by the user on 2026-10-22).
 
 ## UC-16 Record stock use and exit
 - Actors: receptionist, manager.
@@ -234,8 +237,8 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
   3. The system saves the item in the catalogue.
 - Alternative flows:
   - 2a. Data is not valid. The system shows the error and does not save.
-  - The XML file (UC-15) accepts only catalogue items (Q-38, team decision; Q-10 unchanged).
+  - XML import (UC-15) accepts all items from a valid file and creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Manual catalogue management remains a manager action.
   - Stock use and exit (UC-16) use catalogue items (Q-38, team decision).
   - Removal of a catalogue item is not in the team decision (Q-38). If it is added, Q-36 applies.
 
-AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

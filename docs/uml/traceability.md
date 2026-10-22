@@ -33,7 +33,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RF-25 Restaurant staff access only kitchen and restaurant | RestaurantStaff, Location, CardAccessService.canOpen (restaurant staff card rule in the CardAccessService note: kitchen and restaurant, no guest room) |
 | RF-26 Manager manages staff accounts | StaffController.onCreateStaffClicked, onEditStaffClicked, onRemoveStaffClicked, StaffService.createStaff(name, username, password, role, actor), StaffService.canCreateStaff, editStaff, removeStaff, HotelFacade.createStaff, StaffService.createFirstManager, UsernameTakenException |
 | RF-27 Suggestions and complaints | FeedbackController.onSaveFeedbackClicked, onListFeedbackClicked, FeedbackService.save, FeedbackService.list, Feedback, FeedbackType |
-| RF-28 Stock import from supplier XML | StockController.onImportXmlClicked, StockService.importStock, HotelFacade.importStock, StockImport.rejectedItems, StockItem |
+| RF-28 Stock import from supplier XML | StockController.onImportXmlClicked, HotelFacade.importStock, StockService.importStock, StockImport, StockItem, StockMovement. Import accepts all items from a valid XML file and creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). |
 | RF-29 Entry, use and exit of stock | StockController.onRegisterMovementClicked, HotelFacade.registerMovement, StockService.registerMovement, StockService.applyMovement (both take exitReason and user), StockMovement, MovementType, ExitReason, StockItem.stockQuantity |
 | RF-30 Block lost master card, issue new one | CardController.onBlockMasterCardClicked, CardAccessService.blockCard, HotelFacade.blockMasterCard, MagneticCard.active, MagneticCard.blockedAt. Note: the log of the block is not shown in the diagram. |
 
@@ -54,4 +54,4 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RNF-11 Libraries documented | Not covered by a class. See [docs/libraries.md](../libraries.md). |
 | RNF-12 SQL Server database | Main, FirstManagerCommand, AppConfig, Database, UserRepository, JdbcUserRepository |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

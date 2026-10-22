@@ -4,71 +4,74 @@ Use this guide to defend the [sequence diagrams](sequence-diagrams.md). Methods 
 
 ## Main ideas
 
-1. Read from top to bottom. A call names a method of its receiver. A dashed arrow shows data, an error or completion.
-2. A JavaFX controller reads input and shows results. It calls `HotelFacade`. Services check permissions and business rules.
+1. Read from top to bottom. A solid arrow calls a method of its receiver. A dashed arrow shows data, an error or completion.
+2. A JavaFX controller reads input and shows results. It calls `HotelFacade`. Services check permissions and business rules. Controllers never call the database.
 3. Notes describe internal work. They do not add methods to the class model.
 4. `alt` selects one branch. An activation shows when an operation runs. It does not prove a database transaction.
-5. There are two diagrams. SD-04 expands deletion guards. SD-05 shows the card service boundary without internal calls.
-6. G-01 to G-04 are model gaps. Q-49 remains open. They are not approved requirements.
+5. SD-04 is detailed: it expands deletion guards, protection, save and undo. SD-06 is general: it shows XML selection, the import call and the report.
+6. G-01 and G-02 are persistence gaps. The card audit question Q-49 stays open outside these diagrams.
 
 ## SD-04 - Detailed: delete a reservation
 
-**What:** UC-05 deletes a booking for a manager, only before arrival.
+**What:** UC-05 lets a manager delete a booking only before check-in. It removes the booking and its dependent extra and zone-link rows.
 
-**Why:** Reception may cancel a booking, but only the manager may delete it. Check-in history must remain.
+**Why:** Reception can cancel a booking. Only a manager can delete it. Any check-in history protects the booking, even after check-out.
 
-**Why this way:** The controller calls the facade. The service checks the caller and the current arrival state. Each error branch returns an explicit result. The state check and delete share a transaction. This protects against a concurrent check-in. The database uses `NO ACTION` foreign keys. Delete child rows before the reservation.
+**Why this way:** The controller calls the facade, then `ReservationService.delete()`. The service checks the role. It protects the booking and reads its latest state. A missing booking or non-null `checkedInAt` gives an error. It deletes child rows before the booking and saves all deletions together. A failed deletion undoes all changes. Every path releases protection before returning.
 
-**Other option:** Hide the button from reception and trust the screen. A caller could still reach the action. Another option is a database cascade. The current schema uses explicit child deletion so the service controls the transaction.
+**Other option:** Trust the delete button or save each row separately. The service still needs a role check. Separate saves could leave the booking without extras or zone links after a failure.
 
-**Example:** The manager deletes Ana's booking before check-in. The service deletes its extra and zone links first. Reception receives a permission error. A checked-out booking remains protected because `checkedInAt` is not null. A protected link or storage failure rolls back the whole delete.
+**Example:** R17 has two extra rows and one pool link. Success removes those three rows and R17 together. The room, pool and service catalogue remain. If the booking delete fails, rollback restores all four rows.
 
-**Defence point:** Cancel, delete and deactivate mean different things. `cancel()` changes status and keeps history. This use case deletes a reservation. Q-36 does not permit a staff deactivation feature.
+**Transaction and protection:** Commit saves the whole group. Rollback undoes the whole group. A transaction prevents partial deletion. A lock or equivalent guarded operation prevents a concurrent check-in from invalidating the current-state check. Check-in and deletion must respect the same protection. If check-in wins first, deletion later reads `checkedInAt` and refuses. If deletion wins first, check-in waits until save or undo finishes. G-01 and G-02 identify the persistence contracts still needed.
 
-## SD-05 - General: use a magnetic card and log entry
+**Defence point:** Cancel keeps the booking in history. Delete removes it permanently (Q-05). A protected card link must stop deletion; do not remove cards or access history to force it through.
 
-**What:** A general view of UC-09. It shows the access decision and the record of a real entry. The client is the main actor. Staff and master cards use the role variants in the diagram document.
+## SD-06 - General: import supplier XML
 
-**Why:** The hotel must control access and keep entry records. The overview shows this order without expanding each internal permission check.
+**What:** UC-15 starts when a hotel user selects a supplier XML file. The controller calls `HotelFacade.importStock(file, user)`, which calls `StockService.importStock(file, user)`. The service imports the file and returns the report.
 
-**Why this way:** `canOpenRoom()` checks a room. `canOpen()` checks a zone. Both return only a boolean. Every refusal gives the same `false` response. The reader receives no reason. `register()` runs only after access is allowed and entry occurs. It saves one target and the entry time. G-03 identifies the missing reader and door contracts.
+**Why:** The [latest PR #20 decision](https://github.com/BorjaTiago/hotel4you/pull/20#issuecomment-6322549129), 2026-10-21, confirmed by the user on 2026-10-22, accepts all items from a valid XML file. It replaces the earlier catalogue-only rule and preview proposal.
 
-**Other option:** Send a separate reason for an inactive card, a blocked card or a forbidden target. The review requires the same response for all refusals. Another option is to record every check as an entry. The current model cannot distinguish a refused attempt from a real entry.
+**Why this way:** The service checks permission and XML validity before writing. For each XML item, it finds the catalogue entry or creates it if missing. It adds stock and an ENTRY movement. It saves new items, the import, movements and balances together. The controller shows the returned report. Matching items, creating them and storing data stay in notes because this is a general workflow view.
 
-**Example:** Ana's card opens room 202. At 15:05, `register(card, room202, null)` records her entry. Her card opens the pool only if the pool is included. An inactive card, a blocked card and a forbidden target all return `false`. The reader cannot tell which check failed.
+**Other option:** Preview the file, ask for confirmation or reject missing catalogue items. The latest decision removes those stages and accepts new items. The existing one-step import API already fits the requested flow, so no new methods are needed.
 
-**Role variants:** An active master card opens every room and zone. Reception gets zones on floors 0 and 1. Restaurant staff get only kitchen and restaurant. A blocked or inactive card opens nothing. The same boolean response and entry flow apply to every role.
+**Example:** Soap has balance 10. Towels do not exist in the catalogue. The XML supplies soap +5 and towels +3. Success leaves soap at 15, creates towels with balance 3 and saves two ENTRY movements linked to one import. If saving fails, soap stays at 10 and the new towels item is undone too.
 
-**Defence point:** SD-05 is general because it stops at the service boundary. It has no domain or persistence lifelines. SD-04 is detailed because it expands service guards and deletion outcomes. Both cover existing use cases. No assumed hotel-stay use case is needed.
+**Error cases:** An unauthorized user or invalid XML changes no data. A failed save rolls back the whole import. An item missing from the catalogue is not an error. "Accept all items" applies to a valid file; it does not bypass permission or XML validation.
 
-**Boundary point:** The actor arrows stand for the reader boundary. They do not allow JavaFX controllers to bypass the facade. Exactly one target is set: room or location. Giving a card to a guest does not record a room entry.
+**Report and model:** `StockImport` keeps the supplier and import time. Linked movements give items and quantities; the existing user association identifies who imported. The rejected-item field, getter and database column are removed from the documents. The import report remains useful without a rejection list.
 
-**Audit gap:** Denied audit remains open in Q-49 and G-04. Do not call `register()` for a refusal. Its current contract would create a false entry record.
+**Defence point:** The supplier sends the file but does not log in (Q-17). An authorized hotel user performs the import. Automatic item creation is part of that import; manual catalogue management remains a manager action (Q-38).
+
+## Cardinality review
+
+The [sequence file](sequence-diagrams.md#cardinality-review) reviews the existing multiplicities. A lifeline shows one participant in a scenario; it does not limit the number of objects in storage. One import can link many ENTRY movements. Every movement links one stock item and at most one import. Manual movements can have no import. No association counts or database indexes change in this review.
 
 ## Questions the team may get
 
 | Question | Short answer |
 |----------|--------------|
-| Why two diagrams? | The PR review reduced the scope. One general view and one detailed view meet the statement's minimum. |
-| Which one is general? | SD-05 shows only the card service boundary. SD-04 expands deletion decisions and outcomes. |
-| Where is the database participant? | The class model has no persistence API, except `UserRepository` (H4Y-32). SQL Server work appears in notes (G-01). |
-| Does the reader get a refusal reason? | No. Every refusal returns the same `false` value. The reason stays internal. |
-| Is denied access logged? | The current model cannot store an outcome. Q-49 and G-04 keep this gap explicit. |
-| Does a successful render mean Done? | No. It checks diagram syntax. Human review and model decisions remain. |
+| Why two diagrams? | The statement asks for at least one general and one detailed diagram. SD-04 and SD-06 cover two existing use cases. |
+| Which one is general? | SD-06 shows the import workflow. SD-04 expands deletion decisions and outcomes. |
+| Where is the database participant? | The class model includes user persistence (H4Y-32). Reservation and stock persistence contracts are missing. Storage work appears in notes (G-01). |
+| What happens to a new XML item? | Create the catalogue item, add its quantity and record an ENTRY movement in the same import. |
+| Does accept-all mean invalid XML is accepted? | No. Permission and XML validation still apply. |
+| What happens if saving a new item succeeds but a later write fails? | Roll back all writes for the import, including that item. |
+| Is the card audit question closed? | No. Q-49 remains open. The card flow is outside these two diagrams. |
+| Does a successful render mean Done? | No. It checks diagram syntax. Human review and persistence contracts remain. |
 
-## Validation results (2026-10-16)
+## Verification (2026-10-22)
 
-Mermaid CLI 12.0.0 rendered both blocks to temporary SVG and PNG files. The previews were inspected. No rendered file or dependency was added to the repository.
+Mermaid CLI 12.0.0 rendered all five blocks in the changed diagram files to temporary SVG files: the two sequences, class diagram, domain model and ER diagram. Both sequence diagrams also rendered to PNG and were visually inspected. No generated diagram files are committed.
 
-A read-only checker verified each call against its receiving class and argument count. It also checked `classes.md`, participant names, controller-to-facade calls, links, requirement IDs and AI-use footers. Missing method names: **none**.
+A read-only check verified each call's receiving class, public method name and argument count against the class model and `classes.md`. Missing method names: **none**. SD-04 has 10 static message arrows and 3 calls. SD-06 has 9 static message arrows and 3 calls. The SD-04 Mermaid block is unchanged from the previous PR revision.
 
-| Diagram | Static message arrows, including returns | Method call arrows |
-|---------|------------------------------------------|--------------------|
-| SD-04 | 10 | 3 |
-| SD-05 | 5 | 3 |
+Checks confirmed that association counts and database indexes are unchanged. All fifteen updated documentation footers and local links passed checks. The removed rejected-item field, getter and column have no references in the docs. The card sequence and card gaps have no references in this guide or the UML index. Q-49 remains open. `git diff --check` passed.
 
-The counts describe the source, not runtime calls. `git diff --check` passed. The application, JUnit tests and Javadoc were not run. These checks do not establish full Definition of Done approval.
+Only Markdown documentation changed. The app, database scripts, JUnit and Javadoc were not run. No database migration is applied. These checks do not establish full Definition of Done approval; persistence contracts and human review remain.
 
 Use Traceability and Gaps in [sequence-diagrams.md](sequence-diagrams.md) for the method list and class model feedback.
 
-Created by: pedrocostaisep. Updated by: BorjaTiago. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

@@ -163,14 +163,14 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 | 3 | 2 | out | discard | 10 | 2026-10-13 08:00 | 2 | NULL |
 
 ### stock_imports
-**What:** One row for each XML file that the manager loads.
-**Why:** The hotel must know who loaded a delivery, when, from which supplier, and what the backend rejected (RF-28, Q-10).
-**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. `rejected_items` is free text, because we only show it to the manager.
+**What:** One row for each XML file that hotel staff or the manager loads.
+**Why:** The hotel must know who loaded a delivery, when and from which supplier (RF-28, Q-10).
+**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. Every item from a valid XML file enters stock. The import creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Linked movements give the imported items and quantities. Save new items, the import, movements and balances together. A failed save undoes them all. No rejection list is stored.
 **Other option:** `supplier_name` in each movement. We did not, because it repeats and it does not record the load itself.
 
-| id | loaded_at | user_id | supplier_name | rejected_items |
-|---|---|---|---|---|
-| 1 | 2026-10-01 09:00 | 2 | TextilPT | NULL |
+| id | loaded_at | user_id | supplier_name |
+|---|---|---|---|
+| 1 | 2026-10-01 09:00 | 2 | TextilPT |
 
 ---
 
@@ -350,4 +350,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
