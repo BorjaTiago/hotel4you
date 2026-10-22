@@ -89,7 +89,6 @@ classDiagram
     class StockImport {
         supplierName: String
         importedAt: LocalDateTime
-        rejectedItems: List~String~
     }
     class Feedback {
         type: FeedbackType
@@ -182,7 +181,7 @@ classDiagram
 | CardAccessRecord | Saved record of a card entry (Card access record). | entryDateTime |
 | StockItem | Material stored in the hotel (Stock). | name, unit, stockQuantity |
 | StockMovement | Entry, use or exit of a stock item. | type, quantity, dateTime, exitReason |
-| StockImport | Import of a supplier XML file. | supplierName, importedAt, rejectedItems |
+| StockImport | Import of a supplier XML file. | supplierName, importedAt |
 | Feedback | Suggestion or complaint of a client. | type, description, createdAt |
 | Role | Enum: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER. | - |
 | ReservationStatus | Enum: RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT. | - |
@@ -202,7 +201,8 @@ classDiagram
 - A room has one room type. The base price comes from the room type. Extras add to it.
 - A card access record points to a room or a location (each 0..1).
 - A stock movement of type EXIT has an exit reason (DISCARD, RETURN or LOSS).
-- A stock movement from an XML import points to its stock import. Rejected items stay in the stock import.
+- Every item from a valid supplier XML file enters stock. The import creates missing catalogue items (RF-28, Q-10, Q-38; PR #20 decision, 2026-10-21).
+- A stock movement from an XML import points to its stock import. The import keeps supplier and time. Linked movements keep items and quantities. A save failure undoes all changes for that import, including new catalogue items.
 - A client may leave many feedbacks. The client link is 0..1.
 
-AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
