@@ -14,15 +14,15 @@ branch: feat-022-login-service
 
 # login-rececionista: serviço de login
 
-História pai H4Y-22 (5 pontos). Precisa de T0a, auth T1 (hash) e `UserRepository`. Os testes usam os utilizadores de teste de T4, por isso o cartão não espera pelo seed. A chave 022 do ramo é a chave da história.
+História pai H4Y-22 (5 pontos). Precisa de H4Y-32, que já traz a lógica de login (`AuthService.login`), o hash e o `JdbcUserRepository`. Este cartão acrescenta só o que H4Y-22 pede por cima. Os testes usam utilizadores de teste próprios, por isso o cartão não espera pelo seed. A chave 022 do ramo é a chave da história.
 Responsável proposto: Antonio Martinho (a equipa decide).
 
 ## Checklist
 
-- [ ] `AuthenticationService.login` verifica o nome de utilizador e a palavra-passe com hash (AC-1). Devolve uma `Session` com o papel.
+- [ ] `AuthService.login` (de H4Y-32) verifica o nome de utilizador e a palavra-passe com hash (AC-1). O utilizador com sessão iniciada fica em `HotelApp.currentUser` e tem o papel.
 - [ ] Uma palavra-passe errada e um utilizador desconhecido dão o mesmo erro "Credenciais inválidas" (AC-2, AC-3).
 - [ ] Nome de utilizador ou palavra-passe vazios são recusados antes de qualquer pesquisa (AC-4).
 - [ ] O serviço não tem código JavaFX. Os logins do gestor e do restaurante reutilizam-no.
-- [ ] Um ficheiro de dados de teste com um rececionista (T4).
+- [ ] Um ficheiro de dados de teste com um rececionista.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.

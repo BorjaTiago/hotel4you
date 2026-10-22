@@ -13,7 +13,7 @@ This file explains each class in the class diagram. Use it to defend the design.
 
 ## Layers
 
-Interface (JavaFX controllers) calls Business (`HotelFacade`, then services). Services use Domain classes and Enums. Calls go one way only.
+Interface (JavaFX controllers) calls Business (`HotelFacade`, then services). Services use Domain classes, Enums and the repository interfaces in Data. Calls go one way only.
 
 ## Interface
 
@@ -24,6 +24,18 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why:** RF-01. Staff log in with user name and password.
 - **Why this way:** The screen only reads input and shows the result.
 - **Other option:** Check the password in the controller. Not done: the GUI would hold security code.
+
+### HotelApp
+- **What:** The JavaFX application. It opens the login screen. It keeps the facade and the logged-in user.
+- **Why:** RNF-06. JavaFX needs one `Application` class.
+- **Why this way:** `Main` sets the facade first. If the start failed, `HotelApp` shows the error in a popup.
+- **Other option:** Let each screen read the settings. Not done: the screens would know the database.
+
+### ScreenLoader
+- **What:** Opens a screen from an FXML file. It gives the `HotelFacade` to the controller.
+- **Why:** RNF-06, RNF-07. All controllers get the facade in one way.
+- **Why this way:** One class does the loading. A controller never creates services.
+- **Other option:** Each screen loads its own FXML. Not done: the same code many times.
 
 ### RoomController
 - **What:** Room search, room save, room items and prices.
@@ -96,7 +108,8 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Find a user by name. Check the password. Hash the password.
 - **Why:** RF-01, RNF-02. Passwords are never stored in plain text.
 - **Why this way:** One place for login and hashing.
-- **Other option:** Hash in `User`. Not done: `User` holds data. `User.checkPassword` only compares.
+- **Rules:** `login` trims the username. The lookup ignores case (contract of `UserRepository.findByUsername`). An unknown user and a wrong password throw the same `LoginFailedException`.
+- **Other option:** Hash in `User`. Not done: `User` holds data only. The password check is in `AuthService.isValidPassword`, because the domain uses no external library (BCrypt).
 
 ### ClientService
 - **What:** Register a client. Find a client by document.
@@ -125,9 +138,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put the logic only in `Reservation`. Not done: one reservation cannot see the others.
 
 ### StaffService
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
+- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -148,6 +162,50 @@ Services hold the rules. Each service works on the domain classes.
 - **Why:** RF-27.
 - **Why this way:** Small service. Keeps the pattern of the other services.
 - **Other option:** Save in `Feedback` only. Not done: no place for the list query.
+
+### LoginFailedException
+- **What:** Signals a failed login. One fixed message for an unknown user and a wrong password.
+- **Why:** RF-01. The message does not tell which part was wrong.
+
+### UsernameTakenException
+- **What:** Signals that a login name is already in use.
+- **Why:** RF-26. The caller gets a clear error before the save.
+
+## Config
+
+### AppConfig
+- **What:** A record with the settings from `application.properties`: database url, user, password and the first manager.
+- **Why:** RNF-12. Passwords stay out of the code and out of Git.
+- **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
+- **Other option:** Environment variables. Not done: the team uses one settings file.
+
+### Main
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
+- **Why:** RF-01, RNF-12. One place builds the objects.
+
+### FirstManagerCommand
+- **What:** Command line tool. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService` and `StaffService`. Then it calls `createFirstManager`.
+- **Why:** RF-01, RNF-12. The first manager must exist before the first login.
+
+## Data
+
+Data holds the storage interfaces and the SQL Server version. Services use the interfaces.
+
+### UserRepository
+- **What:** Interface for user storage. Finds a user by login name, checks if a login name or a role exists, saves a user.
+- **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version.
+
+### Database
+- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `connect` opens a connection. `check` opens and closes one to test that the database works. `prepare` (static) fills the `?` values of a SQL text.
+- **Why:** RNF-12. One place holds the connection code.
+- **Why this way:** The values go in with `prepare`, not in the SQL text. This stops SQL injection.
+- **Other option:** Each repository opens its own connection. Not done: the same code many times.
+
+### JdbcUserRepository
+- **What:** Implements `UserRepository` with SQL on the tables `users` and `roles`.
+- **Why:** RNF-01, RNF-12. Users are saved in SQL Server.
+- **Why this way:** It gives domain objects to the services. Services never see SQL.
+- **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
 
 ## Users
 
@@ -357,4 +415,4 @@ List<String> rejected = report.getRejectedItems(); // unknown items
 // Known items: StockMovement with type ENTRY, linked to the import.
 ```
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19. Reviewed by: pending.

@@ -1,0 +1,75 @@
+package pt.isep.hotel4you.service;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.InMemoryUserRepository;
+import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.Role;
+import pt.isep.hotel4you.domain.User;
+
+/** Tests that the facade passes calls to the services. */
+class HotelFacadeTest {
+
+    private static final String PASSWORD = "secret123";
+
+    private InMemoryUserRepository repository;
+    private AuthService authService;
+    private HotelFacade facade;
+
+    @BeforeEach
+    void setUp() {
+        repository = new InMemoryUserRepository();
+        authService = new AuthService(repository);
+        StaffService staffService = new StaffService(repository, authService);
+        facade = new HotelFacade(authService, staffService);
+    }
+
+    private User saveAna() {
+        return repository.save(
+                new Receptionist(null, "Ana Silva", "ana", authService.hashPassword(PASSWORD)));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-3")
+    void onLogin_returnUser_whenCredentialsValid() {
+        User ana = saveAna();
+
+        assertEquals(ana, facade.login("ana", PASSWORD));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-3")
+    void onLogin_throwLoginFailed_whenPasswordWrong() {
+        saveAna();
+
+        assertThrows(LoginFailedException.class, () -> facade.login("ana", "wrong-pass"));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-3")
+    void onCanCreateStaff_returnTrue_whenActorIsManager() {
+        assertTrue(facade.canCreateStaff(new Manager(1L, "Rui Costa", "rui", "hash")));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-3")
+    void onCanCreateStaff_returnFalse_whenActorIsReceptionist() {
+        assertFalse(facade.canCreateStaff(new Receptionist(2L, "Ana Silva", "ana", "hash")));
+    }
+
+    @Test
+    @Tag("H4Y-32-AC-3")
+    void onCreateStaff_throwUnsupported_always() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        assertThrows(UnsupportedOperationException.class,
+                () -> facade.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager));
+    }
+}

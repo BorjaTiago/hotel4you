@@ -72,7 +72,7 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 3. Never invent requirements that are not in the statement. If unsure, stop and ask the human. Add each question for the teacher to `docs/requirements/questions.md` as a new `Q-NN` with `status: open`. Cite the `Q-NN` in the draft. Do not edit `enunciado.md`.
 4. Points stay empty until the team decides. Agents only write `points_suggested`.
 5. Criteria live only in the story body. No separate criteria or estimate files.
-6. Every requirement has an ID (RF-NN or RNF-NN). Every story cites it. Every test cites "H4Y-NN AC-n".
+6. Every requirement has an ID (RF-NN or RNF-NN). Every story cites it. Every test has `@Tag("H4Y-NN-AC-n")`.
 7. Never edit or delete an existing Jira issue without explicit OK. No REST or curl fallback. No tokens in files.
 8. Reference every AI use in documentation only. Unreferenced AI use is forbidden by the course code of conduct. Tell the team.
    - Never mention AI use in source code: no comment, header, annotation, file or name. Commit and PR rule stays: no AI co-author, no "Generated with" line.
@@ -82,6 +82,8 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
    - Old footers are not rewritten. The new format applies to every file created or edited from now on.
 9. Sprint numbers in paths have two digits: `sprint-01`, `sprint-02`, ... `sprint-13`.
 10. Commits, PR titles, PR bodies and docs use Simplified Technical English (STE): short sentences, simple words, active voice. Never add an AI as co-author or author: no `Co-Authored-By` trailer, no "Generated with" line, in any commit or PR, by any agent or tool. The AI-use reference (rule 8) goes inside the files, not in the commit trailer. Read `.agent/policies/git-and-jira-conventions.md`, section "Commit and PR rule", before you write a commit or open a PR.
+11. Code follows `docs/uml/` and `docs/database/` exactly (classes, abstractions, signatures, tables, columns). A needed change updates the code and the diagram docs in the same PR.
+12. Write tests first and see them fail. Then write the code. In the PR, the test commit comes before the code commit. Name tests `on<Action>_<result>_<condition>`, for example `onCreateUser_throw_whenUsernameExists`.
 
 ## Output paths
 
@@ -106,4 +108,4 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 - Codex: reads `AGENTS.md`. It may look for skills in `.agents/skills` (unconfirmed). Fallback: tell Codex to read the file named in the pipeline above, for example "Read `.agent/agents/refiner.md` and refine `.agent/drafts/story-x.md`".
 - Other tools: read this file, then the agent file for the step.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

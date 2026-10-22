@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="12" prefWidth="320" styleClass="login-box"
+      stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.LoginController">
+    <padding>
+        <javafx.geometry.Insets top="32" right="32" bottom="32" left="32"/>
+    </padding>
+    <Label text="Hotel4You" styleClass="title"/>
+    <Label text="Sign in to continue" styleClass="subtitle"/>
+    <TextField fx:id="usernameField" promptText="Username"/>
+    <PasswordField fx:id="passwordField" promptText="Password"/>
+    <Button text="Login" onAction="#onLoginClicked" defaultButton="true"
+            maxWidth="Infinity" styleClass="primary-button"/>
+    <Label fx:id="messageLabel" wrapText="true" styleClass="message"/>
+</VBox>

@@ -72,6 +72,6 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Requirement IDs: RF-NN (functional), RNF-NN (non-functional). Each has a source section of the statement.
 - Scrum documents (graded): `docs/scrum/sprint-NN/{planning,review,retrospective,impediments}.md`.
 - Drafts: `.agent/drafts/<type>-<slug>.md`. Examples: `.agent/examples/`.
-- Acceptance scenarios are numbered AC-1, AC-2 inside the story. Tests cite "H4Y-NN AC-n".
+- Acceptance scenarios are numbered AC-1, AC-2 inside the story. Each test has `@Tag("H4Y-NN-AC-n")`.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04); branch rule (2026-10-16). Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04); branch rule (2026-10-16); doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

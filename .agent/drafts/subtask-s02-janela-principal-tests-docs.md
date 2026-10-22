@@ -19,9 +19,9 @@ Responsável proposto: Pedro Costa (a equipa decide).
 
 ## Checklist
 
-- [ ] Um teste JUnit por cada AC-1 a AC-4. Os nomes citam "H4Y-24 AC-n". Os testes usam o modelo de navegação, não um ecrã.
+- [ ] Um teste JUnit por cada AC-1 a AC-4. Os testes têm a tag `@Tag("H4Y-24-AC-n")`. Os testes usam o modelo de navegação, não um ecrã.
 - [ ] Javadoc nas novas classes públicas. O Javadoc compila.
 - [ ] Diagrama de classes atualizado (registo de navegação, sessão) com a referência de uso de IA.
 - [ ] Nenhuma biblioteca nova, ou está em `docs/libraries.md`.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

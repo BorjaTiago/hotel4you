@@ -19,7 +19,7 @@ H4Y-13 (5 points) is not done. It did not pass the Team Leader validation.
 
 ## Keep
 - Daily Scrum at the start of each practical class.
-- Tests that cite "H4Y-NN AC-n".
+- Tests that have `@Tag("H4Y-NN-AC-n")`.
 
 ## Stop
 - Opening pull requests on the last day of the sprint.
@@ -44,4 +44,4 @@ done_points: 8
 velocity: 8
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: impediment-tracker, <AI tool and model>, 2026-11-01. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: impediment-tracker, <AI tool and model>, 2026-11-01; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

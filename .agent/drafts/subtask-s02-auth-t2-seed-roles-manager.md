@@ -5,7 +5,7 @@ parent: H4Y-12
 requirements: [RF-01, RF-02, RNF-02]
 points:
 points_suggested:
-status: published
+status: replaced
 jira_key: H4Y-30
 labels: [security, database, 1st-delivery]
 sprint: 02
@@ -13,6 +13,8 @@ branch: feat-030-seed-roles-first-manager
 ---
 
 # Auth T2: Seed dos papéis e do primeiro gestor
+
+Substituído por H4Y-32 (papéis e primeiro gestor via `StaffService.createFirstManager` e `FirstManagerCommand`). H4Y-30 está Done e ligado como duplicado de H4Y-32. Estado: `replaced`.
 
 Origem: `epic-authentication-users.md`, tarefa T2. Precisa de foundation T2 (esquema) e auth T1 (hash). Os logins usam dados de teste nos seus testes, por isso não esperam por este cartão. O login real de ponta a ponta precisa dele.
 Responsável proposto: Antonio Martinho (a equipa decide).
@@ -27,4 +29,4 @@ Responsável proposto: Antonio Martinho (a equipa decide).
 - [ ] O `.gitignore` cobre o ficheiro de configuração local. Um ficheiro de exemplo não tem nenhum valor real.
 - [ ] Teste JUnit da lógica do seed no repositório em memória.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.
