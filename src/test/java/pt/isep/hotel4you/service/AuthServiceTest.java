@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests password hashing and login. */
@@ -85,10 +86,19 @@ class AuthServiceTest {
 
     @Test
     @Tag("H4Y-32-AC-8")
+    @Tag("H4Y-22-AC-1")
     void onLogin_returnUser_whenCredentialsValid() {
         User ana = saveAna();
 
         assertEquals(ana, authService.login("ana", PASSWORD));
+    }
+
+    @Test
+    @Tag("H4Y-22-AC-1")
+    void onLogin_returnReceptionist_whenReceptionistCredentialsValid() {
+        saveAna();
+
+        assertEquals(Role.RECEPTIONIST, authService.login("ana", PASSWORD).getRole());
     }
 
     @Test
@@ -109,6 +119,7 @@ class AuthServiceTest {
 
     @Test
     @Tag("H4Y-32-AC-8")
+    @Tag("H4Y-22-AC-2")
     void onLogin_throwLoginFailed_whenPasswordWrong() {
         saveAna();
 
@@ -117,12 +128,14 @@ class AuthServiceTest {
 
     @Test
     @Tag("H4Y-32-AC-8")
+    @Tag("H4Y-22-AC-3")
     void onLogin_throwLoginFailed_whenUserUnknown() {
         assertThrows(LoginFailedException.class, () -> authService.login("nobody", PASSWORD));
     }
 
     @Test
     @Tag("H4Y-32-AC-8")
+    @Tag("H4Y-22-AC-3")
     void onLogin_giveSameMessage_whenUserUnknownOrPasswordWrong() {
         saveAna();
 
@@ -138,6 +151,7 @@ class AuthServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
     @Tag("H4Y-32-AC-8")
+    @Tag("H4Y-22-AC-4")
     void onLogin_throw_whenUsernameBlank(String username) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> authService.login(username, PASSWORD));
@@ -149,6 +163,7 @@ class AuthServiceTest {
     @NullAndEmptySource
     @ValueSource(strings = {"   "})
     @Tag("H4Y-32-AC-8")
+    @Tag("H4Y-22-AC-4")
     void onLogin_throw_whenPasswordBlank(String password) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> authService.login("ana", password));
