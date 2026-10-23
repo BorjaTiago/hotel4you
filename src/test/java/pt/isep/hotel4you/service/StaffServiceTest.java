@@ -151,7 +151,7 @@ class StaffServiceTest {
 
     @Test
     @Tag("H4Y-27-AC-1")
-    void onCreateStaff_saveAccount_whenDataValid() {
+    void onCreateStaff_saveReceptionistWithHash_whenActorIsManager() {
         staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
 
         User ana = repository.findByUsername("ana").orElseThrow();
@@ -308,10 +308,30 @@ class StaffServiceTest {
         assertEquals(role, repository.findByUsername("ana").orElseThrow().getRole());
     }
 
-    @ParameterizedTest
-    @EnumSource(value = Role.class, names = {"CLIENT", "SUPPLIER"})
+    @Test
+    @Tag("H4Y-27-AC-1")
     @Tag("H4Y-27-AC-5")
-    void onCreateStaff_throw_whenRoleHasNoAccount(Role role) {
+    void onCreateStaff_saveRestaurantStaff_whenRoleRestaurant() {
+        staffService.createStaff("Joao Lima", "joao", PASSWORD, Role.RESTAURANT, manager());
+
+        User joao = repository.findByUsername("joao").orElseThrow();
+        assertTrue(joao instanceof RestaurantStaff);
+        assertEquals(Role.RESTAURANT, joao.getRole());
+    }
+
+    @Test
+    @Tag("H4Y-27-AC-5")
+    void onCreateStaff_throw_whenRoleIsClient() {
+        assertRoleRefused(Role.CLIENT);
+    }
+
+    @Test
+    @Tag("H4Y-27-AC-5")
+    void onCreateStaff_throw_whenRoleIsSupplier() {
+        assertRoleRefused(Role.SUPPLIER);
+    }
+
+    private void assertRoleRefused(Role role) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> staffService.createStaff("Ana Silva", "ana", PASSWORD, role, manager()));
 

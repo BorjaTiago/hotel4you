@@ -7,9 +7,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Role;
-import pt.isep.hotel4you.service.AccessDeniedException;
 import pt.isep.hotel4you.service.HotelFacade;
-import pt.isep.hotel4you.service.UsernameTakenException;
 
 /** Controller of the screen that creates staff accounts. */
 public class StaffController {
@@ -65,8 +63,7 @@ public class StaffController {
             nameField.clear();
             usernameField.clear();
             roleBox.setValue(null);
-        } catch (IllegalArgumentException | IllegalStateException | AccessDeniedException
-                | UsernameTakenException e) {
+        } catch (RuntimeException e) {
             messageLabel.setText(e.getMessage());
         } finally {
             passwordField.clear();
