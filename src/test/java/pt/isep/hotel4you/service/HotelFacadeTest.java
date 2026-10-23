@@ -90,6 +90,16 @@ class HotelFacadeTest {
     }
 
     @Test
+    @Tag("H4Y-27-AC-1")
+    void onListUsers_returnCreatedAccount_whenAccountCreated() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        facade.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager);
+
+        assertEquals("ana", facade.listUsers().get(0).getUsername());
+    }
+
+    @Test
     @Tag("H4Y-27-AC-4")
     void onCreateStaff_throwAccessDenied_whenActorIsReceptionist() {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -337,6 +338,25 @@ class StaffServiceTest {
 
         assertEquals("Este tipo de conta não é permitido.", error.getMessage());
         assertEquals(0, repository.count());
+    }
+
+    @Test
+    @Tag("H4Y-27-AC-1")
+    void onListUsers_returnCreatedAccounts_whenAccountsExist() {
+        staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
+        staffService.createStaff("Joao Lima", "joao", PASSWORD, Role.RESTAURANT, manager());
+
+        List<User> users = staffService.listUsers();
+
+        assertEquals(List.of("ana", "joao"), users.stream().map(User::getUsername).toList());
+        assertEquals(List.of(Role.RECEPTIONIST, Role.RESTAURANT),
+                users.stream().map(User::getRole).toList());
+    }
+
+    @Test
+    @Tag("H4Y-27-AC-1")
+    void onListUsers_returnEmptyList_whenNoAccountExists() {
+        assertTrue(staffService.listUsers().isEmpty());
     }
 
     @Test

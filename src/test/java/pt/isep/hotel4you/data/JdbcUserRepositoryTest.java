@@ -39,6 +39,16 @@ class JdbcUserRepositoryTest {
     private final JdbcUserRepository repository = new JdbcUserRepository(new FailingDatabase());
 
     @Test
+    @Tag("H4Y-27-AC-1")
+    void onFindAll_keepSqlCause_whenSqlFails() {
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                repository::findAll);
+
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
+        assertInstanceOf(SQLException.class, error.getCause());
+    }
+
+    @Test
     @Tag("H4Y-32-AC-9")
     void onFindByUsername_keepSqlCause_whenSqlFails() {
         IllegalStateException error = assertThrows(IllegalStateException.class,
