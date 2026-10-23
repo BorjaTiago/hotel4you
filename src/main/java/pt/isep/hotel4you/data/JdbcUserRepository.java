@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
@@ -23,6 +25,36 @@ public class JdbcUserRepository implements UserRepository {
      */
     public JdbcUserRepository(Database database) {
         this.database = database;
+    }
+
+    /**
+     * Finds all saved users with their role. Rows of roles without an account (client,
+     * supplier) are skipped.
+     *
+     * @return all users, or an empty list if none exists
+     * @throws IllegalStateException if the database is not available
+     */
+    @Override
+    public List<User> findAll() {
+        String sql = """
+            SELECT u.id, u.name, u.username, u.password_hash, r.name AS role
+            FROM users u
+            JOIN roles r ON r.id = u.role_id
+            """;
+        try (Connection connection = database.connect();
+             PreparedStatement statement = Database.prepare(connection, sql);
+             ResultSet row = statement.executeQuery()) {
+            List<User> users = new ArrayList<>();
+            while (row.next()) {
+                User user = toUser(row);
+                if (user != null) {
+                    users.add(user);
+                }
+            }
+            return users;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
     }
 
     @Override

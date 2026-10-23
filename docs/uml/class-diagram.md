@@ -6,7 +6,7 @@
 - Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
 - `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
 - `$` marks a static member.
-- `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
+- `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. `createStaff` throws `AccessDeniedException` when the actor is not a manager (H4Y-27).
 - `MainController` shows a menu button only when a facade method allows it. Now only the Staff button uses `canCreateStaff(actor)`. The screen has no role check of its own (H4Y-24).
 
 ```mermaid
@@ -59,7 +59,8 @@ classDiagram
         +onCheckOutClicked() void
     }
     class StaffController {
-        +onCreateStaffClicked() void
+        -initialize() void
+        -onCreateStaffClicked() void
         +onEditStaffClicked() void
         +onRemoveStaffClicked() void
         +onListUsersClicked() void
@@ -191,6 +192,9 @@ classDiagram
     class LoginFailedException {
         <<exception>>
     }
+    class AccessDeniedException {
+        <<exception>>
+    }
     class UsernameTakenException {
         <<exception>>
     }
@@ -220,6 +224,7 @@ classDiagram
     %% ==========================================
     class UserRepository {
         <<interface>>
+        +findAll() List~User~
         +findByUsername(username: String) Optional~User~
         +existsByUsername(username: String) boolean
         +existsByRole(role: Role) boolean
@@ -456,6 +461,7 @@ classDiagram
     Database ..> AppConfig : uses
     AuthService ..> LoginFailedException : throws
     StaffService ..> UsernameTakenException : throws
+    StaffService ..> AccessDeniedException : throws
 
     %% ==========================================
     %% DEPENDENCIES (Start-up)
@@ -489,4 +495,4 @@ classDiagram
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
