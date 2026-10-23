@@ -74,7 +74,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Put them in `ReservationController`. Not done: a separate screen is easier to test.
 
 ### StaffController
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Now (H4Y-27) the screen only creates accounts: name, username, password and type. It shows the service message on a refusal.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Now (H4Y-27) the screen creates accounts (name, username, password and type) and shows the list of staff accounts. It shows the service message on a refusal. The list loads when the screen opens and after each new account.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin is a manager task.
 - **Other option:** Put it in `LoginController`. Not done: login and admin are different tasks.
@@ -147,7 +147,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
-- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27).
+- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService

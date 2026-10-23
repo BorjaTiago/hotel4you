@@ -224,6 +224,7 @@ classDiagram
     %% ==========================================
     class UserRepository {
         <<interface>>
+        +findAll() List~User~
         +findByUsername(username: String) Optional~User~
         +existsByUsername(username: String) boolean
         +existsByRole(role: Role) boolean

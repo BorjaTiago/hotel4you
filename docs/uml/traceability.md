@@ -41,7 +41,7 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 
 | Requirement | Classes and methods that cover it |
 |-------------|-----------------------------------|
-| RNF-01 All users saved and accessible | StaffController.onListUsersClicked, HotelFacade.listUsers, StaffService.listUsers, UserRepository, JdbcUserRepository |
+| RNF-01 All users saved and accessible | StaffController.onListUsersClicked, HotelFacade.listUsers, StaffService.listUsers, UserRepository.findAll, JdbcUserRepository.findAll |
 | RNF-02 Passwords saved encrypted | AuthService.hashPassword (BCrypt, `at.favre.lib:bcrypt`), User.passwordHash, AuthService.isValidPassword (BCrypt check) |
 | RNF-03 Client registration and reservation in 30 seconds | Not covered by a class (process and usability test) |
 | RNF-04 Simple and intuitive GUI | Not covered by a class (process and usability test) |
