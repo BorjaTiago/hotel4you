@@ -26,7 +26,7 @@ public class FirstManagerCommand {
             StaffService staffService = new StaffService(userRepository, authService);
 
             boolean created = staffService.createFirstManager(config.managerUsername(), config.managerPassword());
-            System.out.println(created ? "Manager created." : "A manager already exists.");
+            System.out.println(created ? "Gestor criado." : "Já existe um gestor.");
         } catch (RuntimeException e) {
             System.err.println(e.getMessage());
             System.exit(1);

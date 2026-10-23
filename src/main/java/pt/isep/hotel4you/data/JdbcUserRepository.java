@@ -84,7 +84,7 @@ public class JdbcUserRepository implements UserRepository {
                         user.getUsername(), user.getPasswordHash(), user.getRole().name());
                 ResultSet row = statement.executeQuery()) {
             if (!row.next()) {
-                throw new IllegalStateException("Role not found. Run the database scripts.");
+                throw new IllegalStateException("Papel não encontrado. Execute os scripts da base de dados.");
             }
             return createUser(row.getLong("id"), user.getName(), user.getUsername(),
                     user.getPasswordHash(), user.getRole());

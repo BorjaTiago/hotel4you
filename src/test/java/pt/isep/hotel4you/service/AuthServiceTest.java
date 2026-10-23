@@ -19,6 +19,8 @@ import pt.isep.hotel4you.domain.User;
 class AuthServiceTest {
 
     private static final String PASSWORD = "secret123";
+    private static final String FILL_IN_MESSAGE =
+            "Preencha o nome de utilizador e a palavra-passe.";
 
     private InMemoryUserRepository repository;
     private AuthService authService;
@@ -55,7 +57,10 @@ class AuthServiceTest {
     @ValueSource(strings = {"   "})
     @Tag("H4Y-32-AC-4")
     void onHashPassword_throw_whenPasswordBlank(String password) {
-        assertThrows(IllegalArgumentException.class, () -> authService.hashPassword(password));
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> authService.hashPassword(password));
+
+        assertEquals("A palavra-passe não pode estar vazia.", error.getMessage());
     }
 
     @Test
@@ -134,7 +139,10 @@ class AuthServiceTest {
     @ValueSource(strings = {"   "})
     @Tag("H4Y-32-AC-8")
     void onLogin_throw_whenUsernameBlank(String username) {
-        assertThrows(IllegalArgumentException.class, () -> authService.login(username, PASSWORD));
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> authService.login(username, PASSWORD));
+
+        assertEquals(FILL_IN_MESSAGE, error.getMessage());
     }
 
     @ParameterizedTest
@@ -142,7 +150,10 @@ class AuthServiceTest {
     @ValueSource(strings = {"   "})
     @Tag("H4Y-32-AC-8")
     void onLogin_throw_whenPasswordBlank(String password) {
-        assertThrows(IllegalArgumentException.class, () -> authService.login("ana", password));
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> authService.login("ana", password));
+
+        assertEquals(FILL_IN_MESSAGE, error.getMessage());
     }
 
     @Test

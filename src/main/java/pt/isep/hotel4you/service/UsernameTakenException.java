@@ -7,6 +7,6 @@ public class UsernameTakenException extends RuntimeException {
 
     /** Creates the exception with a fixed message. */
     public UsernameTakenException() {
-        super("Username is already taken.");
+        super("O nome de utilizador já existe.");
     }
 }
