@@ -20,6 +20,7 @@ import pt.isep.hotel4you.domain.User;
 class AuthServiceTest {
 
     private static final String PASSWORD = "secret123";
+    private static final String LOGIN_FAILED_MESSAGE = "Credenciais inválidas";
     private static final String FILL_IN_MESSAGE =
             "Preencha o nome de utilizador e a palavra-passe.";
 
@@ -123,14 +124,20 @@ class AuthServiceTest {
     void onLogin_throwLoginFailed_whenPasswordWrong() {
         saveAna();
 
-        assertThrows(LoginFailedException.class, () -> authService.login("ana", "wrong-pass"));
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> authService.login("ana", "wrong-pass"));
+
+        assertEquals(LOGIN_FAILED_MESSAGE, error.getMessage());
     }
 
     @Test
     @Tag("H4Y-32-AC-8")
     @Tag("H4Y-22-AC-3")
     void onLogin_throwLoginFailed_whenUserUnknown() {
-        assertThrows(LoginFailedException.class, () -> authService.login("nobody", PASSWORD));
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> authService.login("nobody", PASSWORD));
+
+        assertEquals(LOGIN_FAILED_MESSAGE, error.getMessage());
     }
 
     @Test
