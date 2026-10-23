@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Check that no secret file is tracked
+        run: |
+          if git ls-files | grep -E '(^|/)(\.env|application\.properties)$'; then echo "A secret file is tracked." && exit 1; fi
+      - name: Check that the PR title starts with the Jira key
+        if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if ! echo "$PR_TITLE" | grep -qE '^H4Y-[0-9]+:? '; then echo "The PR title must start with the Jira key, for example: H4Y-32: add login screen" && exit 1; fi
+      - name: Build and test
+        run: ./mvnw -B verify
+      - name: Generate Javadoc
+        run: ./mvnw -B javadoc:javadoc
+      - name: Save the test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-${{ matrix.os }}
+          path: target/surefire-reports

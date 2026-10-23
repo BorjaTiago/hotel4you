@@ -71,7 +71,6 @@ erDiagram
         DATETIME2 loaded_at
         SMALLINT user_id FK
         VARCHAR100 supplier_name
-        VARCHAR_MAX rejected_items "nullable"
     }
     stock_movements {
         INT id PK
@@ -146,3 +145,5 @@ erDiagram
         DATETIME2 created_at
     }
 ```
+
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.

@@ -13,7 +13,7 @@ This file explains each class in the class diagram. Use it to defend the design.
 
 ## Layers
 
-Interface (JavaFX controllers) calls Business (`HotelFacade`, then services). Services use Domain classes and Enums. Calls go one way only.
+Interface (JavaFX controllers) calls Business (`HotelFacade`, then services). Services use Domain classes, Enums and the repository interfaces in Data. Calls go one way only.
 
 ## Interface
 
@@ -24,6 +24,24 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why:** RF-01. Staff log in with user name and password.
 - **Why this way:** The screen only reads input and shows the result.
 - **Other option:** Check the password in the controller. Not done: the GUI would hold security code.
+
+### MainController
+- **What:** Main window after login. Top: welcome text and Logout. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen.
+- **Why:** RNF-06, RNF-07. Each user finds the functions of the role in one place.
+- **Why this way:** The menu asks `HotelFacade` which buttons to show (now `canCreateStaff`). The screen has no role check of its own.
+- **Other option:** A `Session` or `PermissionPolicy` class for the menu. Not done: the facade already holds the rules, and the extra class adds no value now.
+
+### HotelApp
+- **What:** The JavaFX application. It opens the login screen. It keeps the facade and the logged-in user. Without a logged-in user, the main window does not open (H4Y-24).
+- **Why:** RNF-06. JavaFX needs one `Application` class.
+- **Why this way:** `Main` sets the facade first. If the start failed, `HotelApp` shows the error in a popup.
+- **Other option:** Let each screen read the settings. Not done: the screens would know the database.
+
+### ScreenLoader
+- **What:** Opens a screen from an FXML file. It gives the `HotelFacade` to the controller.
+- **Why:** RNF-06, RNF-07. All controllers get the facade in one way.
+- **Why this way:** One class does the loading. A controller never creates services.
+- **Other option:** Each screen loads its own FXML. Not done: the same code many times.
 
 ### RoomController
 - **What:** Room search, room save, room items and prices.
@@ -96,7 +114,8 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Find a user by name. Check the password. Hash the password.
 - **Why:** RF-01, RNF-02. Passwords are never stored in plain text.
 - **Why this way:** One place for login and hashing.
-- **Other option:** Hash in `User`. Not done: `User` holds data. `User.checkPassword` only compares.
+- **Rules:** `login` trims the username. The lookup ignores case (contract of `UserRepository.findByUsername`). An unknown user and a wrong password throw the same `LoginFailedException`.
+- **Other option:** Hash in `User`. Not done: `User` holds data only. The password check is in `AuthService.isValidPassword`, because the domain uses no external library (BCrypt).
 
 ### ClientService
 - **What:** Register a client. Find a client by document.
@@ -125,9 +144,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put the logic only in `Reservation`. Not done: one reservation cannot see the others.
 
 ### StaffService
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
+- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -140,7 +160,7 @@ Services hold the rules. Each service works on the domain classes.
 ### StockService
 - **What:** Import the XML file. Create and edit items. Register and apply a movement. Each movement takes an exit reason (`ExitReason`) and the user.
 - **Why:** RF-28, RF-29.
-- **Why this way:** One import is one transaction. Stock changes follow the movement rules.
+- **Why this way:** Import every item from a valid XML file. Create missing catalogue items as part of the import (Q-10, Q-38; PR #20 decision, 2026-10-21). One transaction covers those items, the import, ENTRY movements and balances. A failure undoes all of them. No preview or confirmation API is needed.
 - **Other option:** Put the import in `StockImport`. Not done: the import has many items and rules.
 
 ### FeedbackService
@@ -148,6 +168,50 @@ Services hold the rules. Each service works on the domain classes.
 - **Why:** RF-27.
 - **Why this way:** Small service. Keeps the pattern of the other services.
 - **Other option:** Save in `Feedback` only. Not done: no place for the list query.
+
+### LoginFailedException
+- **What:** Signals a failed login. One fixed message for an unknown user and a wrong password.
+- **Why:** RF-01. The message does not tell which part was wrong.
+
+### UsernameTakenException
+- **What:** Signals that a login name is already in use.
+- **Why:** RF-26. The caller gets a clear error before the save.
+
+## Config
+
+### AppConfig
+- **What:** A record with the settings from `application.properties`: database url, user, password and the first manager.
+- **Why:** RNF-12. Passwords stay out of the code and out of Git.
+- **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
+- **Other option:** Environment variables. Not done: the team uses one settings file.
+
+### Main
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
+- **Why:** RF-01, RNF-12. One place builds the objects.
+
+### FirstManagerCommand
+- **What:** Command line tool. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService` and `StaffService`. Then it calls `createFirstManager`.
+- **Why:** RF-01, RNF-12. The first manager must exist before the first login.
+
+## Data
+
+Data holds the storage interfaces and the SQL Server version. Services use the interfaces.
+
+### UserRepository
+- **What:** Interface for user storage. Finds a user by login name, checks if a login name or a role exists, saves a user.
+- **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version.
+
+### Database
+- **What:** Opens connections to SQL Server with the settings from `AppConfig`. `connect` opens a connection. `check` opens and closes one to test that the database works. `prepare` (static) fills the `?` values of a SQL text.
+- **Why:** RNF-12. One place holds the connection code.
+- **Why this way:** The values go in with `prepare`, not in the SQL text. This stops SQL injection.
+- **Other option:** Each repository opens its own connection. Not done: the same code many times.
+
+### JdbcUserRepository
+- **What:** Implements `UserRepository` with SQL on the tables `users` and `roles`.
+- **Why:** RNF-01, RNF-12. Users are saved in SQL Server.
+- **Why this way:** It gives domain objects to the services. Services never see SQL.
+- **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
 
 ## Users
 
@@ -277,8 +341,8 @@ A staff card never opens a guest room. Only the master card does.
 - **Other option:** Change the quantity only. Not done: no history.
 
 ### StockImport
-- **What:** One XML load: supplier, time and rejected items.
-- **Why:** RF-28. The report lists the rejected items.
+- **What:** One XML load with supplier and time. Its movements identify the imported items and quantities.
+- **Why:** RF-28. The report records the delivery and who loaded it through the existing user association.
 - **Why this way:** Each movement from the file points to its import.
 - **Other option:** No import record. Not done: the manager needs the report.
 
@@ -353,8 +417,8 @@ Order: check-in first, then the card (RF-13, RF-16).
 ### 3. XML stock import
 ```java
 StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
-List<String> rejected = report.getRejectedItems(); // unknown items
-// Known items: StockMovement with type ENTRY, linked to the import.
+// Every item in a valid XML file enters stock. Create missing catalogue items.
+// StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

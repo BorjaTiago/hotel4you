@@ -21,9 +21,9 @@ Responsável proposto: Pedro Costa (a equipa decide).
 
 - [ ] AC-1: Com uma sessão, a janela principal mostra a navegação do papel do utilizador.
 - [ ] AC-2: O utilizador abre uma função a partir da navegação e volta à janela principal.
-- [ ] AC-3: Uma função não permitida ao papel não aparece (usa `PermissionPolicy`).
+- [ ] AC-3: Uma função não permitida ao papel não aparece (usa o papel do utilizador em `HotelApp.currentUser`; a regra de funções por papel fica em `HotelFacade`).
 - [ ] AC-4: Sem sessão, a aplicação mostra o ecrã de login e não a janela principal.
 - [ ] A janela só mostra e navega. Nenhuma regra de negócio na GUI (RNF-07).
 - [ ] Voltar a verificar AC-3 depois de `funcoes-por-papel` (sprint 3).
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.

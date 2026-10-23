@@ -36,6 +36,6 @@ Para que o cliente aceda ao seu quarto e aos locais incluídos na reserva.
 
 ## Notas
 Depende de "Registar cliente" e "Criar reserva". Enunciado, secção 2 (cartão magnético).
-Test names: "H4Y-NN AC-1 ...", "H4Y-NN AC-2 ...".
+Test tag: `@Tag("H4Y-NN-AC-1")`. Test name sample: `onCheckIn_createStay_whenReservationValid`.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, <AI tool and model>, 2026-10-15. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, <AI tool and model>, 2026-10-15; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.

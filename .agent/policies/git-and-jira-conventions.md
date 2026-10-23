@@ -42,7 +42,9 @@ Requirement -> story -> test.
 
 - A story lists its requirement IDs (RF-NN, RNF-NN) in `requirements`.
 - Each acceptance scenario has an ID: AC-1, AC-2, and so on.
-- Each test cites the story and scenario, for example in a JUnit `@DisplayName("H4Y-12 AC-1 check-in with valid reservation")`.
+- Each test has a repeatable JUnit tag for the story and scenario, for example `@Tag("H4Y-12-AC-1")`. A later card that changes the test adds one more tag.
+- Test method names follow `on<Action>_<result>_<condition>`, for example `void onCheckIn_createStay_whenReservationValid()`. The AC is not in the method name.
+- To find the tests of an AC: `grep -rn '@Tag("H4Y-12-AC-1")' src/test`.
 - `validate-done` checks that every AC has a test.
 
 ## Jira
@@ -127,3 +129,5 @@ Check real names with getTransitionsForJiraIssue before a transition.
 - Other fields: Rank `customfield_10019`, Flagged `customfield_10021` (option "Impediment"), Labels, Priority, Assignee, Due date.
 - Statuses seen: To Do, In Progress. Confirm "In Review" and "Done" with getTransitionsForJiraIssue before the first transition.
 - Existing issues H4Y-5 to H4Y-10 are Tasks for diagram work. Do not duplicate or change them.
+
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.

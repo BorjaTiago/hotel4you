@@ -1,0 +1,17 @@
+# Copy this file to application.properties and set your own values.
+# Never commit application.properties.
+
+# --- Read by Docker ---
+# The SQL Server password. 8+ characters with upper case, lower case, a digit and a symbol.
+# Do not use the $ character in any password. Docker Compose changes it.
+MSSQL_SA_PASSWORD=change-me-Strong1!
+
+# --- Read by the Java app ---
+# The database. Use the same password as MSSQL_SA_PASSWORD.
+db.url=jdbc:sqlserver://localhost:1433;databaseName=hotel4you;encrypt=true;trustServerCertificate=true;loginTimeout=5
+db.user=sa
+db.password=change-me-Strong1!
+
+# The first manager account. Only the first-manager command uses it.
+manager.username=manager
+manager.password=change-me

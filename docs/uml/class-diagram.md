@@ -1,12 +1,35 @@
 # Hotel4You - Class Diagram (Organized)
 
+## Reading notes
+
+- Constructors and getters are not shown.
+- Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
+- `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
+- `$` marks a static member.
+- `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
+- `MainController` shows a menu button only when a facade method allows it. Now only the Staff button uses `canCreateStaff(actor)`. The screen has no role check of its own (H4Y-24).
+
 ```mermaid
 classDiagram
     %% ==========================================
     %% LAYER 1: INTERFACE (JavaFX Controllers)
     %% ==========================================
     class LoginController {
-        +onLoginClicked() void
+        -onLoginClicked() void
+    }
+    class MainController {
+        -initialize() void
+        -onStaffClicked() void
+        -onLogoutClicked() void
+    }
+    class HotelApp {
+        +facade: HotelFacade$
+        +currentUser: User$
+        +startError: String$
+        +start(stage: Stage) void
+    }
+    class ScreenLoader {
+        +load(fxmlName: String) Parent
     }
     class RoomController {
         +onSearchClicked() void
@@ -79,7 +102,8 @@ classDiagram
         +blockMasterCard(card: MagneticCard) void
         +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
         +getPassesByRoom(room: Room) List~CardAccessRecord~
-        +createStaff(user: User) void
+        +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
+        +canCreateStaff(actor: User) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -105,6 +129,7 @@ classDiagram
     class AuthService {
         +login(username: String, password: String) User
         +hashPassword(password: String) String
+        -isValidPassword(password: String, passwordHash: String) boolean
     }
     class ClientService {
         +register(name: String, document: String, birthday: LocalDate) Client
@@ -135,7 +160,9 @@ classDiagram
         +checkOut(reservation: Reservation) void
     }
     class StaffService {
-        +createStaff(user: User) void
+        +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
+        +canCreateStaff(actor: User) boolean
+        +createFirstManager(username: String, password: String) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -161,6 +188,50 @@ classDiagram
         +save(client: Client, type: FeedbackType, description: String) Feedback
         +list() List~Feedback~
     }
+    class LoginFailedException {
+        <<exception>>
+    }
+    class UsernameTakenException {
+        <<exception>>
+    }
+
+    %% ==========================================
+    %% LAYER: CONFIG
+    %% ==========================================
+    class AppConfig {
+        <<record>>
+        +dbUrl: String
+        +dbUser: String
+        +dbPassword: String
+        +managerUsername: String
+        +managerPassword: String
+        +load(file: Path) AppConfig$
+        +toString() String
+    }
+    class Main {
+        +main(args: String[]) void$
+    }
+    class FirstManagerCommand {
+        +main(args: String[]) void$
+    }
+
+    %% ==========================================
+    %% LAYER: DATA
+    %% ==========================================
+    class UserRepository {
+        <<interface>>
+        +findByUsername(username: String) Optional~User~
+        +existsByUsername(username: String) boolean
+        +existsByRole(role: Role) boolean
+        +save(user: User) User
+    }
+    class Database {
+        +NOT_AVAILABLE String$
+        +connect() Connection
+        +check() void
+        +prepare(connection: Connection, sql: String, values: String...) PreparedStatement$
+    }
+    class JdbcUserRepository
 
     %% ==========================================
     %% LAYER 3: DOMAIN - USERS
@@ -172,7 +243,6 @@ classDiagram
         -username: String
         -passwordHash: String
         -role: Role
-        +checkPassword(password: String) boolean
     }
     class Receptionist
     class Manager
@@ -266,8 +336,6 @@ classDiagram
     class StockImport {
         -supplierName: String
         -importedAt: LocalDateTime
-        -rejectedItems: List~String~
-        +getRejectedItems() List~String~
     }
 
     %% ==========================================
@@ -356,6 +424,7 @@ classDiagram
     %% DEPENDENCIES (Controllers -> Facade)
     %% ==========================================
     LoginController ..> HotelFacade : uses
+    MainController ..> HotelFacade : uses
     RoomController ..> HotelFacade : uses
     ClientController ..> HotelFacade : uses
     LocationController ..> HotelFacade : uses
@@ -378,6 +447,35 @@ classDiagram
     HotelFacade ..> CardAccessService : uses
     HotelFacade ..> StockService : uses
     HotelFacade ..> FeedbackService : uses
+    StaffService ..> AuthService : uses
+    AuthService ..> UserRepository : uses
+    StaffService ..> UserRepository : uses
+    UserRepository ..> User : stores
+    JdbcUserRepository ..|> UserRepository : implements
+    JdbcUserRepository ..> Database : uses
+    Database ..> AppConfig : uses
+    AuthService ..> LoginFailedException : throws
+    StaffService ..> UsernameTakenException : throws
+
+    %% ==========================================
+    %% DEPENDENCIES (Start-up)
+    %% ==========================================
+    Main ..> AppConfig : uses
+    Main ..> HotelApp : starts
+    Main ..> Database : creates
+    Main ..> JdbcUserRepository : creates
+    Main ..> AuthService : creates
+    Main ..> StaffService : creates
+    Main ..> HotelFacade : creates
+    FirstManagerCommand ..> StaffService : uses
+    FirstManagerCommand ..> AppConfig : uses
+    FirstManagerCommand ..> Database : creates
+    FirstManagerCommand ..> JdbcUserRepository : creates
+    FirstManagerCommand ..> AuthService : creates
+    HotelApp ..> ScreenLoader : uses
+    LoginController ..> ScreenLoader : opens main window
+    MainController ..> ScreenLoader : opens login on logout
+    ScreenLoader ..> HotelFacade : gives to controllers
 
     %% ==========================================
     %% NOTE
@@ -388,6 +486,7 @@ classDiagram
     note for ReservationService "addLocation and removeLocation accept only locations with guestCardAccess = true and requiresReservation = true. Allowed only before check-in."
     note for CardAccessService "Master card opens every room and every zone.<br/>Client card opens only its own room and zones with guestCardAccess = true. If requiresReservation = true, only zones included in its reservation.<br/>A blocked or inactive card opens nothing.<br/>Receptionist card opens only zones on floors 0 and 1 and no guest room.<br/>Restaurant staff card opens only the kitchen and the restaurant and no guest room.<br/>A staff card never opens a guest room. Only the master card does."
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
+    note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-AI use: Claude Code, claude-sonnet-5-5, 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

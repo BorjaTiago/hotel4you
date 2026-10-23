@@ -61,7 +61,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - `gui`: JavaFX (ecrãs, controladores, registo de navegação).
    - `config`: leitura da configuração (ligação à base de dados, conta inicial). Valores fora do Git.
 2. Classes de domínio essenciais (fonte: `docs/requirements` e o esquema H4Y-10 do PR #4, branch `chore/db-schema-update`):
-   - `Role` (enum de 5 tipos, RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT_STAFF, SUPPLIER; só os 3 do pessoal têm conta, Q-13, Q-17), `User`, `Session`.
+   - `Role` (enum de 5 tipos, RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT_STAFF, SUPPLIER; só os 3 do pessoal têm conta, Q-13, Q-17), `User`. O utilizador com sessão iniciada fica em `HotelApp.currentUser`.
    - `Floor`, `Location` (zona: nome, piso, marca "exige reserva", Q-32), `RoomType`, `Room`, `RoomItem`.
    - `Customer`, `Reservation` (estado: RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT), locais incluídos na reserva.
    - `AdditionalService` (extras e serviços pagos, vista incluída, Q-37), `ReservationService` (extra ou pedido de serviço na reserva, preço copiado).
@@ -69,7 +69,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - `Item`, `StockMovement` (IN, USE, OUT com motivo, Q-34), `StockImport`.
    - `Feedback` (sugestão ou reclamação).
 3. Serviços essenciais por área (só interfaces e assinaturas nesta tarefa; cada história implementa a sua parte):
-   - Autenticação: `AuthenticationService` (login, logout), `PasswordHasher` (RNF-02), `PermissionPolicy` (papel -> funções, RF-02), `UserService` (contas, RF-26, RNF-01).
+   - Autenticação: `AuthService` (`login`, `hashPassword`, `isValidPassword`; RNF-02), `StaffService` (contas, RF-26, RNF-01), `HotelFacade` (ponto de entrada da GUI). Nota 2026-10-19: H4Y-32 substituiu as tarefas T0a, T0b e T4 e absorveu auth T1 e T2.
    - Edifício e quartos: `BuildingService` (pisos, zonas), `RoomService` (quartos, tipos, preço base, itens do quarto).
    - Clientes e reservas: `CustomerService`, `RoomAvailability` (quartos livres e sobreposição de datas, uma só implementação), `ReservationService` (criar, cancelar, apagar, check-in, check-out, locais).
    - Preços: `PricingService` (preços extra, total), `ReservationExtrasService` (extras e serviços na reserva).
@@ -77,7 +77,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - Stock: `StockService` (catálogo, entrada, uso, saída), `XmlStockImporter`, `ImportReportService`.
    - Apoio ao cliente: `GuestSupportService` (pedidos de serviço de quarto, sugestões e reclamações).
    - Dados: um repositório por agregado (`UserRepository`, `RoomRepository`, `ReservationRepository`, `CardRepository`, `AccessLogRepository`, `StockRepository`, ...), com versão JDBC e versão em memória.
-4. Diagrama de classes inicial curto (domínio, serviços e repositórios), em `docs/` com a referência de uso de IA (RNF-25). Ordem de criação: (a) enums e classes de domínio; (b) interfaces de repositório e versões em memória; (c) interfaces de serviço; (d) scripts SQL do esquema H4Y-10 (PR #4) e ligação JDBC (T2); (e) janela JavaFX vazia com registo de navegação e `Session` simulada. Depois desta ordem, cada história trabalha nos seus ficheiros.
+4. Diagrama de classes inicial curto (domínio, serviços e repositórios), em `docs/` com a referência de uso de IA (RNF-25). Ordem de criação: (a) enums e classes de domínio; (b) interfaces de repositório e versões em memória; (c) interfaces de serviço; (d) scripts SQL do esquema H4Y-10 (PR #4) e ligação JDBC (T2); (e) janela JavaFX vazia com registo de navegação e `HotelApp.currentUser`. Depois desta ordem, cada história trabalha nos seus ficheiros.
 
 - [ ] O projeto compila e arranca com os pacotes `domain`, `service`, `data`, `gui`, `config`.
 - [ ] As classes de domínio e as interfaces de serviço e de repositório acima existem, com Javadoc curto (RNF-09).
@@ -124,4 +124,4 @@ Dados fixos do enunciado que nenhuma história de ator cria.
 - [ ] `CardNumberGenerator` dá sempre um número novo e único (RF-16, Q-26).
 - [ ] O gestor inicial (epic-authentication-users T2) recebe um cartão mestre ativo (Q-19: um cartão mestre por gestor). Ver pergunta nova no backlog sobre gestores criados depois.
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.

@@ -7,7 +7,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 1. The layout follows the teacher's slide: one `«subsystem» Hotel4You` box with its internal structure. Each part inside is one Java package: `gui`, `service`, `domain`, `data`, `config`. The diagram reads from left to right, from input to output (class 1 slides): the actors and the supplier XML file on the left, SQL Server on the right.
 2. Parts connect with assembly connectors (ball and socket). Ports on the border connect to parts with delegation connectors.
 3. The GUI talks only to the business logic. `gui` calls `HotelFacade` and reads `domain` objects. It never uses `data` or SQL Server (RNF-07).
-4. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC, and with an in-memory version for tests (RNF-08, RNF-10, RNF-12).
+4. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC (`JdbcUserRepository`). Unit tests use an in-memory repository in `src/test`, not in the application (RNF-08, RNF-10, RNF-12).
 5. Only `config` knows all packages. It creates and connects the objects at start-up. It holds no business rule.
 6. Only external components and artifacts are in the diagram: SQL Server and the supplier XML file. Libraries and the JDBC driver are not components (teacher feedback, 2026-10-17). Each library has a reason from the statement (RNF-11).
 
@@ -40,13 +40,13 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 - **Other option:** Separate data objects for the GUI. Not done: more code for little gain.
 
 ### data
-- **What:** Repository interfaces, with one JDBC version for SQL Server and one in-memory version for tests.
+- **What:** Repository interfaces and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` from `config` and opens the connections.
 - **Why:** The statement requires SQL Server (RNF-12). All users are saved (RNF-01).
-- **Why this way:** T0 (H4Y-32) puts the repository interfaces and both versions in `data`. `service` uses only the interfaces, never JDBC. Tests use the in-memory version (RNF-10).
+- **Why this way:** T0 (H4Y-32) puts the repository interfaces in `data`. `service` uses only the interfaces, never JDBC. Unit tests use an in-memory repository in `src/test` (RNF-10).
 - **Other option:** SQL inside the services. Not done: rules and SQL would mix, and tests would need a database.
 
 ### config
-- **What:** Reads the database settings. Starts the application.
+- **What:** Reads the settings from the `application.properties` file (`AppConfig`). Starts the application.
 - **Why:** Credentials must not be in the code or in Git (H4Y-33).
 - **Why this way:** One place creates and connects all objects. The other packages do not create each other.
 - **Other option:** Each class reads the settings. Not done: settings code in many places.
@@ -58,18 +58,19 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 | SQL Server | Yes, external component | The statement requires SQL Server (RNF-12). | Other database: not allowed. |
 | Microsoft JDBC Driver for SQL Server (mssql-jdbc) | No, library | Official Microsoft driver. Java needs a driver to connect to SQL Server (RNF-12). | jTDS: not maintained. |
 | JavaFX | No, library | GUI library recommended by the statement (RNF-06, Q-22). | Swing: older and less flexible. |
+| BCrypt (`at.favre.lib:bcrypt`) | No, library | Passwords must be saved encrypted (RNF-02). BCrypt makes a salted one-way hash. Cost 12. | jBCrypt: not maintained. Spring Security Crypto: adds the Spring libraries. PBKDF2 in the JDK: more own code. Argon2: needs a native library. |
 | Supplier XML stock file | Yes, external artifact | The supplier sends one XML file with each delivery (RF-28). | None: the statement sets the format. |
 | JUnit | No, library | The statement requires JUnit tests (RNF-10). | None: the statement names JUnit. |
 
-Every external library also goes in [docs/libraries.md](../libraries.md) with its version (RNF-11, H4Y-36). The versions are set when the build file exists (H4Y-32).
+Every external library also goes in [docs/libraries.md](../libraries.md) with its version (RNF-11, H4Y-36). The versions are in `pom.xml` and `docs/libraries.md`.
 
 ## Questions in class
 
 | Question | Answer |
 |----------|--------|
 | Why does `gui` use `domain`? | `HotelFacade` returns domain objects. The GUI only reads them. `domain` is part of the business logic and has no rules about storage. |
-| Why are the repository interfaces in `data`, not in `service`? | T0 (H4Y-32) puts them in `data`. `service` still depends only on the interfaces, so the tests can use the in-memory version. |
-| Where is the database in the class diagram? | Nowhere yet (G-01, C-01). This diagram adds `data` and the repositories. |
+| Why are the repository interfaces in `data`, not in `service`? | T0 (H4Y-32) puts them in `data`. `service` still depends only on the interfaces, so the unit tests can use the in-memory repository in `src/test`. |
+| Where is the database in the class diagram? | `Database` opens the connection. `JdbcUserRepository` implements `UserRepository` with SQL (G-01, C-01 closed). |
 | Why are JavaFX, the JDBC driver and JUnit not in the diagram? | A library is not a component. Only components, interfaces and external elements go in the diagram. |
 | Why is SQL Server outside the subsystem? | We do not write it. It is an external component that provides `SQL`. `data` reaches it through a port. |
 | Why is there no socket symbol? | Mermaid cannot draw it. The dashed `requires` arrow to the ball stands for the socket. |
@@ -79,6 +80,6 @@ Every external library also goes in [docs/libraries.md](../libraries.md) with it
 
 Mermaid CLI rendered the diagram to a temporary PNG file. The preview was inspected: the subsystem box holds the parts, the ports sit on its border, and SQL Server and the XML file are outside. No rendered file was added to the repository.
 
-The package-to-code check stays pending until H4Y-32 adds the Java files (C-04). Human review is still required.
+The five packages now exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17, C-04). Human review is still required.
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

@@ -80,16 +80,16 @@ flowchart LR
 | `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | `HotelUI` (screens for the actors), through the subsystem port. | `HotelFacade`, `domain` (read only). | RNF-06, RNF-07 |
 | `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, the supplier XML file (through a port). | RNF-07, RNF-08 |
 | `domain` | Domain classes and enums (`User`, `Room`, `Reservation`, `MagneticCard`, `StockItem`, `Role` and the others). No SQL and no JavaFX. | Data types for the other packages. | None. | RNF-07, RNF-08 |
-| `data` | Repository interfaces, for example `UserRepository`, with one JDBC version for SQL Server and one in-memory version for tests (T0, H4Y-32). The JDBC version maps table rows to domain objects. | The repository interfaces. | `domain`, `AppConfig`, `SQL` of SQL Server (through a port). | RNF-01, RNF-10, RNF-12 |
-| `config` | Reads the database settings from a local file or the environment. Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. The start-up links are not drawn. | `AppConfig`. | `gui`, `service`, `data` (start-up only). | RNF-08, RNF-12 |
+| `data` | Repository interfaces, for example `UserRepository`, and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC version maps table rows to domain objects. Unit tests use an in-memory repository in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, `SQL` of SQL Server (through a port). | RNF-01, RNF-10, RNF-12 |
+| `config` | Reads the settings from the `application.properties` file (`AppConfig`). Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. The start-up links are not drawn. | `AppConfig`. | `gui`, `service`, `data` (start-up only). | RNF-08, RNF-12 |
 
 ## Interfaces
 
 | Interface | Provided by | Required by | Requirement IDs |
 |-----------|-------------|-------------|-----------------|
 | `HotelFacade` | `service` | `gui` | RNF-07 |
-| Repositories (`UserRepository` and one for each other aggregate) | Declared and implemented in `data` (T0, H4Y-32) | `service` | RNF-08, RNF-10, RNF-12 |
-| `AppConfig` | `config` | `data` | RNF-12 |
+| Repositories (`UserRepository` and one for each other aggregate) | Declared in `data`. `JdbcUserRepository` is the SQL Server version. | `service` | RNF-08, RNF-10, RNF-12 |
+| `AppConfig` | `config` | `data` (`Database` reads it) | RNF-12 |
 | `HotelUI` | `gui`, through the subsystem port | The actors | RNF-06 |
 | `SQL` | SQL Server (external) | `data`, through the subsystem port | RNF-12 |
 
@@ -100,7 +100,7 @@ flowchart LR
 | SQL Server | External component. Provides `SQL`. | `data`, through a port | RNF-12 |
 | Supplier XML stock file | External artifact (file) | `service` (`StockService`), through a port | RF-28 |
 
-JavaFX, the Microsoft JDBC Driver for SQL Server and JUnit are libraries. A library is not a component (teacher feedback, H4Y-9, 2026-10-17). They are listed with their reasons in [libraries.md](../libraries.md) and [component-guide.md](component-guide.md).
+JavaFX, the Microsoft JDBC Driver for SQL Server, BCrypt (`at.favre.lib:bcrypt`) and JUnit are libraries. A library is not a component (teacher feedback, H4Y-9, 2026-10-17). They are listed with their reasons in [libraries.md](../libraries.md) and [component-guide.md](component-guide.md).
 
 ## Gaps
 
@@ -108,9 +108,9 @@ These gaps need team review. They are not approved requirements.
 
 | ID | Gap | Effect and next step |
 |----|-----|----------------------|
-| C-01 | The class diagram has no repository classes (G-01 in the sequence guide). | This diagram adds the `data` package and the repository interfaces from H4Y-32. Update the class diagram when H4Y-32 adds the repositories. |
-| C-02 | The password hash method is open (H4Y-29). | No hash library is chosen yet. If H4Y-29 picks a library, add it to `docs/libraries.md`. It is not a component. |
-| C-04 | There is no Java code yet. | The package-to-code check is pending. Do it when H4Y-32 adds the Java files. |
-| C-03 | The package of `HotelFacade` is not named in H4Y-32. | The diagram puts it in `service`. Confirm in H4Y-32. |
+| C-01 | The class diagram had no repository classes (G-01 in the sequence guide). | Closed. `UserRepository`, `JdbcUserRepository` and `Database` exist in `data` and the class diagram shows them. |
+| C-02 | The password hash method was open (H4Y-29). | Closed. BCrypt (`at.favre.lib:bcrypt`) is chosen. It is a library, not a component. It is in `docs/libraries.md`. |
+| C-04 | There was no Java code (H4Y-32). | Closed for the classes that exist now. The five packages exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17). |
+| C-03 | The package of `HotelFacade` was not named in H4Y-32. | Closed. `HotelFacade` is in `service`, as in the Java code. |
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23. Reviewed by: pending.
+Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23. Reviewed by: pending.

@@ -1,6 +1,6 @@
 ---
 type: subtask
-summary: T2 - Ligação SQL Server e scripts do esquema H4Y-10 (versão do PR #4)
+summary: T2 - Restantes tabelas do esquema H4Y-10 (as tabelas de papéis e utilizadores estão em H4Y-32)
 parent: H4Y-11
 requirements: [RNF-12]
 points:
@@ -12,20 +12,17 @@ sprint: 02
 branch: feat-033-sqlserver-schema-scripts
 ---
 
-# T2: Ligação SQL Server e scripts do esquema
+# T2: Restantes tabelas do esquema
 
-Origem: `epic-foundation-architecture.md`, tarefa T2. Precisa de T0a (configuração e interfaces de repositório). Usar o esquema do PR #4 já integrado em `docs/database/`, não o antigo. Corre em paralelo com auth T1 (hash).
+Origem: `epic-foundation-architecture.md`, tarefa T2. Âmbito reduzido: H4Y-32 já traz a ligação JDBC (`Database`), as tabelas de papéis e utilizadores e o `JdbcUserRepository`. Este cartão (H4Y-33) cobre só as outras tabelas do esquema de `docs/database/`. Precisa de H4Y-32.
 Responsável proposto: Lukas Sperandio (a equipa decide).
 
 ## Checklist
 
-- [ ] A ligação JDBC lê as credenciais da configuração local ou do ambiente. Nenhuma credencial no Git (RNF-12).
-- [ ] Os scripts criam o esquema de `docs/database/` (versão do PR #4). Verificar primeiro os ficheiros integrados.
-- [ ] Com uma base de dados vazia, a primeira preparação cria todas as tabelas.
+- [ ] Os scripts criam as restantes tabelas de `docs/database/` (todas menos papéis e utilizadores, que estão em H4Y-32). Verificar primeiro os ficheiros integrados.
+- [ ] Com uma base de dados vazia, a preparação cria todas as tabelas, incluindo as de H4Y-32.
 - [ ] Um registo guardado continua lá depois de a aplicação fechar e abrir.
 - [ ] Com o SQL Server em baixo, a aplicação mostra uma mensagem clara e nenhum detalhe da ligação.
-- [ ] Existe um `UserRepository` JDBC (necessário para o login e para create-staff-account).
 - [ ] Os passos de preparação para a equipa estão escritos em `docs/` (sem palavra-passe no texto).
-- [ ] Verificar os dados dos papéis: 5 papéis (Q-46). Comunicar qualquer falha ao Team Leader.
 
-AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.

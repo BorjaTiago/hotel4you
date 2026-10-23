@@ -23,7 +23,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
   - `stock_movements.exit_reason`: discard, return, loss (Q-34).
   - `stock_imports` and `stock_movements.import_id`. `supplier_name` moves to `stock_imports` (RF-28, Q-10).
 - **Changed:**
-  - `roles` has 5 rows, the actor types of RF-02: client, receptionist, manager, restaurant, supplier.
+  - `roles` has 5 rows, the actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER (upper case, the same as the Java `Role` enum).
   - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
   - The view is a service: "sea view" and "mountain view" are rows of `additional_services`. One view per reservation (Q-37, Q-11).
   - Room service requests (food, drink, laundry) use `reservation_services`. `used_at` is the request time (Q-33).
@@ -163,14 +163,14 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 | 3 | 2 | out | discard | 10 | 2026-10-13 08:00 | 2 | NULL |
 
 ### stock_imports
-**What:** One row for each XML file that the manager loads.
-**Why:** The hotel must know who loaded a delivery, when, from which supplier, and what the backend rejected (RF-28, Q-10).
-**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. `rejected_items` is free text, because we only show it to the manager.
+**What:** One row for each XML file that hotel staff or the manager loads.
+**Why:** The hotel must know who loaded a delivery, when and from which supplier (RF-28, Q-10).
+**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. Every item from a valid XML file enters stock. The import creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Linked movements give the imported items and quantities. Save new items, the import, movements and balances together. A failed save undoes them all. No rejection list is stored.
 **Other option:** `supplier_name` in each movement. We did not, because it repeats and it does not record the load itself.
 
-| id | loaded_at | user_id | supplier_name | rejected_items |
-|---|---|---|---|---|
-| 1 | 2026-10-01 09:00 | 2 | TextilPT | NULL |
+| id | loaded_at | user_id | supplier_name |
+|---|---|---|---|
+| 1 | 2026-10-01 09:00 | 2 | TextilPT |
 
 ---
 
@@ -188,18 +188,18 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 | 2 | John Müller | X9876543 |
 
 ### roles
-**What:** The permission groups: the 5 actor types of RF-02 (client, receptionist, manager, restaurant, supplier).
+**What:** The permission groups: the 5 actor types of RF-02 (CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER).
 **Why:** The role of the user decides what the API allows.
 **Why this way:** A table, not free text, so a typo cannot make a new role.
 **Other option:** A text column in `users` with a CHECK. It works for a few roles, but the table is easier to extend.
 
 | id | name |
 |---|---|
-| 1 | client |
-| 2 | receptionist |
-| 3 | manager |
-| 4 | restaurant |
-| 5 | supplier |
+| 1 | CLIENT |
+| 2 | RECEPTIONIST |
+| 3 | MANAGER |
+| 4 | RESTAURANT |
+| 5 | SUPPLIER |
 
 Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 roles.
 
@@ -207,6 +207,7 @@ Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 r
 **What:** The staff accounts. Customers do not log in.
 **Why:** Staff must log in, and the system must know who did each action.
 **Why this way:** The backend hashes the password. The database stores only `password_hash`. There is no `active` column (Q-36). Old reservations and stock movements point to the user, so the hotel does not delete a user who has history.
+**Login names:** The database `hotel4you` is created with the collation `SQL_Latin1_General_CP1_CI_AS` (script `database/v1-create-database.sql`). So usernames are not case sensitive. The application trims spaces.
 **Other option:** Delete the user who leaves. We did not, because the FKs would break or we would lose history.
 
 | id | name | username | password_hash | role_id |
@@ -348,3 +349,5 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why no trigger for overlap? | The backend does it in one transaction with a room lock. It is easier to test and read. |
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
+
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
