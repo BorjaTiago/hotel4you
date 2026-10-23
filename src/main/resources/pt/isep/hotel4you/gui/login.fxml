@@ -11,8 +11,10 @@
     </padding>
     <Label text="Hotel4You" styleClass="title"/>
     <Label text="Inicie sessão para continuar" styleClass="subtitle"/>
-    <TextField fx:id="usernameField" promptText="Nome de utilizador"/>
-    <PasswordField fx:id="passwordField" promptText="Palavra-passe"/>
+    <Label text="Nome de utilizador" labelFor="$usernameField" maxWidth="Infinity"/>
+    <TextField fx:id="usernameField"/>
+    <Label text="Palavra-passe" labelFor="$passwordField" maxWidth="Infinity"/>
+    <PasswordField fx:id="passwordField"/>
     <Button text="Entrar" onAction="#onLoginClicked" defaultButton="true"
             maxWidth="Infinity" styleClass="primary-button"/>
     <Label fx:id="messageLabel" wrapText="true" styleClass="message"/>
