@@ -21,9 +21,6 @@
                   prefWidth="320"
                   minWidth="280">
 
-                <Label text="Create Staff"
-                       styleClass="page-title"/>
-
                 <TextField fx:id="nameField"
                            promptText="Nome"
                            maxWidth="Infinity"/>
@@ -56,7 +53,7 @@
             <VBox spacing="15"
                   HBox.hgrow="ALWAYS">
 
-                <Label text="Staff Members"
+                <Label text="Funcionários"
                        styleClass="page-title"/>
 
                 <TableView fx:id="staffTable"
