@@ -5,8 +5,8 @@ parent:
 requirements: [RF-28, RF-29]
 points:
 points_suggested:
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-49
 labels: [stock, xml, final-delivery]
 sprint:
 ---
@@ -51,4 +51,4 @@ Secção 2. RF-28, RF-29. Q-10, Q-17, Q-21.
 ## Questões em aberto
 - O ficheiro XML de exemplo não consta do enunciado. Q-10 é uma decisão da equipa.
 
-AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16; Jira key by jira-publisher, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
