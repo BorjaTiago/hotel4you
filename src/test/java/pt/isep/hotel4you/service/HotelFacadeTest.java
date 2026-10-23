@@ -80,11 +80,21 @@ class HotelFacadeTest {
     }
 
     @Test
-    @Tag("H4Y-32-AC-3")
-    void onCreateStaff_throwUnsupported_always() {
+    @Tag("H4Y-27-AC-1")
+    void onCreateStaff_saveAccount_whenActorIsManager() {
         User manager = new Manager(1L, "Rui Costa", "rui", "hash");
 
-        assertThrows(UnsupportedOperationException.class,
-                () -> facade.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager));
+        facade.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager);
+
+        assertEquals(Role.RECEPTIONIST, repository.findByUsername("ana").orElseThrow().getRole());
+    }
+
+    @Test
+    @Tag("H4Y-27-AC-4")
+    void onCreateStaff_throwAccessDenied_whenActorIsReceptionist() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+
+        assertThrows(AccessDeniedException.class, () -> facade.createStaff(
+                "Bia Neves", "bia", PASSWORD, Role.RECEPTIONIST, receptionist));
     }
 }
