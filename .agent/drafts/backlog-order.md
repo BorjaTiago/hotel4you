@@ -21,6 +21,35 @@ Revision 2026-10-16: full dependency audit. The status goes back to `draft` beca
 - 1st delivery scope ends in sprint 6 (week of 11-16, ends 11-22). The zip is made in sprint 7 (week of 11-23), before 12-01.
 - No-blocking rule (user, 2026-10-16): one card must not block another. Every story builds and tests alone with its own test data (foundation T4), stubs from the skeleton (foundation T0) and reference data (foundation T5, auth T2). A hard dependency stays only when it cannot be removed. The reason is written below.
 
+## Revision 2026-10-23: sprint 3 planning and forecast for sprints 4 and 5
+
+The order of the items does not change. Only the sprint slice changes. The status goes back to `draft`. The PO (Lukas Sperandio, Team Leader of sprint 3) approves it again.
+
+- Team decision (Team Leader, 2026-10-23): the team works with at least 13 points per sprint. Sprint 2 velocity was 13 (H4Y-20, 22, 24, 27).
+- Sprint 3: 15 committed points (list-rooms pulled from sprint 4) plus 2 stretch points (cadastrar-item-stock, pulled from sprint 4). No test-only sub-tasks: H4Y-21 tests go inside H4Y-23 (Team Leader decision). Plan: `docs/scrum/sprint-03/planning.md`.
+- Sprint 4 goes back to 13 with cancel-reservation (from sprint 5). Sprint 5 goes back to 13 with refuse-delete-reservation (from sprint 6). Sprint 6 goes down from 15 to 13. This also removes the old sprint 6 risk (configure-room-items to sprint 7).
+- If a sprint 3 stretch item does not finish, it goes first in sprint 4 (sprint 4 then has 15 points).
+- Sub-task drafts for sprints 4 and 5 are a forecast: `subtask-s04-*.md`, `subtask-s05-*.md`. The refinement confirms or changes them.
+
+### Forecast
+
+| Sprint | Team Leader | Points | Stories | Tasks |
+|--------|-------------|--------|---------|-------|
+| 3 | Lukas Sperandio | 15 + 2 stretch | login-restaurante (H4Y-21, tests inside H4Y-23), funcoes-por-papel (H4Y-23), model-hotel-floors (H4Y-28), register-rooms (H4Y-25), set-base-price (H4Y-26), list-rooms; stretch: cadastrar-item-stock | none (SQL scripts inside the story sub-tasks) |
+| 4 | Pedro Costa | 13 | registar-cliente (3), procurar-cliente (2), query-free-rooms (5), cancel-reservation (3) | none |
+| 5 | Antonio Martinho | 13 | create-reservation (5), delete-reservation (3), refuse-delete-reservation (2), registar-cliente-rapido (3) | none |
+
+### Refinement agenda (before the sprint 4 planning)
+
+1. Diagram gaps. `docs/uml/class-diagram.md` has only `UserRepository`. Agree the names of the repositories for floors, rooms, room types, clients, reservations and stock items, and the missing methods (list floors, list rooms, find a reservation). AGENTS.md rule 11.
+2. Client data and the duplicate rule (registar-cliente). The diagram has `name`, `document`, `birthday`. Confirm `document` as the unique key and as the search field (procurar-cliente).
+3. How to measure the 30 s of RNF-03 (registar-cliente-rapido): stopwatch, how many runs, who records.
+4. Publish the sprint 4 and 5 stories in Jira first. The tests need the Jira key for `@Tag("H4Y-N-AC-n")`.
+5. Cards deleted from Jira on 2026-10-23: H4Y-33, H4Y-35, H4Y-36, H4Y-37, H4Y-38, H4Y-48. No task cards from now on (Team Leader decision): the SQL scripts go inside the story sub-tasks, and the scrum records stay as files. Decide if RNF-09 and RNF-10 (JUnit, Javadoc, old H4Y-35) need a card, and if the scrum records (RNF-15, RNF-16) need cards or only files in `docs/scrum/`.
+6. Teacher questions still open as team decisions: Q-01 (20 rooms, 7/10/3), Q-05 (cancel vs delete), Q-11 (manager sets the base price).
+7. Jira text is in Portuguese (Portugal). The title "Cadastrar item de stock" uses a Brazilian word. Propose "Registar item de stock".
+8. Check the story size again after sprint 3: if velocity is above 13, pull block-delete-after-check-in (2) into sprint 5.
+
 ## Dependency audit result
 
 - Before: 51 story-to-story links in the old Dependencies list, all treated as blocking. Plus 11 hidden blockers (missing prerequisites or items placed before their prerequisite):
@@ -43,10 +72,10 @@ Revision 2026-10-16: full dependency audit. The status goes back to `draft` beca
 |--------|----------------|--------|---------|-----------------------------------|
 | 1 | 10-12 | 0 | none | Requirements documents. |
 | 2 | 10-19 | 13 | janela-principal, login-rececionista, login-gestor, create-staff-account | Skeleton, database and seed ready. The first manager logs in and creates staff accounts. Receptionists log in and see the main window. |
-| 3 | 10-26 | 13 | login-restaurante, funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price | Restaurant staff log in. Each role sees only its functions. The manager sees floors, registers the 20 rooms and sets base prices. |
-| 4 | 11-02 | 14 | registar-cliente, procurar-cliente, query-free-rooms, list-rooms, cadastrar-item-stock | The receptionist registers and finds clients, lists rooms and searches free rooms. The manager keeps the item catalogue. |
-| 5 | 11-09 | 14 | create-reservation, cancel-reservation, delete-reservation, registar-cliente-rapido | Full reservation life cycle. RNF-03 (30 s, registration + reservation) measured. |
-| 6 | 11-16 | 15 | check-in, check-out, block-delete-after-check-in, refuse-delete-reservation, configure-room-items | Check-in and check-out. Delete rules complete. Room items configured. 1st delivery scope complete. |
+| 3 | 10-26 | 15 + 2 stretch | login-restaurante, funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price, list-rooms; stretch: cadastrar-item-stock | Restaurant staff log in. Each role sees only its functions. The manager sees floors, registers the 20 rooms and sets base prices. Reception sees the room list. Stretch: item catalogue. |
+| 4 | 11-02 | 13 | registar-cliente, procurar-cliente, query-free-rooms, cancel-reservation | The receptionist registers and finds clients, searches free rooms and cancels reservations. |
+| 5 | 11-09 | 13 | create-reservation, delete-reservation, refuse-delete-reservation, registar-cliente-rapido | Full reservation life cycle. Only the manager deletes. RNF-03 (30 s, registration + reservation) measured. |
+| 6 | 11-16 | 13 | check-in, check-out, block-delete-after-check-in, configure-room-items | Check-in and check-out. Delete rules complete. Room items configured. 1st delivery scope complete. |
 | 7 | 11-23 | 12 | consultar-utilizadores, edit-staff-account, remove-staff-account, criar-zona | 1st delivery freeze and zip. Manager edits and removes accounts, lists users, creates zones. |
 | 8 | 11-30 | 14 | editar-zona, remover-zona, reservation-restaurant-pool, limit-reception-floors, limit-restaurant-staff-zones | 1st delivery was due 12-01 (sent at the end of sprint 7). Zones complete. Restaurant and pool in the reservation. Role limits. |
 | 9 | 12-07 | 17 | emitir-cartao-check-in, registar-passagens-cartao, abrir-quarto-com-cartao, abrir-restaurante-piscina-reservados, recusar-cartao-locais-nao-permitidos | The client card is issued, opens the room and the reserved places, and every pass is logged. |
@@ -55,7 +84,7 @@ Revision 2026-10-16: full dependency audit. The status goes back to `draft` beca
 | 12 | 2027-01-18 | 17 | registar-uso-stock, registar-saida-stock, carregar-xml-fornecedor-rececionista, definir-precos-extra, adicionar-extras-quarto-reserva | Stock use and exit. Reception loads XML. Extra prices. Extras on the reservation. |
 | 13 | 2027-01-25 | 17 | adicionar-servicos-extra-reserva, calcular-preco-total-reserva, register-room-service-request, record-suggestion-complaint, list-suggestions-complaints | Paid services, total price, room service, suggestions and complaints. Final zip. |
 
-Check: 13+13+14+14+15+12+14+17+18+16+17+17 = 180. 1st delivery scope (sprints 2 to 6) = 69 points.
+Check: 13+17+13+13+13+12+14+17+18+16+17+17 = 180. 1st delivery scope (sprints 2 to 6) = 69 points.
 
 Changes from the approved order: `create-staff-account` 7 -> 2; `login-restaurante` 2 -> 3; `list-rooms` 3 -> 4; `cadastrar-item-stock` 11 -> 4 (accepted, Q-43); `registar-cliente-rapido` 4 -> 5; `refuse-delete-reservation` 5 -> 6. Inside sprint 2, `janela-principal` no longer waits for login (stub session).
 
@@ -66,10 +95,10 @@ Stories in one lane group have no link between them and run in parallel. "Then" 
 | Sprint | Parallel (no link) | Serial inside the sprint |
 |--------|--------------------|--------------------------|
 | 2 | janela-principal, login-rececionista, create-staff-account | login-rececionista then login-gestor |
-| 3 | login-restaurante, funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price | none |
-| 4 | registar-cliente, procurar-cliente, query-free-rooms, list-rooms, cadastrar-item-stock | none |
-| 5 | create-reservation, cancel-reservation, delete-reservation | create-reservation then registar-cliente-rapido |
-| 6 | check-in, check-out, configure-room-items, (refuse-delete-reservation or block-delete-after-check-in) | refuse-delete-reservation and block-delete-after-check-in both edit the delete action: one developer, or one after the other |
+| 3 | login-restaurante, funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price, list-rooms, cadastrar-item-stock | none |
+| 4 | registar-cliente, procurar-cliente, query-free-rooms, cancel-reservation | none |
+| 5 | create-reservation, delete-reservation | create-reservation then registar-cliente-rapido; delete-reservation then refuse-delete-reservation |
+| 6 | check-in, check-out, configure-room-items, block-delete-after-check-in | none |
 | 7 | consultar-utilizadores, edit-staff-account, remove-staff-account, criar-zona | none |
 | 8 | editar-zona, remover-zona, reservation-restaurant-pool, limit-reception-floors, limit-restaurant-staff-zones | none |
 | 9 | emitir-cartao-check-in, registar-passagens-cartao, abrir-quarto-com-cartao, abrir-restaurante-piscina-reservados, recusar-cartao-locais-nao-permitidos | none (each access rule is its own class, T0) |
@@ -116,16 +145,16 @@ Value: H/M/L. Risk: H/M/L. Dependency: "none (hard)" means it builds and tests a
 | 18 | registar-cliente | Story | RF-10 | 3 | Value H: reservation needs the client (Q-27). Risk L. Dependency: none hard. Date: 1st delivery. | 4 |
 | 19 | procurar-cliente | Story | RF-10 | 2 | Value M. Risk L. Dependency: none hard (test clients). Date: 1st delivery. | 4 |
 | 20 | query-free-rooms | Story | RF-05 | 5 | Value H: core of booking; owns the overlap rule. Risk M: date edges. Dependency: none hard (test rooms and reservations). Date: 1st delivery. | 4 |
-| 21 | list-rooms | Story | RF-04, 06 | 2 | Value M. Risk L. Dependency: none hard (test rooms and prices). Date: 1st delivery; moved from sprint 3 for balance. | 4 |
-| 22 | cadastrar-item-stock | Story | RF-28, 29 | 2 | Value H: room items need the catalogue (removes hidden blocker 6). Risk L. Dependency: none hard. Date: moved from sprint 11 into the 1st delivery (accepted, Q-43). | 4 |
+| 21 | list-rooms | Story | RF-04, 06 | 2 | Value M. Risk L. Dependency: none hard (test rooms and prices). Date: 1st delivery; moved from sprint 3 for balance; back to sprint 3, committed (2026-10-23). | 3 |
+| 22 | cadastrar-item-stock | Story | RF-28, 29 | 2 | Value H: room items need the catalogue (removes hidden blocker 6). Risk L. Dependency: none hard. Date: moved from sprint 11 into the 1st delivery (accepted, Q-43); sprint 3 stretch (2026-10-23). | 3 |
 | 23 | create-reservation | Story | RF-11, 05 | 5 | Value H: central flow. Risk H: client, room, dates, price. Dependency: hard on item 20 (one overlap rule). Date: 1st delivery. | 5 |
-| 24 | cancel-reservation | Story | RF-12 | 3 | Value H. Risk L. Dependency: none hard (test reservations). Date: 1st delivery. | 5 |
+| 24 | cancel-reservation | Story | RF-12 | 3 | Value H. Risk L. Dependency: none hard (test reservations). Date: 1st delivery; moved to sprint 4 (2026-10-23). | 4 |
 | 25 | delete-reservation | Story | RF-22 | 3 | Value H. Risk M: owns the delete action. Dependency: none hard (test reservations). Date: 1st delivery. | 5 |
 | 26 | registar-cliente-rapido | Story | RNF-03, RF-10 | 3 | Value H: 30 s limit. Risk M: time target. Dependency: hard on items 18 and 23 (timed real flow, no stub; removes hidden blocker 4). Date: 1st delivery; last in sprint 5. | 5 |
 | 27 | check-in | Story | RF-13 | 3 | Value H. Risk M. Dependency: none hard (test reservations). Date: 1st delivery. | 6 |
 | 28 | check-out | Story | RF-14 | 3 | Value H. Risk L. Dependency: none hard (test reservations with check-in). Date: 1st delivery. | 6 |
 | 29 | block-delete-after-check-in | Story | RF-13, 22 | 2 | Value H. Risk L. Dependency: hard on item 25 (guard on the same delete action). Date: 1st delivery. | 6 |
-| 30 | refuse-delete-reservation | Story | RF-22 | 2 | Value H. Risk L. Dependency: hard on item 25 (role guard on the same delete action). Date: 1st delivery; moved from sprint 5 for balance. | 6 |
+| 30 | refuse-delete-reservation | Story | RF-22 | 2 | Value H. Risk L. Dependency: hard on item 25 (role guard on the same delete action). Date: 1st delivery; moved from sprint 5 for balance; back to sprint 5 (2026-10-23). | 5 |
 | 31 | configure-room-items | Story | RF-08 | 5 | Value M (should), in the 1st delivery (Q-06). Risk L. Dependency: none hard (test rooms and items). Date: first to move to sprint 7 if sprint 6 is full. | 6 |
 | 32 | Delivery T: class, sequence, executables, Javadoc | Task | RNF-24 | - | Value H. Risk M. Dependency: code of sprints 2 to 6. Date: sprints 5 and 6. | 5 to 6 |
 | 33 | Foundation T3 usability test | Task | RNF-04 | - | Value M. Risk L. Dependency: reception screens. Date: 1st delivery. | 6 |
@@ -245,7 +274,7 @@ Every RF and RNF of `requirements.md`. No `MISSING`.
 | 3 | registar-cliente -> registar-cliente-rapido | 4 -> 5 | AC-1 times the real registration screen. A stub cannot measure 30 s. |
 | 4 | create-reservation -> registar-cliente-rapido | 5 -> 5 | AC-1 ends at the real reservation created. |
 | 5 | query-free-rooms -> create-reservation | 4 -> 5 | One overlap rule (`RoomAvailability`). Two versions would differ. |
-| 6 | delete-reservation -> refuse-delete-reservation | 5 -> 6 | Adds a role guard to the same delete action. |
+| 6 | delete-reservation -> refuse-delete-reservation | 5 -> 5 | Adds a role guard to the same delete action. |
 | 7 | delete-reservation -> block-delete-after-check-in | 5 -> 6 | Adds a state guard to the same delete action. |
 | 8 | create-reservation -> reservation-restaurant-pool | 5 -> 8 | Adds the place choice to the same create form. |
 | 9 | check-in -> emitir-cartao-check-in | 6 -> 9 | The card is issued inside the check-in flow. |
@@ -299,4 +328,4 @@ None by the Definition of Ready. Notes for the PO:
   - Zone flags: Q-45. `guest_card_access` (0 = client card never opens the place, Q-20) and `requires_reservation` (1 = card opens only if the reservation lists the place). See docs/database.
 - Accepted (user, 2026-10-16, Q-43): cadastrar-item-stock in sprint 4 (1st delivery). Seeding room items is not needed.
 
-AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint 3 planning, forecast for sprints 4 and 5 and refinement agenda by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

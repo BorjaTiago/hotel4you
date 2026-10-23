@@ -5,10 +5,10 @@ parent: epic-stock-management
 requirements: [RF-28, RF-29]
 points: 2
 points_suggested: 2
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-51
 labels: [stock, 1st-delivery]
-sprint:
+sprint: 03
 ---
 
 # Título: Cadastrar item de stock
@@ -60,4 +60,4 @@ compared: equal
 reasoning: Criar item com nome e unidade, validar campos e nome único. Cria a tabela base do stock, mas a lógica é simples.
 split_needed: no
 
-AI use: story-writer, estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

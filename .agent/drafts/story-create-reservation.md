@@ -3,12 +3,12 @@ type: story
 summary: Criar uma reserva para um cliente
 parent: epic-reservations
 requirements: [RF-11, RF-05]
-points: 5
+points:
 points_suggested: 5
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-56
 labels: [reservations, 1st-delivery]
-sprint:
+sprint: 05
 ---
 
 # Título: Criar uma reserva para um cliente
@@ -63,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

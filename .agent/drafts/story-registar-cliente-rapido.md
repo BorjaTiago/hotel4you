@@ -3,12 +3,12 @@ type: story
 summary: Registar cliente e reserva em 30 segundos
 parent: epic-client-registration
 requirements: [RNF-03, RF-10]
-points: 3
+points:
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-59
 labels: [clients, 1st-delivery, usability]
-sprint:
+sprint: 05
 ---
 
 # Título: Registar cliente e reserva em 30 segundos
@@ -57,4 +57,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

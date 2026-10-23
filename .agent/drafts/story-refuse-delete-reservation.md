@@ -3,12 +3,12 @@ type: story
 summary: Recusar o apagar de reservas a quem não é gestor
 parent: epic-reservations
 requirements: [RF-22]
-points: 2
+points:
 points_suggested: 2
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-58
 labels: [reservations, security, 1st-delivery]
-sprint:
+sprint: 05
 ---
 
 # Título: Recusar o apagar de reservas a quem não é gestor
@@ -62,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
