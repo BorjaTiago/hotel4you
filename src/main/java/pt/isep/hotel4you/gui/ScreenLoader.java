@@ -1,7 +1,6 @@
 package pt.isep.hotel4you.gui;
 
 import java.io.IOException;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import pt.isep.hotel4you.service.HotelFacade;
@@ -35,23 +34,12 @@ public class ScreenLoader {
      * @throws IllegalStateException if the screen cannot be opened
      */
     public Parent load(String fxmlName) {
-        var resource = getClass().getResource(fxmlName);
-
-        if (resource == null) {
-            throw new IllegalStateException(
-                    "FXML not found: " + fxmlName
-            );
-        }
-
-        FXMLLoader loader = new FXMLLoader(resource);
-        loader.setControllerFactory(this::createController);
-
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlName));
+        loader.setControllerFactory(type -> createController(type));
         try {
             return loader.load();
-        } catch (Exception e) {
-            throw new IllegalStateException(
-                    "Cannot open screen: " + fxmlName, e
-            );
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot open the screen.");
         }
     }
 

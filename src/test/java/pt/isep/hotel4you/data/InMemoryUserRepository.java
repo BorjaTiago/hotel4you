@@ -15,11 +15,6 @@ public class InMemoryUserRepository implements UserRepository {
     private final List<User> users = new ArrayList<>();
 
     @Override
-    public List<User> findAll() {
-        return List.of();
-    }
-
-    @Override
     public Optional<User> findByUsername(String username) {
         return users.stream()
                 .filter(user -> user.getUsername().equalsIgnoreCase(username))

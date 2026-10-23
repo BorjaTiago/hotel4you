@@ -1,18 +1,17 @@
-
 package pt.isep.hotel4you.gui;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Role;
-import pt.isep.hotel4you.domain.User;
+import pt.isep.hotel4you.service.AccessDeniedException;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.UsernameTakenException;
 
+/** Controller of the screen that creates staff accounts. */
 public class StaffController {
 
     private final HotelFacade facade;
@@ -32,92 +31,52 @@ public class StaffController {
     @FXML
     private Label messageLabel;
 
-    @FXML
-    private TableView<User> staffTable;
-
-    @FXML
-    private TableColumn<User, String> nameColumn;
-
-    @FXML
-    private TableColumn<User, String> usernameColumn;
-
-    @FXML
-    private TableColumn<User, String> roleColumn;
-
+    /**
+     * Creates the controller.
+     *
+     * @param facade the facade that creates the accounts
+     */
     public StaffController(HotelFacade facade) {
         this.facade = facade;
     }
 
     @FXML
     private void initialize() {
-        roleBox.getItems().setAll(
-                Role.RECEPTIONIST,
-                Role.RESTAURANT,
-                Role.MANAGER
-        );
-
-        roleBox.setConverter(new javafx.util.StringConverter<>() {
+        roleBox.getItems().setAll(Role.RECEPTIONIST, Role.RESTAURANT, Role.MANAGER);
+        roleBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Role role) {
-                return role == null ? "" : translateRole(role);
+                return role == null ? "" : roleLabel(role);
             }
 
             @Override
-            public Role fromString(String string) {
+            public Role fromString(String text) {
                 return null;
             }
         });
-
-        nameColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(data.getValue().getName()));
-
-        usernameColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(data.getValue().getUsername()));
-
-        roleColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(
-                        translateRole(data.getValue().getRole())));
-
-        loadStaff();
     }
 
     @FXML
     private void onCreateStaffClicked() {
         try {
-            facade.createStaff(
-                    nameField.getText(),
-                    usernameField.getText(),
-                    passwordField.getText(),
-                    roleBox.getValue(),
-                    HotelApp.currentUser
-            );
-
-            messageLabel.setText("Funcionário criado.");
-
+            facade.createStaff(nameField.getText(), usernameField.getText(),
+                    passwordField.getText(), roleBox.getValue(), HotelApp.currentUser);
+            messageLabel.setText("Conta criada.");
             nameField.clear();
             usernameField.clear();
-            passwordField.clear();
             roleBox.setValue(null);
-
-            loadStaff();
-
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException | IllegalStateException | AccessDeniedException
+                | UsernameTakenException e) {
             messageLabel.setText(e.getMessage());
+        } finally {
+            passwordField.clear();
         }
     }
 
-    private void loadStaff() {
-        staffTable.getItems().setAll(facade.findAllUsers().stream()
-                .filter(user -> user.getRole() == Role.RECEPTIONIST
-                        || user.getRole() == Role.RESTAURANT
-                        || user.getRole() == Role.MANAGER)
-                .toList());
-    }
-
-    private String translateRole(Role role) {
+    private static String roleLabel(Role role) {
         return switch (role) {
             case RECEPTIONIST -> "Rececionista";
-            case RESTAURANT -> "Funcionário do Restaurante";
+            case RESTAURANT -> "Funcionário do restaurante";
             case MANAGER -> "Gestor";
             default -> role.name();
         };

@@ -4,85 +4,20 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefWidth="900" prefHeight="600"
-            stylesheets="@style.css"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="pt.isep.hotel4you.gui.StaffController">
+<VBox spacing="12" maxWidth="360" alignment="TOP_LEFT"
+      stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.StaffController">
 
-    <center>
-        <HBox spacing="30">
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
 
-            <padding>
-                <Insets top="30" right="30" bottom="30" left="30"/>
-            </padding>
-
-            <!-- Create staff form -->
-            <VBox spacing="15"
-                  prefWidth="320"
-                  minWidth="280">
-
-                <TextField fx:id="nameField"
-                           promptText="Nome"
-                           maxWidth="Infinity"/>
-
-                <TextField fx:id="usernameField"
-                           promptText="Nome de Utilizador"
-                           maxWidth="Infinity"/>
-
-                <PasswordField fx:id="passwordField"
-                               promptText="Palavra Passe"
-                               maxWidth="Infinity"/>
-
-                <ComboBox fx:id="roleBox"
-                          promptText="Selecionar Permissão"
-                          maxWidth="Infinity"/>
-
-                <Button text="Adicionar"
-                        onAction="#onCreateStaffClicked"
-                        maxWidth="Infinity"/>
-
-                <Label fx:id="messageLabel"
-                       wrapText="true"
-                       maxWidth="Infinity"/>
-
-            </VBox>
-
-            <Separator orientation="VERTICAL"/>
-
-            <!-- Staff list -->
-            <VBox spacing="15"
-                  HBox.hgrow="ALWAYS">
-
-                <Label text="Funcionários"
-                       styleClass="page-title"/>
-
-                <TableView fx:id="staffTable"
-                           VBox.vgrow="ALWAYS"
-                           prefWidth="500">
-
-                    <columns>
-                        <TableColumn fx:id="nameColumn"
-                                     text="Nome"
-                                     prefWidth="160"/>
-
-                        <TableColumn fx:id="usernameColumn"
-                                     text="Nome de Utilizador"
-                                     prefWidth="160"/>
-
-                        <TableColumn fx:id="roleColumn"
-                                     text="Permissão"
-                                     prefWidth="140"/>
-                    </columns>
-
-                    <placeholder>
-                        <Label text="Não foram encontrados funcionários."/>
-                    </placeholder>
-
-                </TableView>
-
-            </VBox>
-
-        </HBox>
-    </center>
-
-</BorderPane>
+    <Label text="Criar conta de funcionário" styleClass="subtitle"/>
+    <TextField fx:id="nameField" promptText="Nome" maxWidth="Infinity"/>
+    <TextField fx:id="usernameField" promptText="Nome de utilizador" maxWidth="Infinity"/>
+    <PasswordField fx:id="passwordField" promptText="Palavra-passe" maxWidth="Infinity"/>
+    <ComboBox fx:id="roleBox" promptText="Tipo de conta" maxWidth="Infinity"/>
+    <Button text="Criar conta" onAction="#onCreateStaffClicked" maxWidth="Infinity"
+            styleClass="primary-button"/>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
