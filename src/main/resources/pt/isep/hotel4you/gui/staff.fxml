@@ -4,20 +4,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="12" maxWidth="360" alignment="TOP_LEFT"
-      stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+<HBox spacing="30" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.StaffController">
 
     <padding>
         <Insets top="30" right="30" bottom="30" left="30"/>
     </padding>
 
-    <Label text="Criar conta de funcionário" styleClass="subtitle"/>
-    <TextField fx:id="nameField" promptText="Nome" maxWidth="Infinity"/>
-    <TextField fx:id="usernameField" promptText="Nome de utilizador" maxWidth="Infinity"/>
-    <PasswordField fx:id="passwordField" promptText="Palavra-passe" maxWidth="Infinity"/>
-    <ComboBox fx:id="roleBox" promptText="Tipo de conta" maxWidth="Infinity"/>
-    <Button text="Criar conta" onAction="#onCreateStaffClicked" maxWidth="Infinity"
-            styleClass="primary-button"/>
-    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
-</VBox>
+    <!-- Create staff form -->
+    <VBox spacing="12" prefWidth="320" minWidth="280">
+        <Label text="Criar conta de funcionário" styleClass="subtitle"/>
+        <TextField fx:id="nameField" promptText="Nome" maxWidth="Infinity"/>
+        <TextField fx:id="usernameField" promptText="Nome de utilizador" maxWidth="Infinity"/>
+        <PasswordField fx:id="passwordField" promptText="Palavra-passe" maxWidth="Infinity"/>
+        <ComboBox fx:id="roleBox" promptText="Tipo de conta" maxWidth="Infinity"/>
+        <Button text="Criar conta" onAction="#onCreateStaffClicked" maxWidth="Infinity"
+                styleClass="primary-button"/>
+        <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+    </VBox>
+
+    <Separator orientation="VERTICAL"/>
+
+    <!-- Staff list -->
+    <VBox spacing="12" HBox.hgrow="ALWAYS">
+        <Label text="Funcionários" styleClass="subtitle"/>
+        <TableView fx:id="staffTable" VBox.vgrow="ALWAYS" prefWidth="500">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Nome" prefWidth="160"/>
+                <TableColumn fx:id="usernameColumn" text="Nome de utilizador" prefWidth="160"/>
+                <TableColumn fx:id="roleColumn" text="Tipo de conta" prefWidth="160"/>
+            </columns>
+            <placeholder>
+                <Label text="Não foram encontrados funcionários."/>
+            </placeholder>
+        </TableView>
+    </VBox>
+</HBox>

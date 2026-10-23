@@ -1,15 +1,19 @@
 package pt.isep.hotel4you.gui;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Role;
+import pt.isep.hotel4you.domain.User;
 import pt.isep.hotel4you.service.HotelFacade;
 
-/** Controller of the screen that creates staff accounts. */
+/** Controller of the screen that creates and lists staff accounts. */
 public class StaffController {
 
     private final HotelFacade facade;
@@ -28,6 +32,18 @@ public class StaffController {
 
     @FXML
     private Label messageLabel;
+
+    @FXML
+    private TableView<User> staffTable;
+
+    @FXML
+    private TableColumn<User, String> nameColumn;
+
+    @FXML
+    private TableColumn<User, String> usernameColumn;
+
+    @FXML
+    private TableColumn<User, String> roleColumn;
 
     /**
      * Creates the controller.
@@ -52,6 +68,21 @@ public class StaffController {
                 return null;
             }
         });
+        nameColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(data.getValue().getName()));
+        usernameColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(data.getValue().getUsername()));
+        roleColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(roleLabel(data.getValue().getRole())));
+        loadStaff();
+    }
+
+    private void loadStaff() {
+        try {
+            staffTable.getItems().setAll(facade.listUsers());
+        } catch (IllegalStateException e) {
+            messageLabel.setText(e.getMessage());
+        }
     }
 
     @FXML
@@ -63,6 +94,7 @@ public class StaffController {
             nameField.clear();
             usernameField.clear();
             roleBox.setValue(null);
+            loadStaff();
         } catch (RuntimeException e) {
             messageLabel.setText(e.getMessage());
         } finally {

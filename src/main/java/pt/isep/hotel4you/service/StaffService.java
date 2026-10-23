@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.service;
 
+import java.util.List;
 import pt.isep.hotel4you.data.UserRepository;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
@@ -25,6 +26,15 @@ public class StaffService {
     public StaffService(UserRepository userRepository, AuthService authService) {
         this.userRepository = userRepository;
         this.authService = authService;
+    }
+
+    /**
+     * Lists all staff accounts: receptionists, restaurant staff and managers.
+     *
+     * @return the accounts, or an empty list if none exists
+     */
+    public List<User> listUsers() {
+        return userRepository.findAll();
     }
 
     /**

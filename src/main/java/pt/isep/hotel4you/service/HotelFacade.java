@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.service;
 
+import java.util.List;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
@@ -54,5 +55,15 @@ public class HotelFacade {
      */
     public void createStaff(String name, String username, String password, Role role, User actor) {
         staffService.createStaff(name, username, password, role, actor);
+    }
+
+    /**
+     * Lists all staff accounts.
+     *
+     * @return the accounts, or an empty list if none exists
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<User> listUsers() {
+        return staffService.listUsers();
     }
 }
