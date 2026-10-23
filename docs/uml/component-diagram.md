@@ -13,7 +13,6 @@ The diagram reads from left to right, from input to output, as in the class 1 sl
 - Left side, inputs: the actors use `HotelUI`, and the supplier XML stock file comes in.
 - Middle: the parts of the subsystem, in call order (`gui`, `service`, `data`).
 - Right side, output: `data` stores the data in SQL Server.
-
 - The big box `«subsystem» Hotel4You` is the structured classifier. Its inside is the internal structure.
 - A box `«component» :name` inside the subsystem is a part. Each part is one Java package of our code.
 - A small box labelled `port` is a port. A port sits on the border of a subsystem or an external component.
@@ -114,4 +113,4 @@ These gaps need team review. They are not approved requirements.
 | C-04 | There is no Java code yet. | The package-to-code check is pending. Do it when H4Y-32 adds the Java files. |
 | C-03 | The package of `HotelFacade` is not named in H4Y-32. | The diagram puts it in `service`. Confirm in H4Y-32. |
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23. Reviewed by: pending.
