@@ -23,7 +23,7 @@ class DatabaseTest {
 
         IllegalStateException error = assertThrows(IllegalStateException.class, database::connect);
 
-        assertEquals("Database not available. Check that SQL Server is running.", error.getMessage());
+        assertEquals("Base de dados indisponível. Verifique se o SQL Server está a funcionar.", error.getMessage());
     }
 
     @Test

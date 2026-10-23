@@ -61,8 +61,10 @@ class StaffServiceTest {
     void onCreateFirstManager_throwUsernameTaken_whenUsernameUsedByOtherRole() {
         repository.save(new Receptionist(null, "Rita Lopes", "rita", HASH));
 
-        assertThrows(UsernameTakenException.class,
+        UsernameTakenException error = assertThrows(UsernameTakenException.class,
                 () -> staffService.createFirstManager("rita", PASSWORD));
+
+        assertEquals("O nome de utilizador já existe.", error.getMessage());
     }
 
     @Test
@@ -107,8 +109,10 @@ class StaffServiceTest {
     @ValueSource(strings = {"   "})
     @Tag("H4Y-32-AC-7")
     void onCreateFirstManager_throw_whenUsernameBlank(String username) {
-        assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> staffService.createFirstManager(username, PASSWORD));
+
+        assertEquals("Preencha o nome de utilizador e a palavra-passe.", error.getMessage());
     }
 
     @ParameterizedTest
