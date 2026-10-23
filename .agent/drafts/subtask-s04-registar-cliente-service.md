@@ -14,7 +14,7 @@ branch: feat/H4Y-69-client-service
 
 # registar-cliente: regras e gravação
 
-História pai: registar-cliente. Usa `ClientService.register(name, document, birthday)` e `HotelFacade.registerClient` do diagrama de classes. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+História pai H4Y-52. Usa `ClientService.register(name, document, birthday)` e `HotelFacade.registerClient` do diagrama de classes. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 4.
 
 ## Checklist
@@ -27,4 +27,8 @@ Responsável: a definir na planning do sprint 4.
 - [ ] AC-3: um cliente com o mesmo documento é recusado com "O cliente já existe".
 - [ ] Só o rececionista regista clientes (Q-13).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+Sem ecrã nesta subtask. O ecrã está em H4Y-70.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

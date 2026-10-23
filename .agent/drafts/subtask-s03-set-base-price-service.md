@@ -26,4 +26,8 @@ Responsável proposto: José Cruz (a equipa decide).
 - [ ] AC-3: preço negativo ou não numérico é recusado e o preço anterior fica.
 - [ ] AC-4: o rececionista é recusado (`AccessDeniedException`).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+Sem ecrã nesta subtask. O ecrã está em H4Y-66.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

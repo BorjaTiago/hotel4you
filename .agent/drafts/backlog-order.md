@@ -26,7 +26,8 @@ Revision 2026-10-16: full dependency audit. The status goes back to `draft` beca
 The order of the items does not change. Only the sprint slice changes. The status goes back to `draft`. The PO (Lukas Sperandio, Team Leader of sprint 3) approves it again.
 
 - Team decision (Team Leader, 2026-10-23): the team works with at least 13 points per sprint. Sprint 2 velocity was 13 (H4Y-20, 22, 24, 27).
-- Sprint 3: 15 committed points (list-rooms pulled from sprint 4) plus 2 stretch points (cadastrar-item-stock, pulled from sprint 4). No test-only sub-tasks: H4Y-21 tests go inside H4Y-23 (Team Leader decision). Plan: `docs/scrum/sprint-03/planning.md`.
+- Sprint 3: 13 committed points (list-rooms pulled from sprint 4) plus 2 stretch points (cadastrar-item-stock, pulled from sprint 4). login-restaurante (H4Y-21) was deleted from Jira: the restaurant login already works since sprint 2.
+- Every sprint goal states the value for the stakeholder, the hotel (Team Leader rule, 2026-10-23). Plan: `docs/scrum/sprint-03/planning.md`.
 - Sprint 4 goes back to 13 with cancel-reservation (from sprint 5). Sprint 5 goes back to 13 with refuse-delete-reservation (from sprint 6). Sprint 6 goes down from 15 to 13. This also removes the old sprint 6 risk (configure-room-items to sprint 7).
 - If a sprint 3 stretch item does not finish, it goes first in sprint 4 (sprint 4 then has 15 points).
 - Sub-task drafts for sprints 4 and 5 are a forecast: `subtask-s04-*.md`, `subtask-s05-*.md`. The refinement confirms or changes them.
@@ -35,7 +36,7 @@ The order of the items does not change. Only the sprint slice changes. The statu
 
 | Sprint | Team Leader | Points | Stories | Tasks |
 |--------|-------------|--------|---------|-------|
-| 3 | Lukas Sperandio | 15 + 2 stretch | login-restaurante (H4Y-21, tests inside H4Y-23), funcoes-por-papel (H4Y-23), model-hotel-floors (H4Y-28), register-rooms (H4Y-25), set-base-price (H4Y-26), list-rooms; stretch: cadastrar-item-stock | none (SQL scripts inside the story sub-tasks) |
+| 3 | Lukas Sperandio | 13 + 2 stretch | funcoes-por-papel (H4Y-23), model-hotel-floors (H4Y-28), register-rooms (H4Y-25), set-base-price (H4Y-26), list-rooms; stretch: cadastrar-item-stock | none (SQL scripts inside the story sub-tasks) |
 | 4 | Pedro Costa | 13 | registar-cliente (3), procurar-cliente (2), query-free-rooms (5), cancel-reservation (3) | none |
 | 5 | Antonio Martinho | 13 | create-reservation (5), delete-reservation (3), refuse-delete-reservation (2), registar-cliente-rapido (3) | none |
 
@@ -72,9 +73,9 @@ The order of the items does not change. Only the sprint slice changes. The statu
 |--------|----------------|--------|---------|-----------------------------------|
 | 1 | 10-12 | 0 | none | Requirements documents. |
 | 2 | 10-19 | 13 | janela-principal, login-rececionista, login-gestor, create-staff-account | Skeleton, database and seed ready. The first manager logs in and creates staff accounts. Receptionists log in and see the main window. |
-| 3 | 10-26 | 15 + 2 stretch | login-restaurante, funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price, list-rooms; stretch: cadastrar-item-stock | Restaurant staff log in. Each role sees only its functions. The manager sees floors, registers the 20 rooms and sets base prices. Reception sees the room list. Stretch: item catalogue. |
-| 4 | 11-02 | 13 | registar-cliente, procurar-cliente, query-free-rooms, cancel-reservation | The receptionist registers and finds clients, searches free rooms and cancels reservations. |
-| 5 | 11-09 | 13 | create-reservation, delete-reservation, refuse-delete-reservation, registar-cliente-rapido | Full reservation life cycle. Only the manager deletes. RNF-03 (30 s, registration + reservation) measured. |
+| 3 | 10-26 | 13 + 2 stretch | funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price, list-rooms; stretch: cadastrar-item-stock | The hotel has its 20 rooms and nightly prices in the system. Reception can tell clients which rooms exist and their price. Each employee uses only the functions of their role. Stretch: item catalogue. |
+| 4 | 11-02 | 13 | registar-cliente, procurar-cliente, query-free-rooms, cancel-reservation | Reception serves clients at the desk: it registers and finds clients, tells them which rooms are free for their dates, and cancels a reservation without losing its history. |
+| 5 | 11-09 | 13 | create-reservation, delete-reservation, refuse-delete-reservation, registar-cliente-rapido | Reception books a room for a new client in 30 seconds or less (RNF-03). Only the manager can delete a reservation, so no booking is lost by mistake. |
 | 6 | 11-16 | 13 | check-in, check-out, block-delete-after-check-in, configure-room-items | Check-in and check-out. Delete rules complete. Room items configured. 1st delivery scope complete. |
 | 7 | 11-23 | 12 | consultar-utilizadores, edit-staff-account, remove-staff-account, criar-zona | 1st delivery freeze and zip. Manager edits and removes accounts, lists users, creates zones. |
 | 8 | 11-30 | 14 | editar-zona, remover-zona, reservation-restaurant-pool, limit-reception-floors, limit-restaurant-staff-zones | 1st delivery was due 12-01 (sent at the end of sprint 7). Zones complete. Restaurant and pool in the reservation. Role limits. |
@@ -84,7 +85,7 @@ The order of the items does not change. Only the sprint slice changes. The statu
 | 12 | 2027-01-18 | 17 | registar-uso-stock, registar-saida-stock, carregar-xml-fornecedor-rececionista, definir-precos-extra, adicionar-extras-quarto-reserva | Stock use and exit. Reception loads XML. Extra prices. Extras on the reservation. |
 | 13 | 2027-01-25 | 17 | adicionar-servicos-extra-reserva, calcular-preco-total-reserva, register-room-service-request, record-suggestion-complaint, list-suggestions-complaints | Paid services, total price, room service, suggestions and complaints. Final zip. |
 
-Check: 13+17+13+13+13+12+14+17+18+16+17+17 = 180. 1st delivery scope (sprints 2 to 6) = 69 points.
+Check: 13+15+13+13+13+12+14+17+18+16+17+17 = 178 (180 minus login-restaurante, 2, deleted). 1st delivery scope (sprints 2 to 6) = 67 points.
 
 Changes from the approved order: `create-staff-account` 7 -> 2; `login-restaurante` 2 -> 3; `list-rooms` 3 -> 4; `cadastrar-item-stock` 11 -> 4 (accepted, Q-43); `registar-cliente-rapido` 4 -> 5; `refuse-delete-reservation` 5 -> 6. Inside sprint 2, `janela-principal` no longer waits for login (stub session).
 

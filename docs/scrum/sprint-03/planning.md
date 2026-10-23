@@ -3,11 +3,13 @@
 - Dates: 2026-10-26 to 2026-11-01
 - Team Leader: Lukas Sperandio (member 1, see `.agent/context/team.md`)
 - Limit: at least 13 points per sprint (velocity of sprint 2 = 13; team decision 2026-10-23)
-- Committed: 15 points
+- Committed: 13 points
 
 ## Goal
 
-The manager sees the hotel floors, registers the 20 rooms and sets the base price of each room type, and every user sees only the functions of their role.
+Value for the hotel: at the end of the sprint, the hotel has its 20 rooms and their nightly prices in the system. The reception can tell a client which rooms exist and what they cost, and each employee can use only the functions of their role. This prepares the client registration and reservations of sprints 4 and 5.
+
+Team rule (Team Leader, 2026-10-23): every sprint goal states the value for the stakeholder (the hotel), not only the work.
 
 ## Capacity
 
@@ -25,22 +27,21 @@ The manager sees the hotel floors, registers the 20 rooms and sets the base pric
 
 ## Committed points
 
-15. The minimum is 13.
+13. The minimum is 13.
 
 ## Stories
 
 | Key | Story | Points | Proposed owner | Requirements | Sub-tasks |
 |-----|-------|--------|----------------|--------------|-----------|
-| H4Y-21 | Iniciar sessão como funcionário do restaurante | 2 | Lukas Sperandio | RF-01, RF-02 | none, done inside 23.1 |
 | H4Y-23 | Mostrar apenas as funções permitidas ao papel | 3 | Lukas Sperandio | RF-02 | H4Y-60, H4Y-61 |
 | H4Y-50 | Consultar a lista de quartos | 2 | Antonio Martinho | RF-04, RF-06 | H4Y-67 |
 | H4Y-28 | Consultar os pisos e zonas do hotel | 2 | Tiago Borja | RF-03 | H4Y-62 |
 | H4Y-25 | Registar os 20 quartos por tipo e piso | 3 | Pedro Costa | RF-04 | H4Y-63, H4Y-64 |
 | H4Y-26 | Definir o preço base por noite de cada tipo de quarto | 3 | José Cruz | RF-06 | H4Y-65, H4Y-66 |
 
-Total: 15 points. The team confirms the owners.
+Total: 13 points. The team confirms the owners.
 
-No test-only sub-tasks (Team Leader decision, 2026-10-23). H4Y-21 reuses the login of H4Y-22. Its tests go inside 23.1, which already works on roles and login.
+H4Y-21 (restaurant login, 2 points) was deleted from Jira by the Team Leader on 2026-10-23. The restaurant login already works since sprint 2 (H4Y-22, H4Y-27). Counting it again would inflate the velocity. No test-only sub-tasks (Team Leader decision, 2026-10-23).
 
 ## Tasks
 
@@ -58,7 +59,7 @@ Team decision (2026-10-23, Team Leader): the team works with at least 13 points 
 |-------|-----|------|--------|----------------|-----------------|
 | 1 | H4Y-51 | Cadastrar item de stock (sub-task H4Y-68) | 2 | Tiago Borja | No link to the other stories. Tiago has 2 committed points. Needed before configure-room-items (sprint 6). |
 
-With the stretch item: 17 points. Hours check (warning only): this is above the 40 hours. Do not start a stretch item before the committed sub-tasks of the same person are in review.
+With the stretch item: 15 points. Hours check (warning only): this is above the 40 hours. Do not start a stretch item before the committed sub-tasks of the same person are in review.
 
 H4Y-50 and H4Y-51 were created in Jira on 2026-10-23, under the new epic H4Y-49 (stock) and H4Y-14 (rooms).
 
@@ -83,15 +84,15 @@ H4Y-50 and H4Y-51 were created in Jira on 2026-10-23, under the new epic H4Y-49 
 
 ## Next steps
 
-1. Done (2026-10-23, Team Leader approval): epic H4Y-49, stories H4Y-50 to H4Y-59 and sub-tasks H4Y-60 to H4Y-79 are in Jira. Points are set only on the sprint 3 stories. Backlog stories (H4Y-52 to H4Y-59) have no points until the refinement.
-2. Create the sprint "H4Y - Sprint 3" on the Jira board. Then add H4Y-21, 23, 25, 26, 28, 50, 51 and their sub-tasks to it.
+1. Done (2026-10-23, Team Leader approval): epic H4Y-49, stories H4Y-50 to H4Y-59 and sub-tasks H4Y-60 to H4Y-79 are in Jira. Points are set only on the sprint 3 stories. H4Y-67 got a screen and a menu button, and H4Y-60 lost the H4Y-21 part (Team Leader OK, 2026-10-23). Backlog stories (H4Y-52 to H4Y-59) have no points until the refinement.
+2. Create the sprint "H4Y - Sprint 3" on the Jira board. Then add H4Y-23, 25, 26, 28, 50, 51 and their sub-tasks to it.
 3. Close "H4Y - Sprint 2" after the sprint review.
 
 ```
-committed_points: 15
-limit: 15
+committed_points: 13
+limit: 13
 limit_source: forecast (team decision: at least 13, sprint 2 velocity 13)
 over_limit: false
 ```
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; value goal, H4Y-21 removal and UI review by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

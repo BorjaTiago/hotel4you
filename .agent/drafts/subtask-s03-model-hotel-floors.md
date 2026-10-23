@@ -26,4 +26,11 @@ Responsável proposto: Tiago Borja (a equipa decide).
 - [ ] AC-2: o piso 4 dá a mensagem "O piso não existe".
 - [ ] Ecrã simples aberto pelo menu do gestor. Texto em português.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+- Botão "Pisos e zonas" no menu do gestor (regra de H4Y-23).
+- Ecrã `floors.fxml` no centro da janela principal: lista dos pisos (-1 a 3) com a descrição; ao escolher um piso, mostra os locais desse piso (nome, "acesso com cartão do cliente": sim/não, "exige reserva": sim/não).
+- Campo "Número do piso" e botão "Procurar": com o piso 4 mostra a mensagem "O piso não existe." (AC-2).
+- Só leitura. Nenhuma regra no controlador (RNF-07). Texto em português.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

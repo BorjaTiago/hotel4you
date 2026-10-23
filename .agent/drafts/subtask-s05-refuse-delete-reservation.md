@@ -14,7 +14,7 @@ branch: feat/H4Y-78-refuse-delete-reservation
 
 # refuse-delete-reservation: só o gestor apaga
 
-História pai: refuse-delete-reservation. Puxada do sprint 6 para o sprint 5 (decisão de 2026-10-23, mínimo de 13 pontos por sprint). Acrescenta uma guarda a `ReservationService.delete`. Faz-se depois de delete-reservation, no mesmo sprint, pela mesma pessoa ou a seguir. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+História pai H4Y-58. Puxada do sprint 6 para o sprint 5 (decisão de 2026-10-23, mínimo de 13 pontos por sprint). Acrescenta uma guarda a `ReservationService.delete`. Faz-se depois de delete-reservation, no mesmo sprint, pela mesma pessoa ou a seguir. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 5.
 
 ## Checklist
@@ -27,4 +27,9 @@ Responsável: a definir na planning do sprint 5.
 - [ ] A mensagem de recusa não mostra dados da reserva.
 - [ ] Usa a regra de papéis de H4Y-23. Não cria uma regra nova.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+- O rececionista e o funcionário do restaurante não veem o botão "Apagar reserva" no ecrã `reservations.fxml`. O rececionista continua a ver "Cancelar reserva" (AC-2).
+- Se a ação chegar ao serviço por outro caminho, o ecrã mostra "Só o gestor pode apagar reservas." sem dados da reserva.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
