@@ -1,11 +1,19 @@
 package pt.isep.hotel4you.data;
 
+import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
 /** Stores and finds users. */
 public interface UserRepository {
+
+    /**
+     * Finds all created users.
+     *
+     * @return all users, or empty if none.
+     */
+    List<User> findAll();
 
     /**
      * Finds a user by login name. The search ignores case.

@@ -3,6 +3,8 @@ package pt.isep.hotel4you.service;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
+import java.util.List;
+
 /** Single entry point for the GUI. */
 public class HotelFacade {
 
@@ -54,5 +56,9 @@ public class HotelFacade {
      */
     public void createStaff(String name, String username, String password, Role role, User actor) {
         staffService.createStaff(name, username, password, role, actor);
+    }
+
+    public List<User> findAllUsers() {
+        return staffService.findAll();
     }
 }

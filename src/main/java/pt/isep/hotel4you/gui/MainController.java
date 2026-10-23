@@ -46,8 +46,8 @@ public class MainController {
 
     @FXML
     private void onStaffClicked() {
-        // The staff screen comes with H4Y-27.
-        contentPane.getChildren().setAll(new Label("Contas de funcionários"));
+        Parent staffScreen = new ScreenLoader(facade).load("staff.fxml");
+        contentPane.getChildren().setAll(staffScreen);
     }
 
     @FXML
