@@ -7,6 +7,6 @@ public class LoginFailedException extends RuntimeException {
 
     /** Creates the exception with a fixed message. */
     public LoginFailedException() {
-        super("Invalid username or password.");
+        super("Credenciais inválidas");
     }
 }
