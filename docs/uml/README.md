@@ -8,7 +8,7 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - [class-diagram.md](class-diagram.md): UML class diagram with types, visibility and multiplicities.
 - [classes.md](classes.md): all classes by layer, with attributes, methods and requirements.
 - [traceability.md](traceability.md): requirements to classes.
-- [use-cases.md](use-cases.md): use-case diagrams for all 19 use cases.
+- [use-cases.md](use-cases.md): use-case diagrams for all 50 use cases, by area, with include and extend relations (H4Y-7).
 - [use-case-catalog.md](use-case-catalog.md): short descriptions, actors, permissions and requirement links.
 - [component-diagram.md](component-diagram.md): components, interfaces and external systems (H4Y-9).
 - [component-guide.md](component-guide.md): guide to defend the component diagram (H4Y-9).
@@ -33,4 +33,4 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - `docs/requirements/use-cases.md`
 - `docs/requirements/questions.md`
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; OpenAI Codex, GPT-6, 2026-10-16; class diagram link restored by OpenAI Codex, GPT-6, 2026-10-16; component diagram links by Cursor agent, Claude Opus 5.5, 2026-10-16; sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; OpenAI Codex, GPT-6, 2026-10-16; class diagram link restored by OpenAI Codex, GPT-6, 2026-10-16; component diagram links by Cursor agent, Claude Opus 5.5, 2026-10-16; sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; use-case link text by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
