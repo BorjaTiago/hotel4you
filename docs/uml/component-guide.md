@@ -4,7 +4,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 
 ## Main ideas
 
-1. The layout follows the teacher's slide: one `«subsystem» Hotel4You` box with its internal structure. Each part inside is one Java package: `gui`, `service`, `domain`, `data`, `config`.
+1. The layout follows the teacher's slide: one `«subsystem» Hotel4You` box with its internal structure. Each part inside is one Java package: `gui`, `service`, `domain`, `data`, `config`. The diagram reads from left to right, from input to output (class 1 slides): the actors and the supplier XML file on the left, SQL Server on the right.
 2. Parts connect with assembly connectors (ball and socket). Ports on the border connect to parts with delegation connectors.
 3. The GUI talks only to the business logic. `gui` calls `HotelFacade` and reads `domain` objects. It never uses `data` or SQL Server (RNF-07).
 4. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC, and with an in-memory version for tests (RNF-08, RNF-10, RNF-12).
@@ -81,4 +81,4 @@ Mermaid CLI rendered the diagram to a temporary PNG file. The preview was inspec
 
 The package-to-code check stays pending until H4Y-32 adds the Java files (C-04). Human review is still required.
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21. Reviewed by: pending.
+Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
