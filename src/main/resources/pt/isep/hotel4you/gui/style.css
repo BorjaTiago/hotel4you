@@ -49,3 +49,20 @@
     -fx-font-size: 12px;
     -fx-min-height: 18px;
 }
+
+.main-window {
+    -fx-background-color: white;
+}
+
+.top-bar {
+    -fx-padding: 10;
+    -fx-border-color: #d0d7de;
+    -fx-border-width: 0 0 1 0;
+}
+
+.menu {
+    -fx-padding: 10;
+    -fx-background-color: #f6f8fa;
+    -fx-border-color: #d0d7de;
+    -fx-border-width: 0 1 0 0;
+}

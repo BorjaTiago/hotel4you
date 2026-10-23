@@ -1,10 +1,12 @@
 package pt.isep.hotel4you.gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import pt.isep.hotel4you.domain.User;
+import javafx.stage.Stage;
 import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.LoginFailedException;
 
@@ -34,15 +36,15 @@ public class LoginController {
     @FXML
     private void onLoginClicked() {
         try {
-            User user = facade.login(usernameField.getText(), passwordField.getText());
-            HotelApp.currentUser = user;
-            // The real main window comes with H4Y-24.
-            messageLabel.setStyle("-fx-text-fill: #1e8449;");
-            messageLabel.setText("Welcome, " + user.getName() + " (" + user.getRole() + ")");
+            HotelApp.currentUser = facade.login(usernameField.getText(), passwordField.getText());
+            Parent root = new ScreenLoader(facade).load("main.fxml");
+            Stage stage = (Stage) messageLabel.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.sizeToScene();
+            stage.centerOnScreen();
         } catch (IllegalArgumentException | LoginFailedException | IllegalStateException e) {
-            messageLabel.setStyle("");
             messageLabel.setText(e.getMessage());
+            passwordField.clear();
         }
-        passwordField.clear();
     }
 }
