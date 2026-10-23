@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
@@ -54,14 +55,28 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-32-AC-3")
+    @Tag("H4Y-24-AC-3")
     void onCanCreateStaff_returnTrue_whenActorIsManager() {
         assertTrue(facade.canCreateStaff(new Manager(1L, "Rui Costa", "rui", "hash")));
     }
 
     @Test
     @Tag("H4Y-32-AC-3")
+    @Tag("H4Y-24-AC-3")
     void onCanCreateStaff_returnFalse_whenActorIsReceptionist() {
         assertFalse(facade.canCreateStaff(new Receptionist(2L, "Ana Silva", "ana", "hash")));
+    }
+
+    @Test
+    @Tag("H4Y-24-AC-3")
+    void onCanCreateStaff_returnFalse_whenActorIsRestaurantStaff() {
+        assertFalse(facade.canCreateStaff(new RestaurantStaff(3L, "Joao Lima", "joao", "hash")));
+    }
+
+    @Test
+    @Tag("H4Y-24-AC-3")
+    void onCanCreateStaff_returnFalse_whenActorIsNull() {
+        assertFalse(facade.canCreateStaff(null));
     }
 
     @Test
