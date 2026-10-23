@@ -99,7 +99,7 @@ Set `manager.username` and `manager.password` in `application.properties`, then 
 ./mvnw compile exec:java -Dexec.mainClass=pt.isep.hotel4you.config.FirstManagerCommand
 ```
 
-It prints `Manager created.` or `A manager already exists.`. You run it once.
+It prints `Gestor criado.` (manager created) or `Já existe um gestor.` (a manager already exists). You run it once.
 
 ### 6. Run the application
 
@@ -108,7 +108,7 @@ It prints `Manager created.` or `A manager already exists.`. You run it once.
 ```
 
 Log in with the manager username and password. If SQL Server is not running, the app shows the message
-`Database not available. Check that SQL Server is running.`
+`Base de dados indisponível. Verifique se o SQL Server está a funcionar.` (database not available).
 
 ### Stop Docker
 
@@ -161,3 +161,5 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
+
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
