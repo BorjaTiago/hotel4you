@@ -8,67 +8,80 @@ Sources: [statement](../../.agent/context/enunciado.md) sections 2 and 3, [requi
 
 ## Reading rules
 
-- A box with `«component»` is one Java package of our code.
-- A circle is an interface. A solid line from a component to a circle: the component provides the interface.
-- A dashed arrow is a dependency ("uses"). It goes from the user to the provider.
-- A box with `«external»` is a system or a library that the team does not write.
-- Calls go one way: `gui` to `service` to `data`. `service` calls `data` only through the `Repositories` interface.
-- `data` also uses the `domain` types. The arrow is not drawn, to keep the diagram easy to read. See the Components table.
-- `config` is at the top because it starts the application. It holds no business rule.
+The diagram reads from left to right, from input to output, as in the class 1 slides (Moodle).
+
+- Left side, inputs: the actors use `HotelUI`, and the supplier XML stock file comes in.
+- Middle: the parts of the subsystem, in call order (`gui`, `service`, `data`).
+- Right side, output: `data` stores the data in SQL Server.
+- The big box `«subsystem» Hotel4You` is the structured classifier. Its inside is the internal structure.
+- A box `«component» :name` inside the subsystem is a part. Each part is one Java package of our code.
+- A small box labelled `port` is a port. A port sits on the border of a subsystem or an external component.
+- A circle is a provided interface (ball). A solid line joins the circle to the component that provides it.
+- A dashed arrow labelled `requires` goes to the interface that a component needs. Mermaid cannot draw the socket, so this arrow is the socket. A required interface and a provided interface together are one assembly connector (ball and socket).
+- A solid arrow labelled `delegation` is a delegation connector. It joins a port to the part that does the work.
+- A solid arrow labelled `input` shows the supplier XML file going in through a port. `service` (`StockService`) reads it.
+- A box with `«external»` is outside our code. SQL Server is an external component. The supplier XML file is an external artifact.
+- Libraries (JavaFX, JUnit) and the JDBC driver are not components. They are not in the diagram. See [libraries.md](../libraries.md).
+- A dashed arrow labelled `uses` is a dependency. `gui`, `service` and `data` use the `domain` types.
+- `config` creates all parts at start-up. These links are wiring, not dependencies, so they are not drawn.
 
 ```mermaid
 %%{init: {"theme":"neutral","fontFamily":"Arial"}}%%
-flowchart TB
-    %% Requirements: RF-28; RNF-02, RNF-05, RNF-06, RNF-07, RNF-08, RNF-10, RNF-11, RNF-12.
-    subgraph APP["«system» Hotel4You (Java application)"]
-        direction TB
-        GUI["«component»<br/>gui<br/>JavaFX controllers and views"]
-        subgraph BL["Business logic"]
-            direction TB
-            FAC(("HotelFacade"))
-            SVC["«component»<br/>service<br/>HotelFacade and services"]
-            DOM["«component»<br/>domain<br/>Domain classes and enums"]
-        end
+flowchart LR
+    UI(("HotelUI"))
+    XML["«external» «artifact»<br/>Supplier XML stock file"]
+    subgraph H4Y["«subsystem» Hotel4You"]
+        direction LR
+        PUI["port"]
+        PXML["port"]
+        GUI["«component»<br/>:gui"]
+        FAC(("HotelFacade"))
+        SVC["«component»<br/>:service"]
+        DOM["«component»<br/>:domain"]
         REPO(("Repositories"))
-        DATA["«component»<br/>data<br/>Repository interfaces<br/>and JDBC versions"]
-        CFG["«component»<br/>config<br/>Settings and start-up"]
-        SET(("AppConfig"))
+        DATA["«component»<br/>:data"]
+        CFGI(("AppConfig"))
+        CFG["«component»<br/>:config"]
+        PDB["port"]
+    end
+    SQLI(("SQL"))
+    subgraph DBS["«external» SQL Server"]
+        direction LR
+        PSQL["port"]
+        DBE["«component»<br/>:database"]
     end
 
-    JFX["«external library»<br/>JavaFX"]
-    BCRYPT["«external library»<br/>BCrypt (at.favre.lib:bcrypt)"]
-    JDBC["«external library»<br/>Microsoft JDBC Driver<br/>for SQL Server"]
-    DB[("«external system»<br/>SQL Server")]
-    XML["«external system»<br/>Supplier XML stock file"]
-
-    GUI -.->|uses| FAC
-    GUI -.->|reads| DOM
-    GUI -.->|uses| JFX
+    UI --- PUI
+    PUI -->|delegation| GUI
+    GUI -.->|requires| FAC
     FAC --- SVC
     SVC -.->|requires| REPO
-    CFG --- SET
-    SVC -.->|uses| DOM
-    SVC -.->|reads| XML
-    SVC -.->|uses| BCRYPT
     REPO --- DATA
-    DOM ~~~ DATA
-    DATA -.->|reads| SET
-    DATA -.->|uses| JDBC
-    JDBC -.->|connects| DB
-    CFG -.->|creates| GUI
-    CFG -.->|creates| SVC
-    CFG -.->|creates| DATA
+    DATA -.->|requires| CFGI
+    CFGI --- CFG
+    SVC -.->|uses| DOM
+    GUI -.->|uses| DOM
+    DATA -.->|uses| DOM
+    DATA -->|delegation| PDB
+    PDB -.->|requires| SQLI
+    SQLI --- PSQL
+    PSQL -->|delegation| DBE
+    XML -->|input| PXML
+    PXML -->|delegation| SVC
+
+    classDef port fill:#fff,stroke:#333,stroke-width:1px
+    class PUI,PDB,PXML,PSQL port
 ```
 
 ## Components
 
 | Component (package) | Content | Provides | Uses | Requirement IDs |
 |---------------------|---------|----------|------|-----------------|
-| `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | Screens for the actors. | `HotelFacade`, `domain` (read only), JavaFX. | RNF-06, RNF-07 |
-| `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, BCrypt. | RNF-02, RNF-07, RNF-08 |
+| `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | `HotelUI` (screens for the actors), through the subsystem port. | `HotelFacade`, `domain` (read only). | RNF-06, RNF-07 |
+| `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, the supplier XML file (through a port). | RNF-07, RNF-08 |
 | `domain` | Domain classes and enums (`User`, `Room`, `Reservation`, `MagneticCard`, `StockItem`, `Role` and the others). No SQL and no JavaFX. | Data types for the other packages. | None. | RNF-07, RNF-08 |
-| `data` | Repository interfaces, for example `UserRepository`, and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC version maps table rows to domain objects. Unit tests use an in-memory repository in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, JDBC driver. | RNF-01, RNF-10, RNF-12 |
-| `config` | Reads the settings from the `application.properties` file (`AppConfig`). Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. | `AppConfig`. | `gui`, `service`, `data`. | RNF-08, RNF-12 |
+| `data` | Repository interfaces, for example `UserRepository`, and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC version maps table rows to domain objects. Unit tests use an in-memory repository in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, `SQL` of SQL Server (through a port). | RNF-01, RNF-10, RNF-12 |
+| `config` | Reads the settings from the `application.properties` file (`AppConfig`). Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. The start-up links are not drawn. | `AppConfig`. | `gui`, `service`, `data` (start-up only). | RNF-08, RNF-12 |
 
 ## Interfaces
 
@@ -77,19 +90,17 @@ flowchart TB
 | `HotelFacade` | `service` | `gui` | RNF-07 |
 | Repositories (`UserRepository` and one for each other aggregate) | Declared in `data`. `JdbcUserRepository` is the SQL Server version. | `service` | RNF-08, RNF-10, RNF-12 |
 | `AppConfig` | `config` | `data` (`Database` reads it) | RNF-12 |
+| `HotelUI` | `gui`, through the subsystem port | The actors | RNF-06 |
+| `SQL` | SQL Server (external) | `data`, through the subsystem port | RNF-12 |
 
-## External systems and libraries
+## External components
 
 | Name | Type | Used by | Requirement IDs |
 |------|------|---------|-----------------|
-| SQL Server | External system | `data`, through JDBC | RNF-12 |
-| Microsoft JDBC Driver for SQL Server (mssql-jdbc) | External library | `data`, through JDBC | RNF-11, RNF-12 |
-| JavaFX | External library | `gui` | RNF-06, RNF-11 |
-| BCrypt (`at.favre.lib:bcrypt`) | External library | `service` (`AuthService`) | RNF-02, RNF-11 |
-| Supplier XML stock file | External system (file) | `service` (`StockService`) | RF-28 |
-| JUnit | External library (tests only) | Test code. Not in the diagram: not part of the running application. | RNF-10, RNF-11 |
+| SQL Server | External component. Provides `SQL`. | `data`, through a port | RNF-12 |
+| Supplier XML stock file | External artifact (file) | `service` (`StockService`), through a port | RF-28 |
 
-The justification of each library is in [component-guide.md](component-guide.md) and [libraries.md](../libraries.md).
+JavaFX, the Microsoft JDBC Driver for SQL Server, BCrypt (`at.favre.lib:bcrypt`) and JUnit are libraries. A library is not a component (teacher feedback, H4Y-9, 2026-10-17). They are listed with their reasons in [libraries.md](../libraries.md) and [component-guide.md](component-guide.md).
 
 ## Gaps
 
@@ -98,8 +109,8 @@ These gaps need team review. They are not approved requirements.
 | ID | Gap | Effect and next step |
 |----|-----|----------------------|
 | C-01 | The class diagram had no repository classes (G-01 in the sequence guide). | Closed. `UserRepository`, `JdbcUserRepository` and `Database` exist in `data` and the class diagram shows them. |
-| C-02 | The password hash method was open (H4Y-29). | Closed. BCrypt (`at.favre.lib:bcrypt`) is chosen. It is in the external table and in `docs/libraries.md`. |
+| C-02 | The password hash method was open (H4Y-29). | Closed. BCrypt (`at.favre.lib:bcrypt`) is chosen. It is a library, not a component. It is in `docs/libraries.md`. |
 | C-04 | There was no Java code (H4Y-32). | Closed for the classes that exist now. The five packages exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17). |
 | C-03 | The package of `HotelFacade` was not named in H4Y-32. | Closed. `HotelFacade` is in `service`, as in the Java code. |
 
-Created by: jmbcruz. Updated by: BorjaTiago. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
