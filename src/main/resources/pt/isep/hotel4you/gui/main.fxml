@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="900" prefHeight="600" styleClass="main-window"
+            stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="pt.isep.hotel4you.gui.MainController">
+
+    <!-- Top: welcome text and logout -->
+    <top>
+        <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="top-bar">
+            <Label fx:id="welcomeLabel"/>
+            <Button text="Terminar sessão" onAction="#onLogoutClicked"/>
+        </HBox>
+    </top>
+
+    <!-- Left: menu with the functions of the user -->
+    <left>
+        <VBox spacing="10" prefWidth="180" styleClass="menu">
+            <Button fx:id="staffButton" text="Funcionários" onAction="#onStaffClicked"
+                    maxWidth="Infinity" visible="false"/>
+        </VBox>
+    </left>
+
+    <!-- Centre: the open function -->
+    <center>
+        <StackPane fx:id="contentPane"/>
+    </center>
+
+</BorderPane>

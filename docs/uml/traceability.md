@@ -47,11 +47,11 @@ Requirements from [../requirements/requirements.md](../requirements/requirements
 | RNF-04 Simple and intuitive GUI | Not covered by a class (process and usability test) |
 | RNF-05 Software in Java | Not covered. The diagram shows no class for a language rule. |
 | RNF-06 JavaFX GUI | All Interface classes (LoginController to FeedbackController) |
-| RNF-07 Business logic separate from GUI | HotelFacade (note: "The business layer does not use JavaFX"), Interface layer calls only the facade |
+| RNF-07 Business logic separate from GUI | HotelFacade (note: "The business layer does not use JavaFX"), Interface layer calls only the facade, MainController shows menu buttons from HotelFacade.canCreateStaff |
 | RNF-08 Maintainable class structure | Layers: Interface, Facade, Services, Domain, Enums. Facade and services split by topic. |
 | RNF-09 Javadoc | Not covered. The diagram shows no class for documentation. |
 | RNF-10 JUnit unit tests | Not covered. The diagram shows no test classes. |
 | RNF-11 Libraries documented | Not covered by a class. See [docs/libraries.md](../libraries.md). |
 | RNF-12 SQL Server database | Main, FirstManagerCommand, AppConfig, Database, UserRepository, JdbcUserRepository |
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

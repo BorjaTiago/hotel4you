@@ -25,8 +25,14 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why this way:** The screen only reads input and shows the result.
 - **Other option:** Check the password in the controller. Not done: the GUI would hold security code.
 
+### MainController
+- **What:** Main window after login. Top: welcome text and Logout. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen.
+- **Why:** RNF-06, RNF-07. Each user finds the functions of the role in one place.
+- **Why this way:** The menu asks `HotelFacade` which buttons to show (now `canCreateStaff`). The screen has no role check of its own.
+- **Other option:** A `Session` or `PermissionPolicy` class for the menu. Not done: the facade already holds the rules, and the extra class adds no value now.
+
 ### HotelApp
-- **What:** The JavaFX application. It opens the login screen. It keeps the facade and the logged-in user.
+- **What:** The JavaFX application. It opens the login screen. It keeps the facade and the logged-in user. Without a logged-in user, the main window does not open (H4Y-24).
 - **Why:** RNF-06. JavaFX needs one `Application` class.
 - **Why this way:** `Main` sets the facade first. If the start failed, `HotelApp` shows the error in a popup.
 - **Other option:** Let each screen read the settings. Not done: the screens would know the database.
@@ -415,4 +421,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
