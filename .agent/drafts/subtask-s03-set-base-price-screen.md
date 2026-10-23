@@ -24,4 +24,11 @@ Responsável proposto: José Cruz (a equipa decide).
 - [ ] O erro de preço inválido vem do serviço. Nenhuma regra no controlador (RNF-07).
 - [ ] Botão no menu do gestor. Texto em português.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+- Botão "Preços" no menu do gestor.
+- Ecrã `prices.fxml`: tabela com os 3 tipos de quarto (tipo, capacidade, preço base por noite). Um tipo sem preço mostra "—".
+- Ao escolher um tipo: campo "Novo preço (€)" e botão "Guardar". Depois de guardar, a tabela mostra o valor novo (AC-1, AC-2).
+- Preço inválido: mensagem de erro e o valor antigo fica na tabela (AC-3).
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

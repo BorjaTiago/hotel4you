@@ -14,7 +14,7 @@ branch: feat/H4Y-72-free-rooms-service
 
 # query-free-rooms: regra de disponibilidade
 
-História pai: query-free-rooms. Dona da regra única de sobreposição de datas. A reserva (sprint 5) reutiliza-a. Usa `RoomService.isAvailable` e `RoomService.searchRooms` do diagrama. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+História pai H4Y-54. Dona da regra única de sobreposição de datas. A reserva (sprint 5) reutiliza-a. Usa `RoomService.isAvailable` e `RoomService.searchRooms` do diagrama. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 4. Proposta: uma pessoa com experiência em datas e SQL.
 
 ## Checklist
@@ -29,4 +29,8 @@ Responsável: a definir na planning do sprint 4. Proposta: uma pessoa com experi
 - [ ] AC-5: sem quartos livres, a resposta é uma lista vazia com mensagem.
 - [ ] Reservas de teste próprias: uma ativa e uma cancelada.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+Sem ecrã nesta subtask. O ecrã está em H4Y-73.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

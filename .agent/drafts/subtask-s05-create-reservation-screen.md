@@ -14,7 +14,7 @@ branch: feat/H4Y-76-reservation-screen
 
 # create-reservation: ecrã
 
-História pai: create-reservation. Depende do serviço. Liga a pesquisa de cliente e a pesquisa de quartos livres (sprint 4). Usa `ReservationController.onCreateReservationClicked`. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+História pai H4Y-56. Depende do serviço. Liga a pesquisa de cliente e a pesquisa de quartos livres (sprint 4). Usa `ReservationController.onCreateReservationClicked`. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 5.
 
 ## Checklist
@@ -24,4 +24,12 @@ Responsável: a definir na planning do sprint 5.
 - [ ] Os erros vêm do serviço (RNF-07).
 - [ ] Verificação manual: reservar e ver que o quarto sai da pesquisa de livres.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+- No ecrã `reservations.fxml` (H4Y-74): botão "Nova reserva".
+- Formulário: cliente (o escolhido em "Usar na reserva", ou procurar pelo documento), quarto livre (o escolhido em "Quartos livres", ou procurar ali mesmo), datas de entrada e saída.
+- Antes de confirmar: resumo com o preço base por noite e o número de noites (AC-4). Botão "Confirmar reserva".
+- Dados em falta: a mensagem diz o que falta (AC-3). Quarto ocupado: "O quarto já está reservado nessas datas." (AC-2).
+- Depois de confirmar: a nova reserva aparece na tabela com o estado "Reservada".
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

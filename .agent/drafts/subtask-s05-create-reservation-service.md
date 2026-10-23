@@ -14,7 +14,7 @@ branch: feat/H4Y-75-reservation-service
 
 # create-reservation: regras e gravação
 
-História pai: create-reservation. Usa `ReservationService.create` e `HotelFacade.createReservation`. Reutiliza a regra `RoomService.isAvailable` do sprint 4. Não cria uma segunda regra. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+História pai H4Y-56. Usa `ReservationService.create` e `HotelFacade.createReservation`. Reutiliza a regra `RoomService.isAvailable` do sprint 4. Não cria uma segunda regra. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 5.
 
 ## Checklist
@@ -27,4 +27,8 @@ Responsável: a definir na planning do sprint 5.
 - [ ] AC-4: o preço base por noite do tipo vem do serviço.
 - [ ] A reserva guarda o utilizador que a criou (`created_by_user_id`).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+Sem ecrã nesta subtask. O ecrã está em H4Y-76.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

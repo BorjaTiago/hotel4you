@@ -28,4 +28,8 @@ Responsável proposto: Pedro Costa (a equipa decide).
 - [ ] AC-4: o 11.º quarto do piso 3 é recusado.
 - [ ] Só o gestor regista quartos (regra de H4Y-23, ou `AccessDeniedException` se 23.1 ainda não estiver no main).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+Sem ecrã nesta subtask. O ecrã está em H4Y-64.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

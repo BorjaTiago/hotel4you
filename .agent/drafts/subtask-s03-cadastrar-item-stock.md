@@ -14,7 +14,7 @@ branch: feat/H4Y-68-stock-item
 
 # cadastrar-item-stock: catálogo de itens
 
-História pai: cadastrar-item-stock (2 pontos). Usa `StockService.createItem(name, unit)` e `StockController.onSaveItemClicked`. Esta subtask cria a tabela de itens.
+História pai H4Y-51 (2 pontos). Usa `StockService.createItem(name, unit)` e `StockController.onSaveItemClicked`. Esta subtask cria a tabela de itens.
 Extra do sprint 3: entra quando o trabalho comprometido estiver em curso. Se não acabar, passa para o início do sprint 4.
 Responsável proposto: Tiago Borja (a equipa decide).
 
@@ -28,4 +28,11 @@ Responsável proposto: Tiago Borja (a equipa decide).
 - [ ] AC-3: um item com o mesmo nome é recusado.
 - [ ] AC-4: um utilizador que não é gestor é recusado.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+- Botão "Stock" no menu do gestor.
+- Ecrã `stock.fxml`: formulário com "Nome" e "Unidade" (por exemplo: unidade, kg, litro) e botão "Registar item".
+- Por baixo: tabela com os itens do catálogo (nome, unidade, quantidade em stock).
+- Mensagens de erro do serviço por baixo do formulário (campo em falta, item repetido). Usa `StockController.onSaveItemClicked`.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

@@ -25,4 +25,11 @@ Responsável proposto: Pedro Costa (a equipa decide).
 - [ ] Botão no menu do gestor. Texto em português.
 - [ ] Verificação manual: registar os 20 quartos e ver o resumo.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## Interface (UI)
+
+- Botão "Registar quartos" no menu do gestor.
+- Ecrã `rooms.fxml`: formulário com "Número" (campo de texto), "Piso" (caixa de escolha só com 2 e 3) e "Tipo" (caixa de escolha: individual, duplo, familiar), botão "Registar".
+- Por baixo: tabela com os quartos registados (número, piso, tipo) e um resumo "Piso 2: x/10 · Piso 3: y/10 · Individuais x/7 · Duplos y/10 · Familiares z/3" (AC-2).
+- Mensagem de sucesso a verde e de erro a vermelho, por baixo do formulário. Os textos vêm do serviço.
+
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
