@@ -19,9 +19,10 @@ Responsável proposto: Pedro Costa (a equipa decide).
 
 ## Checklist
 
-- [ ] Um teste JUnit por cada AC-1 a AC-4. Os testes têm a tag `@Tag("H4Y-24-AC-n")`. Os testes usam o modelo de navegação, não um ecrã.
+- [ ] AC-3: testes JUnit de `canCreateStaff` com a tag `@Tag("H4Y-24-AC-3")` (gestor sim; rececionista, funcionário do restaurante e `null` não). Ficheiros: `StaffServiceTest`, `HotelFacadeTest`.
+- [ ] AC-1, AC-2 e AC-4: são ecrãs. A equipa não usa TestFX, por isso verificam-se à mão. Registar no PR o nome, a data e o resultado de cada verificação.
 - [ ] Javadoc nas novas classes públicas. O Javadoc compila.
-- [ ] Diagrama de classes atualizado (registo de navegação, sessão) com a referência de uso de IA.
+- [ ] Diagrama de classes atualizado com `MainController` e com a referência de uso de IA. Não há `Session` nem registo de navegação: não existem no diagrama.
 - [ ] Nenhuma biblioteca nova, ou está em `docs/libraries.md`.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
