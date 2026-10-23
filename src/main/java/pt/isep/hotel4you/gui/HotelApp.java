@@ -29,7 +29,10 @@ public class HotelApp extends Application {
     @Override
     public void start(Stage stage) {
         if (startError != null) {
-            new Alert(Alert.AlertType.ERROR, startError).showAndWait();
+            Alert alert = new Alert(Alert.AlertType.ERROR, startError);
+            alert.setTitle("Erro");
+            alert.setHeaderText(null);
+            alert.showAndWait();
             Platform.exit();
             return;
         }

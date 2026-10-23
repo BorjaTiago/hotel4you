@@ -63,6 +63,7 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Estimation: Fibonacci story points (1, 2, 3, 5, 8, 13). Stories above 8 are split.
 - Stories in Portuguese. Format: "Como <papel>, Eu quero <ação>, Para que <benefício>".
 - Code and docs in English, Simplified Technical English.
+- All text the app shows to the user is in Portuguese (Portugal): screen labels, buttons, messages, popups and console output of the app tools. Code names, log text for developers and internal checks stay in English (team decision, user, 2026-10-23).
 - Agents write local drafts in `.agent/drafts/`. A human approves before anything goes to Jira.
 - Points stay empty in a draft until the team decides. Sprint capacity is committed in points.
 - Team roster and Team Leader rotation: `team.md`.
@@ -74,4 +75,4 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Drafts: `.agent/drafts/<type>-<slug>.md`. Examples: `.agent/examples/`.
 - Acceptance scenarios are numbered AC-1, AC-2 inside the story. Each test has `@Tag("H4Y-NN-AC-n")`.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04); branch rule (2026-10-16); doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04); branch rule (2026-10-16); doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; UI language rule, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

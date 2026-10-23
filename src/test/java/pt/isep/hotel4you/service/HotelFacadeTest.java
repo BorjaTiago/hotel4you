@@ -19,6 +19,7 @@ import pt.isep.hotel4you.domain.User;
 class HotelFacadeTest {
 
     private static final String PASSWORD = "secret123";
+    private static final String LOGIN_FAILED_MESSAGE = "Credenciais inválidas";
 
     private InMemoryUserRepository repository;
     private AuthService authService;
@@ -43,6 +44,45 @@ class HotelFacadeTest {
         User ana = saveAna();
 
         assertEquals(ana, facade.login("ana", PASSWORD));
+    }
+
+    private User saveRui() {
+        return repository.save(
+                new Manager(null, "Rui Costa", "rui", authService.hashPassword(PASSWORD)));
+    }
+
+    @Test
+    @Tag("H4Y-20-AC-1")
+    void onLogin_returnManager_whenManagerCredentialsValid() {
+        User rui = saveRui();
+
+        User user = facade.login("rui", PASSWORD);
+
+        assertEquals(rui, user);
+        assertEquals(Role.MANAGER, user.getRole());
+        assertTrue(facade.canCreateStaff(user));
+    }
+
+    @Test
+    @Tag("H4Y-20-AC-2")
+    void onLogin_throwLoginFailed_whenManagerPasswordWrong() {
+        saveRui();
+
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> facade.login("rui", "wrong-pass"));
+
+        assertEquals(LOGIN_FAILED_MESSAGE, error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-20-AC-3")
+    void onLogin_throwLoginFailed_whenUsernameUnknown() {
+        saveRui();
+
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> facade.login("nobody", PASSWORD));
+
+        assertEquals(LOGIN_FAILED_MESSAGE, error.getMessage());
     }
 
     @Test

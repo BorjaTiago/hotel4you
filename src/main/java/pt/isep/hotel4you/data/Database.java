@@ -10,7 +10,7 @@ import pt.isep.hotel4you.config.AppConfig;
 public class Database {
 
     /** The message of the error when the database cannot be reached. */
-    public static final String NOT_AVAILABLE = "Database not available. Check that SQL Server is running.";
+    public static final String NOT_AVAILABLE = "Base de dados indisponível. Verifique se o SQL Server está a funcionar.";
 
     private final AppConfig config;
 

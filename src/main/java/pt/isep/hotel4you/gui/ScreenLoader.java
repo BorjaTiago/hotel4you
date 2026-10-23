@@ -39,7 +39,7 @@ public class ScreenLoader {
         try {
             return loader.load();
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot open the screen.");
+            throw new IllegalStateException("Não foi possível abrir o ecrã.");
         }
     }
 
@@ -47,7 +47,7 @@ public class ScreenLoader {
         try {
             return type.getConstructor(HotelFacade.class).newInstance(facade);
         } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Cannot create the screen controller.");
+            throw new IllegalStateException("Não foi possível criar o controlador do ecrã.");
         }
     }
 }

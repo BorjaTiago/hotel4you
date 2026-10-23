@@ -31,7 +31,7 @@ public record AppConfig(String dbUrl, String dbUser, String dbPassword,
         try (Reader reader = Files.newBufferedReader(file)) {
             properties.load(reader);
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot read application.properties.");
+            throw new IllegalStateException("Não foi possível ler o ficheiro application.properties.");
         }
 
         // 2. Take each value by its key. The database values must exist.
@@ -57,7 +57,7 @@ public record AppConfig(String dbUrl, String dbUser, String dbPassword,
     private static String required(Properties properties, String key) {
         String value = properties.getProperty(key);
         if (value == null || value.isBlank()) {
-            throw new IllegalStateException("Missing setting: " + key);
+            throw new IllegalStateException("Falta a configuração: " + key);
         }
         return value;
     }

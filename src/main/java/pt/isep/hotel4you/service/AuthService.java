@@ -31,7 +31,7 @@ public class AuthService {
      */
     public String hashPassword(String password) {
         if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Password must not be blank.");
+            throw new IllegalArgumentException("A palavra-passe não pode estar vazia.");
         }
         return BCrypt.with(VERSION, LongPasswordStrategies.hashSha512(VERSION))
                 .hashToString(COST, password.toCharArray());
@@ -48,7 +48,7 @@ public class AuthService {
      */
     public User login(String username, String password) {
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Fill in username and password.");
+            throw new IllegalArgumentException("Preencha o nome de utilizador e a palavra-passe.");
         }
         User user = userRepository.findByUsername(username.trim())
                 .orElseThrow(LoginFailedException::new);

@@ -48,7 +48,7 @@ public class StaffService {
      */
     public boolean createFirstManager(String username, String password) {
         if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Fill in username and password.");
+            throw new IllegalArgumentException("Preencha o nome de utilizador e a palavra-passe.");
         }
         String trimmed = username.trim();
         if (userRepository.existsByRole(Role.MANAGER)) {

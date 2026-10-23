@@ -49,14 +49,17 @@ class AppConfigTest {
         IllegalStateException error =
                 assertThrows(IllegalStateException.class, () -> AppConfig.load(configFile));
 
-        assertTrue(error.getMessage().contains("db.url"));
+        assertEquals("Falta a configuração: db.url", error.getMessage());
     }
 
     @Test
     @Tag("H4Y-32-AC-5")
     void onLoad_throw_whenFileMissing() {
-        assertThrows(IllegalStateException.class,
+        IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> AppConfig.load(tempDir.resolve("missing.properties")));
+
+        assertEquals("Não foi possível ler o ficheiro application.properties.",
+                error.getMessage());
     }
 
     @Test
