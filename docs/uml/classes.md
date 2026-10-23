@@ -12,6 +12,7 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | LoginController | Interface | - | onLoginClicked() (private) | RF-01 |
+| MainController | Interface | - | initialize(), onStaffClicked(), onLogoutClicked() (private) | RNF-06, RNF-07 |
 | HotelApp | Interface | facade (static), currentUser (static), startError (static) | start() | RNF-06, RNF-07 |
 | ScreenLoader | Interface | - | load() | RNF-06, RNF-07 |
 | RoomController | Interface | - | onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() | RF-04, RF-05, RF-06, RF-08 |
@@ -99,4 +100,4 @@ Notes:
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.

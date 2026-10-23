@@ -7,6 +7,7 @@
 - `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
 - `$` marks a static member.
 - `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. The `createStaff` logic comes with H4Y-27.
+- `MainController` shows a menu button only when a facade method allows it. Now only the Staff button uses `canCreateStaff(actor)`. The screen has no role check of its own (H4Y-24).
 
 ```mermaid
 classDiagram
@@ -15,6 +16,11 @@ classDiagram
     %% ==========================================
     class LoginController {
         -onLoginClicked() void
+    }
+    class MainController {
+        -initialize() void
+        -onStaffClicked() void
+        -onLogoutClicked() void
     }
     class HotelApp {
         +facade: HotelFacade$
@@ -418,6 +424,7 @@ classDiagram
     %% DEPENDENCIES (Controllers -> Facade)
     %% ==========================================
     LoginController ..> HotelFacade : uses
+    MainController ..> HotelFacade : uses
     RoomController ..> HotelFacade : uses
     ClientController ..> HotelFacade : uses
     LocationController ..> HotelFacade : uses
@@ -466,6 +473,8 @@ classDiagram
     FirstManagerCommand ..> JdbcUserRepository : creates
     FirstManagerCommand ..> AuthService : creates
     HotelApp ..> ScreenLoader : uses
+    LoginController ..> ScreenLoader : opens main window
+    MainController ..> ScreenLoader : opens login on logout
     ScreenLoader ..> HotelFacade : gives to controllers
 
     %% ==========================================
@@ -480,4 +489,4 @@ classDiagram
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
