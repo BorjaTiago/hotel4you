@@ -11,14 +11,14 @@
     <top>
         <HBox spacing="10" alignment="CENTER_RIGHT" styleClass="top-bar">
             <Label fx:id="welcomeLabel"/>
-            <Button text="Logout" onAction="#onLogoutClicked"/>
+            <Button text="Terminar sessão" onAction="#onLogoutClicked"/>
         </HBox>
     </top>
 
     <!-- Left: menu with the functions of the user -->
     <left>
         <VBox spacing="10" prefWidth="180" styleClass="menu">
-            <Button fx:id="staffButton" text="Staff" onAction="#onStaffClicked"
+            <Button fx:id="staffButton" text="Funcionários" onAction="#onStaffClicked"
                     maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>

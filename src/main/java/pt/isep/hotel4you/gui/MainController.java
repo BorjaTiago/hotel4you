@@ -39,7 +39,7 @@ public class MainController {
     @FXML
     private void initialize() {
         User user = HotelApp.currentUser;
-        welcomeLabel.setText("Welcome, " + user.getName() + " (" + user.getRole() + ")");
+        welcomeLabel.setText("Bem-vindo, " + user.getName());
         staffButton.managedProperty().bind(staffButton.visibleProperty());
         staffButton.setVisible(facade.canCreateStaff(user));
     }
@@ -47,7 +47,7 @@ public class MainController {
     @FXML
     private void onStaffClicked() {
         // The staff screen comes with H4Y-27.
-        contentPane.getChildren().setAll(new Label("Staff accounts"));
+        contentPane.getChildren().setAll(new Label("Contas de funcionários"));
     }
 
     @FXML
