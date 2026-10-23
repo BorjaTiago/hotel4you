@@ -19,7 +19,7 @@ import pt.isep.hotel4you.domain.User;
 class HotelFacadeTest {
 
     private static final String PASSWORD = "secret123";
-    private static final String LOGIN_FAILED_MESSAGE = "Invalid username or password.";
+    private static final String LOGIN_FAILED_MESSAGE = "Credenciais inválidas";
 
     private InMemoryUserRepository repository;
     private AuthService authService;
