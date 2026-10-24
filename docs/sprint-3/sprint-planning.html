@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+  <meta charset="utf-8">
+  <title>Sprint Planning</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      margin: 0;
+      padding: 35pt 42.5pt 14pt;
+      width: 510pt;
+      background: #fff;
+      color: #172A4D;
+      font: 8pt Arial, "Liberation Sans", Helvetica, sans-serif;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    /* Titles */
+    h1.title {
+      font-size: 14pt;
+      font-weight: normal;
+      margin: 3.65pt 0 0;
+    }
+
+    h1 {
+      font-size: 11.5pt;
+      font-weight: normal;
+      margin: 40pt 0 0;
+      break-after: avoid;
+    }
+
+    h2 {
+      font-size: 9pt;
+      margin: 18pt 0 0;
+      break-after: avoid;
+    }
+
+    /* Tables */
+    table {
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 9pt 0 0;
+      width: 498.5pt;
+      break-inside: avoid;
+    }
+
+    th,
+    td {
+      border: .75pt solid #C1C7D0;
+      padding: 2pt 0 0 4.2pt;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      font-size: 8pt;
+      font-weight: bold;
+    }
+
+    td {
+      font-size: 8pt;
+    }
+
+    tr {
+      height: 14.4pt;
+    }
+
+    /* Agenda */
+    ol {
+      margin: 9pt 0 0;
+      padding-left: 14pt;
+      font-size: 8pt;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 class="title">Sprint Planning</h1>
+
+  <h1>✅ Lista de verificação de planeamento do sprint</h1>
+  <table>
+    <colgroup><col style="width:166.35pt"><col style="width:166.35pt"><col style="width:165.8pt"></colgroup>
+    <tr><th style="background:#E3FBEF">Preparação</th><th style="background:#E3FBEF">Reunião</th><th style="background:#E3FBEF">Acompanhamento</th></tr>
+    <tr style="height:26pt"><td>- Rever o backlog e a ordem das stories<br>- Confirmar os pontos de cada story<br>- Confirmar a disponibilidade da equipa<br>- Verificar se o código já cobre alguma story</td><td>- Definir o sprint goal com valor para o hotel<br>- Confirmar a capacidade (mínimo de 13 pontos)<br>- Selecionar as stories e atribuir responsáveis<br>- Combinar os nomes das classes novas</td><td>- Atualizar o quadro no Jira (sprint, datas e responsáveis)<br>- Fazer o daily scrum todos os dias para verificar o andamento da sprint<br>- Validar as stories com os testes de aceitação<br>- Reunião de alinhamento das regras de negócio</td></tr>
+  </table>
+
+  <h1>👥 Membros da equipa do sprint</h1>
+  <table>
+    <colgroup><col style="width:165.85pt"><col style="width:332.65pt"></colgroup>
+    <tr><th style="background:#DEEBFF">Nome</th><th style="background:#DEEBFF">Função</th></tr>
+    <tr><td>Lukas Sperandio</td><td>Team Leader (Scrum Master e Product Owner) e developer</td></tr>
+    <tr><td>Tiago Borja</td><td>Developer</td></tr>
+    <tr><td>Pedro Costa</td><td>Developer</td></tr>
+    <tr><td>António Martinho</td><td>Developer</td></tr>
+    <tr><td>José Cruz</td><td>Developer</td></tr>
+  </table>
+
+  <h1>✏️ Itens da reunião de planeamento do sprint</h1>
+
+  <h2>Resumo do sprint anterior</h2>
+  <table>
+    <colgroup><col style="width:84.7pt"><col style="width:413.8pt"></colgroup>
+    <tr><th style="background:#FFFAE6">Tema do sprint</th><td>Sprint 2: o gestor inicia sessão e cria contas de funcionário. O rececionista inicia sessão e vê a janela principal com as funções do seu papel.</td></tr>
+    <tr><th style="background:#FFFAE6">Pontos da história</th><td>27 pontos planeados. 18 concluídos (H4Y-32, H4Y-20, H4Y-22, H4Y-24 e H4Y-27). 9 pontos em carry-over (H4Y-7, H4Y-8 e H4Y-9).</td></tr>
+    <tr><th style="background:#FFFAE6">Resumo</th><td>Concluídos: fundação do projeto, login do gestor e do rececionista, janela principal e criação de contas. Carry-over com o feedback do professor: H4Y-7 e H4Y-9 já corrigidos (PRs #23 e #21). Falta H4Y-8 (diagramas de sequência).</td></tr>
+  </table>
+
+  <h2>Agenda</h2>
+  <ol>
+    <li>Rever o resumo da Sprint 2, a retrospetiva e o carry-over (H4Y-7, H4Y-8 e H4Y-9)</li>
+    <li>Definir o objetivo da Sprint 3</li>
+    <li>Confirmar a capacidade e o limite de pontos</li>
+    <li>Selecionar as stories e distribuir as subtasks</li>
+    <li>Combinar os nomes das classes novas e a ordem dos scripts SQL</li>
+    <li>Rever os riscos</li>
+    <li>Marcar a reunião de alinhamento das regras de negócio (ação da retrospetiva)</li>
+  </ol>
+
+  <h2>Detalhes</h2>
+  <table>
+    <colgroup><col style="width:84.7pt"><col style="width:413.8pt"></colgroup>
+    <tr><th style="background:#FFFAE6">Data de início</th><td>24/10/2026</td></tr>
+    <tr><th style="background:#FFFAE6">Data de término</th><td>30/10/2026</td></tr>
+    <tr><th style="background:#FFFAE6">Tema do sprint</th><td>O hotel passa a ter os seus 20 quartos e os preços por noite no sistema. A receção já consegue dizer ao cliente que quartos existem e quanto custam, e cada funcionário só usa as funções do seu papel.</td></tr>
+  </table>
+
+  <h2>Planeamento da capacidade</h2>
+  <table>
+    <colgroup><col style="width:105.15pt"><col style="width:178.65pt"><col style="width:214.7pt"></colgroup>
+    <tr><th style="background:#FFFAE6"></th><th style="background:#FFFAE6">Sprint atual</th><th style="background:#FFFAE6">Sprint anterior</th></tr>
+    <tr><th style="background:#FFFAE6">Total de dias</th><td>7 dias - 5 úteis</td><td>7 dias - 5 úteis</td></tr>
+    <tr><th style="background:#FFFAE6">Capacidade da equipa</th><td>40 h (5 elementos x 8 h)</td><td>50 h (5 elementos x 10 h)</td></tr>
+    <tr><th style="background:#FFFAE6">Capacidade prevista</th><td>16 pontos + 2 de extra (mínimo de 13; velocidade da Sprint 2: 18)</td><td>27 pontos (previsão da equipa, sem histórico)</td></tr>
+    <tr><th style="background:#FFFAE6">Capacidade individual</th><td>8 h por elemento</td><td>8 h por elemento</td></tr>
+  </table>
+
+  <h2>Possíveis riscos</h2>
+  <table>
+    <colgroup><col style="width:249.55pt"><col style="width:248.95pt"></colgroup>
+    <tr><th style="background:#FFFAE6">Risco</th><th style="background:#FFFAE6">Mitigação</th></tr>
+    <tr><td>O Pedro tem uma story nova (H4Y-25) e o carry-over H4Y-8.</td><td>As correções da H4Y-8 são pequenas e vêm primeiro. Se atrasar, o Tiago ajuda e a story extra (H4Y-51) não começa.</td></tr>
+    <tr><td>O diagrama de classes não tem os repositórios de pisos, quartos e tipos de quarto. Duas pessoas podem criar classes parecidas.</td><td>Combinar os nomes no primeiro dia. Cada PR atualiza o código e o docs/uml juntos.</td></tr>
+    <tr><td>Quatro stories acrescentam botões ao MainController e ao main.fxml. Conflitos de merge.</td><td>Fazer merge primeiro da H4Y-61 (menu por papel). Os outros acrescentam o botão já com a regra nova.</td></tr>
+    <tr><td>A tabela rooms (H4Y-25) depende das tabelas floors (H4Y-28) e room_types (H4Y-26).</td><td>Merge cedo da H4Y-62 e da H4Y-65. Até lá, os testes usam repositórios em memória.</td></tr>
+    <tr><td>A equipa interpreta as regras de negócio de formas diferentes (retrospetiva).</td><td>Reunião de alinhamento no início da sprint.</td></tr>
+    <tr><td>Q-01 (20 quartos, 7/10/3) e Q-11 (o gestor define o preço base) não estão confirmadas pelo professor.</td><td>Perguntar na próxima aula prática.</td></tr>
+  </table>
+
+  <h2>Backlog da sprint</h2>
+  <table>
+    <colgroup><col style="width:52pt"><col style="width:236pt"><col style="width:38pt"><col style="width:82pt"><col style="width:90.5pt"></colgroup>
+    <tr><th style="background:#FFFAE6">Chave</th><th style="background:#FFFAE6">Story</th><th style="background:#FFFAE6">Pontos</th><th style="background:#FFFAE6">Responsável</th><th style="background:#FFFAE6">Subtasks</th></tr>
+    <tr><td>H4Y-23</td><td>Mostrar apenas as funções permitidas ao papel</td><td>3</td><td>Lukas Sperandio</td><td>H4Y-60, H4Y-61</td></tr>
+    <tr><td>H4Y-28</td><td>Consultar os pisos e zonas do hotel</td><td>2</td><td>Tiago Borja</td><td>H4Y-62</td></tr>
+    <tr><td>H4Y-25</td><td>Registar os 20 quartos por tipo e piso</td><td>3</td><td>Pedro Costa</td><td>H4Y-63, H4Y-64</td></tr>
+    <tr><td>H4Y-26</td><td>Definir o preço base por noite de cada tipo de quarto</td><td>3</td><td>José Cruz</td><td>H4Y-65, H4Y-66</td></tr>
+    <tr><td>H4Y-50</td><td>Consultar a lista de quartos</td><td>2</td><td>António Martinho</td><td>H4Y-67</td></tr>
+    <tr><td>H4Y-8</td><td>Diagramas de sequência (carry-over: feedback do professor)</td><td>3</td><td>Pedro Costa</td><td>-</td></tr>
+    <tr><td>H4Y-51</td><td>Extra: Cadastrar item de stock</td><td>2</td><td>Tiago Borja</td><td>H4Y-68</td></tr>
+  </table>
+  <img src="board.png" alt="Backlog da sprint" style="display:block;width:498.5pt;margin-top:9pt">
+</body>
+</html>
