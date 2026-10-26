@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.service;
 
 import java.util.List;
+import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
@@ -9,16 +10,20 @@ public class HotelFacade {
 
     private final AuthService authService;
     private final StaffService staffService;
+    private final LocationService locationService;
 
     /**
      * Creates the facade.
      *
      * @param authService the login service
      * @param staffService the staff service
+     * @param locationService the floor and zone service
      */
-    public HotelFacade(AuthService authService, StaffService staffService) {
+    public HotelFacade(AuthService authService, StaffService staffService,
+            LocationService locationService) {
         this.authService = authService;
         this.staffService = staffService;
+        this.locationService = locationService;
     }
 
     /**
@@ -65,5 +70,41 @@ public class HotelFacade {
      */
     public List<User> listUsers() {
         return staffService.listUsers();
+    }
+
+    /**
+     * Tells if the user may view the floors.
+     *
+     * @param actor the logged-in user, can be null
+     * @return true if the actor is a manager
+     */
+    public boolean canViewFloors(User actor) {
+        return locationService.canViewFloors(actor);
+    }
+
+    /**
+     * Lists all floors with their zones.
+     *
+     * @param actor the logged-in user who asks
+     * @return the floors ordered by number
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Floor> listFloors(User actor) {
+        return locationService.listFloors(actor);
+    }
+
+    /**
+     * Finds one floor with its zones.
+     *
+     * @param number the floor number
+     * @param actor the logged-in user who asks
+     * @return the floor
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws FloorNotFoundException if the floor does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public Floor findFloor(int number, User actor) {
+        return locationService.findFloor(number, actor);
     }
 }

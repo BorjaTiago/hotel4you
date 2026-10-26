@@ -5,10 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.InMemoryFloorRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
+import pt.isep.hotel4you.domain.Floor;
+import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
@@ -23,6 +27,7 @@ class HotelFacadeTest {
 
     private InMemoryUserRepository repository;
     private AuthService authService;
+    private InMemoryFloorRepository floorRepository;
     private HotelFacade facade;
 
     @BeforeEach
@@ -30,7 +35,8 @@ class HotelFacadeTest {
         repository = new InMemoryUserRepository();
         authService = new AuthService(repository);
         StaffService staffService = new StaffService(repository, authService);
-        facade = new HotelFacade(authService, staffService);
+        floorRepository = new InMemoryFloorRepository();
+        facade = new HotelFacade(authService, staffService, new LocationService(floorRepository));
     }
 
     private User saveAna() {
@@ -146,5 +152,35 @@ class HotelFacadeTest {
 
         assertThrows(AccessDeniedException.class, () -> facade.createStaff(
                 "Bia Neves", "bia", PASSWORD, Role.RECEPTIONIST, receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-1")
+    void onListFloors_returnFloors_whenManager() {
+        floorRepository.add(new Floor(1, "Piso 1", List.of(new Location(null, "Piscina", false, false))));
+        floorRepository.add(new Floor(0, "Piso 0", List.of()));
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        List<Floor> floors = facade.listFloors(manager);
+
+        assertEquals(List.of(0, 1), floors.stream().map(Floor::number).toList());
+        assertEquals("Piscina", floors.get(1).locations().get(0).name());
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-2")
+    void onFindFloor_throwFloorNotFound_whenFloorMissing() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        FloorNotFoundException error = assertThrows(FloorNotFoundException.class,
+                () -> facade.findFloor(4, manager));
+
+        assertEquals("O piso não existe.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-1")
+    void onCanViewFloors_returnFalse_whenNotManager() {
+        assertFalse(facade.canViewFloors(new Receptionist(2L, "Ana Silva", "ana", "hash")));
     }
 }

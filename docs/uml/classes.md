@@ -6,13 +6,14 @@ Notes:
 
 - Constructors and getters are not shown.
 - Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
+- `InMemoryFloorRepository` (in `src/test`) is a test helper, so it is not in this diagram.
 
 ## Interface (JavaFX controllers)
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | LoginController | Interface | - | onLoginClicked() (private) | RF-01 |
-| MainController | Interface | - | initialize(), onStaffClicked(), onLogoutClicked() (private) | RNF-06, RNF-07 |
+| MainController | Interface | - | initialize(), onStaffClicked(), onFloorsClicked(), onLogoutClicked() (private) | RF-03, RNF-06, RNF-07 |
 | HotelApp | Interface | facade (static), currentUser (static), startError (static) | start() | RNF-06, RNF-07 |
 | ScreenLoader | Interface | - | load() | RNF-06, RNF-07 |
 | RoomController | Interface | - | onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() | RF-04, RF-05, RF-06, RF-08 |
@@ -24,12 +25,13 @@ Notes:
 | CardController | Interface | - | onIssueCardClicked(), onIssueMasterCardClicked(), onBlockMasterCardClicked(), onShowPlacesByCardClicked(), onShowPassesByRoomClicked() | RF-16, RF-20, RF-21, RF-23, RF-30 |
 | StockController | Interface | - | onImportXmlClicked(), onSaveItemClicked(), onRegisterMovementClicked() | RF-28, RF-29 |
 | FeedbackController | Interface | - | onSaveFeedbackClicked(), onListFeedbackClicked() | RF-27 |
+| FloorController | Interface | - | initialize(), onSearchClicked() (private) | RF-03 |
 
 ## Business - Facade
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canCreateStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
+| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canCreateStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback(), listFloors(), findFloor(), canViewFloors() | All RF and RNF-07 (entry point) |
 
 ## Business - Services
 
@@ -37,32 +39,34 @@ Notes:
 |-------|-------|-----------------|--------------|-------------|
 | AuthService | Business - Services | - | login(), hashPassword(), isValidPassword() (private) | RF-01, RNF-02 |
 | ClientService | Business - Services | - | register(), find() | RF-10, RNF-03 |
-| LocationService | Business - Services | - | createLocation(), editLocation(), removeLocation() | RF-03, RF-18 |
+| LocationService | Business - Services | - | createLocation(), editLocation(), removeLocation(), listFloors(), findFloor(), canViewFloors() | RF-03, RF-18 |
 | RoomService | Business - Services | - | isAvailable(), searchRooms(), saveRoom(), configureItem(), setBasePrice(), setExtraPrice() | RF-04, RF-05, RF-06, RF-07, RF-08, RF-09 |
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
-| StaffService | Business - Services | - | createStaff(name, username, password, role, actor), canCreateStaff(), createFirstManager(), editStaff(), removeStaff(), listUsers() | RF-02, RF-26, RNF-01 |
+| StaffService | Business - Services | - | createStaff(name, username, password, role, actor), canCreateStaff(), editStaff(), removeStaff(), listUsers() | RF-02, RF-26, RNF-01 |
 | CardAccessService | Business - Services | - | issueCard(), issueMasterCard(), blockCard(), canOpen(), register(), getPlacesByCard(), getPassesByRoom(), canOpenRoom() (access rules in the diagram note) | RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-24, RF-25, RF-30 |
 | StockService | Business - Services | - | importStock(), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
 | FeedbackService | Business - Services | - | save(), list() | RF-27 |
 | LoginFailedException | Business - Exception | - | - (one fixed message for unknown user and wrong password) | RF-01 |
 | UsernameTakenException | Business - Exception | - | - | RF-26 |
 | AccessDeniedException | Business - Exception | - | - (the user may not do the action) | RF-26 |
+| FloorNotFoundException | Business - Exception | - | - (the floor number does not exist) | RF-03 |
 
 ## Config
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load() (static), toString() (hides the passwords) | RNF-12 |
+| AppConfig | Config (record) | dbUrl, dbUser, dbPassword | load() (static), toString() (hides the passwords) | RNF-12 |
 | Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, AuthService, StaffService, HotelFacade. Starts HotelApp | RF-01, RNF-12 |
-| FirstManagerCommand | Config | - | main() (static). Uses AppConfig and StaffService. Creates Database, JdbcUserRepository, AuthService | RF-01, RNF-12 |
 
 ## Data
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), existsByRole(), save() | RF-01, RNF-01, RNF-12 |
+| UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), save() | RF-01, RNF-01, RNF-12 |
+| FloorRepository | Data - Repository interface | - | findAll(), findByNumber() | RF-03 |
 | Database | Data | NOT_AVAILABLE (static) | connect(), check(), prepare() (static) | RNF-12 |
-| JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), existsByRole(), save() | RNF-01, RNF-12 |
+| JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), save() | RNF-01, RNF-12 |
+| JdbcFloorRepository | Data - Repository (SQL Server) | - | findAll(), findByNumber() | RF-03, RNF-12 |
 
 ## Domain
 
@@ -101,4 +105,4 @@ Notes:
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
