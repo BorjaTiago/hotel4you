@@ -57,11 +57,11 @@ public class FloorController {
                 setText(empty || floor == null ? null : "Piso " + floor.number() + " - " + floor.description());
             }
         });
-        nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().name()));
+        nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         guestCardColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(yesNo(data.getValue().guestCardAccess())));
+                data -> new SimpleStringProperty(yesNo(data.getValue().isGuestCardAccess())));
         reservationColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(yesNo(data.getValue().requiresReservation())));
+                data -> new SimpleStringProperty(yesNo(data.getValue().isRequiresReservation())));
         floorList.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldFloor, floor) -> showZones(floor));
         loadFloors();

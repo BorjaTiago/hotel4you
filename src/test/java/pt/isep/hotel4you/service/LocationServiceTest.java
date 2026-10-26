@@ -44,7 +44,7 @@ class LocationServiceTest {
     }
 
     private static List<String> zoneNames(Floor floor) {
-        return floor.locations().stream().map(Location::name).toList();
+        return floor.locations().stream().map(Location::getName).toList();
     }
 
     private User manager() {

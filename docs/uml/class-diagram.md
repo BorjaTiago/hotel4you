@@ -10,6 +10,7 @@
 - `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. `createStaff` throws `AccessDeniedException` when the actor is not a manager (H4Y-27).
 - `canViewFloors(actor)` is true only for a manager. `listFloors` and `findFloor` throw `AccessDeniedException` for other users, and `findFloor` throws `FloorNotFoundException` for an unknown floor (H4Y-28).
 - `MainController` shows a menu button only when a facade method allows it. The Staff button uses `canCreateStaff(actor)`. The "Pisos e zonas" button uses `canViewFloors(actor)` (H4Y-28). The screen has no role check of its own (H4Y-24).
+- `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32).
 
 ```mermaid
 classDiagram
@@ -278,8 +279,9 @@ classDiagram
     %% LAYER 3: DOMAIN - HOTEL
     %% ==========================================
     class Floor {
-        -number: int
-        -description: String
+        <<record>>
+        +number: int
+        +description: String
     }
     class Location {
         -id: Long
@@ -513,4 +515,4 @@ classDiagram
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.

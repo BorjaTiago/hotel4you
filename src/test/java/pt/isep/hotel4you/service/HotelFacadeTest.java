@@ -164,7 +164,7 @@ class HotelFacadeTest {
         List<Floor> floors = facade.listFloors(manager);
 
         assertEquals(List.of(0, 1), floors.stream().map(Floor::number).toList());
-        assertEquals("Piscina", floors.get(1).locations().get(0).name());
+        assertEquals("Piscina", floors.get(1).locations().get(0).getName());
     }
 
     @Test

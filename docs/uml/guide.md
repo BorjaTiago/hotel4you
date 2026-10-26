@@ -252,13 +252,13 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 ### Floor
 - **What:** A floor number (-1 to 3) and description.
 - **Why:** RF-03. Floors decide staff access (floors 0 and 1).
-- **Why this way:** Rooms and zones both link to a floor.
+- **Why this way:** Rooms and zones both link to a floor. The floors are fixed, so `Floor` is a record.
 - **Other option:** Store the number on each `Location`. Not done: the floor is shared by many places.
 
 ### Location
 - **What:** A zone with a card reader (pool, restaurant, bar). Flags: `guestCardAccess`, `requiresReservation`.
 - **Why:** RF-03, RF-18.
-- **Why this way:** The two flags say if a client card opens the zone.
+- **Why this way:** The two flags say if a client card opens the zone. The manager changes zones, so `Location` is a class.
 - **Other option:** Fixed list of zone names in code. Not done: the manager adds and removes zones.
 
 ### Room
@@ -421,4 +421,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.

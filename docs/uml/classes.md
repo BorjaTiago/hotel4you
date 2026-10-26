@@ -77,8 +77,8 @@ Notes:
 | Manager | Domain | (inherits User) | (inherits User) | RF-02, RF-23, RF-26, RF-30 |
 | RestaurantStaff | Domain | (inherits User) | (inherits User) | RF-02, RF-25 |
 | Client | Domain | id, name, document, birthday | - | RF-02, RF-10 |
-| Floor | Domain | number, description | - | RF-03 |
-| Location | Domain | id, name, guestCardAccess, requiresReservation | - | RF-03, RF-18 |
+| Floor | Domain (record) | number, description | - | RF-03 |
+| Location | Domain (class) | id, name, guestCardAccess, requiresReservation | - | RF-03, RF-18 |
 | Room | Domain | id, number | - | RF-04, RF-05 |
 | RoomType | Domain | id, name, capacity, basePrice | - | RF-04, RF-06 |
 | RoomItem | Domain | quantity | - | RF-08 |
@@ -105,4 +105,4 @@ Notes:
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
