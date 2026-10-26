@@ -20,7 +20,7 @@ O sistema conhece o edifício e os 20 quartos. O gestor define os preços base e
 1.ª entrega (quartos). O uso de zonas por cartão está em epic-magnetic-card-access (entrega final).
 
 ## Âmbito
-- Modelo de pisos: -1, 0, 1, 2, 3.
+- Modelo de pisos: -1, 0, 1, 2, 3. H4Y-28: Consultar os pisos e gerir as zonas do hotel (inclui criar, editar e remover zonas).
 - 20 quartos: 10 no piso 2, 10 no piso 3; 7 individuais, 10 duplos, 3 familiares (Q-01).
 - Preço base por noite por tipo de quarto (gestor, Q-11).
 - O gestor configura os itens do quarto.

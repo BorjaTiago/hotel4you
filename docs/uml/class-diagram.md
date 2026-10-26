@@ -6,11 +6,12 @@
 - Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
 - `InMemoryFloorRepository` (in `src/test`) is a test helper, so it is not in this diagram.
 - `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
+- `InMemoryLocationRepository` (in `src/test`) is a test helper, so it is not in this diagram. Its `delete` returns false when other rows use the zone.
 - `$` marks a static member.
 - `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. `createStaff` throws `AccessDeniedException` when the actor is not a manager (H4Y-27).
 - `canViewFloors(actor)` is true only for a manager. `listFloors` and `findFloor` throw `AccessDeniedException` for other users, and `findFloor` throws `FloorNotFoundException` for an unknown floor (H4Y-28).
 - `MainController` shows a menu button only when a facade method allows it. The Staff button uses `canCreateStaff(actor)`. The "Pisos e zonas" button uses `canViewFloors(actor)` (H4Y-28). The screen has no role check of its own (H4Y-24).
-- `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32).
+- `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32). `FloorController` is the one screen for floors and zones (H4Y-28): it has the zone form, so there is no `LocationController` for zone CRUD. `createLocation`, `editLocation` and `removeLocation` need a manager. `removeLocation` throws `LocationInUseException` when `LocationRepository.delete` returns false (Q-36). `HotelFacade.removeLocation(reservation, location)` is the reservation method and stays.
 
 ```mermaid
 classDiagram
@@ -54,10 +55,6 @@ classDiagram
         +onAddLocationClicked() void
         +onRemoveLocationClicked() void
     }
-    class LocationController {
-        +onSaveLocationClicked() void
-        +onRemoveLocationClicked() void
-    }
     class CheckInOutController {
         +onCheckInClicked() void
         +onCheckOutClicked() void
@@ -88,6 +85,9 @@ classDiagram
     class FloorController {
         -initialize() void
         -onSearchClicked() void
+        -onCreateLocationClicked() void
+        -onSaveLocationClicked() void
+        -onRemoveLocationClicked() void
     }
 
     %% ==========================================
@@ -121,9 +121,9 @@ classDiagram
         +configureRoomItem(room: Room, item: StockItem, quantity: int) void
         +setBasePrice(type: RoomType, price: BigDecimal) void
         +setExtraPrice(service: ExtraService, price: BigDecimal) void
-        +createLocation(location: Location) void
-        +editLocation(location: Location) void
-        +removeLocation(location: Location) void
+        +createLocation(floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
+        +editLocation(id: long, floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
+        +removeLocation(id: long, actor: User) void
         +importStock(file: String, user: User) StockImport
         +createItem(name: String, unit: String) StockItem
         +editItem(item: StockItem) void
@@ -148,9 +148,9 @@ classDiagram
         +find(document: String) Client
     }
     class LocationService {
-        +createLocation(location: Location) void
-        +editLocation(location: Location) void
-        +removeLocation(location: Location) void
+        +createLocation(floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
+        +editLocation(id: long, floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
+        +removeLocation(id: long, actor: User) void
         +listFloors(actor: User) List~Floor~
         +findFloor(number: int, actor: User) Floor
         +canViewFloors(actor: User) boolean
@@ -214,6 +214,15 @@ classDiagram
     class FloorNotFoundException {
         <<exception>>
     }
+    class LocationNotFoundException {
+        <<exception>>
+    }
+    class LocationNameTakenException {
+        <<exception>>
+    }
+    class LocationInUseException {
+        <<exception>>
+    }
 
     %% ==========================================
     %% LAYER: CONFIG
@@ -245,6 +254,14 @@ classDiagram
         +findAll() List~Floor~
         +findByNumber(number: int) Optional~Floor~
     }
+    class LocationRepository {
+        <<interface>>
+        +findById(id: long) Optional~Location~
+        +findByFloorAndName(floorNumber: int, name: String) Optional~Location~
+        +save(floorNumber: int, location: Location) Location
+        +update(floorNumber: int, location: Location) void
+        +delete(id: long) boolean
+    }
     class Database {
         +NOT_AVAILABLE String$
         +connect() Connection
@@ -253,6 +270,7 @@ classDiagram
     }
     class JdbcUserRepository
     class JdbcFloorRepository
+    class JdbcLocationRepository
 
     %% ==========================================
     %% LAYER 3: DOMAIN - USERS
@@ -449,7 +467,6 @@ classDiagram
     MainController ..> HotelFacade : uses
     RoomController ..> HotelFacade : uses
     ClientController ..> HotelFacade : uses
-    LocationController ..> HotelFacade : uses
     ReservationController ..> HotelFacade : uses
     CheckInOutController ..> HotelFacade : uses
     StaffController ..> HotelFacade : uses
@@ -474,18 +491,25 @@ classDiagram
     AuthService ..> UserRepository : uses
     StaffService ..> UserRepository : uses
     LocationService ..> FloorRepository : uses
+    LocationService ..> LocationRepository : uses
     UserRepository ..> User : stores
     FloorRepository ..> Floor : stores
+    LocationRepository ..> Location : stores
     JdbcUserRepository ..|> UserRepository : implements
     JdbcUserRepository ..> Database : uses
     JdbcFloorRepository ..|> FloorRepository : implements
     JdbcFloorRepository ..> Database : uses
+    JdbcLocationRepository ..|> LocationRepository : implements
+    JdbcLocationRepository ..> Database : uses
     Database ..> AppConfig : uses
     AuthService ..> LoginFailedException : throws
     StaffService ..> UsernameTakenException : throws
     StaffService ..> AccessDeniedException : throws
     LocationService ..> FloorNotFoundException : throws
     LocationService ..> AccessDeniedException : throws
+    LocationService ..> LocationNotFoundException : throws
+    LocationService ..> LocationNameTakenException : throws
+    LocationService ..> LocationInUseException : throws
 
     %% ==========================================
     %% DEPENDENCIES (Start-up)
@@ -495,6 +519,7 @@ classDiagram
     Main ..> Database : creates
     Main ..> JdbcUserRepository : creates
     Main ..> JdbcFloorRepository : creates
+    Main ..> JdbcLocationRepository : creates
     Main ..> AuthService : creates
     Main ..> StaffService : creates
     Main ..> HotelFacade : creates
@@ -515,4 +540,4 @@ classDiagram
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26. Reviewed by: pending.

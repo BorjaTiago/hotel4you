@@ -5,13 +5,16 @@ parent: epic-magnetic-card-access
 requirements: [RF-03]
 points: 3
 points_suggested: 3
-status: approved
+status: merged
+merged_into: H4Y-28
 jira_key:
 labels: [access-control, final-delivery]
 sprint:
 ---
 
 # Título: Criar uma zona num piso
+
+Juntada a H4Y-28 (decisão do utilizador, 2026-10-26). Não publicar no Jira.
 
 Como gestor,
 Eu quero criar uma zona num piso e marcar se a zona exige reserva,

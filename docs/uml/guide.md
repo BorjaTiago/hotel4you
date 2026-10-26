@@ -61,11 +61,11 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why this way:** Reception works on reservations here.
 - **Other option:** Put the delete button in the manager screen only. Not done: the role check is in the service, not the screen.
 
-### LocationController
-- **What:** Save and remove zones (pool, restaurant, bar).
-- **Why:** RF-03, RF-18.
-- **Why this way:** Zones are not rooms. They need their own screen.
-- **Other option:** Put zones in `RoomController`. Not done: mixes two topics.
+### FloorController
+- **What:** Show the floors and their zones. Create, save and remove a zone with the form below the zone table (H4Y-28).
+- **Why:** RF-03.
+- **Why this way:** One screen for floors and zones. There is no `LocationController` for zone CRUD. The controller has no rules.
+- **Other option:** A separate zone screen. Not done: the zones belong to the floor the manager is looking at.
 
 ### CheckInOutController
 - **What:** Check-in and check-out buttons.
@@ -124,10 +124,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Let the database fail. Not done: the user gets no clear message.
 
 ### LocationService
-- **What:** Create, edit and remove zones.
+- **What:** Create, edit and remove zones. Show floors and zones. Uses `FloorRepository` and `LocationRepository` (H4Y-28).
 - **Why:** RF-03, RF-18.
 - **Why this way:** Zone rules (card access, reservation needed) stay in one place.
-- **Rule:** Remove is refused when the zone has links (reservations, card passes). The system shows a clear error (Q-36).
+- **Rule:** Only a manager manages zones. The name is trimmed, required and has at most 50 characters. The name is unique per floor. Remove is refused with `LocationInUseException` when the delete fails because the zone has links (reservations, card passes). The system shows a clear error (Q-36).
 - **Other option:** Put zones in `RoomService`. Not done: zones are not rooms.
 
 ### RoomService
@@ -254,6 +254,12 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why:** RF-03. Floors decide staff access (floors 0 and 1).
 - **Why this way:** Rooms and zones both link to a floor. The floors are fixed, so `Floor` is a record.
 - **Other option:** Store the number on each `Location`. Not done: the floor is shared by many places.
+
+### LocationRepository and JdbcLocationRepository
+- **What:** Find a zone by id or by floor and name. Save, update and delete a zone.
+- **Why:** RF-03 (H4Y-28).
+- **Why this way:** `delete` returns false when SQL Server refuses it because other rows use the zone (error 547). The service then throws `LocationInUseException`.
+- **Other option:** Count the links before the delete. Not done: the database already knows them.
 
 ### Location
 - **What:** A zone with a card reader (pool, restaurant, bar). Flags: `guestCardAccess`, `requiresReservation`.
@@ -421,4 +427,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26. Reviewed by: pending.
