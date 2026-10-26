@@ -89,22 +89,6 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean existsByRole(Role role) {
-        String sql = """
-                SELECT 1
-                FROM users u JOIN roles r ON r.id = u.role_id
-                WHERE r.name = ?
-                """;
-        try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, role.name());
-                ResultSet row = statement.executeQuery()) {
-            return row.next();
-        } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
-        }
-    }
-
-    @Override
     public User save(User user) {
         String sql = """
                 INSERT INTO users (name, username, password_hash, role_id)

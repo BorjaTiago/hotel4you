@@ -144,10 +144,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put the logic only in `Reservation`. Not done: one reservation cannot see the others.
 
 ### StaffService
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
-- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
+- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -184,7 +184,7 @@ Services hold the rules. Each service works on the domain classes.
 ## Config
 
 ### AppConfig
-- **What:** A record with the settings from `application.properties`: database url, user, password and the first manager.
+- **What:** A record with the settings from `application.properties`: database url, user and password.
 - **Why:** RNF-12. Passwords stay out of the code and out of Git.
 - **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
@@ -192,10 +192,6 @@ Services hold the rules. Each service works on the domain classes.
 ### Main
 - **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
 - **Why:** RF-01, RNF-12. One place builds the objects.
-
-### FirstManagerCommand
-- **What:** Command line tool. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService` and `StaffService`. Then it calls `createFirstManager`.
-- **Why:** RF-01, RNF-12. The first manager must exist before the first login.
 
 ## Data
 
@@ -425,4 +421,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
