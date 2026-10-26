@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryFloorRepository;
+import pt.isep.hotel4you.data.InMemoryLocationRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
@@ -28,6 +29,7 @@ class HotelFacadeTest {
     private InMemoryUserRepository repository;
     private AuthService authService;
     private InMemoryFloorRepository floorRepository;
+    private InMemoryLocationRepository locationRepository;
     private HotelFacade facade;
 
     @BeforeEach
@@ -36,7 +38,9 @@ class HotelFacadeTest {
         authService = new AuthService(repository);
         StaffService staffService = new StaffService(repository, authService);
         floorRepository = new InMemoryFloorRepository();
-        facade = new HotelFacade(authService, staffService, new LocationService(floorRepository));
+        locationRepository = new InMemoryLocationRepository();
+        LocationService locationService = new LocationService(floorRepository, locationRepository);
+        facade = new HotelFacade(authService, staffService, locationService);
     }
 
     private User saveAna() {
@@ -182,5 +186,44 @@ class HotelFacadeTest {
     @Tag("H4Y-28-AC-1")
     void onCanViewFloors_returnFalse_whenNotManager() {
         assertFalse(facade.canViewFloors(new Receptionist(2L, "Ana Silva", "ana", "hash")));
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-3")
+    void onCreateLocation_returnZone_whenManager() {
+        floorRepository.add(new Floor(1, "Piso 1", List.of()));
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        Location zone = facade.createLocation(1, "Spa", true, true, manager);
+
+        assertEquals("Spa", zone.getName());
+        assertTrue(zone.isRequiresReservation());
+        assertEquals(zone.getId(), locationRepository.findById(zone.getId()).get().getId());
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-11")
+    void onEditLocation_throwLocationNotFound_whenZoneMissing() {
+        floorRepository.add(new Floor(1, "Piso 1", List.of()));
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        LocationNotFoundException error = assertThrows(LocationNotFoundException.class,
+                () -> facade.editLocation(99L, 1, "Spa", false, false, manager));
+
+        assertEquals("A zona não existe.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-14")
+    void onRemoveLocation_throwInUse_whenZoneHasAssociations() {
+        floorRepository.add(new Floor(1, "Piso 1", List.of()));
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        Location zone = facade.createLocation(1, "Spa", false, false, manager);
+        locationRepository.markInUse(zone.getId());
+
+        LocationInUseException error = assertThrows(LocationInUseException.class,
+                () -> facade.removeLocation(zone.getId(), manager));
+
+        assertEquals("A zona tem associações e não pode ser removida.", error.getMessage());
     }
 }
