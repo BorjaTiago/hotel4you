@@ -45,9 +45,9 @@
         <CheckBox fx:id="guestCardBox" text="Acesso com cartão do cliente"/>
         <CheckBox fx:id="reservationBox" text="Exige reserva"/>
         <HBox spacing="12">
-            <Button text="Criar zona" onAction="#onCreateLocationClicked" styleClass="action-button save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <Button styleClass="action-button edit-button" text="Guardar alterações" onAction="#onSaveLocationClicked" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-            <Button styleClass="action-button danger-button" text="Remover zona" onAction="#onRemoveLocationClicked" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Criar zona" onAction="#onCreateLocationClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button styleClass="action-button, edit-button" text="Guardar alterações" onAction="#onSaveLocationClicked" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button styleClass="action-button, danger-button" text="Remover zona" onAction="#onRemoveLocationClicked" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
         </HBox>
     </VBox>
 </HBox>
