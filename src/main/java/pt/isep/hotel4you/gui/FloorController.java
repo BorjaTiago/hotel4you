@@ -162,6 +162,11 @@ public class FloorController {
             messageLabel.setText("Escolha uma zona na tabela e o piso.");
             return;
         }
+        Alert question = new Alert(Alert.AlertType.CONFIRMATION,
+                "Guardar as alterações da zona " + zoneNameField.getText() + "?", ButtonType.YES, ButtonType.NO);
+        if (question.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
         try {
             facade.editLocation(selectedZoneId, floor.number(), zoneNameField.getText(),
                     guestCardBox.isSelected(), reservationBox.isSelected(), HotelApp.currentUser);

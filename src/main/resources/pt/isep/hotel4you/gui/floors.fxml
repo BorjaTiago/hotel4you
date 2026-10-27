@@ -46,8 +46,8 @@
         <CheckBox fx:id="reservationBox" text="Exige reserva"/>
         <HBox spacing="12">
             <Button text="Criar zona" onAction="#onCreateLocationClicked" styleClass="primary-button"/>
-            <Button text="Guardar alterações" onAction="#onSaveLocationClicked"/>
-            <Button text="Remover zona" onAction="#onRemoveLocationClicked"/>
+            <Button styleClass="secondary-button" text="Guardar alterações" onAction="#onSaveLocationClicked"/>
+            <Button styleClass="danger-button" text="Remover zona" onAction="#onRemoveLocationClicked"/>
         </HBox>
     </VBox>
 </HBox>
