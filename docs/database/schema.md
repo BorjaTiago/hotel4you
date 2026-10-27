@@ -24,7 +24,7 @@ rooms
 
 locations
   id                    TINYINT IDENTITY PK             -- Internal location ID.
-  name                  VARCHAR(50) NOT NULL            -- Name of a place with a card reader (pool, restaurant, kitchen...).
+  name                  VARCHAR(50) NOT NULL            -- Name of a place with a card reader (pool, restaurant, bar...).
   floor_id              TINYINT NOT NULL FK floors      -- Floor of the location. Used to check staff access.
   guest_card_access     BIT NOT NULL DEFAULT 0          -- 1 = a client card can open this place. 0 = a client card never opens it (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). See decision 11.
   requires_reservation  BIT NOT NULL DEFAULT 0          -- 1 = the zone needs a reservation to open with the client card (Q-32). Used only when guest_card_access = 1. See decision 11.
@@ -133,7 +133,7 @@ feedback
 - `floors`: floors of the hotel. `number` is `SMALLINT` because it can be negative (-1 to 3). `description` is the name the manager sees.
 - `room_types`: individual, double or family. Holds `capacity` and `base_price` per night.
 - `rooms`: one row per room. Links to one floor and one room type. The view is not here. It is a service of the reservation (see below).
-- `locations`: places with a card reader (pool, restaurant, kitchen). Each one is on one floor. Used to check staff access. `guest_card_access = 0` means a client card never opens the place. `requires_reservation = 1` means the zone needs a reservation to open with the client card. The name is unique per floor.
+- `locations`: places with a card reader (pool, restaurant, bar). Each one is on one floor. Used to check staff access. `guest_card_access = 0` means a client card never opens the place. `requires_reservation = 1` means the zone needs a reservation to open with the client card. The name is unique per floor.
 - `reservation_locations`: locations included in a reservation. Composite PK (`reservation_id`, `location_id`).
 
 ### Inventory
@@ -266,4 +266,4 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). Import every item from a valid XML file and create missing `items` rows (Q-10, Q-38; PR #20 decision, 2026-10-21). Save the new catalogue items, import, ENTRY movements and balances in one transaction. A failed save undoes the whole import. No rejected-item field is needed. This updates the schema documentation; no database migration is applied here. `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
 13. **Zone removal**: the backend deletes the `locations` row. If another row references it (FK NO ACTION, SQL error 547), the delete fails and the backend shows 'A zona tem associações e não pode ser removida.' (Q-36, H4Y-28).
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.

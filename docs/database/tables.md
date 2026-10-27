@@ -104,11 +104,13 @@ Room 202 is a double room: 90.00 per night.
 
 | id | name | floor_id | guest_card_access | requires_reservation |
 |---|---|---|---|---|
-| 1 | pool | 3 | 1 | 1 |
-| 2 | restaurant | 3 | 1 | 1 |
-| 3 | kitchen | 3 | 0 | 0 |
-| 4 | bar | 2 | 0 | 0 |
-| 5 | garage | 1 | 0 | 0 |
+| 1 | Garagem | 1 | 0 | 0 |
+| 2 | Arrecadação | 1 | 0 | 0 |
+| 3 | Receção | 2 | 0 | 0 |
+| 4 | Bar | 2 | 0 | 0 |
+| 5 | Salas de conferência | 2 | 0 | 0 |
+| 6 | Restaurante | 3 | 1 | 1 |
+| 7 | Piscina | 3 | 1 | 1 |
 
 Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 
@@ -351,4 +353,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
