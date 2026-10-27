@@ -18,7 +18,7 @@ class DatabaseTest {
     void onConnect_throwFixedMessage_whenServerDown() {
         AppConfig config = new AppConfig(
                 "jdbc:sqlserver://localhost:1;databaseName=hotel4you;loginTimeout=1",
-                "secret-user", "secret-password", null, null);
+                "secret-user", "secret-password");
         Database database = new Database(config);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, database::connect);
@@ -31,7 +31,7 @@ class DatabaseTest {
     void onConnect_hideConnectionDetails_whenServerDown() {
         AppConfig config = new AppConfig(
                 "jdbc:sqlserver://localhost:1;databaseName=hotel4you;loginTimeout=1",
-                "secret-user", "secret-password", null, null);
+                "secret-user", "secret-password");
         Database database = new Database(config);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, database::connect);
@@ -47,7 +47,7 @@ class DatabaseTest {
     void onConnect_keepSqlCause_whenServerDown() {
         AppConfig config = new AppConfig(
                 "jdbc:sqlserver://localhost:1;databaseName=hotel4you;loginTimeout=1",
-                "secret-user", "secret-password", null, null);
+                "secret-user", "secret-password");
         Database database = new Database(config);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, database::connect);
@@ -60,7 +60,7 @@ class DatabaseTest {
     void onCheck_keepSqlCause_whenServerDown() {
         AppConfig config = new AppConfig(
                 "jdbc:sqlserver://localhost:1;databaseName=hotel4you;loginTimeout=1",
-                "secret-user", "secret-password", null, null);
+                "secret-user", "secret-password");
         Database database = new Database(config);
 
         IllegalStateException error = assertThrows(IllegalStateException.class, database::check);

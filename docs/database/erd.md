@@ -31,6 +31,7 @@ erDiagram
     floors {
         TINYINT id PK
         SMALLINT number UK
+        NVARCHAR100 description
     }
     room_types {
         TINYINT id PK
@@ -146,4 +147,4 @@ erDiagram
     }
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.

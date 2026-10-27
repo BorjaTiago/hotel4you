@@ -23,9 +23,9 @@ Phase: "1st" = 1st delivery, "final" = final delivery (Q-06, Q-27). "backlog" = 
 | ID | Use case | Actor(s) | Short description | Permission rules | Phase | Requirements and decisions |
 |---|---|---|---|---|---|---|
 | UC-25 | Consult floors and zones | Manager | The manager sees floors -1 to 3 and the zones of each floor. | Manager only. | 1st | RF-03; H4Y-28 |
-| UC-26 | Create zone | Manager | The manager creates a zone on a floor and sets its two card flags. | Manager only. Flags: guest card access, and reservation needed (Q-45). | final | RF-03, RF-18; Q-32, Q-45 |
-| UC-27 | Edit zone | Manager | The manager changes the name or the card flags of a zone. | Manager only. | final | RF-03, RF-18; Q-32, Q-45 |
-| UC-28 | Remove zone | Manager | The manager removes a zone. | Manager only. A zone with reservations or card passes cannot be removed (Q-36). | final | RF-03; Q-32, Q-36 |
+| UC-26 | Create zone | Manager | The manager creates a zone on a floor and sets its two card flags. | Manager only. Flags: guest card access, and reservation needed (Q-45). | final | RF-03, RF-18; Q-32, Q-45; H4Y-28 |
+| UC-27 | Edit zone | Manager | The manager changes the name or the card flags of a zone. | Manager only. | final | RF-03, RF-18; Q-32, Q-45; H4Y-28 |
+| UC-28 | Remove zone | Manager | The manager removes a zone. | Manager only. A zone with reservations or card passes cannot be removed (Q-36). | final | RF-03; Q-32, Q-36; H4Y-28 |
 | UC-29 | Register rooms | Manager | The manager registers the 20 rooms with their number, floor and type. | Manager only. Floors 2 and 3, 10 rooms each. 7 single, 10 double, 3 family (Q-01). | 1st | RF-04; Q-01; H4Y-25 |
 | UC-30 | List rooms | Receptionist | The receptionist sees the rooms with type, floor and price per night. | Logged-in staff. | 1st | RF-04, RF-06 |
 | UC-12 | Configure room items | Manager | The manager adds, changes or removes the items of a room (towels, TV, safe, and so on). | Manager only. Invalid data is not saved. | 1st | RF-08; Q-43 |

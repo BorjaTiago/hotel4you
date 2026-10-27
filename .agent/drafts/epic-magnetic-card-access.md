@@ -45,9 +45,9 @@ Secção 2. RF-03, RF-13, RF-16, RF-17, RF-18, RF-19. Q-09, Q-20.
 - Abrir restaurante e piscina só se estiverem na reserva (actor: client; RF-18)
 - Recusar o cartão nos locais não permitidos (actor: client; RF-18)
 - Guardar cada passagem com local e hora (actor: client; RF-19)
-- Criar uma zona num piso, com marca "exige reserva" (actor: manager; RF-03)
-- Editar uma zona de um piso (actor: manager; RF-03)
-- Remover uma zona de um piso (actor: manager; RF-03)
+- Criar uma zona num piso, com marca "exige reserva" (actor: manager; RF-03) - juntada a H4Y-28 (epic-rooms-pricing)
+- Editar uma zona de um piso (actor: manager; RF-03) - juntada a H4Y-28 (epic-rooms-pricing)
+- Remover uma zona de um piso (actor: manager; RF-03) - juntada a H4Y-28 (epic-rooms-pricing)
 
 ## Questões em aberto
 - Estado do cartão no check-out: decidido em 2026-10-16. O cartão deixa de funcionar e o registo de acessos mantém-se (ver story-check-out AC-4).
