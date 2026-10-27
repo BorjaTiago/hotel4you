@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
@@ -30,7 +31,8 @@ class HotelFacadeTest {
         repository = new InMemoryUserRepository();
         authService = new AuthService(repository);
         StaffService staffService = new StaffService(repository, authService);
-        facade = new HotelFacade(authService, staffService);
+        RoomService roomService = new RoomService(new InMemoryRoomRepository());
+        facade = new HotelFacade(authService, staffService, roomService);
     }
 
     private User saveAna() {
