@@ -382,9 +382,9 @@ Enums have fixed values. They stop typing errors.
 
 Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
 
-Each story that adds a function adds its value to `Permission`, a test, and a row to this table, in the same PR. Example: H4Y-50 adds `LIST_ROOMS` for the manager and the receptionist.
+Each story that adds a function adds its value to `Permission`, a test, and a row to this table, in the same PR.
 
-Note on H4Y-23 AC-1 ("the receptionist can use the functions of the role"): today the receptionist has no function, so only the manager part of AC-1 has a test. The receptionist part is covered when H4Y-50 adds `LIST_ROOMS`. That test also gets `@Tag("H4Y-23-AC-1")`. H4Y-23 is not done before that test exists (PR #33 review, 2026-10-27).
+Note on H4Y-23 AC-1 ("the receptionist can use the functions of the role"): today the receptionist has no function, so only the manager part of AC-1 has a test. The receptionist part is covered when H4Y-50 (list rooms) adds its permission and its test, with `@Tag("H4Y-23-AC-1")`. H4Y-23 is not done before that test exists (PR #33 review, 2026-10-27).
 
 ### ReservationStatus
 - **What:** RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT.
