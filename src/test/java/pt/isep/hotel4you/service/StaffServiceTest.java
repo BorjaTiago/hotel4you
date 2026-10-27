@@ -128,28 +128,6 @@ class StaffServiceTest {
                 () -> staffService.createFirstManager("rui", password));
     }
 
-    @Test
-    @Tag("H4Y-32-AC-3")
-    @Tag("H4Y-24-AC-3")
-    void onCanCreateStaff_returnTrue_whenActorIsManager() {
-        assertTrue(staffService.canCreateStaff(new Manager(1L, "Rui Costa", "rui", HASH)));
-    }
-
-    @Test
-    @Tag("H4Y-32-AC-3")
-    @Tag("H4Y-24-AC-3")
-    @Tag("H4Y-27-AC-4")
-    void onCanCreateStaff_returnFalse_whenActorIsReceptionist() {
-        assertFalse(staffService.canCreateStaff(new Receptionist(2L, "Ana Silva", "ana", HASH)));
-    }
-
-    @Test
-    @Tag("H4Y-32-AC-3")
-    @Tag("H4Y-24-AC-3")
-    void onCanCreateStaff_returnFalse_whenActorIsNull() {
-        assertFalse(staffService.canCreateStaff(null));
-    }
-
     private User manager() {
         return new Manager(1L, "Rui Costa", "rui", HASH);
     }
@@ -279,6 +257,7 @@ class StaffServiceTest {
 
     @Test
     @Tag("H4Y-27-AC-4")
+    @Tag("H4Y-23-AC-2")
     void onCreateStaff_throwAccessDenied_whenActorIsReceptionist() {
         assertAccessDenied(new Receptionist(2L, "Ana Silva", "ana", HASH));
     }
@@ -291,6 +270,7 @@ class StaffServiceTest {
 
     @Test
     @Tag("H4Y-27-AC-4")
+    @Tag("H4Y-23-AC-3")
     void onCreateStaff_throwAccessDenied_whenActorIsNull() {
         assertAccessDenied(null);
     }

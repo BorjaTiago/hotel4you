@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
@@ -60,7 +61,7 @@ class HotelFacadeTest {
 
         assertEquals(rui, user);
         assertEquals(Role.MANAGER, user.getRole());
-        assertTrue(facade.canCreateStaff(user));
+        assertTrue(facade.canUse(user, Permission.MANAGE_STAFF));
     }
 
     @Test
@@ -96,27 +97,32 @@ class HotelFacadeTest {
     @Test
     @Tag("H4Y-32-AC-3")
     @Tag("H4Y-24-AC-3")
-    void onCanCreateStaff_returnTrue_whenActorIsManager() {
-        assertTrue(facade.canCreateStaff(new Manager(1L, "Rui Costa", "rui", "hash")));
+    void onCanUse_returnTrue_whenManagerManagesStaff() {
+        assertTrue(facade.canUse(new Manager(1L, "Rui Costa", "rui", "hash"),
+                Permission.MANAGE_STAFF));
     }
 
     @Test
     @Tag("H4Y-32-AC-3")
     @Tag("H4Y-24-AC-3")
-    void onCanCreateStaff_returnFalse_whenActorIsReceptionist() {
-        assertFalse(facade.canCreateStaff(new Receptionist(2L, "Ana Silva", "ana", "hash")));
+    @Tag("H4Y-23-AC-2")
+    void onCanUse_returnFalse_whenReceptionistManagesStaff() {
+        assertFalse(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"),
+                Permission.MANAGE_STAFF));
     }
 
     @Test
     @Tag("H4Y-24-AC-3")
-    void onCanCreateStaff_returnFalse_whenActorIsRestaurantStaff() {
-        assertFalse(facade.canCreateStaff(new RestaurantStaff(3L, "Joao Lima", "joao", "hash")));
+    void onCanUse_returnFalse_whenRestaurantStaffManagesStaff() {
+        assertFalse(facade.canUse(new RestaurantStaff(3L, "Joao Lima", "joao", "hash"),
+                Permission.MANAGE_STAFF));
     }
 
     @Test
     @Tag("H4Y-24-AC-3")
-    void onCanCreateStaff_returnFalse_whenActorIsNull() {
-        assertFalse(facade.canCreateStaff(null));
+    @Tag("H4Y-23-AC-3")
+    void onCanUse_returnFalse_whenActorIsNull() {
+        assertFalse(facade.canUse(null, Permission.MANAGE_STAFF));
     }
 
     @Test
@@ -141,10 +147,20 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-27-AC-4")
+    @Tag("H4Y-23-AC-2")
     void onCreateStaff_throwAccessDenied_whenActorIsReceptionist() {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
 
         assertThrows(AccessDeniedException.class, () -> facade.createStaff(
                 "Bia Neves", "bia", PASSWORD, Role.RECEPTIONIST, receptionist));
+        assertEquals(0, repository.count());
+    }
+
+    @Test
+    @Tag("H4Y-23-AC-3")
+    void onCreateStaff_throwAccessDenied_whenActorIsNull() {
+        assertThrows(AccessDeniedException.class, () -> facade.createStaff(
+                "Bia Neves", "bia", PASSWORD, Role.RECEPTIONIST, null));
+        assertEquals(0, repository.count());
     }
 }
