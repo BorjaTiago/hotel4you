@@ -122,7 +122,6 @@ class LocationServiceTest {
         assertEquals(DENIED_MESSAGE, error.getMessage());
     }
 
-
     private Location createBar() {
         return service.createLocation(1, "Bar", false, false, manager());
     }
