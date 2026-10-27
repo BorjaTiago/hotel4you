@@ -74,7 +74,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Put them in `ReservationController`. Not done: a separate screen is easier to test.
 
 ### StaffController
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Now (H4Y-27) the screen creates accounts (name, username, password and type) and shows the list of staff accounts. It shows the service message on a refusal. The list loads when the screen opens and after each new account.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Now (H4Y-27) the screen creates accounts (name, username, password and type) and shows the list of staff accounts. It shows the service message on a refusal. The list loads when the screen opens and after each new account. The type of account shows `Role.displayName()` (H4Y-61).
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin is a manager task.
 - **Other option:** Put it in `LoginController`. Not done: login and admin are different tasks.
@@ -368,6 +368,7 @@ Enums have fixed values. They stop typing errors.
 - **Why:** RF-02. The five actor types.
 - **Why this way:** Fixed list in code. The DB has a `roles` table with the same five names.
 - **Other option:** Only the `roles` table. Not done: code needs a type-safe value.
+- **Name on the screen:** `displayName()` gives the name in Portuguese ("Cliente", "Rececionista", "Gestor", "Funcionário do restaurante", "Fornecedor"). The main window and the staff screen use it. So each role has one name in the whole application (H4Y-61).
 
 ### Permission
 - **What:** One value for each function of the application. Each value keeps the roles that may use it (`allowedRoles`). `allows(actor)` returns true only when the actor is logged in and has one of these roles.
@@ -443,4 +444,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 role display name, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
