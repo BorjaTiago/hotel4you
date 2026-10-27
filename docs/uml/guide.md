@@ -372,19 +372,19 @@ Enums have fixed values. They stop typing errors.
 ### Permission
 - **What:** One value for each function of the application. Each value keeps the roles that may use it (`allowedRoles`). `allows(actor)` returns true only when the actor is logged in and has one of these roles.
 - **Why:** RF-02. Each role uses only its own functions (H4Y-23, H4Y-60).
-- **Why this way:** Before, each function needed its own method, for example `canCreateStaff`. With more functions in sprint 3 (floors, rooms, prices), that gives many small methods with the same check. Now the rule is in one list. To add a function, add one value. The GUI asks `HotelFacade.canUse(actor, permission)` and the service uses the same value to refuse the action. So the menu and the service never disagree.
+- **Why this way:** Before, each function needed its own method, for example `canCreateStaff`. Each new function (floors, rooms, prices) would add one more small method with the same check. Now the rule is in one list. To add a function, add one value. The GUI asks `HotelFacade.canUse(actor, permission)` and the service uses the same value to refuse the action. So the menu and the service never disagree.
 - **Other option:** A `PermissionService` with a map from role to functions. Not done: one more class, and the enum already keeps the roles next to each function.
-- **Roles and functions (only the functions that exist or come in sprint 3):**
+- **Roles and functions (only the functions that exist in the code):**
 
 | Permission | Function | Manager | Receptionist | Restaurant staff |
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
-| VIEW_FLOORS | See floors and zones (H4Y-28) | yes | no | no |
-| REGISTER_ROOMS | Register rooms (H4Y-25) | yes | no | no |
-| SET_BASE_PRICE | Set the base price per night (H4Y-26) | yes | no | no |
-| LIST_ROOMS | See the list of rooms (H4Y-50) | yes | yes | no |
 
-Without a logged-in user, no function is allowed. Restaurant staff has no function in the application yet. Each later story adds its value to this table.
+Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
+
+Each story that adds a function adds its value to `Permission`, a test, and a row to this table, in the same PR. Example: H4Y-50 adds `LIST_ROOMS` for the manager and the receptionist.
+
+Note on H4Y-23 AC-1 ("the receptionist can use the functions of the role"): today the receptionist has no function, so only the manager part of AC-1 has a test. The receptionist part is covered when H4Y-50 adds `LIST_ROOMS`. That test also gets `@Tag("H4Y-23-AC-1")`. H4Y-23 is not done before that test exists (PR #33 review, 2026-10-27).
 
 ### ReservationStatus
 - **What:** RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT.
@@ -443,4 +443,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
