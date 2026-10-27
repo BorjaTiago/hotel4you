@@ -5,17 +5,17 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 Notes:
 
 - Constructors and getters are not shown.
-- Unit tests use `InMemoryUserRepository` (in `src/test`). It is a test helper, so it is not in this diagram.
+- Unit tests use `InMemoryUserRepository` and `InMemoryRoomRepository` (in `src/test`). They are test helpers, so they are not in this diagram.
 
 ## Interface (JavaFX controllers)
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | LoginController | Interface | - | onLoginClicked() (private) | RF-01 |
-| MainController | Interface | - | initialize(), onStaffClicked(), onLogoutClicked() (private) | RNF-06, RNF-07 |
+| MainController | Interface | - | initialize(), onStaffClicked(), onRoomsClicked(), onLogoutClicked() (private) | RNF-06, RNF-07 |
 | HotelApp | Interface | facade (static), currentUser (static), startError (static) | start() | RNF-06, RNF-07 |
 | ScreenLoader | Interface | - | load() | RNF-06, RNF-07 |
-| RoomController | Interface | - | onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() | RF-04, RF-05, RF-06, RF-08 |
+| RoomController | Interface | - | initialize(), onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() (all private) | RF-04, RF-05, RF-06, RF-08 |
 | ClientController | Interface | - | onRegisterClientClicked(), onSearchClientClicked() | RF-10 |
 | ReservationController | Interface | - | onCreateReservationClicked(), onCancelReservationClicked(), onDeleteReservationClicked(), onAddExtraClicked(), onRemoveExtraClicked(), onAddLocationClicked(), onRemoveLocationClicked() | RF-11, RF-12, RF-15, RF-18, RF-22 |
 | LocationController | Interface | - | onSaveLocationClicked(), onRemoveLocationClicked() | RF-03, RF-18 |
@@ -29,7 +29,7 @@ Notes:
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canCreateStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
+| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canCreateStaff(), editStaff(), removeStaff(), listUsers(), searchRooms(), canRegisterRooms(actor), saveRoom(room, actor), listRooms(), listRoomTypes(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback() | All RF and RNF-07 (entry point) |
 
 ## Business - Services
 
@@ -38,7 +38,7 @@ Notes:
 | AuthService | Business - Services | - | login(), hashPassword(), isValidPassword() (private) | RF-01, RNF-02 |
 | ClientService | Business - Services | - | register(), find() | RF-10, RNF-03 |
 | LocationService | Business - Services | - | createLocation(), editLocation(), removeLocation() | RF-03, RF-18 |
-| RoomService | Business - Services | - | isAvailable(), searchRooms(), saveRoom(), configureItem(), setBasePrice(), setExtraPrice() | RF-04, RF-05, RF-06, RF-07, RF-08, RF-09 |
+| RoomService | Business - Services | - | isAvailable(), searchRooms(), canRegisterRooms(actor), saveRoom(room, actor), listRooms(), listRoomTypes(), configureItem(), setBasePrice(), setExtraPrice() | RF-04, RF-05, RF-06, RF-07, RF-08, RF-09 |
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
 | StaffService | Business - Services | - | createStaff(name, username, password, role, actor), canCreateStaff(), createFirstManager(), editStaff(), removeStaff(), listUsers() | RF-02, RF-26, RNF-01 |
 | CardAccessService | Business - Services | - | issueCard(), issueMasterCard(), blockCard(), canOpen(), register(), getPlacesByCard(), getPassesByRoom(), canOpenRoom() (access rules in the diagram note) | RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-24, RF-25, RF-30 |
@@ -53,7 +53,7 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | AppConfig | Config (record) | dbUrl, dbUser, dbPassword, managerUsername, managerPassword | load() (static), toString() (hides the passwords) | RNF-12 |
-| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, AuthService, StaffService, HotelFacade. Starts HotelApp | RF-01, RNF-12 |
+| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, JdbcRoomRepository, AuthService, StaffService, RoomService, HotelFacade. Starts HotelApp | RF-01, RNF-12 |
 | FirstManagerCommand | Config | - | main() (static). Uses AppConfig and StaffService. Creates Database, JdbcUserRepository, AuthService | RF-01, RNF-12 |
 
 ## Data
@@ -61,8 +61,12 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), existsByRole(), save() | RF-01, RNF-01, RNF-12 |
+| RoomRepository | Data - Repository interface | - | floorExists(), roomTypeExists(), findRoomTypeNames(), existsByNumber(), countByFloor(), findAll(), saveWithinFloorLimit() | RF-04 |
 | Database | Data | NOT_AVAILABLE (static) | connect(), check(), prepare() (static) | RNF-12 |
 | JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), existsByRole(), save() | RNF-01, RNF-12 |
+| JdbcRoomRepository | Data - Repository (SQL Server) | - | floorExists(), roomTypeExists(), findRoomTypeNames(), existsByNumber(), countByFloor(), findAll(), saveWithinFloorLimit() | RF-04 |
+| DuplicateRoomException | Data - Exception | - | - | RF-04 |
+| RoomLimitExceededException | Data - Exception | - | - | RF-04 |
 
 ## Domain
 
@@ -75,7 +79,7 @@ Notes:
 | Client | Domain | id, name, document, birthday | - | RF-02, RF-10 |
 | Floor | Domain | number, description | - | RF-03 |
 | Location | Domain | id, name, guestCardAccess, requiresReservation | - | RF-03, RF-18 |
-| Room | Domain | id, number | - | RF-04, RF-05 |
+| Room | Domain | id, number, floorNumber, roomTypeName | - | RF-04, RF-05 |
 | RoomType | Domain | id, name, capacity, basePrice | - | RF-04, RF-06 |
 | RoomItem | Domain | quantity | - | RF-08 |
 | Reservation | Domain | id, startDate, endDate, status, checkedInAt, checkedOutAt | checkIn(), checkOut(), cancel(), overlaps(), calculateTotal() | RF-05, RF-11, RF-12, RF-13, RF-14, RF-22 |
@@ -101,4 +105,4 @@ Notes:
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27. Reviewed by: pending.

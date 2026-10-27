@@ -3,10 +3,12 @@ package pt.isep.hotel4you.config;
 import java.nio.file.Path;
 import javafx.application.Application;
 import pt.isep.hotel4you.data.Database;
+import pt.isep.hotel4you.data.JdbcRoomRepository;
 import pt.isep.hotel4you.data.JdbcUserRepository;
 import pt.isep.hotel4you.gui.HotelApp;
 import pt.isep.hotel4you.service.AuthService;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.RoomService;
 import pt.isep.hotel4you.service.StaffService;
 
 /** Starts the Hotel4You application. */
@@ -27,7 +29,8 @@ public class Main {
             JdbcUserRepository userRepository = new JdbcUserRepository(database);
             AuthService authService = new AuthService(userRepository);
             StaffService staffService = new StaffService(userRepository, authService);
-            HotelFacade facade = new HotelFacade(authService, staffService);
+            RoomService roomService = new RoomService(new JdbcRoomRepository(database));
+            HotelFacade facade = new HotelFacade(authService, staffService, roomService);
 
             // Check now that the database works.
             database.check();

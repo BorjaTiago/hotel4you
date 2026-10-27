@@ -25,6 +25,9 @@ public class MainController {
     private Button staffButton;
 
     @FXML
+    private Button roomsButton;
+
+    @FXML
     private StackPane contentPane;
 
     /**
@@ -42,12 +45,20 @@ public class MainController {
         welcomeLabel.setText("Bem-vindo, " + user.getName());
         staffButton.managedProperty().bind(staffButton.visibleProperty());
         staffButton.setVisible(facade.canCreateStaff(user));
+        roomsButton.managedProperty().bind(roomsButton.visibleProperty());
+        roomsButton.setVisible(facade.canRegisterRooms(user));
     }
 
     @FXML
     private void onStaffClicked() {
         Parent staffScreen = new ScreenLoader(facade).load("staff.fxml");
         contentPane.getChildren().setAll(staffScreen);
+    }
+
+    @FXML
+    private void onRoomsClicked() {
+        Parent roomScreen = new ScreenLoader(facade).load("rooms.fxml");
+        contentPane.getChildren().setAll(roomScreen);
     }
 
     @FXML

@@ -131,10 +131,13 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put zones in `RoomService`. Not done: zones are not rooms.
 
 ### RoomService
-- **What:** Check if a room is free. Search rooms. Save a room. Set prices. Configure room items.
-- **Why:** RF-04 to RF-09.
-- **Why this way:** Room and price rules in one place.
-- **Other option:** Put rules in `Room`. Not done: `Room` would need reservation data.
+- **What:** Save and list rooms. Return the room type names for the registration screen. Keep the other room, price and room item operations here.
+- **Why:** RF-04 to RF-09. Only a manager may register rooms. Floors 2 and 3 hold at most 10 rooms each.
+- **Why this way:** The controller collects fields and shows results. `RoomService` checks the manager, floor, type, duplicate number and floor limit. `RoomRepository` reads the catalogue and saves the room. The JDBC save locks the floor row and checks the limit in the same transaction. This protects the limit when two requests arrive together.
+- **Other option:** Put the validation in `RoomController` or only in SQL constraints. Not done: controllers hold no business rules, and a unique number constraint cannot enforce a per-floor count.
+- **Example:** A manager saves room 202 on floor 2 as a double room. The service checks that floor 2 and the type exist, that room 202 is free, and that floor 2 has fewer than 10 rooms. The repository saves the room with its floor and type foreign keys.
+- **Q-01:** The test can register the proposed 7 single, 10 double and 3 family rooms. The service does not enforce those type totals because the teacher has not confirmed them.
+- **Integration:** The current repository reads the existing `floors` and `room_types` tables. When H4Y-28 and H4Y-26 merge, align these lookups with their repository contracts.
 
 ### ReservationService
 - **What:** Create, cancel, delete a reservation. Add and remove an extra. Add and remove a zone. Check-in and check-out.
@@ -425,4 +428,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27. Reviewed by: pending.

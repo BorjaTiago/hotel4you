@@ -7,7 +7,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 1. The layout follows the teacher's slide: one `«subsystem» Hotel4You` box with its internal structure. Each part inside is one Java package: `gui`, `service`, `domain`, `data`, `config`. The diagram reads from left to right, from input to output (class 1 slides): the actors and the supplier XML file on the left, SQL Server on the right.
 2. Parts connect with assembly connectors (ball and socket). Ports on the border connect to parts with delegation connectors.
 3. The GUI talks only to the business logic. `gui` calls `HotelFacade` and reads `domain` objects. It never uses `data` or SQL Server (RNF-07).
-4. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC (`JdbcUserRepository`). Unit tests use an in-memory repository in `src/test`, not in the application (RNF-08, RNF-10, RNF-12).
+4. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC (`JdbcUserRepository`, `JdbcRoomRepository`). Unit tests use in-memory repositories in `src/test`, not in the application (RNF-08, RNF-10, RNF-12).
 5. Only `config` knows all packages. It creates and connects the objects at start-up. It holds no business rule.
 6. Only external components and artifacts are in the diagram: SQL Server and the supplier XML file. Libraries and the JDBC driver are not components (teacher feedback, 2026-10-17). Each library has a reason from the statement (RNF-11).
 
@@ -40,9 +40,9 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 - **Other option:** Separate data objects for the GUI. Not done: more code for little gain.
 
 ### data
-- **What:** Repository interfaces and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` from `config` and opens the connections.
-- **Why:** The statement requires SQL Server (RNF-12). All users are saved (RNF-01).
-- **Why this way:** T0 (H4Y-32) puts the repository interfaces in `data`. `service` uses only the interfaces, never JDBC. Unit tests use an in-memory repository in `src/test` (RNF-10).
+- **What:** Repository interfaces and the JDBC versions for SQL Server (`JdbcUserRepository`, `JdbcRoomRepository`, `Database`). `Database` gets `AppConfig` from `config` and opens the connections.
+- **Why:** The statement requires SQL Server (RNF-12). Users and rooms are saved (RF-04, RNF-01).
+- **Why this way:** T0 (H4Y-32) puts the repository interfaces in `data`. `service` uses only the interfaces, never JDBC. Unit tests use in-memory repositories in `src/test` (RNF-10).
 - **Other option:** SQL inside the services. Not done: rules and SQL would mix, and tests would need a database.
 
 ### config
@@ -82,4 +82,4 @@ Mermaid CLI rendered the diagram to a temporary PNG file. The preview was inspec
 
 The five packages now exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17, C-04). Human review is still required.
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: jmbcruz. Updated by: pedrocostaisep. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27. Reviewed by: pending.
