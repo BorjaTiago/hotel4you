@@ -28,7 +28,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 ### MainController
 - **What:** Main window after login. Top: welcome text and Logout. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen.
 - **Why:** RNF-06, RNF-07. Each user finds the functions of the role in one place.
-- **Why this way:** The menu asks `HotelFacade` which buttons to show (now `canCreateStaff`). The screen has no role check of its own.
+- **Why this way:** The menu asks `HotelFacade.canUse(actor, permission)` which buttons to show. The screen has no role check of its own.
 - **Other option:** A `Session` or `PermissionPolicy` class for the menu. Not done: the facade already holds the rules, and the extra class adds no value now.
 
 ### HotelApp
@@ -105,6 +105,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why this way:** Controllers do not know which service does the work. Keeps the GUI simple.
 - **Other option:** Controllers call services directly. Not done: GUI would know every service and their rules.
 - **Note:** The business layer does not use JavaFX (RNF-07).
+- **Permissions:** `canUse(actor, permission)` tells if the user may use a function. The GUI asks it to show or hide a menu button (H4Y-60).
 
 ## Services
 
@@ -147,7 +148,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
-- **Rules:** Only a manager can create accounts. `canCreateStaff(actor)` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
+- **Rules:** Only a manager can create accounts. `Permission.MANAGE_STAFF` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -178,7 +179,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Why:** RF-26. The caller gets a clear error before the save.
 
 ### AccessDeniedException
-- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when the actor is not a manager.
+- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when `Permission.MANAGE_STAFF` does not allow the actor.
 - **Why:** RF-26. The service refuses the request even if the screen shows the button by mistake.
 
 ## Config
@@ -368,6 +369,23 @@ Enums have fixed values. They stop typing errors.
 - **Why this way:** Fixed list in code. The DB has a `roles` table with the same five names.
 - **Other option:** Only the `roles` table. Not done: code needs a type-safe value.
 
+### Permission
+- **What:** One value for each function of the application. Each value keeps the roles that may use it (`allowedRoles`). `allows(actor)` returns true only when the actor is logged in and has one of these roles.
+- **Why:** RF-02. Each role uses only its own functions (H4Y-23, H4Y-60).
+- **Why this way:** Before, each function needed its own method, for example `canCreateStaff`. With more functions in sprint 3 (floors, rooms, prices), that gives many small methods with the same check. Now the rule is in one list. To add a function, add one value. The GUI asks `HotelFacade.canUse(actor, permission)` and the service uses the same value to refuse the action. So the menu and the service never disagree.
+- **Other option:** A `PermissionService` with a map from role to functions. Not done: one more class, and the enum already keeps the roles next to each function.
+- **Roles and functions (only the functions that exist or come in sprint 3):**
+
+| Permission | Function | Manager | Receptionist | Restaurant staff |
+|------------|----------|---------|--------------|------------------|
+| MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
+| VIEW_FLOORS | See floors and zones (H4Y-28) | yes | no | no |
+| REGISTER_ROOMS | Register rooms (H4Y-25) | yes | no | no |
+| SET_BASE_PRICE | Set the base price per night (H4Y-26) | yes | no | no |
+| LIST_ROOMS | See the list of rooms (H4Y-50) | yes | yes | no |
+
+Without a logged-in user, no function is allowed. Restaurant staff has no function in the application yet. Each later story adds its value to this table.
+
 ### ReservationStatus
 - **What:** RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT.
 - **Why:** RF-12 to RF-14.
@@ -425,4 +443,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
