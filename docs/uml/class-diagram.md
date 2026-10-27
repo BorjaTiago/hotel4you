@@ -8,9 +8,9 @@
 - `UserRepository` is in the data layer. `JdbcUserRepository` is the SQL Server version.
 - `InMemoryLocationRepository` (in `src/test`) is a test helper, so it is not in this diagram. Its `delete` returns false when other rows use the zone.
 - `$` marks a static member.
-- `actor` is the logged-in user that `login()` returned. `canCreateStaff(actor)` is true only for a manager. `createStaff` throws `AccessDeniedException` when the actor is not a manager (H4Y-27).
+- `actor` is the logged-in user that `login()` returned. `Permission` holds the roles that may use each function. `Permission.allows(actor)` is false when `actor` is null. `createStaff` throws `AccessDeniedException` when `MANAGE_STAFF` does not allow the actor (H4Y-27, H4Y-60).
 - `canViewFloors(actor)` is true only for a manager. `listFloors` and `findFloor` throw `AccessDeniedException` for other users, and `findFloor` throws `FloorNotFoundException` for an unknown floor (H4Y-28).
-- `MainController` shows a menu button only when a facade method allows it. The Staff button uses `canCreateStaff(actor)`. The "Pisos e zonas" button uses `canViewFloors(actor)` (H4Y-28). The screen has no role check of its own (H4Y-24).
+- `MainController` shows a menu button only when a facade method allows it. The Staff button uses `canUse(actor, MANAGE_STAFF)`. The "Pisos e zonas" button uses `canViewFloors(actor)` (H4Y-28). The screen has no role check of its own (H4Y-24, H4Y-60).
 - `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32). `FloorController` is the one screen for floors and zones (H4Y-28): it has the zone form, so there is no `LocationController` for zone CRUD. `createLocation`, `editLocation` and `removeLocation` need a manager. `removeLocation` throws `LocationInUseException` when `LocationRepository.delete` returns false (Q-36). `HotelFacade.removeLocation(reservation, location)` is the reservation method and stays.
 
 ```mermaid
@@ -112,7 +112,7 @@ classDiagram
         +getPlacesByCard(card: MagneticCard) List~CardAccessRecord~
         +getPassesByRoom(room: Room) List~CardAccessRecord~
         +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
-        +canCreateStaff(actor: User) boolean
+        +canUse(actor: User, permission: Permission) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -176,7 +176,6 @@ classDiagram
     }
     class StaffService {
         +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
-        +canCreateStaff(actor: User) boolean
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
@@ -398,6 +397,12 @@ classDiagram
         RESTAURANT
         SUPPLIER
     }
+    class Permission {
+        <<enumeration>>
+        MANAGE_STAFF
+        -allowedRoles: Set~Role~
+        +allows(actor: User) boolean
+    }
     class ReservationStatus {
         <<enumeration>>
         RESERVED
@@ -510,6 +515,9 @@ classDiagram
     LocationService ..> LocationNotFoundException : throws
     LocationService ..> LocationNameTakenException : throws
     LocationService ..> LocationInUseException : throws
+    HotelFacade ..> Permission : uses
+    StaffService ..> Permission : uses
+    Permission ..> Role : uses
 
     %% ==========================================
     %% DEPENDENCIES (Start-up)
@@ -540,4 +548,4 @@ classDiagram
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.

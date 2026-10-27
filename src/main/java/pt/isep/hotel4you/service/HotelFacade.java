@@ -3,6 +3,7 @@ package pt.isep.hotel4you.service;
 import java.util.List;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
@@ -41,13 +42,14 @@ public class HotelFacade {
     }
 
     /**
-     * Tells if the user may create staff accounts.
+     * Tells if the user may use a function. The GUI uses it to show or hide a menu button.
      *
      * @param actor the logged-in user, can be null
-     * @return true if the actor is a manager
+     * @param permission the function to check
+     * @return true if the role of the actor may use the function
      */
-    public boolean canCreateStaff(User actor) {
-        return staffService.canCreateStaff(actor);
+    public boolean canUse(User actor, Permission permission) {
+        return permission.allows(actor);
     }
 
     /**

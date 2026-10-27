@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
 import pt.isep.hotel4you.service.HotelFacade;
 
@@ -44,7 +45,7 @@ public class MainController {
         User user = HotelApp.currentUser;
         welcomeLabel.setText("Bem-vindo, " + user.getName());
         staffButton.managedProperty().bind(staffButton.visibleProperty());
-        staffButton.setVisible(facade.canCreateStaff(user));
+        staffButton.setVisible(facade.canUse(user, Permission.MANAGE_STAFF));
         floorsButton.managedProperty().bind(floorsButton.visibleProperty());
         floorsButton.setVisible(facade.canViewFloors(user));
     }
