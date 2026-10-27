@@ -6,7 +6,6 @@ import java.util.Optional;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
-import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
 /** Keeps users in memory. Unit tests use it instead of the database. */
@@ -29,11 +28,6 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public boolean existsByUsername(String username) {
         return findByUsername(username).isPresent();
-    }
-
-    @Override
-    public boolean existsByRole(Role role) {
-        return users.stream().anyMatch(user -> user.getRole() == role);
     }
 
     @Override

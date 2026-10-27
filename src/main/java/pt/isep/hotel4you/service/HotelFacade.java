@@ -1,6 +1,8 @@
 package pt.isep.hotel4you.service;
 
 import java.util.List;
+import pt.isep.hotel4you.domain.Floor;
+import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
@@ -10,16 +12,20 @@ public class HotelFacade {
 
     private final AuthService authService;
     private final StaffService staffService;
+    private final LocationService locationService;
 
     /**
      * Creates the facade.
      *
      * @param authService the login service
      * @param staffService the staff service
+     * @param locationService the floor and zone service
      */
-    public HotelFacade(AuthService authService, StaffService staffService) {
+    public HotelFacade(AuthService authService, StaffService staffService,
+            LocationService locationService) {
         this.authService = authService;
         this.staffService = staffService;
+        this.locationService = locationService;
     }
 
     /**
@@ -67,5 +73,87 @@ public class HotelFacade {
      */
     public List<User> listUsers() {
         return staffService.listUsers();
+    }
+
+    /**
+     * Lists all floors with their zones.
+     *
+     * @param actor the logged-in user who asks
+     * @return the floors ordered by number
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Floor> listFloors(User actor) {
+        return locationService.listFloors(actor);
+    }
+
+    /**
+     * Finds one floor with its zones.
+     *
+     * @param number the floor number
+     * @param actor the logged-in user who asks
+     * @return the floor
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws FloorNotFoundException if the floor does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public Floor findFloor(int number, User actor) {
+        return locationService.findFloor(number, actor);
+    }
+
+    /**
+     * Creates a zone on a floor.
+     *
+     * @param floorNumber the floor number
+     * @param name the zone name
+     * @param guestCardAccess true if the guest card opens the zone
+     * @param requiresReservation true if the zone needs a reservation
+     * @param actor the logged-in user who asks
+     * @return the new zone with its id
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the name is blank or too long
+     * @throws FloorNotFoundException if the floor does not exist
+     * @throws LocationNameTakenException if the floor already has a zone with this name
+     * @throws IllegalStateException if the database is not available
+     */
+    public Location createLocation(int floorNumber, String name, boolean guestCardAccess,
+            boolean requiresReservation, User actor) {
+        return locationService.createLocation(floorNumber, name, guestCardAccess, requiresReservation, actor);
+    }
+
+    /**
+     * Changes a zone.
+     *
+     * @param id the zone id
+     * @param floorNumber the new floor number
+     * @param name the new zone name
+     * @param guestCardAccess true if the guest card opens the zone
+     * @param requiresReservation true if the zone needs a reservation
+     * @param actor the logged-in user who asks
+     * @return the changed zone
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the name is blank or too long
+     * @throws FloorNotFoundException if the floor does not exist
+     * @throws LocationNotFoundException if the zone does not exist
+     * @throws LocationNameTakenException if the floor has another zone with this name
+     * @throws IllegalStateException if the database is not available
+     */
+    public Location editLocation(long id, int floorNumber, String name, boolean guestCardAccess,
+            boolean requiresReservation, User actor) {
+        return locationService.editLocation(id, floorNumber, name, guestCardAccess, requiresReservation, actor);
+    }
+
+    /**
+     * Removes a zone.
+     *
+     * @param id the zone id
+     * @param actor the logged-in user who asks
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws LocationNotFoundException if the zone does not exist
+     * @throws LocationInUseException if other data still uses the zone
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeLocation(long id, User actor) {
+        locationService.removeLocation(id, actor);
     }
 }

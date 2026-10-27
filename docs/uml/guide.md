@@ -61,11 +61,11 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Why this way:** Reception works on reservations here.
 - **Other option:** Put the delete button in the manager screen only. Not done: the role check is in the service, not the screen.
 
-### LocationController
-- **What:** Save and remove zones (pool, restaurant, bar).
-- **Why:** RF-03, RF-18.
-- **Why this way:** Zones are not rooms. They need their own screen.
-- **Other option:** Put zones in `RoomController`. Not done: mixes two topics.
+### FloorController
+- **What:** Show the floors and their zones. Create, save and remove a zone with the form below the zone table (H4Y-28).
+- **Why:** RF-03.
+- **Why this way:** One screen for floors and zones. There is no `LocationController` for zone CRUD. The controller has no rules.
+- **Other option:** A separate zone screen. Not done: the zones belong to the floor the manager is looking at.
 
 ### CheckInOutController
 - **What:** Check-in and check-out buttons.
@@ -125,10 +125,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Let the database fail. Not done: the user gets no clear message.
 
 ### LocationService
-- **What:** Create, edit and remove zones.
+- **What:** Create, edit and remove zones. Show floors and zones. Uses `FloorRepository` and `LocationRepository` (H4Y-28). It checks `Permission.MANAGE_FLOORS` and throws `AccessDeniedException` when it does not allow the actor.
 - **Why:** RF-03, RF-18.
 - **Why this way:** Zone rules (card access, reservation needed) stay in one place.
-- **Rule:** Remove is refused when the zone has links (reservations, card passes). The system shows a clear error (Q-36).
+- **Rule:** Only a manager manages zones. The name is trimmed, required and has at most 50 characters. The name is unique per floor. Remove is refused with `LocationInUseException` when the delete fails because the zone has links (reservations, card passes). The system shows a clear error (Q-36).
 - **Other option:** Put zones in `RoomService`. Not done: zones are not rooms.
 
 ### RoomService
@@ -145,10 +145,10 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put the logic only in `Reservation`. Not done: one reservation cannot see the others.
 
 ### StaffService
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Create the first manager (`createFirstManager`), only when no manager exists.
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
-- **Rules:** Only a manager can create accounts. `Permission.MANAGE_STAFF` holds this rule. `createFirstManager` trims the username and uses it as the manager name. It returns `false` when a manager already exists. It throws `UsernameTakenException` when the username is taken. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
+- **Rules:** Only a manager can create accounts. `Permission.MANAGE_STAFF` holds this rule. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -179,13 +179,13 @@ Services hold the rules. Each service works on the domain classes.
 - **Why:** RF-26. The caller gets a clear error before the save.
 
 ### AccessDeniedException
-- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when `Permission.MANAGE_STAFF` does not allow the actor.
+- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when `Permission.MANAGE_STAFF` does not allow the actor. `LocationService` throws it when `Permission.MANAGE_FLOORS` does not allow the actor (H4Y-28).
 - **Why:** RF-26. The service refuses the request even if the screen shows the button by mistake.
 
 ## Config
 
 ### AppConfig
-- **What:** A record with the settings from `application.properties`: database url, user, password and the first manager.
+- **What:** A record with the settings from `application.properties`: database url, user and password.
 - **Why:** RNF-12. Passwords stay out of the code and out of Git.
 - **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
@@ -193,10 +193,6 @@ Services hold the rules. Each service works on the domain classes.
 ### Main
 - **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
 - **Why:** RF-01, RNF-12. One place builds the objects.
-
-### FirstManagerCommand
-- **What:** Command line tool. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService` and `StaffService`. Then it calls `createFirstManager`.
-- **Why:** RF-01, RNF-12. The first manager must exist before the first login.
 
 ## Data
 
@@ -257,13 +253,19 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 ### Floor
 - **What:** A floor number (-1 to 3) and description.
 - **Why:** RF-03. Floors decide staff access (floors 0 and 1).
-- **Why this way:** Rooms and zones both link to a floor.
+- **Why this way:** Rooms and zones both link to a floor. The floors are fixed, so `Floor` is a record.
 - **Other option:** Store the number on each `Location`. Not done: the floor is shared by many places.
+
+### LocationRepository and JdbcLocationRepository
+- **What:** Find a zone by id or by floor and name. Save, update and delete a zone.
+- **Why:** RF-03 (H4Y-28).
+- **Why this way:** `delete` returns false when SQL Server refuses it because other rows use the zone (error 547). The service then throws `LocationInUseException`.
+- **Other option:** Count the links before the delete. Not done: the database already knows them.
 
 ### Location
 - **What:** A zone with a card reader (pool, restaurant, bar). Flags: `guestCardAccess`, `requiresReservation`.
 - **Why:** RF-03, RF-18.
-- **Why this way:** The two flags say if a client card opens the zone.
+- **Why this way:** The two flags say if a client card opens the zone. The manager changes zones, so `Location` is a class.
 - **Other option:** Fixed list of zone names in code. Not done: the manager adds and removes zones.
 
 ### Room
@@ -380,6 +382,7 @@ Enums have fixed values. They stop typing errors.
 | Permission | Function | Manager | Receptionist | Restaurant staff |
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
+| MANAGE_FLOORS | View the floors and create, edit and remove zones (H4Y-28) | yes | no | no |
 
 Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
 
@@ -444,4 +447,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 role display name, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-61 role display name, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.

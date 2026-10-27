@@ -39,30 +39,6 @@ public class StaffService {
     }
 
     /**
-     * Creates the first manager if no manager exists. The manager name is the username.
-     *
-     * @param username the login name, not blank
-     * @param password the plain password, not blank
-     * @return true if the manager was created, false if a manager already exists
-     * @throws IllegalArgumentException if the username or password is blank
-     * @throws UsernameTakenException if the username is already in use
-     */
-    public boolean createFirstManager(String username, String password) {
-        if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Preencha o nome de utilizador e a palavra-passe.");
-        }
-        String trimmed = username.trim();
-        if (userRepository.existsByRole(Role.MANAGER)) {
-            return false;
-        }
-        if (userRepository.existsByUsername(trimmed)) {
-            throw new UsernameTakenException();
-        }
-        userRepository.save(new Manager(null, trimmed, trimmed, authService.hashPassword(password)));
-        return true;
-    }
-
-    /**
      * Creates a staff account. Only a manager may do it. The name and the username are trimmed.
      * The password is saved as a bcrypt hash.
      *

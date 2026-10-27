@@ -15,6 +15,7 @@ Columns and constraints: [schema.md](schema.md). Diagram: [erd.md](erd.md).
 This version applies the schema decisions of PR #3 (branch `backlog-requirements`). The `Q-NN` are in `docs/requirements/questions.md` of that PR.
 
 - **Added:**
+  - `floors.description` (H4Y-28): the name of each floor that the manager sees. PR #3 removed it. It is back now.
   - `reservation_locations`: locations of a reservation (Q-09, RF-18).
   - `locations.requires_reservation` (Q-32): 1 = the zone needs a reservation to open with the client card. Used for restaurant and pool.
   - `locations.guest_card_access` (Q-20): 0 = a client card never opens the place (bar, conference rooms, garage, storeroom, private pools, spa). We chose one BIT column, the simplest way to say "never". Default 0.
@@ -53,16 +54,16 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 ### floors
 **What:** The floors of the hotel (-1 to 3): -1 garage and storeroom; 0 reception, bar, conference rooms; 1 restaurant and pool; 2 and 3 rooms (RF-03).
 **Why:** Rooms and locations need a floor. Staff access uses the floor.
-**Why this way:** `number` is `SMALLINT` because `TINYINT` cannot store -1. `id` is separate from `number`, so a renumbering does not break FKs. There is no description column: it was not needed.
+**Why this way:** `number` is `SMALLINT` because `TINYINT` cannot store -1. `id` is separate from `number`, so a renumbering does not break FKs. `description` is the name the manager sees (H4Y-28).
 **Other option:** Store the floor number inside `rooms`. We did not, because `locations` also needs floors, and the number would repeat.
 
-| id | number |
-|---|---|
-| 1 | -1 |
-| 2 | 0 |
-| 3 | 1 |
-| 4 | 2 |
-| 5 | 3 |
+| id | number | description |
+|---|---|---|
+| 1 | -1 | Garagem e arrecadação |
+| 2 | 0 | Receção, bar e salas de conferência |
+| 3 | 1 | Restaurante e piscina |
+| 4 | 2 | Quartos |
+| 5 | 3 | Quartos |
 
 ### room_types
 **What:** The kinds of room: individual, double, family. The hotel has 20 rooms: 7 individual, 10 double, 3 family (RF-04).
@@ -103,11 +104,13 @@ Room 202 is a double room: 90.00 per night.
 
 | id | name | floor_id | guest_card_access | requires_reservation |
 |---|---|---|---|---|
-| 1 | pool | 3 | 1 | 1 |
-| 2 | restaurant | 3 | 1 | 1 |
-| 3 | kitchen | 3 | 0 | 0 |
-| 4 | bar | 2 | 0 | 0 |
-| 5 | garage | 1 | 0 | 0 |
+| 1 | Garagem | 1 | 0 | 0 |
+| 2 | Arrecadação | 1 | 0 | 0 |
+| 3 | Receção | 2 | 0 | 0 |
+| 4 | Bar | 2 | 0 | 0 |
+| 5 | Salas de conferência | 2 | 0 | 0 |
+| 6 | Restaurante | 3 | 1 | 1 |
+| 7 | Piscina | 3 | 1 | 1 |
 
 Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 
@@ -350,4 +353,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.

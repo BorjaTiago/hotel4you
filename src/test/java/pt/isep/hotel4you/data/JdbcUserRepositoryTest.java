@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.domain.Manager;
-import pt.isep.hotel4you.domain.Role;
 
 /** Tests that the repository keeps the SQL error as the cause. */
 class JdbcUserRepositoryTest {
@@ -63,16 +62,6 @@ class JdbcUserRepositoryTest {
     void onExistsByUsername_keepSqlCause_whenSqlFails() {
         IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> repository.existsByUsername("manager"));
-
-        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
-        assertInstanceOf(SQLException.class, error.getCause());
-    }
-
-    @Test
-    @Tag("H4Y-32-AC-9")
-    void onExistsByRole_keepSqlCause_whenSqlFails() {
-        IllegalStateException error = assertThrows(IllegalStateException.class,
-                () -> repository.existsByRole(Role.MANAGER));
 
         assertEquals(Database.NOT_AVAILABLE, error.getMessage());
         assertInstanceOf(SQLException.class, error.getCause());
