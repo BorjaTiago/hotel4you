@@ -6,7 +6,7 @@ import pt.isep.hotel4you.data.FloorRepository;
 import pt.isep.hotel4you.data.LocationRepository;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
-import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
 
 /** Shows the floors of the hotel and manages their zones. Only a manager may use it. */
@@ -26,17 +26,6 @@ public class LocationService {
     public LocationService(FloorRepository floorRepository, LocationRepository locationRepository) {
         this.floorRepository = floorRepository;
         this.locationRepository = locationRepository;
-    }
-
-    /**
-     * Tells if the user may view the floors. Only a manager may. The GUI also uses this method
-     * to show or hide the floors button.
-     *
-     * @param actor the logged-in user, can be null
-     * @return true if the actor is a manager
-     */
-    public boolean canViewFloors(User actor) {
-        return actor instanceof Manager;
     }
 
     /**
@@ -140,7 +129,7 @@ public class LocationService {
     }
 
     private void checkManage(User actor) {
-        if (!canViewFloors(actor)) {
+        if (!Permission.MANAGE_FLOORS.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode gerir as zonas.");
         }
     }
@@ -169,7 +158,7 @@ public class LocationService {
     }
 
     private void checkAccess(User actor) {
-        if (!canViewFloors(actor)) {
+        if (!Permission.MANAGE_FLOORS.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode consultar os pisos.");
         }
     }

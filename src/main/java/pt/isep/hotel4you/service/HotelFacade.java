@@ -76,16 +76,6 @@ public class HotelFacade {
     }
 
     /**
-     * Tells if the user may view the floors.
-     *
-     * @param actor the logged-in user, can be null
-     * @return true if the actor is a manager
-     */
-    public boolean canViewFloors(User actor) {
-        return locationService.canViewFloors(actor);
-    }
-
-    /**
      * Lists all floors with their zones.
      *
      * @param actor the logged-in user who asks

@@ -6,7 +6,10 @@ import java.util.Set;
 /** A function of the application and the roles that may use it. */
 public enum Permission {
     /** Create and list staff accounts. */
-    MANAGE_STAFF(Role.MANAGER);
+    MANAGE_STAFF(Role.MANAGER),
+
+    /** View the floors and create, edit and remove the zones. */
+    MANAGE_FLOORS(Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 

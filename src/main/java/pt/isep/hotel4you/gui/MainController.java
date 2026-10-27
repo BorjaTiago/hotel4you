@@ -47,7 +47,7 @@ public class MainController {
         staffButton.managedProperty().bind(staffButton.visibleProperty());
         staffButton.setVisible(facade.canUse(user, Permission.MANAGE_STAFF));
         floorsButton.managedProperty().bind(floorsButton.visibleProperty());
-        floorsButton.setVisible(facade.canViewFloors(user));
+        floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
     }
 
     @FXML
