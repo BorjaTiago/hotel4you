@@ -200,8 +200,14 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-28-AC-1")
-    void onCanViewFloors_returnFalse_whenNotManager() {
-        assertFalse(facade.canViewFloors(new Receptionist(2L, "Ana Silva", "ana", "hash")));
+    void onCanUse_returnTrue_whenManagerManagesFloors() {
+        assertTrue(facade.canUse(new Manager(1L, "Rui Costa", "rui", "hash"), Permission.MANAGE_FLOORS));
+    }
+
+    @Test
+    @Tag("H4Y-28-AC-1")
+    void onCanUse_returnFalse_whenReceptionistManagesFloors() {
+        assertFalse(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"), Permission.MANAGE_FLOORS));
     }
 
     @Test

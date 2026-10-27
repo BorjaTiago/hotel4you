@@ -122,23 +122,6 @@ class LocationServiceTest {
         assertEquals(DENIED_MESSAGE, error.getMessage());
     }
 
-    @Test
-    @Tag("H4Y-28-AC-1")
-    void onCanViewFloors_returnTrue_whenManager() {
-        assertTrue(service.canViewFloors(manager()));
-    }
-
-    @Test
-    @Tag("H4Y-28-AC-1")
-    void onCanViewFloors_returnFalse_whenNotManager() {
-        assertFalse(service.canViewFloors(receptionist()));
-    }
-
-    @Test
-    @Tag("H4Y-28-AC-1")
-    void onCanViewFloors_returnFalse_whenActorNull() {
-        assertFalse(service.canViewFloors(null));
-    }
 
     private Location createBar() {
         return service.createLocation(1, "Bar", false, false, manager());
