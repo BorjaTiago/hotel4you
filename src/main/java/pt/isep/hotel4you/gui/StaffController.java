@@ -60,7 +60,7 @@ public class StaffController {
         roleBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(Role role) {
-                return role == null ? "" : roleLabel(role);
+                return role == null ? "" : role.displayName();
             }
 
             @Override
@@ -73,7 +73,7 @@ public class StaffController {
         usernameColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().getUsername()));
         roleColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(roleLabel(data.getValue().getRole())));
+                data -> new SimpleStringProperty(data.getValue().getRole().displayName()));
         loadStaff();
     }
 
@@ -100,14 +100,5 @@ public class StaffController {
         } finally {
             passwordField.clear();
         }
-    }
-
-    private static String roleLabel(Role role) {
-        return switch (role) {
-            case RECEPTIONIST -> "Rececionista";
-            case RESTAURANT -> "Funcionário do restaurante";
-            case MANAGER -> "Gestor";
-            default -> role.name();
-        };
     }
 }
