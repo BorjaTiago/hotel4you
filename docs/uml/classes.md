@@ -30,7 +30,7 @@ Notes:
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canUse(actor, permission), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback(), listFloors(), findFloor(), canViewFloors() | All RF and RNF-07 (entry point) |
+| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canUse(actor, permission), editStaff(), removeStaff(), listUsers(), searchRooms(), saveRoom(), configureRoomItem(), setBasePrice(), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback(), listFloors(), findFloor() | All RF and RNF-07 (entry point) |
 
 ## Business - Services
 
@@ -38,7 +38,7 @@ Notes:
 |-------|-------|-----------------|--------------|-------------|
 | AuthService | Business - Services | - | login(), hashPassword(), isValidPassword() (private) | RF-01, RNF-02 |
 | ClientService | Business - Services | - | register(), find() | RF-10, RNF-03 |
-| LocationService | Business - Services | - | createLocation(floor, name, flags, actor), editLocation(id, floor, name, flags, actor), removeLocation(id, actor), listFloors(), findFloor(), canViewFloors() | RF-03, RF-18 |
+| LocationService | Business - Services | - | createLocation(floor, name, flags, actor), editLocation(id, floor, name, flags, actor), removeLocation(id, actor), listFloors(), findFloor() | RF-03, RF-18 |
 | RoomService | Business - Services | - | isAvailable(), searchRooms(), saveRoom(), configureItem(), setBasePrice(), setExtraPrice() | RF-04, RF-05, RF-06, RF-07, RF-08, RF-09 |
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
 | StaffService | Business - Services | - | createStaff(name, username, password, role, actor), editStaff(), removeStaff(), listUsers() | RF-02, RF-26, RNF-01 |
@@ -103,11 +103,11 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | Role | Enum | CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER | - | RF-02 |
-| Permission | Enum | MANAGE_STAFF; allowedRoles | allows(actor) | RF-02 |
+| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS; allowedRoles | allows(actor) | RF-02 |
 | ReservationStatus | Enum | RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT | - | RF-12, RF-13, RF-14 |
 | CardType | Enum | CLIENT, MASTER | - | RF-16, RF-23 |
 | FeedbackType | Enum | SUGGESTION, COMPLAINT | - | RF-27 |
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. Reviewed by: pending.

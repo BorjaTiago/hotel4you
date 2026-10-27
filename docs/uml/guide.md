@@ -125,7 +125,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Let the database fail. Not done: the user gets no clear message.
 
 ### LocationService
-- **What:** Create, edit and remove zones. Show floors and zones. Uses `FloorRepository` and `LocationRepository` (H4Y-28).
+- **What:** Create, edit and remove zones. Show floors and zones. Uses `FloorRepository` and `LocationRepository` (H4Y-28). It checks `Permission.MANAGE_FLOORS` and throws `AccessDeniedException` when it does not allow the actor.
 - **Why:** RF-03, RF-18.
 - **Why this way:** Zone rules (card access, reservation needed) stay in one place.
 - **Rule:** Only a manager manages zones. The name is trimmed, required and has at most 50 characters. The name is unique per floor. Remove is refused with `LocationInUseException` when the delete fails because the zone has links (reservations, card passes). The system shows a clear error (Q-36).
@@ -179,7 +179,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Why:** RF-26. The caller gets a clear error before the save.
 
 ### AccessDeniedException
-- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when `Permission.MANAGE_STAFF` does not allow the actor.
+- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when `Permission.MANAGE_STAFF` does not allow the actor. `LocationService` throws it when `Permission.MANAGE_FLOORS` does not allow the actor (H4Y-28).
 - **Why:** RF-26. The service refuses the request even if the screen shows the button by mistake.
 
 ## Config
@@ -381,6 +381,7 @@ Enums have fixed values. They stop typing errors.
 | Permission | Function | Manager | Receptionist | Restaurant staff |
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
+| MANAGE_FLOORS | View the floors and create, edit and remove zones (H4Y-28) | yes | no | no |
 
 Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
 
@@ -445,4 +446,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. Reviewed by: pending.
