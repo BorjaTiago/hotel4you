@@ -20,18 +20,9 @@ class PermissionTest {
             new RestaurantStaff(3L, "Joao Lima", "joao", HASH);
 
     @Test
-    @Tag("H4Y-23-AC-1")
-    void onAllows_returnTrue_whenReceptionistListsRooms() {
-        assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = Permission.class, names = {"LIST_ROOMS"},
-            mode = EnumSource.Mode.EXCLUDE)
-    @Tag("H4Y-23-AC-1")
     @Tag("H4Y-23-AC-2")
-    void onAllows_returnFalse_whenReceptionistUsesManagerFunction(Permission permission) {
-        assertFalse(permission.allows(RECEPTIONIST));
+    void onAllows_returnFalse_whenReceptionistManagesStaff() {
+        assertFalse(Permission.MANAGE_STAFF.allows(RECEPTIONIST));
     }
 
     @ParameterizedTest

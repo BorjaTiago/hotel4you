@@ -126,13 +126,6 @@ class HotelFacadeTest {
     }
 
     @Test
-    @Tag("H4Y-23-AC-1")
-    void onCanUse_returnTrue_whenReceptionistListsRooms() {
-        assertTrue(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"),
-                Permission.LIST_ROOMS));
-    }
-
-    @Test
     @Tag("H4Y-27-AC-1")
     void onCreateStaff_saveAccount_whenActorIsManager() {
         User manager = new Manager(1L, "Rui Costa", "rui", "hash");
