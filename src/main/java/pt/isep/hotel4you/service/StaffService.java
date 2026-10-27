@@ -3,6 +3,7 @@ package pt.isep.hotel4you.service;
 import java.util.List;
 import pt.isep.hotel4you.data.UserRepository;
 import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
@@ -62,17 +63,6 @@ public class StaffService {
     }
 
     /**
-     * Tells if the user may create staff accounts. Only a manager may. The GUI also uses this
-     * method to show or hide the create-staff button.
-     *
-     * @param actor the logged-in user, can be null
-     * @return true if the actor is a manager
-     */
-    public boolean canCreateStaff(User actor) {
-        return actor != null && actor.getRole() == Role.MANAGER;
-    }
-
-    /**
      * Creates a staff account. Only a manager may do it. The name and the username are trimmed.
      * The password is saved as a bcrypt hash.
      *
@@ -86,7 +76,7 @@ public class StaffService {
      * @throws UsernameTakenException if the username is already in use
      */
     public void createStaff(String name, String username, String password, Role role, User actor) {
-        if (!canCreateStaff(actor)) {
+        if (!Permission.MANAGE_STAFF.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode criar contas.");
         }
         if (name == null || name.isBlank() || username == null || username.isBlank()
