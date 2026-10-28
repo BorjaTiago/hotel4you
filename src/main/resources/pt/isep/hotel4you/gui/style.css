@@ -44,6 +44,39 @@
     -fx-background-color: #1f58c8;
 }
 
+.action-button {
+    -fx-pref-height: 40px;
+    -fx-min-width: 150px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.save-button {
+    -fx-background-color: #2e9e5b;
+}
+
+.save-button:hover {
+    -fx-background-color: #237a45;
+}
+
+.edit-button {
+    -fx-background-color: #2f6fed;
+}
+
+.edit-button:hover {
+    -fx-background-color: #1f58c8;
+}
+
+.danger-button {
+    -fx-background-color: #c0392b;
+}
+
+.danger-button:hover {
+    -fx-background-color: #962d22;
+}
+
 .message {
     -fx-text-fill: #c0392b;
     -fx-font-size: 12px;

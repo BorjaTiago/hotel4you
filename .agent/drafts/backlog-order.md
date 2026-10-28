@@ -330,3 +330,5 @@ None by the Definition of Ready. Notes for the PO:
 - Accepted (user, 2026-10-16, Q-43): cadastrar-item-stock in sprint 4 (1st delivery). Seeding room items is not needed.
 
 Created by: BorjaTiago. Updated by: lukassperandio. AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint 3 planning, forecast for sprints 4 and 5 and refinement agenda by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+
+Note (2026-10-26): criar-zona, editar-zona and remover-zona are merged into model-hotel-floors (H4Y-28). Order not changed.

@@ -12,11 +12,8 @@ import java.util.Properties;
  * @param dbUrl the JDBC url of the database
  * @param dbUser the database user
  * @param dbPassword the database password
- * @param managerUsername the login name of the first manager, can be null
- * @param managerPassword the password of the first manager, can be null
  */
-public record AppConfig(String dbUrl, String dbUser, String dbPassword,
-                        String managerUsername, String managerPassword) {
+public record AppConfig(String dbUrl, String dbUser, String dbPassword) {
 
     /**
      * Reads the settings from a file with {@code key=value} lines.
@@ -38,9 +35,7 @@ public record AppConfig(String dbUrl, String dbUser, String dbPassword,
         return new AppConfig(
                 required(properties, "db.url"),
                 required(properties, "db.user"),
-                required(properties, "db.password"),
-                properties.getProperty("manager.username"),
-                properties.getProperty("manager.password"));
+                required(properties, "db.password"));
     }
 
     /**
@@ -50,8 +45,7 @@ public record AppConfig(String dbUrl, String dbUser, String dbPassword,
      */
     @Override
     public String toString() {
-        return "AppConfig[dbUrl=" + dbUrl + ", dbUser=" + dbUser + ", dbPassword=***"
-                + ", managerUsername=" + managerUsername + ", managerPassword=***]";
+        return "AppConfig[dbUrl=" + dbUrl + ", dbUser=" + dbUser + ", dbPassword=***]";
     }
 
     private static String required(Properties properties, String key) {

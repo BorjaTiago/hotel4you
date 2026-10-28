@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
 import pt.isep.hotel4you.service.HotelFacade;
 
@@ -23,6 +24,9 @@ public class MainController {
 
     @FXML
     private Button staffButton;
+
+    @FXML
+    private Button floorsButton;
 
     @FXML
     private Button roomsButton;
@@ -44,7 +48,9 @@ public class MainController {
         User user = HotelApp.currentUser;
         welcomeLabel.setText("Bem-vindo, " + user.getName());
         staffButton.managedProperty().bind(staffButton.visibleProperty());
-        staffButton.setVisible(facade.canCreateStaff(user));
+        staffButton.setVisible(facade.canUse(user, Permission.MANAGE_STAFF));
+        floorsButton.managedProperty().bind(floorsButton.visibleProperty());
+        floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
         roomsButton.managedProperty().bind(roomsButton.visibleProperty());
         roomsButton.setVisible(facade.canRegisterRooms(user));
     }
@@ -53,6 +59,12 @@ public class MainController {
     private void onStaffClicked() {
         Parent staffScreen = new ScreenLoader(facade).load("staff.fxml");
         contentPane.getChildren().setAll(staffScreen);
+    }
+
+    @FXML
+    private void onFloorsClicked() {
+        Parent floorsScreen = new ScreenLoader(facade).load("floors.fxml");
+        contentPane.getChildren().setAll(floorsScreen);
     }
 
     @FXML

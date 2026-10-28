@@ -20,6 +20,8 @@
         <VBox spacing="10" prefWidth="180" styleClass="menu">
             <Button fx:id="staffButton" text="Funcionários" onAction="#onStaffClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button fx:id="floorsButton" text="Pisos e zonas" onAction="#onFloorsClicked"
+                    maxWidth="Infinity" visible="false"/>
             <Button fx:id="roomsButton" text="Registar quartos" onAction="#onRoomsClicked"
                     maxWidth="Infinity" visible="false"/>
         </VBox>

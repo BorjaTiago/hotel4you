@@ -3,6 +3,7 @@ package pt.isep.hotel4you.service;
 import java.util.List;
 import pt.isep.hotel4you.data.UserRepository;
 import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
@@ -38,41 +39,6 @@ public class StaffService {
     }
 
     /**
-     * Creates the first manager if no manager exists. The manager name is the username.
-     *
-     * @param username the login name, not blank
-     * @param password the plain password, not blank
-     * @return true if the manager was created, false if a manager already exists
-     * @throws IllegalArgumentException if the username or password is blank
-     * @throws UsernameTakenException if the username is already in use
-     */
-    public boolean createFirstManager(String username, String password) {
-        if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            throw new IllegalArgumentException("Preencha o nome de utilizador e a palavra-passe.");
-        }
-        String trimmed = username.trim();
-        if (userRepository.existsByRole(Role.MANAGER)) {
-            return false;
-        }
-        if (userRepository.existsByUsername(trimmed)) {
-            throw new UsernameTakenException();
-        }
-        userRepository.save(new Manager(null, trimmed, trimmed, authService.hashPassword(password)));
-        return true;
-    }
-
-    /**
-     * Tells if the user may create staff accounts. Only a manager may. The GUI also uses this
-     * method to show or hide the create-staff button.
-     *
-     * @param actor the logged-in user, can be null
-     * @return true if the actor is a manager
-     */
-    public boolean canCreateStaff(User actor) {
-        return actor != null && actor.getRole() == Role.MANAGER;
-    }
-
-    /**
      * Creates a staff account. Only a manager may do it. The name and the username are trimmed.
      * The password is saved as a bcrypt hash.
      *
@@ -86,7 +52,7 @@ public class StaffService {
      * @throws UsernameTakenException if the username is already in use
      */
     public void createStaff(String name, String username, String password, Role role, User actor) {
-        if (!canCreateStaff(actor)) {
+        if (!Permission.MANAGE_STAFF.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode criar contas.");
         }
         if (name == null || name.isBlank() || username == null || username.isBlank()
