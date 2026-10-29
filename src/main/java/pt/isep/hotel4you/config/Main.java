@@ -34,7 +34,7 @@ public class Main {
             StaffService staffService = new StaffService(userRepository, authService);
             LocationService locationService = new LocationService(
                     new JdbcFloorRepository(database), new JdbcLocationRepository(database));
-            RoomService roomService = new RoomService(new JdbcRoomRepository(database), config.roomFloorLimits());
+            RoomService roomService = new RoomService(new JdbcRoomRepository(database));
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService);
 
             // Check now that the database works.

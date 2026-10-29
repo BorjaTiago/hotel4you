@@ -43,14 +43,7 @@ MSSQL_SA_PASSWORD=MyStrong-Password1!
 db.url=jdbc:sqlserver://localhost:1433;databaseName=hotel4you;encrypt=true;trustServerCertificate=true;loginTimeout=5
 db.user=sa
 db.password=MyStrong-Password1!
-
-# Room floors and limits (Q-01 team decision, teacher confirmation pending)
-rooms.floor-limits=2:10,3:10
 ```
-
-`rooms.floor-limits` supplies the room floors and their limits to the service and screen.
-Use `floor:limit` pairs. Each floor must exist in the database. A missing or empty setting
-enables no room floor. The room type totals from Q-01 are not enforced.
 
 ### 3. Start SQL Server (choose A or B)
 
@@ -159,4 +152,4 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29. Reviewed by: pending.

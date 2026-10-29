@@ -61,9 +61,6 @@ public class RoomController {
     private void initialize() {
         floorLimits = facade.roomFloorLimits();
         floorBox.getItems().setAll(floorLimits.keySet().stream().sorted().toList());
-        if (floorLimits.isEmpty()) {
-            showMessage("Configure os pisos de quartos em rooms.floor-limits.", false);
-        }
         numberColumn.setCellValueFactory(
                 data -> new ReadOnlyObjectWrapper<>(data.getValue().number()));
         floorColumn.setCellValueFactory(

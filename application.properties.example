@@ -11,7 +11,3 @@ MSSQL_SA_PASSWORD=change-me-Strong1!
 db.url=jdbc:sqlserver://localhost:1433;databaseName=hotel4you;encrypt=true;trustServerCertificate=true;loginTimeout=5
 db.user=sa
 db.password=change-me-Strong1!
-
-# Room floors and their limits. Team decision Q-01; teacher confirmation is pending.
-# Use floor:limit pairs. Missing or empty settings enable no room floors.
-rooms.floor-limits=2:10,3:10

@@ -174,7 +174,7 @@ public class HotelFacade {
     }
 
     /**
-     * Returns the configured room floors and limits.
+     * Returns the room floors and limits from the statement.
      *
      * @return an immutable map from floor number to maximum room count
      */
