@@ -1,39 +1,41 @@
 package pt.isep.hotel4you.service;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomRepository;
-import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.User;
 
 /** Applies room registration rules. */
 public class RoomService {
 
-    private static final Set<Integer> ROOM_FLOORS = Set.of(2, 3);
-    private static final int ROOMS_PER_FLOOR = 10;
-
     private final RoomRepository roomRepository;
+    private final Map<Integer, Integer> roomFloorLimits;
 
     /**
      * Creates the service.
      *
      * @param roomRepository the room store
+     * @param roomFloorLimits the room floors and their positive room limits
      */
-    public RoomService(RoomRepository roomRepository) {
+    public RoomService(RoomRepository roomRepository, Map<Integer, Integer> roomFloorLimits) {
         this.roomRepository = roomRepository;
+        this.roomFloorLimits = Map.copyOf(roomFloorLimits);
+        if (this.roomFloorLimits.values().stream().anyMatch(limit -> limit < 1)) {
+            throw new IllegalArgumentException("O limite de quartos deve ser positivo.");
+        }
     }
 
     /**
-     * Tells if a user may register rooms.
+     * Returns the configured room floors and limits for the screen.
      *
-     * @param actor the logged-in user
-     * @return true only for a manager
+     * @return an immutable map from floor number to maximum room count
      */
-    public boolean canRegisterRooms(User actor) {
-        return actor instanceof Manager;
+    public Map<Integer, Integer> roomFloorLimits() {
+        return roomFloorLimits;
     }
 
     /**
@@ -46,10 +48,10 @@ public class RoomService {
      * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalArgumentException if the floor or room type is invalid
      * @throws DuplicateRoomException if the room number is already in use
-     * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws RoomLimitExceededException if the floor has reached its configured limit
      */
     public synchronized Room saveRoom(Room room, User actor) {
-        if (!canRegisterRooms(actor)) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode registar quartos.");
         }
         if (room == null) {
@@ -58,8 +60,9 @@ public class RoomService {
         if (!roomRepository.floorExists(room.floorNumber())) {
             throw new IllegalArgumentException("O piso indicado não existe.");
         }
-        if (!ROOM_FLOORS.contains(room.floorNumber())) {
-            throw new IllegalArgumentException("Só os pisos 2 e 3 têm quartos.");
+        Integer floorLimit = roomFloorLimits.get(room.floorNumber());
+        if (floorLimit == null) {
+            throw new IllegalArgumentException("O piso indicado não está configurado para quartos.");
         }
         if (!roomRepository.roomTypeExists(room.roomTypeName())) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
@@ -67,10 +70,10 @@ public class RoomService {
         if (roomRepository.existsByNumber(room.number())) {
             throw new DuplicateRoomException();
         }
-        if (roomRepository.countByFloor(room.floorNumber()) >= ROOMS_PER_FLOOR) {
-            throw new RoomLimitExceededException(ROOMS_PER_FLOOR);
+        if (roomRepository.countByFloor(room.floorNumber()) >= floorLimit) {
+            throw new RoomLimitExceededException(floorLimit);
         }
-        return roomRepository.saveWithinFloorLimit(room, ROOMS_PER_FLOOR);
+        return roomRepository.save(room, floorLimit);
     }
 
     /**

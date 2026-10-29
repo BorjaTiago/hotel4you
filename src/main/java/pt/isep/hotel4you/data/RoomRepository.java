@@ -61,5 +61,5 @@ public interface RoomRepository {
      * @throws DuplicateRoomException if the room number is already in use
      * @throws RoomLimitExceededException if the floor is full
      */
-    Room saveWithinFloorLimit(Room room, int floorLimit);
+    Room save(Room room, int floorLimit);
 }

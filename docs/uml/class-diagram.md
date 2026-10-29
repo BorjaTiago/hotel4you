@@ -11,8 +11,9 @@
 - `$` marks a static member.
 - `actor` is the logged-in user that `login()` returned. `Permission` holds the roles that may use each function. `Permission.allows(actor)` is false when `actor` is null. `createStaff` throws `AccessDeniedException` when `MANAGE_STAFF` does not allow the actor (H4Y-27, H4Y-60).
 - `MANAGE_FLOORS` is allowed for a manager only. `listFloors` and `findFloor` throw `AccessDeniedException` for other users, and `findFloor` throws `FloorNotFoundException` for an unknown floor (H4Y-28). `LocationService` checks `MANAGE_FLOORS` and throws `AccessDeniedException` when it does not allow the actor (H4Y-28).
-- `MainController` shows a menu button only when a facade method allows it. The Staff button uses `canUse(actor, MANAGE_STAFF)`. The "Pisos e zonas" button uses `canUse(actor, MANAGE_FLOORS)` (H4Y-28). The "Registar quartos" button uses `canRegisterRooms(actor)` (H4Y-25). The screen has no role check of its own (H4Y-24, H4Y-60).
-- `RoomService.canRegisterRooms(actor)` allows a manager only. The service checks the room floor, room type, duplicate number and floor limit before it saves a room (H4Y-25).
+- `MainController` shows a menu button only when `canUse(actor, permission)` allows it. Staff uses `MANAGE_STAFF`, floors and zones use `MANAGE_FLOORS`, and room registration uses `MANAGE_ROOMS`. The screen has no role check of its own (H4Y-24, H4Y-60).
+- `RoomService.saveRoom` checks `Permission.MANAGE_ROOMS`. Only a manager may register a room. The service checks the floor catalogue, configured floor and limit, room type and duplicate number (H4Y-25).
+- `AppConfig.roomFloorLimits` maps each room floor number to its room limit. It reads `rooms.floor-limits` from the local settings. The service and screen use the same immutable map. No setting means no room floor is enabled.
 - Q-01 is a team decision, not confirmed by the teacher. The 7/10/3 split is a test scenario only. `RoomService` does not enforce room type totals.
 - `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32). `FloorController` is the one screen for floors and zones (H4Y-28): it has the zone form, so there is no `LocationController` for zone CRUD. `createLocation`, `editLocation` and `removeLocation` need a manager. `removeLocation` throws `LocationInUseException` when `LocationRepository.delete` returns false (Q-36). `HotelFacade.removeLocation(reservation, location)` is the reservation method and stays.
 
@@ -121,7 +122,7 @@ classDiagram
         +removeStaff(user: User) void
         +listUsers() List~User~
         +searchRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
-        +canRegisterRooms(actor: User) boolean
+        +roomFloorLimits() Map
         +saveRoom(room: Room, actor: User) Room
         +listRooms() List~Room~
         +listRoomTypes() List~String~
@@ -161,9 +162,10 @@ classDiagram
         +findFloor(number: int, actor: User) Floor
     }
     class RoomService {
+        -roomFloorLimits: Map
         +isAvailable(room: Room, start: LocalDate, end: LocalDate) boolean
         +searchRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
-        +canRegisterRooms(actor: User) boolean
+        +roomFloorLimits() Map
         +saveRoom(room: Room, actor: User) Room
         +listRooms() List~Room~
         +listRoomTypes() List~String~
@@ -239,6 +241,7 @@ classDiagram
         +dbUrl: String
         +dbUser: String
         +dbPassword: String
+        +roomFloorLimits: Map
         +load(file: Path) AppConfig$
         +toString() String
     }
@@ -277,7 +280,7 @@ classDiagram
         +existsByNumber(roomNumber: int) boolean
         +countByFloor(floorNumber: int) int
         +findAll() List~Room~
-        +saveWithinFloorLimit(room: Room, floorLimit: int) Room
+        +save(room: Room, floorLimit: int) Room
     }
     class Database {
         +NOT_AVAILABLE String$
@@ -424,6 +427,7 @@ classDiagram
         <<enumeration>>
         MANAGE_STAFF
         MANAGE_FLOORS
+        MANAGE_ROOMS
         -allowedRoles: Set~Role~
         +allows(actor: User) boolean
     }
@@ -549,6 +553,7 @@ classDiagram
     RoomRepository ..> RoomLimitExceededException : throws
     HotelFacade ..> Permission : uses
     StaffService ..> Permission : uses
+    RoomService ..> Permission : uses
     LocationService ..> Permission : uses
     Permission ..> Role : uses
 
@@ -581,7 +586,7 @@ classDiagram
     note for CardAccessService "Master card opens every room and every zone.<br/>Client card opens only its own room and zones with guestCardAccess = true. If requiresReservation = true, only zones included in its reservation.<br/>A blocked or inactive card opens nothing.<br/>Receptionist card opens only zones on floors 0 and 1 and no guest room.<br/>Restaurant staff card opens only the kitchen and the restaurant and no guest room.<br/>A staff card never opens a guest room. Only the master card does."
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
     note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38)."
-    note for RoomService "Only a manager may save a room.<br/>Floors 2 and 3 allow 10 rooms each.<br/>The repository checks the limit again in one transaction for concurrent requests.<br/>Q-01 type totals are not enforced until the teacher confirms them."
+    note for RoomService "MANAGE_ROOMS allows a manager to save a room.<br/>AppConfig supplies the room floors and their limits.<br/>The repository checks the limit again in one transaction for concurrent requests.<br/>Q-01 type totals are not enforced until the teacher confirms them."
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29. Reviewed by: pending.

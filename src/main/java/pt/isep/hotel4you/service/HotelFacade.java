@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.service;
 
 import java.util.List;
+import java.util.Map;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
@@ -173,13 +174,12 @@ public class HotelFacade {
     }
 
     /**
-     * Tells if a user may register rooms.
+     * Returns the configured room floors and limits.
      *
-     * @param actor the logged-in user
-     * @return true only for a manager
+     * @return an immutable map from floor number to maximum room count
      */
-    public boolean canRegisterRooms(User actor) {
-        return roomService.canRegisterRooms(actor);
+    public Map<Integer, Integer> roomFloorLimits() {
+        return roomService.roomFloorLimits();
     }
 
     /**

@@ -52,7 +52,7 @@ public class MainController {
         floorsButton.managedProperty().bind(floorsButton.visibleProperty());
         floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
         roomsButton.managedProperty().bind(roomsButton.visibleProperty());
-        roomsButton.setVisible(facade.canRegisterRooms(user));
+        roomsButton.setVisible(facade.canUse(user, Permission.MANAGE_ROOMS));
     }
 
     @FXML

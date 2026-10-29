@@ -47,6 +47,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **What:** Room search, room save, room items and prices.
 - **Why:** RF-04 to RF-08.
 - **Why this way:** One screen group for rooms and room prices.
+- **Registration summary:** H4Y-64 requires counts by floor and type. The floor choices and denominators come from `HotelFacade.roomFloorLimits()`. The screen counts the loaded rooms for display. It does not choose room floors or enforce limits. Type totals have no fixed target until Q-01 is confirmed.
 - **Other option:** One controller per action. Not done: more files for little gain.
 
 ### ClientController
@@ -133,10 +134,10 @@ Services hold the rules. Each service works on the domain classes.
 
 ### RoomService
 - **What:** Save and list rooms. Return the room type names for the registration screen. Keep the other room, price and room item operations here.
-- **Why:** RF-04 to RF-09. Only a manager may register rooms. Floors 2 and 3 hold at most 10 rooms each.
-- **Why this way:** The controller collects fields and shows results. `RoomService` checks the manager, floor, type, duplicate number and floor limit. `RoomRepository` reads the catalogue and saves the room. The JDBC save locks the floor row and checks the limit in the same transaction. This protects the limit when two requests arrive together.
+- **Why:** RF-04 to RF-09. `Permission.MANAGE_ROOMS` allows only a manager to register rooms.
+- **Why this way:** The controller collects fields and shows results. `AppConfig` supplies an immutable map of room floors and their limits. `RoomService` checks the permission, floor catalogue, configured floor, type, duplicate number and configured limit. `RoomRepository.save(room, floorLimit)` locks the floor row and checks the limit in the same transaction. This protects the limit when two requests arrive together.
 - **Other option:** Put the validation in `RoomController` or only in SQL constraints. Not done: controllers hold no business rules, and a unique number constraint cannot enforce a per-floor count.
-- **Example:** A manager saves room 202 on floor 2 as a double room. The service checks that floor 2 and the type exist, that room 202 is free, and that floor 2 has fewer than 10 rooms. The repository saves the room with its floor and type foreign keys.
+- **Example:** With `rooms.floor-limits=2:10,3:10`, a manager saves room 202 on floor 2 as a double room. The service checks that floor 2 and the type exist, that room 202 is free, and that floor 2 has fewer than 10 rooms. The repository saves the room with its floor and type foreign keys. The sample limits retain the current team decision, pending teacher confirmation (Q-01).
 - **Q-01:** The test can register the proposed 7 single, 10 double and 3 family rooms. The service does not enforce those type totals because the teacher has not confirmed them.
 - **Integration:** H4Y-28 provides the `floors` table on `main`. The `room_types` table depends on H4Y-26.
 
@@ -188,9 +189,10 @@ Services hold the rules. Each service works on the domain classes.
 ## Config
 
 ### AppConfig
-- **What:** A record with the settings from `application.properties`: database url, user and password.
-- **Why:** RNF-12. Passwords stay out of the code and out of Git.
+- **What:** A record with the settings from `application.properties`: database url, user, password and room floor limits.
+- **Why:** RNF-12 and RF-04. Passwords stay out of Git. Room floors and limits can change without a code change.
 - **Why this way:** `load(file)` reads the file once. `toString()` hides the passwords.
+- **Room setting:** `rooms.floor-limits=2:10,3:10` enables floors 2 and 3 with a limit of 10 each. Every configured floor must also exist in the floor catalogue. Duplicate floors, invalid numbers and non-positive limits are refused. A missing or blank value enables no room floors; login and other functions remain available. The screen asks the user to configure room floors.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
 
 ### Main
@@ -216,6 +218,13 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why:** RNF-01, RNF-12. Users are saved in SQL Server.
 - **Why this way:** It gives domain objects to the services. Services never see SQL.
 - **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
+
+### JdbcRoomRepository
+- **What:** Read the catalogues and save rooms in SQL Server.
+- **Why:** RF-04 and RNF-12. Room numbers must be unique and a full floor must reject new rooms.
+- **Why this way:** `save(room, floorLimit)` opens one transaction. It locks the floor row with `UPDLOCK, HOLDLOCK`, reads the count, inserts with `OUTPUT INSERTED.id` and commits. SQL and runtime errors roll back. A rollback error is kept as a suppressed error. Each statement and result closes with a resource block. Small helper methods avoid nested resource blocks.
+- **Other option:** Check the limit only in the service. This cannot protect two application instances that save at the same time.
+- **Example:** Two requests see nine rooms on a floor with a limit of ten. Only one holds the floor lock. After it commits, the next request sees ten rooms and rolls back without inserting.
 
 ## Users
 
@@ -385,6 +394,7 @@ Enums have fixed values. They stop typing errors.
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
 | MANAGE_FLOORS | View the floors and create, edit and remove zones (H4Y-28) | yes | no | no |
+| MANAGE_ROOMS | Register rooms (H4Y-25) | yes | no | no |
 
 Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
 
@@ -449,4 +459,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29. Reviewed by: pending.

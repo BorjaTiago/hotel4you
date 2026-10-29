@@ -2,6 +2,8 @@ package pt.isep.hotel4you.gui;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.StringJoiner;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -17,6 +19,7 @@ import pt.isep.hotel4you.service.HotelFacade;
 public class RoomController {
 
     private final HotelFacade facade;
+    private Map<Integer, Integer> floorLimits;
 
     @FXML
     private TextField numberField;
@@ -56,7 +59,11 @@ public class RoomController {
 
     @FXML
     private void initialize() {
-        floorBox.getItems().setAll(2, 3);
+        floorLimits = facade.roomFloorLimits();
+        floorBox.getItems().setAll(floorLimits.keySet().stream().sorted().toList());
+        if (floorLimits.isEmpty()) {
+            showMessage("Configure os pisos de quartos em rooms.floor-limits.", false);
+        }
         numberColumn.setCellValueFactory(
                 data -> new ReadOnlyObjectWrapper<>(data.getValue().number()));
         floorColumn.setCellValueFactory(
@@ -73,16 +80,7 @@ public class RoomController {
             if (floorBox.getValue() == null || roomTypeBox.getValue() == null) {
                 throw new IllegalArgumentException("Escolha o piso e o tipo de quarto.");
             }
-            String numberText = numberField.getText();
-            if (numberText == null || numberText.isBlank()) {
-                throw new IllegalArgumentException("Indique o número do quarto.");
-            }
-            int number;
-            try {
-                number = Integer.parseInt(numberText.trim());
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Indique um número de quarto válido.");
-            }
+            int number = readRoomNumber();
             facade.saveRoom(new Room(null, number, floorBox.getValue(), roomTypeBox.getValue()),
                     HotelApp.currentUser);
             showMessage("Quarto registado.", true);
@@ -90,6 +88,18 @@ public class RoomController {
             loadRooms();
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
+        }
+    }
+
+    private int readRoomNumber() {
+        String numberText = numberField.getText();
+        if (numberText == null || numberText.isBlank()) {
+            throw new IllegalArgumentException("Indique o número do quarto.");
+        }
+        try {
+            return Integer.parseInt(numberText.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Indique um número de quarto válido.");
         }
     }
 
@@ -114,13 +124,14 @@ public class RoomController {
     }
 
     private void updateSummary(List<Room> rooms) {
-        String floors = "Piso 2: " + countOnFloor(rooms, 2) + "/10 · Piso 3: "
-                + countOnFloor(rooms, 3) + "/10";
-        String types = roomTypeBox.getItems().stream()
-                .map(type -> typeLabel(type) + ": " + countOfType(rooms, type))
-                .reduce((left, right) -> left + " · " + right)
-                .orElse("Sem tipos de quarto.");
-        summaryLabel.setText(floors + " · " + types);
+        StringJoiner summary = new StringJoiner(" · ");
+        for (int floor : floorBox.getItems()) {
+            summary.add("Piso " + floor + ": " + countOnFloor(rooms, floor) + "/" + floorLimits.get(floor));
+        }
+        for (String type : roomTypeBox.getItems()) {
+            summary.add(typeLabel(type) + ": " + countOfType(rooms, type));
+        }
+        summaryLabel.setText(summary.toString());
     }
 
     private static long countOnFloor(List<Room> rooms, int floorNumber) {
