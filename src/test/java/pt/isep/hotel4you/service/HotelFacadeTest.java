@@ -43,7 +43,7 @@ class HotelFacadeTest {
         floorRepository = new InMemoryFloorRepository();
         locationRepository = new InMemoryLocationRepository();
         LocationService locationService = new LocationService(floorRepository, locationRepository);
-        RoomService roomService = new RoomService(new InMemoryRoomRepository(), Map.of(2, 10, 3, 10));
+        RoomService roomService = new RoomService(new InMemoryRoomRepository());
         facade = new HotelFacade(authService, staffService, locationService, roomService);
     }
 

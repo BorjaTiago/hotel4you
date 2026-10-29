@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -12,6 +11,8 @@ import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
@@ -32,13 +33,13 @@ class RoomServiceTest {
     @BeforeEach
     void setUp() {
         repository = new InMemoryRoomRepository();
-        for (int floor : List.of(-1, 0, 1, 2, 3)) {
+        for (int floor : List.of(-1, 0, 1, 2, 3, 5)) {
             repository.addFloor(floor);
         }
         for (String roomType : List.of("single", "double", "family")) {
             repository.addRoomType(roomType);
         }
-        roomService = new RoomService(repository, Map.of(2, FLOOR_LIMIT, 3, FLOOR_LIMIT));
+        roomService = new RoomService(repository);
     }
 
     @Test
@@ -77,22 +78,24 @@ class RoomServiceTest {
         assertEquals(3, rooms.stream().filter(room -> room.roomTypeName().equals("family")).count());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 0, 1, 5})
     @Tag("H4Y-25-AC-3")
-    void onSaveRoom_throw_whenFloorIsNotForRooms() {
+    void onSaveRoom_throw_whenFloorIsNotForRooms(int floorNumber) {
         assertThrows(IllegalArgumentException.class,
-                () -> roomService.saveRoom(room(101, 1, "single"), manager()));
+                () -> roomService.saveRoom(room(101, floorNumber, "single"), manager()));
 
         assertEquals(0, repository.findAll().size());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3})
     @Tag("H4Y-25-AC-4")
-    void onSaveRoom_throw_whenFloorIsFull() {
-        seedRooms(3, 301, FLOOR_LIMIT);
+    void onSaveRoom_throw_whenFloorIsFull(int floorNumber) {
+        seedRooms(floorNumber, 301, FLOOR_LIMIT);
 
         assertThrows(RoomLimitExceededException.class,
-                () -> roomService.saveRoom(room(311, 3, "double"), manager()));
+                () -> roomService.saveRoom(room(311, floorNumber, "double"), manager()));
 
         assertEquals(FLOOR_LIMIT, repository.findAll().size());
     }
@@ -127,52 +130,11 @@ class RoomServiceTest {
     }
 
     @Test
-    @Tag("H4Y-25-AC-1")
-    void onSaveRoom_saveRoom_whenAnotherFloorIsConfigured() {
-        repository.addFloor(5);
-        RoomService configured = new RoomService(repository, Map.of(5, 2));
-
-        assertEquals(5, configured.saveRoom(room(501, 5, "single"), manager()).floorNumber());
-        assertEquals(Map.of(5, 2), configured.roomFloorLimits());
-    }
-
-    @Test
-    @Tag("H4Y-25-AC-3")
-    void onSaveRoom_throw_whenExistingFloorIsNotConfigured() {
-        RoomService configured = new RoomService(repository, Map.of(3, 2));
-
-        assertThrows(IllegalArgumentException.class,
-                () -> configured.saveRoom(room(201, 2, "single"), manager()));
-        assertEquals(0, repository.findAll().size());
-    }
-
-    @Test
     @Tag("H4Y-25-AC-4")
-    void onSaveRoom_applyOwnLimit_whenFloorsHaveDifferentLimits() {
-        RoomService configured = new RoomService(repository, Map.of(2, 1, 3, 2));
-        configured.saveRoom(room(201, 2, "single"), manager());
-        configured.saveRoom(room(301, 3, "single"), manager());
-        configured.saveRoom(room(302, 3, "double"), manager());
-
-        assertThrows(RoomLimitExceededException.class,
-                () -> configured.saveRoom(room(202, 2, "double"), manager()));
-        assertThrows(RoomLimitExceededException.class,
-                () -> configured.saveRoom(room(303, 3, "double"), manager()));
-        assertEquals(3, repository.findAll().size());
-    }
-
-    @Test
-    @Tag("H4Y-25-AC-4")
-    void onSaveRoom_keepLimit_whenCallerChangesConfigurationMap() {
-        Map<Integer, Integer> limits = new HashMap<>(Map.of(2, 1));
-        RoomService configured = new RoomService(repository, limits);
-        limits.put(2, 10);
-        configured.saveRoom(room(201, 2, "single"), manager());
-
-        assertThrows(RoomLimitExceededException.class,
-                () -> configured.saveRoom(room(202, 2, "single"), manager()));
+    void onRoomFloorLimits_returnImmutableRules_whenScreenReadsLimits() {
+        assertEquals(Map.of(2, 10, 3, 10), roomService.roomFloorLimits());
         assertThrows(UnsupportedOperationException.class,
-                () -> configured.roomFloorLimits().put(2, 10));
+                () -> roomService.roomFloorLimits().put(5, 10));
     }
 
     @Test
@@ -202,7 +164,7 @@ class RoomServiceTest {
         List<Callable<Boolean>> attempts = List.of(
                 () -> trySave(room(210, 2, "double")),
                 () -> {
-                    RoomService second = new RoomService(repository, Map.of(2, FLOOR_LIMIT));
+                    RoomService second = new RoomService(repository);
                     try {
                         second.saveRoom(room(211, 2, "double"), manager());
                         return true;
