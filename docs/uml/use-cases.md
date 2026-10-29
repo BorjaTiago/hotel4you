@@ -1,8 +1,10 @@
 # Use-case diagrams
 
-Hotel4You has 5 actors and 50 use cases. The overview table shows which actor takes part in each functional area. Seven diagrams show each area in detail (area 1 has two diagrams). The [catalogue](use-case-catalog.md) gives the short description, the permission rules and the requirement links of each use case. The flows are in [../requirements/use-cases.md](../requirements/use-cases.md).
+Hotel4You has 5 actors and 53 use cases. The overview table shows which actor takes part in each functional area. Seven diagrams show each area in detail (area 1 has two diagrams). The [catalogue](use-case-catalog.md) gives the short description, the permission rules and the requirement links of each use case. The flows are in [../requirements/use-cases.md](../requirements/use-cases.md).
 
 Review for H4Y-7 (teacher feedback, sprint 2): the old diagrams had 19 large use cases. The review splits them into the real user goals, adds the missing use cases, and adds the `«include»` and `«extend»` relations.
+
+Sprint 2 retrospective fixes for H4Y-7 (sprint 3): UC-51 (included in UC-05), UC-52 (included in UC-06) and UC-53 (included in UC-50).
 
 ## Notation
 
@@ -30,10 +32,10 @@ The table shows which actor takes part in each area. "P" = primary actor (starts
 |----------------|-----------|:---:|:---:|:---:|:---:|:---:|
 | 1. Access and staff accounts | UC-01, UC-13, UC-17, UC-20 to UC-24, UC-45 | P | P | P | | |
 | 2. Hotel structure and prices | UC-12, UC-25 to UC-32 | P | P | | | |
-| 3. Clients and reservations | UC-02 to UC-05, UC-33 to UC-38 | P | P | | | |
-| 4. Stay and guest services | UC-06 to UC-08, UC-14, UC-39 to UC-41 | P | P | | S | |
+| 3. Clients and reservations | UC-02 to UC-05, UC-33 to UC-38, UC-51 | P | P | | | |
+| 4. Stay and guest services | UC-06 to UC-08, UC-14, UC-39 to UC-41, UC-52 | P | P | | S | |
 | 5. Magnetic cards | UC-09 to UC-11, UC-18, UC-42 to UC-44, UC-46 | | P | | P | |
-| 6. Stock | UC-15, UC-16, UC-19, UC-47 to UC-50 | P | P | | | S |
+| 6. Stock | UC-15, UC-16, UC-19, UC-47 to UC-50, UC-53 | P | P | | | S |
 
 ## 1. Access and staff accounts
 
@@ -152,6 +154,7 @@ flowchart LR
     UC38(["UC-38 Include restaurant and pool in reservation"]):::uc
     UC04(["UC-04 Cancel reservation"]):::uc
     UC05(["UC-05 Delete reservation"]):::uc
+    UC51(["UC-51 Check reservation has check-in"]):::uc
   end
 
   Receptionist --- UC02
@@ -170,6 +173,7 @@ flowchart LR
   UC36 -.->|"«extend»"| UC03
   UC37 -.->|"«extend»"| UC03
   UC38 -.->|"«extend»"| UC03
+  UC05 -.->|"«include»"| UC51
 
   classDef actor fill:none,stroke:none,font-size:18px
   classDef uc fill:#ffffff,stroke:#333333,color:#000000
@@ -177,6 +181,8 @@ flowchart LR
 ```
 
 UC-36, UC-37 and UC-38 extend UC-03 when the receptionist creates the reservation. The receptionist can also start them alone, to change an existing reservation until check-in (Q-40). For this reason they also have a direct association.
+
+UC-05 always includes UC-51. The system checks if the reservation has a check-in. If it has a check-in, the system refuses the delete (RF-22).
 
 ## 4. Stay and guest services
 
@@ -189,6 +195,7 @@ flowchart LR
   subgraph Hotel4You["Hotel4You"]
     direction TB
     UC06(["UC-06 Check-in"]):::uc
+    UC52(["UC-52 Check client has reservation"]):::uc
     UC39(["UC-39 Issue guest card"]):::uc
     UC07(["UC-07 Check-out"]):::uc
     UC40(["UC-40 Deactivate guest card"]):::uc
@@ -209,6 +216,7 @@ flowchart LR
   UC14 --- Client
   UC40 ~~~ Client
 
+  UC06 -.->|"«include»"| UC52
   UC06 -.->|"«include»"| UC39
   UC07 -.->|"«include»"| UC40
 
@@ -218,6 +226,8 @@ flowchart LR
 ```
 
 The client is a secondary actor in UC-08 and UC-14. The client asks reception. The receptionist records the request in the application (Q-18, Q-33).
+
+UC-06 always includes UC-52. The system checks if the client has a reservation. Without a reservation, the system refuses the check-in (RF-13).
 
 ## 5. Magnetic cards
 
@@ -273,6 +283,7 @@ flowchart LR
     UC15(["UC-15 Enter supplier delivery in stock"]):::uc
     UC47(["UC-47 Show import report"]):::uc
     UC50(["UC-50 Record stock entry"]):::uc
+    UC53(["UC-53 Read supplier XML stock file"]):::uc
     UC16(["UC-16 Record stock use"]):::uc
     UC49(["UC-49 Record stock exit"]):::uc
   end
@@ -293,6 +304,8 @@ flowchart LR
   UC47 ~~~ Supplier
 
   UC15 -.->|"«include»"| UC47
+  UC50 -.->|"«include»"| UC53
+  UC53 ~~~ Supplier
 
   classDef actor fill:none,stroke:none,font-size:18px
   classDef uc fill:#ffffff,stroke:#333333,color:#000000
@@ -300,6 +313,8 @@ flowchart LR
 ```
 
 The supplier is a secondary actor in UC-15. The supplier sends the XML file. The receptionist or the manager loads it (Q-17).
+
+UC-50 always includes UC-53. The supplier XML stock file gives the stock entry (RF-28).
 
 ## Changes from the first version
 
@@ -322,4 +337,4 @@ The supplier is a secondary actor in UC-15. The supplier sends the XML file. The
 
 UC-02, UC-04, UC-05, UC-10, UC-11 and UC-12 keep their name. The IDs UC-01 to UC-19 do not change, because the sequence diagrams and the requirements use them.
 
-Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29. Reviewed by: pending.
