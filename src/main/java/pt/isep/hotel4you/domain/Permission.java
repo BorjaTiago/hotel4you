@@ -12,7 +12,10 @@ public enum Permission {
     MANAGE_FLOORS(Role.MANAGER),
 
     /** Register and list rooms. */
-    MANAGE_ROOMS(Role.MANAGER);
+    MANAGE_ROOMS(Role.MANAGER),
+
+    /** See the room list with type, floor and base price. */
+    LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 

@@ -2,6 +2,7 @@ package pt.isep.hotel4you.data;
 
 import java.util.List;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomSummary;
 
 /** Stores rooms and reads the floor and room type catalogues. */
 public interface RoomRepository {
@@ -51,6 +52,13 @@ public interface RoomRepository {
      * @return an immutable list of rooms
      */
     List<Room> findAll();
+
+    /**
+     * Returns all rooms with the floor, room type and base price, ordered by room number.
+     *
+     * @return an immutable list of room summaries
+     */
+    List<RoomSummary> findSummaries();
 
     /**
      * Saves a room only while the floor is below the limit. The check and save must be atomic.

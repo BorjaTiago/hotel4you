@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="16" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.RoomListController">
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <Label text="Lista de quartos" styleClass="subtitle"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Tipo"/>
+        <ComboBox fx:id="roomTypeBox" onAction="#onRoomTypeChanged" prefWidth="180"/>
+    </HBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true"/>
+    <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefHeight="360">
+        <columns>
+            <TableColumn fx:id="numberColumn" text="Número" prefWidth="120"/>
+            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="100"/>
+            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="160"/>
+            <TableColumn fx:id="basePriceColumn" text="Preço base por noite" prefWidth="180"/>
+        </columns>
+        <placeholder>
+            <Label text="Não há quartos."/>
+        </placeholder>
+    </TableView>
+</VBox>

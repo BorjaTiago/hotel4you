@@ -7,6 +7,7 @@ import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.User;
 
 /** Single entry point for the GUI. */
@@ -189,6 +190,19 @@ public class HotelFacade {
      */
     public List<Room> listRooms() {
         return roomService.listRooms();
+    }
+
+    /**
+     * Lists the rooms with type, floor and base price.
+     *
+     * @param roomTypeName the room type to show, or null or blank to show all rooms
+     * @param actor the logged-in user
+     * @return the rooms ordered by number, or an empty list if no room matches
+     * @throws AccessDeniedException if the actor is not logged in or may not see the list
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<RoomSummary> listRoomSummaries(String roomTypeName, User actor) {
+        return roomService.listRoomSummaries(roomTypeName, actor);
     }
 
     /**

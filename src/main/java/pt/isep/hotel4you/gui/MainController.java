@@ -32,6 +32,9 @@ public class MainController {
     private Button roomsButton;
 
     @FXML
+    private Button roomListButton;
+
+    @FXML
     private StackPane contentPane;
 
     /**
@@ -53,6 +56,8 @@ public class MainController {
         floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
         roomsButton.managedProperty().bind(roomsButton.visibleProperty());
         roomsButton.setVisible(facade.canUse(user, Permission.MANAGE_ROOMS));
+        roomListButton.managedProperty().bind(roomListButton.visibleProperty());
+        roomListButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
     }
 
     @FXML
@@ -71,6 +76,12 @@ public class MainController {
     private void onRoomsClicked() {
         Parent roomScreen = new ScreenLoader(facade).load("rooms.fxml");
         contentPane.getChildren().setAll(roomScreen);
+    }
+
+    @FXML
+    private void onRoomListClicked() {
+        Parent roomListScreen = new ScreenLoader(facade).load("room-list.fxml");
+        contentPane.getChildren().setAll(roomListScreen);
     }
 
     @FXML
