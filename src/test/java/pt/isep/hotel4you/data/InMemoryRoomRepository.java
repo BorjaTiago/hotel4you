@@ -55,7 +55,7 @@ public class InMemoryRoomRepository implements RoomRepository {
     }
 
     @Override
-    public synchronized Room saveWithinFloorLimit(Room room, int floorLimit) {
+    public synchronized Room save(Room room, int floorLimit) {
         if (!floorExists(room.floorNumber())) {
             throw new IllegalArgumentException("O piso indicado não existe.");
         }

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -36,7 +38,7 @@ class RoomServiceTest {
         for (String roomType : List.of("single", "double", "family")) {
             repository.addRoomType(roomType);
         }
-        roomService = new RoomService(repository);
+        roomService = new RoomService(repository, Map.of(2, FLOOR_LIMIT, 3, FLOOR_LIMIT));
     }
 
     @Test
@@ -126,6 +128,63 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-25-AC-1")
+    void onSaveRoom_saveRoom_whenAnotherFloorIsConfigured() {
+        repository.addFloor(5);
+        RoomService configured = new RoomService(repository, Map.of(5, 2));
+
+        assertEquals(5, configured.saveRoom(room(501, 5, "single"), manager()).floorNumber());
+        assertEquals(Map.of(5, 2), configured.roomFloorLimits());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-3")
+    void onSaveRoom_throw_whenExistingFloorIsNotConfigured() {
+        RoomService configured = new RoomService(repository, Map.of(3, 2));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> configured.saveRoom(room(201, 2, "single"), manager()));
+        assertEquals(0, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-4")
+    void onSaveRoom_applyOwnLimit_whenFloorsHaveDifferentLimits() {
+        RoomService configured = new RoomService(repository, Map.of(2, 1, 3, 2));
+        configured.saveRoom(room(201, 2, "single"), manager());
+        configured.saveRoom(room(301, 3, "single"), manager());
+        configured.saveRoom(room(302, 3, "double"), manager());
+
+        assertThrows(RoomLimitExceededException.class,
+                () -> configured.saveRoom(room(202, 2, "double"), manager()));
+        assertThrows(RoomLimitExceededException.class,
+                () -> configured.saveRoom(room(303, 3, "double"), manager()));
+        assertEquals(3, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-4")
+    void onSaveRoom_keepLimit_whenCallerChangesConfigurationMap() {
+        Map<Integer, Integer> limits = new HashMap<>(Map.of(2, 1));
+        RoomService configured = new RoomService(repository, limits);
+        limits.put(2, 10);
+        configured.saveRoom(room(201, 2, "single"), manager());
+
+        assertThrows(RoomLimitExceededException.class,
+                () -> configured.saveRoom(room(202, 2, "single"), manager()));
+        assertThrows(UnsupportedOperationException.class,
+                () -> configured.roomFloorLimits().put(2, 10));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onSaveRoom_throwAccessDenied_whenActorIsNull() {
+        assertThrows(AccessDeniedException.class,
+                () -> roomService.saveRoom(room(202, 2, "double"), null));
+        assertEquals(0, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
     void onSaveRoom_throwAccessDenied_whenActorIsNotManager() {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", HASH);
 
@@ -142,7 +201,15 @@ class RoomServiceTest {
         seedRooms(2, 201, FLOOR_LIMIT - 1);
         List<Callable<Boolean>> attempts = List.of(
                 () -> trySave(room(210, 2, "double")),
-                () -> trySave(room(211, 2, "double")));
+                () -> {
+                    RoomService second = new RoomService(repository, Map.of(2, FLOOR_LIMIT));
+                    try {
+                        second.saveRoom(room(211, 2, "double"), manager());
+                        return true;
+                    } catch (RoomLimitExceededException e) {
+                        return false;
+                    }
+                });
 
         try (var executor = Executors.newFixedThreadPool(2)) {
             var results = executor.invokeAll(attempts);
@@ -173,7 +240,7 @@ class RoomServiceTest {
 
     private void seedRooms(int floorNumber, int firstRoomNumber, int count) {
         for (int i = 0; i < count; i++) {
-            repository.saveWithinFloorLimit(
+            repository.save(
                     room(firstRoomNumber + i, floorNumber, "double"), FLOOR_LIMIT);
         }
     }

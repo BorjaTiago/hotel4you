@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -42,13 +43,21 @@ class HotelFacadeTest {
         floorRepository = new InMemoryFloorRepository();
         locationRepository = new InMemoryLocationRepository();
         LocationService locationService = new LocationService(floorRepository, locationRepository);
-        RoomService roomService = new RoomService(new InMemoryRoomRepository());
+        RoomService roomService = new RoomService(new InMemoryRoomRepository(), Map.of(2, 10, 3, 10));
         facade = new HotelFacade(authService, staffService, locationService, roomService);
     }
 
     private User saveAna() {
         return repository.save(
                 new Receptionist(null, "Ana Silva", "ana", authService.hashPassword(PASSWORD)));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onCanUse_allowRooms_whenActorIsManager() {
+        assertTrue(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_ROOMS));
+        assertFalse(facade.canUse(new Receptionist(2L, "Ana", "ana", "hash"), Permission.MANAGE_ROOMS));
+        assertEquals(Map.of(2, 10, 3, 10), facade.roomFloorLimits());
     }
 
     @Test
