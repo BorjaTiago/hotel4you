@@ -14,7 +14,7 @@
     <Label text="Lista de quartos" styleClass="subtitle"/>
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label text="Tipo"/>
-        <ComboBox fx:id="roomTypeBox" onAction="#onRoomTypeChanged" prefWidth="180"/>
+        <ComboBox fx:id="roomTypeBox" prefWidth="180"/>
     </HBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true"/>
     <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefHeight="360">

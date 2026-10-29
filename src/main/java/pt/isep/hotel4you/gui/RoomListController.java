@@ -78,11 +78,7 @@ public class RoomListController {
         });
         loadRoomTypes();
         loadRooms();
-    }
-
-    @FXML
-    private void onRoomTypeChanged() {
-        loadRooms();
+        roomTypeBox.setOnAction(event -> loadRooms());
     }
 
     private void loadRoomTypes() {

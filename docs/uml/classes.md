@@ -15,7 +15,7 @@ Notes:
 | MainController | Interface | - | initialize(), onStaffClicked(), onFloorsClicked(), onRoomsClicked(), onRoomListClicked(), onLogoutClicked() (private) | RF-03, RF-04, RNF-06, RNF-07 |
 | HotelApp | Interface | facade (static), currentUser (static), startError (static) | start() | RNF-06, RNF-07 |
 | ScreenLoader | Interface | - | load() | RNF-06, RNF-07 |
-| RoomListController | Interface | - | initialize(), onRoomTypeChanged() (private). Read-only table with a type filter | RF-04, RF-06 |
+| RoomListController | Interface | - | initialize() (private). The type box reloads the list. Read-only table with a type filter | RF-04, RF-06 |
 | RoomController | Interface | - | onSearchClicked(), onSaveRoomClicked(), onConfigureRoomItemClicked(), onSavePriceClicked() | RF-04, RF-05, RF-06, RF-08 |
 | ClientController | Interface | - | onRegisterClientClicked(), onSearchClientClicked() | RF-10 |
 | ReservationController | Interface | - | onCreateReservationClicked(), onCancelReservationClicked(), onDeleteReservationClicked(), onAddExtraClicked(), onRemoveExtraClicked(), onAddLocationClicked(), onRemoveLocationClicked() | RF-11, RF-12, RF-15, RF-18, RF-22 |

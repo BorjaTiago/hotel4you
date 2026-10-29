@@ -45,7 +45,6 @@ classDiagram
     }
     class RoomListController {
         -initialize() void
-        -onRoomTypeChanged() void
     }
     class RoomController {
         +onSearchClicked() void
