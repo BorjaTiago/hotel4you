@@ -1,7 +1,11 @@
 package pt.isep.hotel4you.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigDecimal;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +22,9 @@ import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests room registration rules. */
@@ -189,6 +195,111 @@ class RoomServiceTest {
         }
 
         assertEquals(FLOOR_LIMIT, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-1")
+    void listRoomSummaries_receptionistAsksWithoutFilter_returnsEveryRoomWithTypeFloorAndPrice() {
+        seedPricedRooms();
+
+        List<RoomSummary> rooms = roomService.listRoomSummaries(null, receptionist());
+
+        assertEquals(List.of(
+                new RoomSummary(201, 2, "single", new BigDecimal("80.00")),
+                new RoomSummary(202, 2, "double", new BigDecimal("120.00")),
+                new RoomSummary(301, 3, "family", new BigDecimal("180.00"))), rooms);
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-1")
+    void listRoomSummaries_managerAsks_returnsEveryRoom() {
+        seedPricedRooms();
+
+        assertEquals(3, roomService.listRoomSummaries(null, manager()).size());
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-1")
+    void listRoomSummaries_roomTypeHasNoBasePrice_returnsRoomWithNullPrice() {
+        repository.save(room(203, 2, "double"), FLOOR_LIMIT);
+
+        RoomSummary summary = roomService.listRoomSummaries(null, receptionist()).getFirst();
+
+        assertEquals(203, summary.number());
+        assertNull(summary.basePrice());
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-2")
+    void listRoomSummaries_filterByFamilyType_returnsOnlyFamilyRooms() {
+        seedPricedRooms();
+        repository.save(room(302, 3, "family"), FLOOR_LIMIT);
+
+        List<RoomSummary> rooms = roomService.listRoomSummaries("family", receptionist());
+
+        assertEquals(List.of(301, 302), rooms.stream().map(RoomSummary::number).toList());
+        assertTrue(rooms.stream().allMatch(room -> room.roomTypeName().equals("family")));
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-2")
+    void listRoomSummaries_filterHasOtherCaseAndSpaces_returnsMatchingRooms() {
+        seedPricedRooms();
+
+        List<RoomSummary> rooms = roomService.listRoomSummaries("  FAMILY ", receptionist());
+
+        assertEquals(List.of(301), rooms.stream().map(RoomSummary::number).toList());
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-2")
+    void listRoomSummaries_filterIsBlank_returnsEveryRoom() {
+        seedPricedRooms();
+
+        assertEquals(3, roomService.listRoomSummaries("  ", receptionist()).size());
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-3")
+    void listRoomSummaries_noRoomsRegistered_returnsEmptyList() {
+        assertEquals(List.of(), roomService.listRoomSummaries(null, receptionist()));
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-3")
+    void listRoomSummaries_filterMatchesNoRoom_returnsEmptyList() {
+        seedPricedRooms();
+
+        assertEquals(List.of(), roomService.listRoomSummaries("suite", receptionist()));
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-4")
+    void listRoomSummaries_actorIsNotLoggedIn_throwsAccessDenied() {
+        seedPricedRooms();
+
+        assertThrows(AccessDeniedException.class, () -> roomService.listRoomSummaries(null, null));
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-4")
+    void listRoomSummaries_actorIsRestaurantStaff_throwsAccessDenied() {
+        RestaurantStaff joao = new RestaurantStaff(3L, "Joao Lima", "joao", HASH);
+
+        assertThrows(AccessDeniedException.class, () -> roomService.listRoomSummaries(null, joao));
+    }
+
+    private void seedPricedRooms() {
+        repository.setBasePrice("single", new BigDecimal("80.00"));
+        repository.setBasePrice("double", new BigDecimal("120.00"));
+        repository.setBasePrice("family", new BigDecimal("180.00"));
+        repository.save(room(202, 2, "double"), FLOOR_LIMIT);
+        repository.save(room(301, 3, "family"), FLOOR_LIMIT);
+        repository.save(room(201, 2, "single"), FLOOR_LIMIT);
+    }
+
+    private static Receptionist receptionist() {
+        return new Receptionist(2L, "Ana Silva", "ana", HASH);
     }
 
     private boolean trySave(Room room) {
