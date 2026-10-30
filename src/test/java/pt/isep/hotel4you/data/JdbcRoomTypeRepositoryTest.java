@@ -55,7 +55,9 @@ class JdbcRoomTypeRepositoryTest {
 
         private final List<String> calls = new ArrayList<>();
         private final int updatedRows;
+        private final Map<Integer, Object> parameters = new HashMap<>();
         private BigDecimal price;
+        private String sql;
 
         FakeDatabase(int updatedRows) {
             super(null);
@@ -67,8 +69,13 @@ class JdbcRoomTypeRepositoryTest {
             return (Connection) Proxy.newProxyInstance(
                     Connection.class.getClassLoader(),
                     new Class<?>[] {Connection.class},
-                    (proxy, method, args) -> method.getName().equals("prepareStatement")
-                            ? statement() : defaultValue(method));
+                    (proxy, method, args) -> {
+                        if (method.getName().equals("prepareStatement")) {
+                            sql = (String) args[0];
+                            return statement();
+                        }
+                        return defaultValue(method);
+                    });
         }
 
         private PreparedStatement statement() {
@@ -77,6 +84,10 @@ class JdbcRoomTypeRepositoryTest {
                     new Class<?>[] {PreparedStatement.class},
                     (proxy, method, args) -> {
                         calls.add(method.getName());
+                        if (method.getName().equals("setBigDecimal")
+                                || method.getName().equals("setLong")) {
+                            parameters.put((Integer) args[0], args[1]);
+                        }
                         if (method.getName().equals("executeUpdate")) {
                             return updatedRows;
                         }
@@ -137,6 +148,12 @@ class JdbcRoomTypeRepositoryTest {
 
     private final JdbcRoomTypeRepository failing = new JdbcRoomTypeRepository(new FailingDatabase());
 
+    private static void assertUpdate(FakeDatabase database, long id) {
+        assertEquals("UPDATE room_types SET base_price = ? WHERE id = ?", database.sql);
+        assertEquals(new BigDecimal("80.00"), database.parameters.get(1));
+        assertEquals(id, database.parameters.get(2));
+    }
+
     @Test
     @Tag("H4Y-26-AC-1")
     void onFindAll_keepSqlCause_whenSqlFails() {
@@ -190,14 +207,18 @@ class JdbcRoomTypeRepositoryTest {
         assertFalse(updated);
         assertTrue(database.calls.contains("setBigDecimal"));
         assertTrue(database.calls.contains("setLong"));
+        assertUpdate(database, 99L);
     }
 
     @Test
     @Tag("H4Y-26-AC-1")
     void onUpdateBasePrice_returnTrue_whenRowChanges() {
-        boolean updated = new JdbcRoomTypeRepository(new FakeDatabase(1))
+        FakeDatabase database = new FakeDatabase(1);
+
+        boolean updated = new JdbcRoomTypeRepository(database)
                 .updateBasePrice(1L, new BigDecimal("80.00"));
 
         assertTrue(updated);
+        assertUpdate(database, 1L);
     }
 }
