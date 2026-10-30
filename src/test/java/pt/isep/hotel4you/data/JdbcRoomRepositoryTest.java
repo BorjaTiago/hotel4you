@@ -40,16 +40,6 @@ class JdbcRoomRepositoryTest {
 
     @Test
     @Tag("H4Y-25-AC-1")
-    void onRead_bindNumbersWithJdbcTypes_whenCheckingRoomAndFloor() {
-        repository.floorExists(2);
-        repository.existsByNumber(202);
-
-        assertEquals(List.of(new Binding("setInt", 1, 2), new Binding("setInt", 1, 202)),
-                database.bindings);
-    }
-
-    @Test
-    @Tag("H4Y-25-AC-1")
     void onSave_commitAndClose_whenRoomIsValid() {
         Room saved = repository.save(room, 10);
 
@@ -85,6 +75,7 @@ class JdbcRoomRepositoryTest {
         IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> repository.save(room, 10));
 
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
         assertSame(database.insertFailure, error.getCause());
         assertSame(database.rollbackFailure, error.getCause().getSuppressed()[0]);
         assertFalse(database.events.contains("commit"));

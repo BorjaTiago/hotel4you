@@ -17,11 +17,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
+import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests room registration rules. */
@@ -31,6 +33,7 @@ class RoomServiceTest {
     private static final String HASH = "$2a$12$abcdefghijklmnopqrstuuAbCdEfGhIjKlMnOpQrStUvWxYz01234";
 
     private InMemoryRoomRepository repository;
+    private InMemoryRoomTypeRepository roomTypeRepository;
     private RoomService roomService;
 
     @BeforeEach
@@ -42,7 +45,11 @@ class RoomServiceTest {
         for (String roomType : List.of("individual", "duplo", "familiar")) {
             repository.addRoomType(roomType);
         }
-        roomService = new RoomService(repository, new pt.isep.hotel4you.data.InMemoryRoomTypeRepository());
+        roomTypeRepository = new InMemoryRoomTypeRepository();
+        roomTypeRepository.add(new RoomType(1L, "duplo", 2, null));
+        roomTypeRepository.add(new RoomType(2L, "familiar", 4, null));
+        roomTypeRepository.add(new RoomType(3L, "individual", 1, null));
+        roomService = new RoomService(repository, roomTypeRepository);
     }
 
     @Test
@@ -87,7 +94,7 @@ class RoomServiceTest {
     void onSaveRoom_throw_whenFloorIsNotForRooms(int floorNumber) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> roomService.saveRoom(room(101, floorNumber, "individual"), manager()));
-        assertEquals("Só os pisos 2 e 3 têm quartos", error.getMessage());
+        assertEquals("Só os pisos 2 e 3 têm quartos.", error.getMessage());
 
         assertEquals(0, repository.findAll().size());
     }
@@ -113,6 +120,25 @@ class RoomServiceTest {
                 () -> roomService.saveRoom(room(202, 3, "duplo"), manager()));
 
         assertEquals(1, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-4")
+    void onSaveRoom_throwLimit_whenFloorIsFullAndNumberExists() {
+        seedRooms(2, 301, FLOOR_LIMIT);
+
+        assertThrows(RoomLimitExceededException.class,
+                () -> roomService.saveRoom(room(301, 2, "duplo"), manager()));
+
+        assertEquals(FLOOR_LIMIT, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_returnRoomTypeRepositoryNames_whenRoomRepositoryHasNone() {
+        RoomService service = new RoomService(new InMemoryRoomRepository(), roomTypeRepository);
+
+        assertEquals(List.of("duplo", "familiar", "individual"), service.listRoomTypes(manager()));
     }
 
     @Test
@@ -168,7 +194,7 @@ class RoomServiceTest {
         List<Callable<Boolean>> attempts = List.of(
                 () -> trySave(room(210, 2, "duplo")),
                 () -> {
-                    RoomService second = new RoomService(repository, new pt.isep.hotel4you.data.InMemoryRoomTypeRepository());
+                    RoomService second = new RoomService(repository, roomTypeRepository);
                     try {
                         second.saveRoom(room(211, 2, "duplo"), manager());
                         return true;

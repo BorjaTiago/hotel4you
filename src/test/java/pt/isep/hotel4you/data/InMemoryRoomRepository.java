@@ -24,23 +24,15 @@ public class InMemoryRoomRepository implements RoomRepository {
         roomTypes.add(roomTypeName.toLowerCase(Locale.ROOT));
     }
 
-    @Override
-    public synchronized boolean floorExists(int floorNumber) {
+    private boolean floorExists(int floorNumber) {
         return floors.contains(floorNumber);
     }
 
-    @Override
-    public synchronized boolean roomTypeExists(String roomTypeName) {
+    private boolean roomTypeExists(String roomTypeName) {
         return roomTypeName != null && roomTypes.contains(roomTypeName.toLowerCase(Locale.ROOT));
     }
 
-    @Override
-    public synchronized List<String> findRoomTypeNames() {
-        return roomTypes.stream().sorted().toList();
-    }
-
-    @Override
-    public synchronized boolean existsByNumber(int roomNumber) {
+    private boolean existsByNumber(int roomNumber) {
         return rooms.stream().anyMatch(room -> room.getNumber() == roomNumber);
     }
 
@@ -61,11 +53,11 @@ public class InMemoryRoomRepository implements RoomRepository {
         if (!roomTypeExists(room.getRoomTypeName())) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
-        if (existsByNumber(room.getNumber())) {
-            throw new DuplicateRoomException();
-        }
         if (countByFloor(room.getFloorNumber()) >= floorLimit) {
             throw new RoomLimitExceededException(floorLimit);
+        }
+        if (existsByNumber(room.getNumber())) {
+            throw new DuplicateRoomException();
         }
         Room saved = new Room((long) rooms.size() + 1, room.getNumber(),
                 room.getFloorNumber(), room.getRoomTypeName());
