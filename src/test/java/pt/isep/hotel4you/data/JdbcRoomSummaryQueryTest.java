@@ -30,17 +30,29 @@ class JdbcRoomSummaryQueryTest {
     @Tag("H4Y-50-AC-1")
     void onFindSummaries_returnOneSummaryPerRow_whenRowsHaveTypeFloorAndPrice() {
         database.rows = List.of(
-                row(201, 2, "single", new BigDecimal("80.00")),
-                row(301, 3, "family", null));
+                row(11L, 201, 2, "single", new BigDecimal("80.00")),
+                row(12L, 301, 3, "family", null));
 
         List<RoomSummary> rooms = repository.findSummaries();
 
         assertEquals(List.of(
-                new RoomSummary(201, 2, "single", new BigDecimal("80.00")),
-                new RoomSummary(301, 3, "family", null)), rooms);
+                new RoomSummary(11L, 201, 2, "Quartos", "single", new BigDecimal("80.00")),
+                new RoomSummary(12L, 301, 3, "Quartos", "family", null)), rooms);
+        assertTrue(database.sql.contains("r.id"));
         assertTrue(database.sql.contains("t.base_price"));
+        assertTrue(database.sql.contains("f.description"));
         assertTrue(database.sql.contains("ORDER BY r.number"));
         assertEquals(List.of("result", "statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-1")
+    void onFindSummaries_returnFloorDescription_whenRoomIsSaved() {
+        Map<String, Object> values = row(13L, 101, 1, "single", new BigDecimal("80.00"));
+        values.put("description", "Receção");
+        database.rows = List.of(values);
+
+        assertEquals("Receção", repository.findSummaries().get(0).floorDescription());
     }
 
     @Test
@@ -60,10 +72,12 @@ class JdbcRoomSummaryQueryTest {
         assertSame(database.failure, error.getCause());
     }
 
-    private static Map<String, Object> row(int number, int floor, String type, BigDecimal price) {
+    private static Map<String, Object> row(long id, int number, int floor, String type, BigDecimal price) {
         Map<String, Object> values = new HashMap<>();
+        values.put("id", id);
         values.put("number", number);
         values.put("floor_number", floor);
+        values.put("description", "Quartos");
         values.put("room_type_name", type);
         values.put("base_price", price);
         return values;
@@ -122,7 +136,7 @@ class JdbcRoomSummaryQueryTest {
                                 current[0] = iterator.hasNext() ? iterator.next() : null;
                                 return current[0] != null;
                             }
-                            case "getInt", "getString", "getBigDecimal" -> {
+                            case "getInt", "getLong", "getString", "getBigDecimal" -> {
                                 return ((Map<?, ?>) current[0]).get(args[0]);
                             }
                             case "close" -> closed.add("result");
