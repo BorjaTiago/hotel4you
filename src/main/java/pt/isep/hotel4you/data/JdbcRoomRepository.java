@@ -23,44 +23,6 @@ public class JdbcRoomRepository implements RoomRepository {
     }
 
     @Override
-    public boolean floorExists(int floorNumber) {
-        return exists("SELECT 1 FROM floors WHERE number = ?", floorNumber);
-    }
-
-    @Override
-    public boolean roomTypeExists(String roomTypeName) {
-        try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection,
-                        "SELECT 1 FROM room_types WHERE name = ?", roomTypeName);
-                ResultSet result = statement.executeQuery()) {
-            return result.next();
-        } catch (SQLException e) {
-            throw persistenceError(e);
-        }
-    }
-
-    @Override
-    public List<String> findRoomTypeNames() {
-        List<String> names = new ArrayList<>();
-        try (Connection connection = database.connect();
-                PreparedStatement statement = connection.prepareStatement(
-                        "SELECT name FROM room_types ORDER BY name");
-                ResultSet result = statement.executeQuery()) {
-            while (result.next()) {
-                names.add(result.getString("name"));
-            }
-            return List.copyOf(names);
-        } catch (SQLException e) {
-            throw persistenceError(e);
-        }
-    }
-
-    @Override
-    public boolean existsByNumber(int roomNumber) {
-        return exists("SELECT 1 FROM rooms WHERE number = ?", roomNumber);
-    }
-
-    @Override
     public List<Room> findAll() {
         String sql = "SELECT r.id, r.number, f.number AS floor_number, t.name AS room_type_name "
                 + "FROM rooms r JOIN floors f ON f.id = r.floor_id "
@@ -115,16 +77,6 @@ public class JdbcRoomRepository implements RoomRepository {
         } catch (RuntimeException e) {
             rollback(connection, e);
             throw e;
-        }
-    }
-
-    private boolean exists(String sql, int value) {
-        try (Connection connection = database.connect();
-                PreparedStatement statement = prepareInt(connection, sql, value);
-                ResultSet result = statement.executeQuery()) {
-            return result.next();
-        } catch (SQLException e) {
-            throw persistenceError(e);
         }
     }
 
@@ -211,6 +163,6 @@ public class JdbcRoomRepository implements RoomRepository {
     }
 
     private static IllegalStateException persistenceError(SQLException error) {
-        return new IllegalStateException("Não foi possível aceder aos dados dos quartos.", error);
+        return new IllegalStateException(Database.NOT_AVAILABLE, error);
     }
 }

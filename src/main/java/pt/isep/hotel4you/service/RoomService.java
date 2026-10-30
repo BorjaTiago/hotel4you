@@ -74,7 +74,8 @@ public class RoomService {
 
     /**
      * Saves a room. Only a manager may register a room.
-     * The repository checks the floor limit inside its save transaction.
+     * The repository checks the floor, room type, floor limit and room number inside its save
+     * transaction.
      *
      * @param room the room to save
      * @param actor the logged-in user
@@ -92,18 +93,9 @@ public class RoomService {
         if (room == null) {
             throw new IllegalArgumentException("Indique os dados do quarto.");
         }
-        if (!roomRepository.floorExists(room.getFloorNumber())) {
-            throw new IllegalArgumentException("O piso indicado não existe.");
-        }
         Integer floorLimit = ROOM_FLOOR_LIMITS.get(room.getFloorNumber());
         if (floorLimit == null) {
-            throw new IllegalArgumentException("Só os pisos 2 e 3 têm quartos");
-        }
-        if (!roomRepository.roomTypeExists(room.getRoomTypeName())) {
-            throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
-        }
-        if (roomRepository.existsByNumber(room.getNumber())) {
-            throw new DuplicateRoomException();
+            throw new IllegalArgumentException("Só os pisos 2 e 3 têm quartos.");
         }
         return roomRepository.save(room, floorLimit);
     }
@@ -135,7 +127,7 @@ public class RoomService {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode consultar os tipos de quarto.");
         }
-        return roomRepository.findRoomTypeNames();
+        return roomTypeRepository.findAll().stream().map(RoomType::getName).toList();
     }
 
     /**

@@ -91,7 +91,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v5-creat
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v6-create-rooms.sql
 ```
 
-`v5-create-room-types.sql` from H4Y-26 creates `individual`, `duplo` and `familiar`. Run it before `v6-create-rooms.sql`. The manager then uses "Quartos" to register rooms. The separate "Pre?os" screen sets base prices. No room registration requires a base price to be set.
+`v5-create-room-types.sql` from H4Y-26 creates `individual`, `duplo` and `familiar`. Run it before `v6-create-rooms.sql`. The manager then uses "Quartos" to register rooms. The separate "Preços" screen sets base prices. No room registration requires a base price to be set.
 
 `v3-insert-test-users.sql` adds one test user for each staff role. Use it only on a local test database. The usernames and passwords are in the script header.
 
