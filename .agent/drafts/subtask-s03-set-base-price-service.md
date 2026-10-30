@@ -9,7 +9,7 @@ status: published
 jira_key: H4Y-65
 labels: [rooms, pricing, 1st-delivery]
 sprint: 03
-branch: feat/H4Y-65-base-price-service
+branch: feat/H4Y-26-base-price
 ---
 
 # set-base-price: regras e gravação
@@ -30,4 +30,4 @@ Responsável proposto: José Cruz (a equipa decide).
 
 Sem ecrã nesta subtask. O ecrã está em H4Y-66.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.

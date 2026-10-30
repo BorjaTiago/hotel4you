@@ -9,7 +9,10 @@ public enum Permission {
     MANAGE_STAFF(Role.MANAGER),
 
     /** View the floors and create, edit and remove the zones. */
-    MANAGE_FLOORS(Role.MANAGER);
+    MANAGE_FLOORS(Role.MANAGER),
+
+    /** View and set the base price of the room types. */
+    MANAGE_PRICES(Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 

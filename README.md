@@ -76,6 +76,7 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v2-create-roles-users.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v3-insert-test-users.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v4-create-floors-locations.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v5-create-room-types.sql
 ```
 
 Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
@@ -85,6 +86,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v1-creat
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v2-create-roles-users.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v3-insert-test-users.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v4-create-floors-locations.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v5-create-room-types.sql
 ```
 
 `v3-insert-test-users.sql` adds one test user for each staff role. Use it only on a local test database. The usernames and passwords are in the script header.

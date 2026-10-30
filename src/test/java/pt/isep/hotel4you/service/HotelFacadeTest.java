@@ -5,12 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryFloorRepository;
 import pt.isep.hotel4you.data.InMemoryLocationRepository;
+import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
@@ -19,6 +21,7 @@ import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
+import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests that the facade passes calls to the services. */
@@ -31,6 +34,7 @@ class HotelFacadeTest {
     private AuthService authService;
     private InMemoryFloorRepository floorRepository;
     private InMemoryLocationRepository locationRepository;
+    private InMemoryRoomTypeRepository roomTypeRepository;
     private HotelFacade facade;
 
     @BeforeEach
@@ -41,7 +45,9 @@ class HotelFacadeTest {
         floorRepository = new InMemoryFloorRepository();
         locationRepository = new InMemoryLocationRepository();
         LocationService locationService = new LocationService(floorRepository, locationRepository);
-        facade = new HotelFacade(authService, staffService, locationService);
+        roomTypeRepository = new InMemoryRoomTypeRepository();
+        RoomService roomService = new RoomService(roomTypeRepository);
+        facade = new HotelFacade(authService, staffService, locationService, roomService);
     }
 
     private User saveAna() {
@@ -247,5 +253,31 @@ class HotelFacadeTest {
                 () -> facade.removeLocation(zone.getId(), manager));
 
         assertEquals("A zona tem associações e não pode ser removida.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-26-AC-1")
+    void onSetBasePrice_savePrice_whenManager() {
+        RoomType duplo = new RoomType(2L, "duplo", 2, null);
+        roomTypeRepository.add(duplo);
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        facade.setBasePrice(duplo, new BigDecimal("80.00"), manager);
+
+        assertEquals(new BigDecimal("80.00"), facade.listBasePrices(manager).get(0).getBasePrice());
+    }
+
+    @Test
+    @Tag("H4Y-26-AC-4")
+    void onListBasePrices_throwAccessDenied_whenReceptionist() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+
+        assertThrows(AccessDeniedException.class, () -> facade.listBasePrices(receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-26-AC-3")
+    void onParsePrice_returnPrice_whenTextHasComma() {
+        assertEquals(new BigDecimal("80.50"), facade.parsePrice("80,50"));
     }
 }

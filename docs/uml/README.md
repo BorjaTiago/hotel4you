@@ -23,7 +23,7 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - No `Stay` class. The `Reservation` holds the stay times.
 - `Client` class vs `customers` table.
 - `Role` enum vs `roles` table.
-- `RoomType.name` is "single" in requirements (RF-04) and "individual" in the database schema. Align one side.
+- `RoomType.name` uses the stored values `individual`, `duplo`, `familiar`, as in the H4Y-26 draft (user decision, 2026-10-30). The English requirement terms are descriptions, not stored names.
 - Card owners in the class diagram: `Reservation 0..1 -> 0..1 MagneticCard` and `User 0..1 -> * MagneticCard`. A card has a reservation or a staff user, never both. Check that the database has the same cardinality.
 
 ## Requirements sources
@@ -33,4 +33,4 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - `docs/requirements/use-cases.md`
 - `docs/requirements/questions.md`
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; OpenAI Codex, GPT-6, 2026-10-16; class diagram link restored by OpenAI Codex, GPT-6, 2026-10-16; component diagram links by Cursor agent, Claude Opus 5.5, 2026-10-16; sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; use-case link text by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; use-case count update by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; OpenAI Codex, GPT-6, 2026-10-16; class diagram link restored by OpenAI Codex, GPT-6, 2026-10-16; component diagram links by Cursor agent, Claude Opus 5.5, 2026-10-16; sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; use-case link text by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
