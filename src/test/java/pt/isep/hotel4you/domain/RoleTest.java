@@ -17,7 +17,7 @@ class RoleTest {
         "RESTAURANT, Funcionário do restaurante",
         "SUPPLIER, Fornecedor"
     })
-    @Tag("H4Y-23-AC-1")
+    @Tag("H4Y-61")
     void onDisplayName_returnPortugueseName_always(Role role, String expected) {
         assertEquals(expected, role.displayName());
     }
