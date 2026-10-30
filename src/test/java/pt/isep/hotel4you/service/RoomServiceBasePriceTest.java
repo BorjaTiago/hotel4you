@@ -100,7 +100,7 @@ class RoomServiceBasePriceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"-0.01", "-10", "80.123", "1000000.00"})
+    @ValueSource(strings = {"-0.01", "-10", "80.123", "1000000.00", "1.000", "80.100"})
     @Tag("H4Y-26-AC-3")
     void onSetBasePrice_throw_whenPriceIsInvalid(String value) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
