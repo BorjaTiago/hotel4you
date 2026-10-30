@@ -89,7 +89,7 @@ public class RoomService {
     private static boolean isValidPrice(BigDecimal price) {
         return price != null
                 && price.signum() >= 0
-                && price.stripTrailingZeros().scale() <= PRICE_SCALE
+                && price.scale() <= PRICE_SCALE
                 && price.compareTo(MAX_PRICE) <= 0;
     }
 }
