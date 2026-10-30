@@ -47,6 +47,7 @@ public class RoomService {
      * @throws IllegalArgumentException if the floor or room type is invalid
      * @throws DuplicateRoomException if the room number is already in use
      * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws IllegalStateException if the database is not available
      */
     public synchronized Room saveRoom(Room room, User actor) {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
@@ -77,18 +78,30 @@ public class RoomService {
     /**
      * Lists saved rooms.
      *
+     * @param actor the logged-in user
      * @return all saved rooms
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<Room> listRooms() {
+    public List<Room> listRooms(User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode consultar os quartos.");
+        }
         return roomRepository.findAll();
     }
 
     /**
      * Lists the room types from the catalogue.
      *
+     * @param actor the logged-in user
      * @return all room type names
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<String> listRoomTypes() {
+    public List<String> listRoomTypes(User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode consultar os tipos de quarto.");
+        }
         return roomRepository.findRoomTypeNames();
     }
 }

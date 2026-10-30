@@ -65,7 +65,7 @@ public class JdbcRoomRepository implements RoomRepository {
         String sql = "SELECT COUNT(*) FROM rooms r JOIN floors f ON f.id = r.floor_id "
                 + "WHERE f.number = ?";
         try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, Integer.toString(floorNumber));
+                PreparedStatement statement = Database.prepare(connection, sql, floorNumber);
                 ResultSet result = statement.executeQuery()) {
             result.next();
             return result.getInt(1);
@@ -134,7 +134,7 @@ public class JdbcRoomRepository implements RoomRepository {
 
     private boolean exists(String sql, int value) {
         try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, Integer.toString(value));
+                PreparedStatement statement = Database.prepare(connection, sql, value);
                 ResultSet result = statement.executeQuery()) {
             return result.next();
         } catch (SQLException e) {
@@ -145,7 +145,7 @@ public class JdbcRoomRepository implements RoomRepository {
     private static long findFloorIdForUpdate(Connection connection, int floorNumber)
             throws SQLException {
         String sql = "SELECT id FROM floors WITH (UPDLOCK, HOLDLOCK) WHERE number = ?";
-        try (PreparedStatement statement = Database.prepare(connection, sql, Integer.toString(floorNumber));
+        try (PreparedStatement statement = Database.prepare(connection, sql, floorNumber);
                 ResultSet result = statement.executeQuery()) {
             if (!result.next()) {
                 throw new IllegalArgumentException("O piso indicado não existe.");
@@ -168,7 +168,7 @@ public class JdbcRoomRepository implements RoomRepository {
 
     private static int countByFloorId(Connection connection, long floorId) throws SQLException {
         try (PreparedStatement statement = Database.prepare(connection,
-                "SELECT COUNT(*) FROM rooms WHERE floor_id = ?", Long.toString(floorId));
+                "SELECT COUNT(*) FROM rooms WHERE floor_id = ?", floorId);
                 ResultSet result = statement.executeQuery()) {
             result.next();
             return result.getInt(1);
@@ -180,7 +180,7 @@ public class JdbcRoomRepository implements RoomRepository {
         String sql = "INSERT INTO rooms (number, floor_id, room_type_id) "
                 + "OUTPUT INSERTED.id VALUES (?, ?, ?)";
         try (PreparedStatement statement = Database.prepare(connection, sql,
-                Integer.toString(room.number()), Long.toString(floorId), Long.toString(roomTypeId));
+                room.number(), floorId, roomTypeId);
                 ResultSet keys = statement.executeQuery()) {
             if (!keys.next()) {
                 throw new SQLException("SQL Server did not return the room identifier.");

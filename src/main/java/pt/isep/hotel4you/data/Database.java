@@ -55,16 +55,25 @@ public class Database {
      *
      * @param connection the open connection
      * @param sql the SQL text with {@code ?} for each value
-     * @param values the values for the {@code ?} marks, in order
+     * @param values the values for the {@code ?} marks, in order; numeric values keep their JDBC type
      * @return the statement, ready to run
      * @throws SQLException if the SQL is not valid
      */
-    public static PreparedStatement prepare(Connection connection, String sql, String... values)
+    public static PreparedStatement prepare(Connection connection, String sql, Object... values)
             throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql);
         try {
             for (int i = 0; i < values.length; i++) {
-                statement.setString(i + 1, values[i]);
+                Object value = values[i];
+                if (value instanceof Integer number) {
+                    statement.setInt(i + 1, number);
+                } else if (value instanceof Long number) {
+                    statement.setLong(i + 1, number);
+                } else if (value == null || value instanceof String) {
+                    statement.setString(i + 1, (String) value);
+                } else {
+                    statement.setObject(i + 1, value);
+                }
             }
         } catch (SQLException error) {
             closeAfterBindingFailure(statement, error);

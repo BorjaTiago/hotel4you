@@ -102,7 +102,7 @@ public class RoomController {
 
     private void loadRoomTypes() {
         try {
-            roomTypeBox.getItems().setAll(facade.listRoomTypes());
+            roomTypeBox.getItems().setAll(facade.listRoomTypes(HotelApp.currentUser));
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
         }
@@ -110,7 +110,7 @@ public class RoomController {
 
     private void loadRooms() {
         try {
-            List<Room> rooms = facade.listRooms();
+            List<Room> rooms = facade.listRooms(HotelApp.currentUser);
             roomTable.getItems().setAll(rooms);
             updateSummary(rooms);
         } catch (RuntimeException e) {
@@ -143,9 +143,9 @@ public class RoomController {
 
     private static String typeLabel(String roomTypeName) {
         return switch (roomTypeName.toLowerCase(Locale.ROOT)) {
-            case "single", "individual" -> "Individual";
-            case "double", "duplo" -> "Duplo";
-            case "family", "familiar" -> "Familiar";
+            case "individual" -> "Individual";
+            case "double" -> "Duplo";
+            case "family" -> "Familiar";
             default -> roomTypeName;
         };
     }

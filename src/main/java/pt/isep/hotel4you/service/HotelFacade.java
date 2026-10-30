@@ -2,6 +2,8 @@ package pt.isep.hotel4you.service;
 
 import java.util.List;
 import java.util.Map;
+import pt.isep.hotel4you.data.DuplicateRoomException;
+import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
@@ -168,6 +170,11 @@ public class HotelFacade {
      * @param room the room to save
      * @param actor the logged-in user
      * @return the saved room
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room data, floor or room type is invalid
+     * @throws DuplicateRoomException if the room number is already in use
+     * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws IllegalStateException if the database is not available
      */
     public Room saveRoom(Room room, User actor) {
         return roomService.saveRoom(room, actor);
@@ -185,18 +192,24 @@ public class HotelFacade {
     /**
      * Lists saved rooms.
      *
+     * @param actor the logged-in user
      * @return all saved rooms
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<Room> listRooms() {
-        return roomService.listRooms();
+    public List<Room> listRooms(User actor) {
+        return roomService.listRooms(actor);
     }
 
     /**
      * Lists the room types from the catalogue.
      *
+     * @param actor the logged-in user
      * @return all room type names
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<String> listRoomTypes() {
-        return roomService.listRoomTypes();
+    public List<String> listRoomTypes(User actor) {
+        return roomService.listRoomTypes(actor);
     }
 }
