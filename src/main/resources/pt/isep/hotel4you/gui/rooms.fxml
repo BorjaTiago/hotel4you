@@ -12,7 +12,7 @@
     </padding>
 
     <Label text="Quartos" styleClass="subtitle"/>
-    <HBox spacing="10">
+    <HBox spacing="10" alignment="CENTER_LEFT">
         <TextField fx:id="numberField" promptText="Número" prefWidth="150"/>
         <ComboBox fx:id="floorBox" promptText="Piso" prefWidth="120"/>
         <ComboBox fx:id="roomTypeBox" promptText="Tipo" prefWidth="180"/>
@@ -22,9 +22,9 @@
     <Label fx:id="summaryLabel" wrapText="true"/>
     <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefHeight="360">
         <columns>
-            <TableColumn fx:id="numberColumn" text="Número" prefWidth="150"/>
-            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="100"/>
-            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="200"/>
+            <TableColumn fx:id="numberColumn" text="Número" prefWidth="160"/>
+            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="130"/>
+            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="190"/>
         </columns>
         <placeholder>
             <Label text="Ainda não existem quartos registados."/>

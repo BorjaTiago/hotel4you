@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.RoomService.RoomTypeTarget;
@@ -68,7 +69,18 @@ public class RoomController {
         floorColumn.setCellValueFactory(
                 data -> new ReadOnlyObjectWrapper<>(data.getValue().getFloorNumber()));
         roomTypeColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(data.getValue().getRoomTypeName()));
+                data -> new SimpleStringProperty(typeText(data.getValue().getRoomTypeName())));
+        roomTypeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(String name) {
+                return name == null ? "" : typeText(name);
+            }
+
+            @Override
+            public String fromString(String text) {
+                return null;
+            }
+        });
         loadRoomTypes();
         loadRooms();
     }
@@ -131,6 +143,10 @@ public class RoomController {
             summary.add(type.label() + " " + countOfType(rooms, type.name()) + "/" + type.total());
         }
         summaryLabel.setText(summary.toString());
+    }
+
+    private static String typeText(String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
     private static long countOnFloor(List<Room> rooms, int floorNumber) {
