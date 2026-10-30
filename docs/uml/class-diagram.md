@@ -16,10 +16,12 @@
 - `$` marks a static member.
 - `actor` is the logged-in user that `login()` returned. `Permission` holds the roles that may use each function. `Permission.allows(actor)` is false when `actor` is null. `createStaff` throws `AccessDeniedException` when `MANAGE_STAFF` does not allow the actor (H4Y-27, H4Y-60).
 - `MANAGE_FLOORS` is allowed for a manager only. `listFloors` and `findFloor` throw `AccessDeniedException` for other users, and `findFloor` throws `FloorNotFoundException` for an unknown floor (H4Y-28). `LocationService` checks `MANAGE_FLOORS` and throws `AccessDeniedException` when it does not allow the actor (H4Y-28).
-- `MainController` shows a menu button only when `canUse(actor, permission)` allows it. Staff uses `MANAGE_STAFF`, floors and zones use `MANAGE_FLOORS`, room registration uses `MANAGE_ROOMS`, prices use `MANAGE_PRICES`, and the room list uses `LIST_ROOMS`. The screen has no role check of its own (H4Y-24, H4Y-60). The top shows "Olá, <name> (<role>)" with `Role.displayName()`. Without a logged-in user, no button shows and `openLogin()` opens the login screen (H4Y-61).
+- `MainController` shows a menu button only when `canUse(actor, permission)` allows it. Staff uses `MANAGE_STAFF`, floors and zones use `MANAGE_FLOORS`, prices use `MANAGE_PRICES`, and the "Quartos" button uses `LIST_ROOMS`. The screen has no role check of its own (H4Y-24, H4Y-60). The top shows "Olá, <name> (<role>)" with `Role.displayName()`. Without a logged-in user, no button shows and `openLogin()` opens the login screen (H4Y-61).
 - `RoomService.saveRoom` checks `Permission.MANAGE_ROOMS`. Only a manager may register a room. The service checks the floor catalogue, room floor, room type and duplicate number. The repository checks the floor limit inside its save transaction (H4Y-25).
-- `listRooms(actor)` and `listRoomTypes(actor)` also require `MANAGE_ROOMS`. The controller passes the logged-in user through the facade. These registration queries are not open to other staff roles.
-- `RoomService.listRoomSummaries` checks `Permission.LIST_ROOMS`. A receptionist or a manager sees each room with type, floor and base price. A blank type shows all rooms. `basePrice` is null until the manager sets the price of the type (H4Y-26). The screen shows "—" (H4Y-50).
+- `RoomService.removeRoom` checks `Permission.MANAGE_ROOMS`. It throws `RoomInUseException` when `RoomRepository.delete` returns false (Q-36). `RoomRepository.delete` throws `IllegalArgumentException` for an unknown room. The manager removes a room on the "Quartos" screen ("Remover quarto", then a confirmation). "Limpar" clears the form, the table selection and the message (user decision, 2026-10-30).
+- `RoomController` is one screen ("Quartos") for the room table, the type filter, the registration form, the edit form and the room summary (H4Y-50). The table and filter are for every user with `LIST_ROOMS`. The form and the summary show only when `canUse(actor, Permission.MANAGE_ROOMS)` is true, so a receptionist sees the table and the filter only. The manager selects a row. The form fills. The manager changes the number, floor or type and clicks "Guardar alterações" (`onSaveRoomChangesClicked`). The screen asks for a confirmation, then calls `HotelFacade.editRoom`. The floor box is a `ComboBox<Floor>`. For the manager it calls `listFloors(actor)` and keeps only the floors in `roomFloorLimits()`. Layout, top to bottom: title, type filter, summary, table, form with the "Registar quarto" and "Guardar alterações" buttons, message.
+- `RoomController` calls `listRoomSummaries` for the table. For the manager only, it calls `listRooms` for the summary, which always counts all rooms. `listRooms(actor)` and `listRoomTypes(actor)` require `MANAGE_ROOMS`. The controller passes the logged-in user through the facade.
+- `RoomService.listRoomSummaries` checks `Permission.LIST_ROOMS`. A receptionist or a manager sees each room with type, floor and base price. A blank type shows all rooms. `basePrice` is null until the manager sets the price of the type (H4Y-26). The table shows "—" (H4Y-50). The floor shows as number and description, for example "3 - Quartos". Floors 2 and 3 have the same description, so the number tells them apart.
 - `RoomService` holds the statement rules as constants: floors 2 and 3 allow 10 rooms each. `roomFloorLimits()` returns the immutable map used by validation, floor choices and the summary. These rules are not application settings.
 - Q-01 is a team decision, not confirmed by the teacher. The 7/10/3 split is a provisional summary target and test scenario. `RoomService` does not enforce room type totals.
 - `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32). `FloorController` is the one screen for floors and zones (H4Y-28): it has the zone form, so there is no `LocationController` for zone CRUD. `createLocation`, `editLocation` and `removeLocation` need a manager. `removeLocation` throws `LocationInUseException` when `LocationRepository.delete` returns false (Q-36). `HotelFacade.removeLocation(reservation, location)` is the reservation method and stays.
@@ -38,7 +40,6 @@ classDiagram
         -onFloorsClicked() void
         -onRoomsClicked() void
         -onPricesClicked() void
-        -onRoomListClicked() void
         -onLogoutClicked() void
         -openLogin() void
     }
@@ -51,12 +52,13 @@ classDiagram
     class ScreenLoader {
         +load(fxmlName: String) Parent
     }
-    class RoomListController {
-        -initialize() void
-    }
     class RoomController {
+        -initialize() void
         +onSearchClicked() void
-        +onSaveRoomClicked() void
+        -onSaveRoomClicked() void
+        -onSaveRoomChangesClicked() void
+        -onRemoveRoomClicked() void
+        -onClearClicked() void
         +onConfigureRoomItemClicked() void
     }
     class ClientController {
@@ -141,6 +143,8 @@ classDiagram
         +roomFloorLimits() Map
         +roomTypeTargets() List~RoomTypeTarget~
         +saveRoom(room: Room, actor: User) Room
+        +editRoom(room: Room, actor: User) Room
+        +removeRoom(id: long, actor: User) void
         +listRooms(actor: User) List~Room~
         +listRoomSummaries(roomTypeName: String, actor: User) List~RoomSummary~
         +listRoomTypes(actor: User) List~String~
@@ -191,6 +195,8 @@ classDiagram
         +roomFloorLimits() Map
         +roomTypeTargets() List~RoomTypeTarget~
         +saveRoom(room: Room, actor: User) Room
+        +editRoom(room: Room, actor: User) Room
+        +removeRoom(id: long, actor: User) void
         +listRooms(actor: User) List~Room~
         +listRoomSummaries(roomTypeName: String, actor: User) List~RoomSummary~
         +listRoomTypes(actor: User) List~String~
@@ -259,6 +265,9 @@ classDiagram
     class LocationInUseException {
         <<exception>>
     }
+    class RoomInUseException {
+        <<exception>>
+    }
 
     %% ==========================================
     %% LAYER: CONFIG
@@ -303,6 +312,8 @@ classDiagram
         +findAll() List~Room~
         +findSummaries() List~RoomSummary~
         +save(room: Room, floorLimit: int) Room
+        +update(room: Room, floorLimit: int) Room
+        +delete(id: long) boolean
     }
     class Database {
         +NOT_AVAILABLE String$
@@ -318,7 +329,10 @@ classDiagram
     class JdbcUserRepository
     class JdbcFloorRepository
     class JdbcLocationRepository
-    class JdbcRoomRepository
+    class JdbcRoomRepository {
+        +update(room: Room, floorLimit: int) Room
+        +delete(id: long) boolean
+    }
     class DuplicateRoomException
     class RoomLimitExceededException
     class JdbcRoomTypeRepository
@@ -381,8 +395,10 @@ classDiagram
     }
     class RoomSummary {
         <<record>>
+        -id: long
         -number: int
         -floorNumber: int
+        -floorDescription: String
         -roomTypeName: String
         -basePrice: BigDecimal
     }
@@ -554,7 +570,6 @@ classDiagram
     LoginController ..> HotelFacade : uses
     MainController ..> HotelFacade : uses
     RoomController ..> HotelFacade : uses
-    RoomListController ..> HotelFacade : uses
     ClientController ..> HotelFacade : uses
     ReservationController ..> HotelFacade : uses
     CheckInOutController ..> HotelFacade : uses
@@ -595,6 +610,8 @@ classDiagram
     JdbcLocationRepository ..> Database : uses
     RoomService ..> RoomTypeTarget : supplies fixed summary data
     RoomController ..> RoomTypeTarget : displays
+    RoomController ..> RoomSummary : displays
+    RoomController ..> Floor : displays
     RoomService ..> RoomRepository : uses
     RoomRepository ..> Room : stores
     JdbcRoomRepository ..|> RoomRepository : implements
@@ -611,6 +628,7 @@ classDiagram
     LocationService ..> LocationNameTakenException : throws
     LocationService ..> LocationInUseException : throws
     RoomService ..> AccessDeniedException : throws
+    RoomService ..> RoomInUseException : throws
     RoomRepository ..> DuplicateRoomException : throws
     RoomRepository ..> RoomLimitExceededException : throws
 
@@ -654,4 +672,4 @@ classDiagram
     note for RoomService "MANAGE_ROOMS allows a manager to save a room.<br/>Constants enforce floors 2 and 3 with 10 rooms each, as stated in the course statement.<br/>Only the repository checks the room count, inside its save transaction.<br/>Q-01 targets 7/10/3 appear in the summary but are not enforced."
 ```
 
-Created by: antonioprmartinho. Updated by: lukassperandio. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.

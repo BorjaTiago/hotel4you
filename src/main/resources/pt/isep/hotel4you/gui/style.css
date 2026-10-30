@@ -1,4 +1,8 @@
-/* Shared style for all screens. Add the line  stylesheets="@style.css"  to a new FXML file to use it. */
+/* Shared style for all screens. ScreenLoader applies this file to every screen. */
+
+.screen {
+    -fx-padding: 30;
+}
 
 .login-box {
     -fx-background-color: white;
@@ -27,6 +31,19 @@
 }
 
 .text-field:focused, .password-field:focused {
+    -fx-border-color: #2f6fed;
+    -fx-background-color: white;
+}
+
+.combo-box {
+    -fx-pref-height: 38px;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-border-color: #d0d7de;
+    -fx-background-color: #f6f8fa;
+}
+
+.combo-box:focused {
     -fx-border-color: #2f6fed;
     -fx-background-color: white;
 }
@@ -77,10 +94,22 @@
     -fx-background-color: #962d22;
 }
 
+.clear-button {
+    -fx-background-color: #5a6672;
+}
+
+.clear-button:hover {
+    -fx-background-color: #434d57;
+}
+
 .message {
     -fx-text-fill: #c0392b;
     -fx-font-size: 12px;
     -fx-min-height: 18px;
+}
+
+.message-success {
+    -fx-text-fill: #2e9e5b;
 }
 
 .main-window {

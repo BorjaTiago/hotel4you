@@ -1,33 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="16" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.RoomController">
 
-    <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
-    </padding>
-
     <Label text="Quartos" styleClass="subtitle"/>
-    <HBox spacing="10" alignment="CENTER_LEFT">
-        <TextField fx:id="numberField" promptText="Número" prefWidth="150"/>
-        <ComboBox fx:id="floorBox" promptText="Piso" prefWidth="120"/>
-        <ComboBox fx:id="roomTypeBox" promptText="Tipo" prefWidth="180"/>
-        <Button text="Registar" onAction="#onSaveRoomClicked" styleClass="primary-button"/>
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Tipo" labelFor="$filterBox"/>
+        <ComboBox fx:id="filterBox" prefWidth="180"/>
     </HBox>
-    <Label fx:id="messageLabel" styleClass="message" wrapText="true"/>
     <Label fx:id="summaryLabel" wrapText="true"/>
-    <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefHeight="360">
+    <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefWidth="500">
         <columns>
-            <TableColumn fx:id="numberColumn" text="Número" prefWidth="160"/>
-            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="130"/>
-            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="190"/>
+            <TableColumn fx:id="numberColumn" text="Número" prefWidth="120"/>
+            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="160"/>
+            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="160"/>
+            <TableColumn fx:id="basePriceColumn" text="Preço base por noite" prefWidth="180"/>
         </columns>
         <placeholder>
-            <Label text="Ainda não existem quartos registados."/>
+            <Label text="Não há quartos."/>
         </placeholder>
     </TableView>
+    <VBox fx:id="formBox" spacing="12">
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Número do quarto" labelFor="$numberField"/>
+                <TextField fx:id="numberField" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Piso" labelFor="$floorBox"/>
+                <ComboBox fx:id="floorBox" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Tipo de quarto" labelFor="$roomTypeBox"/>
+                <ComboBox fx:id="roomTypeBox" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="12">
+            <Button text="Registar quarto" onAction="#onSaveRoomClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Guardar alterações" onAction="#onSaveRoomChangesClicked" styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Remover quarto" onAction="#onRemoveRoomClicked" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </VBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>

@@ -12,6 +12,8 @@ import pt.isep.hotel4you.domain.RoomSummary;
 /** Stores rooms in SQL Server. */
 public class JdbcRoomRepository implements RoomRepository {
 
+    private static final int FOREIGN_KEY_ERROR = 547;
+
     private final Database database;
 
     /**
@@ -47,7 +49,7 @@ public class JdbcRoomRepository implements RoomRepository {
 
     @Override
     public List<RoomSummary> findSummaries() {
-        String sql = "SELECT r.number, f.number AS floor_number, t.name AS room_type_name, "
+        String sql = "SELECT r.id, r.number, f.number AS floor_number, f.description, t.name AS room_type_name, "
                 + "t.base_price FROM rooms r JOIN floors f ON f.id = r.floor_id "
                 + "JOIN room_types t ON t.id = r.room_type_id ORDER BY r.number";
         List<RoomSummary> rooms = new ArrayList<>();
@@ -56,8 +58,10 @@ public class JdbcRoomRepository implements RoomRepository {
                 ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 rooms.add(new RoomSummary(
+                        result.getLong("id"),
                         result.getInt("number"),
                         result.getInt("floor_number"),
+                        result.getString("description"),
                         result.getString("room_type_name"),
                         result.getBigDecimal("base_price")));
             }
@@ -76,6 +80,66 @@ public class JdbcRoomRepository implements RoomRepository {
             return saveInTransaction(connection, room, floorLimit);
         } catch (SQLException e) {
             throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public Room update(Room room, int floorLimit) {
+        if (floorLimit < 1) {
+            throw new IllegalArgumentException("O limite de quartos deve ser positivo.");
+        }
+        try (Connection connection = database.connect()) {
+            return updateInTransaction(connection, room, floorLimit);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    private static Room updateInTransaction(Connection connection, Room room, int floorLimit)
+            throws SQLException {
+        connection.setAutoCommit(false);
+        try {
+            long floorId = findFloorIdForUpdate(connection, room.getFloorNumber());
+            long roomTypeId = findRoomTypeId(connection, room.getRoomTypeName());
+            if (countOtherRoomsOnFloor(connection, floorId, room.getId()) >= floorLimit) {
+                throw new RoomLimitExceededException(floorLimit);
+            }
+            updateRoom(connection, room, floorId, roomTypeId);
+            connection.commit();
+            return room;
+        } catch (SQLException e) {
+            rollback(connection, e);
+            if (isDuplicateKey(e)) {
+                throw new DuplicateRoomException();
+            }
+            throw e;
+        } catch (RuntimeException e) {
+            rollback(connection, e);
+            throw e;
+        }
+    }
+
+    private static int countOtherRoomsOnFloor(Connection connection, long floorId, long roomId)
+            throws SQLException {
+        String sql = "SELECT COUNT(*) FROM rooms WHERE floor_id = ? AND id <> ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, floorId);
+            statement.setLong(2, roomId);
+            try (ResultSet result = statement.executeQuery()) {
+                result.next();
+                return result.getInt(1);
+            }
+        }
+    }
+
+    private static void updateRoom(
+            Connection connection, Room room, long floorId, long roomTypeId) throws SQLException {
+        String sql = "UPDATE rooms SET number = ?, floor_id = ?, room_type_id = ? WHERE id = ?";
+        try (PreparedStatement statement = prepareInsert(connection, sql, room, floorId, roomTypeId)) {
+            statement.setLong(4, room.getId());
+            if (statement.executeUpdate() == 0) {
+                throw new IllegalArgumentException("O quarto indicado não existe.");
+            }
         }
     }
 
@@ -161,6 +225,22 @@ public class JdbcRoomRepository implements RoomRepository {
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setLong(1, value);
         return statement;
+    }
+
+    @Override
+    public boolean delete(long id) {
+        try (Connection connection = database.connect();
+                PreparedStatement statement = prepareLong(connection, "DELETE FROM rooms WHERE id = ?", id)) {
+            if (statement.executeUpdate() == 0) {
+                throw new IllegalArgumentException("O quarto indicado não existe.");
+            }
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == FOREIGN_KEY_ERROR) {
+                return false;
+            }
+            throw persistenceError(e);
+        }
     }
 
     private static PreparedStatement prepareInsert(

@@ -96,8 +96,40 @@ class HotelFacadeTest {
         User ana = new Receptionist(2L, "Ana", "ana", "hash");
 
         assertTrue(facade.canUse(ana, Permission.LIST_ROOMS));
-        assertEquals(List.of(new RoomSummary(301, 3, "familiar", new BigDecimal("180.00"))),
+        assertEquals(List.of(new RoomSummary(1L, 301, 3, "Quartos", "familiar", new BigDecimal("180.00"))),
                 facade.listRoomSummaries("familiar", ana));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-5")
+    void onEditRoom_changeRoomThroughRoomService_whenManagerEdits() {
+        roomRepository.addFloor(2);
+        roomRepository.addFloor(3);
+        roomRepository.addRoomType("duplo");
+        roomRepository.addRoomType("familiar");
+        Room saved = roomRepository.save(new Room(null, 202, 2, "duplo"), 10);
+        User rui = new Manager(1L, "Rui", "rui", "hash");
+
+        Room edited = facade.editRoom(new Room(saved.getId(), 305, 3, "familiar"), rui);
+
+        assertEquals(saved.getId(), edited.getId());
+        assertEquals(305, edited.getNumber());
+        assertEquals(3, edited.getFloorNumber());
+        assertEquals("familiar", edited.getRoomTypeName());
+        assertEquals(305, roomRepository.findAll().getFirst().getNumber());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-10")
+    void onRemoveRoom_deleteRoomThroughRoomService_whenManagerRemoves() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        Room saved = roomRepository.save(new Room(null, 202, 2, "duplo"), 10);
+        User rui = new Manager(1L, "Rui", "rui", "hash");
+
+        facade.removeRoom(saved.getId(), rui);
+
+        assertTrue(roomRepository.findAll().isEmpty());
     }
 
     @Test

@@ -32,4 +32,6 @@ Responsável proposto: Lukas Sperandio (a equipa decide).
 - No topo: o nome e o papel do utilizador ("Olá, Ana (Rececionista)").
 - Sem sessão: abre o ecrã de login, nunca a janela principal.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Nota: por decisão de Tiago Borja (2026-10-30), a "Lista de quartos" (`room-list.fxml`, `RoomListController`) foi fundida com o ecrã de quartos (`rooms.fxml`, `RoomController`). O ecrã único chama-se "Quartos". O botão "Quartos" aparece com `LIST_ROOMS` (rececionista e gestor). O formulário de registo e o resumo só aparecem com `MANAGE_ROOMS`.
+
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.

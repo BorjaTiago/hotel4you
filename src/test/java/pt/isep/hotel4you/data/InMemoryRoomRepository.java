@@ -19,6 +19,7 @@ public class InMemoryRoomRepository implements RoomRepository {
     private final Set<String> roomTypes = new HashSet<>();
     private final List<Room> rooms = new ArrayList<>();
     private final Map<String, BigDecimal> basePrices = new HashMap<>();
+    private final Set<Long> inUse = new HashSet<>();
 
     /** Adds a floor to the test catalogue. */
     public synchronized void addFloor(int floorNumber) {
@@ -60,8 +61,8 @@ public class InMemoryRoomRepository implements RoomRepository {
     public synchronized List<RoomSummary> findSummaries() {
         return rooms.stream()
                 .sorted(Comparator.comparingInt(Room::getNumber))
-                .map(room -> new RoomSummary(room.getNumber(), room.getFloorNumber(), room.getRoomTypeName(),
-                        basePrices.get(room.getRoomTypeName().toLowerCase(Locale.ROOT))))
+                .map(room -> new RoomSummary(room.getId(), room.getNumber(), room.getFloorNumber(), "Quartos",
+                        room.getRoomTypeName(), basePrices.get(room.getRoomTypeName().toLowerCase(Locale.ROOT))))
                 .toList();
     }
 
@@ -83,5 +84,53 @@ public class InMemoryRoomRepository implements RoomRepository {
                 room.getFloorNumber(), room.getRoomTypeName());
         rooms.add(saved);
         return saved;
+    }
+
+    @Override
+    public synchronized Room update(Room room, int floorLimit) {
+        if (!floorExists(room.getFloorNumber())) {
+            throw new IllegalArgumentException("O piso indicado não existe.");
+        }
+        if (!roomTypeExists(room.getRoomTypeName())) {
+            throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
+        }
+        long others = rooms.stream().filter(other -> other.getFloorNumber() == room.getFloorNumber()
+                && !other.getId().equals(room.getId())).count();
+        if (others >= floorLimit) {
+            throw new RoomLimitExceededException(floorLimit);
+        }
+        int index = -1;
+        for (int i = 0; i < rooms.size(); i++) {
+            if (rooms.get(i).getId().equals(room.getId())) {
+                index = i;
+            }
+        }
+        if (index < 0) {
+            throw new IllegalArgumentException("O quarto indicado não existe.");
+        }
+        boolean duplicate = rooms.stream().anyMatch(other -> other.getNumber() == room.getNumber()
+                && !other.getId().equals(room.getId()));
+        if (duplicate) {
+            throw new DuplicateRoomException();
+        }
+        Room saved = new Room(room.getId(), room.getNumber(), room.getFloorNumber(), room.getRoomTypeName());
+        rooms.set(index, saved);
+        return saved;
+    }
+
+    @Override
+    public synchronized boolean delete(long id) {
+        if (inUse.contains(id)) {
+            return false;
+        }
+        if (!rooms.removeIf(room -> room.getId() == id)) {
+            throw new IllegalArgumentException("O quarto indicado não existe.");
+        }
+        return true;
+    }
+
+    /** Marks a room as used by other data, so that delete refuses it. */
+    public synchronized void markInUse(long id) {
+        inUse.add(id);
     }
 }

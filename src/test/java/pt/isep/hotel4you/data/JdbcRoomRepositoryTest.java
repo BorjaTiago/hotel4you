@@ -23,6 +23,7 @@ class JdbcRoomRepositoryTest {
     private final RecordingDatabase database = new RecordingDatabase();
     private final JdbcRoomRepository repository = new JdbcRoomRepository(database);
     private final Room room = new Room(null, 202, 2, "duplo");
+    private final Room existing = new Room(7L, 202, 2, "duplo");
 
     @Test
     @Tag("H4Y-25-AC-1")
@@ -119,6 +120,122 @@ class JdbcRoomRepositoryTest {
         assertEquals(1, database.closedResults);
     }
 
+    @Test
+    @Tag("H4Y-25-AC-5")
+    void onUpdate_bindNumbersWithJdbcTypes_whenRoomIsValid() {
+        repository.update(existing, 10);
+
+        assertEquals(List.of(
+                new Binding("setInt", 1, 2),
+                new Binding("setString", 1, "duplo"),
+                new Binding("setLong", 1, 1L),
+                new Binding("setLong", 2, 7L),
+                new Binding("setInt", 1, 202),
+                new Binding("setLong", 2, 1L),
+                new Binding("setLong", 3, 2L),
+                new Binding("setLong", 4, 7L)), database.bindings);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-5")
+    void onUpdate_commitAndClose_whenRoomIsValid() {
+        Room saved = repository.update(existing, 10);
+
+        assertEquals(7L, saved.getId());
+        assertEquals(202, saved.getNumber());
+        assertEquals(2, saved.getFloorNumber());
+        assertEquals("duplo", saved.getRoomTypeName());
+        assertEquals(List.of("begin", "lock floor", "find type", "count", "update", "commit", "close"),
+                database.events);
+        assertEquals(4, database.closedStatements);
+        assertEquals(3, database.closedResults);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-6")
+    void onUpdate_throwDuplicateAndRollback_whenSqlRejectsDuplicate() {
+        database.updateFailure = new SQLException("Duplicate", "23000", 2601);
+
+        assertThrows(DuplicateRoomException.class, () -> repository.update(existing, 10));
+
+        assertTrue(database.events.contains("rollback"));
+        assertFalse(database.events.contains("commit"));
+        assertEquals("close", database.events.getLast());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-7")
+    void onUpdate_rollbackWithoutUpdate_whenFloorIsFull() {
+        database.roomCount = 10;
+
+        assertThrows(RoomLimitExceededException.class, () -> repository.update(existing, 10));
+
+        assertFalse(database.events.contains("update"));
+        assertFalse(database.events.contains("commit"));
+        assertTrue(database.events.contains("rollback"));
+        assertEquals("close", database.events.getLast());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-9")
+    void onUpdate_rollbackAndThrow_whenNoRowIsUpdated() {
+        database.updatedRows = 0;
+
+        assertThrows(IllegalArgumentException.class, () -> repository.update(existing, 10));
+
+        assertTrue(database.events.contains("update"));
+        assertTrue(database.events.contains("rollback"));
+        assertFalse(database.events.contains("commit"));
+        assertEquals("close", database.events.getLast());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-10")
+    void onDelete_bindIdAndClose_whenRoomExists() {
+        assertTrue(repository.delete(7L));
+
+        assertEquals(List.of(new Binding("setLong", 1, 7L)), database.bindings);
+        assertEquals(List.of("delete", "close"), database.events);
+        assertEquals(1, database.closedStatements);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-11")
+    void onDelete_returnFalse_whenForeignKeyRefuses() {
+        database.deleteFailure = new SQLException("fk", "23000", 547);
+
+        assertFalse(repository.delete(7L));
+
+        assertEquals("close", database.events.getLast());
+        assertEquals(1, database.closedStatements);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-13")
+    void onDelete_throw_whenNoRowIsDeleted() {
+        database.deletedRows = 0;
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> repository.delete(7L));
+
+        assertEquals("O quarto indicado não existe.", error.getMessage());
+        assertEquals("close", database.events.getLast());
+        assertEquals(1, database.closedStatements);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-10")
+    void onDelete_keepSqlCause_whenOtherSqlError() {
+        database.deleteFailure = new SQLException("down", "08001", 100);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> repository.delete(7L));
+
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
+        assertSame(database.deleteFailure, error.getCause());
+        assertEquals("close", database.events.getLast());
+    }
+
     private record Binding(String method, int position, Object value) { }
 
     /** Records JDBC calls and provides one row per successful query. */
@@ -130,6 +247,10 @@ class JdbcRoomRepositoryTest {
         private int closedResults;
         private boolean identifierReturned = true;
         private boolean floorFound = true;
+        private int updatedRows = 1;
+        private int deletedRows = 1;
+        private SQLException deleteFailure;
+        private SQLException updateFailure;
         private SQLException insertFailure;
         private SQLException rollbackFailure;
 
@@ -189,6 +310,21 @@ class JdbcRoomRepositoryTest {
                                 throw insertFailure;
                             }
                             return result(42, identifierReturned);
+                        }
+                        if (method.getName().equals("executeUpdate")) {
+                            if (sql.startsWith("DELETE FROM rooms WHERE id = ?")) {
+                                events.add("delete");
+                                if (deleteFailure != null) {
+                                    throw deleteFailure;
+                                }
+                                return deletedRows;
+                            }
+                            assertTrue(sql.startsWith("UPDATE rooms SET number = ?, floor_id = ?, room_type_id = ? WHERE id = ?"));
+                            events.add("update");
+                            if (updateFailure != null) {
+                                throw updateFailure;
+                            }
+                            return updatedRows;
                         }
                         if (method.getName().equals("close")) {
                             closedStatements++;

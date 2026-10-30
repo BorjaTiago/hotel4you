@@ -291,9 +291,9 @@ class RoomServiceTest {
         List<RoomSummary> rooms = roomService.listRoomSummaries(null, receptionist());
 
         assertEquals(List.of(
-                new RoomSummary(201, 2, "individual", new BigDecimal("80.00")),
-                new RoomSummary(202, 2, "duplo", new BigDecimal("120.00")),
-                new RoomSummary(301, 3, "familiar", new BigDecimal("180.00"))), rooms);
+                new RoomSummary(3L, 201, 2, "Quartos", "individual", new BigDecimal("80.00")),
+                new RoomSummary(1L, 202, 2, "Quartos", "duplo", new BigDecimal("120.00")),
+                new RoomSummary(2L, 301, 3, "Quartos", "familiar", new BigDecimal("180.00"))), rooms);
     }
 
     @Test
@@ -373,6 +373,161 @@ class RoomServiceTest {
         RestaurantStaff joao = new RestaurantStaff(3L, "Joao Lima", "joao", HASH);
 
         assertThrows(AccessDeniedException.class, () -> roomService.listRoomSummaries(null, joao));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-5")
+    void onEditRoom_changeNumberFloorAndType_whenDataIsValid() {
+        Room saved = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        Room edited = roomService.editRoom(new Room(saved.getId(), 305, 3, "familiar"), manager());
+
+        assertEquals(saved.getId(), edited.getId());
+        assertEquals(305, edited.getNumber());
+        assertEquals(3, edited.getFloorNumber());
+        assertEquals("familiar", edited.getRoomTypeName());
+        List<Room> listed = roomService.listRooms(manager());
+        assertEquals(1, listed.size());
+        assertRoom(listed.getFirst(), saved.getId(), 305, 3, "familiar");
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-5")
+    void onEditRoom_keepOwnNumber_whenOnlyTypeChanges() {
+        Room saved = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        Room edited = roomService.editRoom(new Room(saved.getId(), 202, 2, "familiar"), manager());
+
+        assertEquals(202, edited.getNumber());
+        assertEquals("familiar", roomService.listRooms(manager()).getFirst().getRoomTypeName());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-6")
+    void onEditRoom_throwDuplicate_whenNumberBelongsToAnotherRoom() {
+        Room first = repository.save(room(201, 2, "duplo"), FLOOR_LIMIT);
+        repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        assertThrows(DuplicateRoomException.class,
+                () -> roomService.editRoom(new Room(first.getId(), 202, 2, "duplo"), manager()));
+
+        assertRoom(repository.findAll().getFirst(), first.getId(), 201, 2, "duplo");
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-7")
+    void onEditRoom_throwLimitExceeded_whenTargetFloorIsFull() {
+        seedRooms(3, 301, FLOOR_LIMIT);
+        Room moving = repository.save(room(201, 2, "duplo"), FLOOR_LIMIT);
+
+        assertThrows(RoomLimitExceededException.class,
+                () -> roomService.editRoom(new Room(moving.getId(), 201, 3, "duplo"), manager()));
+
+        Room stored = repository.findAll().stream()
+                .filter(room -> room.getId().equals(moving.getId())).findFirst().orElseThrow();
+        assertRoom(stored, moving.getId(), 201, 2, "duplo");
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-7")
+    void onEditRoom_saveChange_whenRoomStaysOnFullFloor() {
+        seedRooms(2, 201, FLOOR_LIMIT);
+        Room stays = repository.findAll().getFirst();
+
+        Room edited = roomService.editRoom(new Room(stays.getId(), 220, 2, "familiar"), manager());
+
+        assertEquals(220, edited.getNumber());
+        assertEquals(FLOOR_LIMIT, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-7")
+    void onEditRoom_throw_whenFloorHasNoRooms() {
+        Room saved = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> roomService.editRoom(new Room(saved.getId(), 101, 1, "duplo"), manager()));
+
+        assertEquals("Só os pisos 2 e 3 têm quartos.", error.getMessage());
+        assertRoom(repository.findAll().getFirst(), saved.getId(), 202, 2, "duplo");
+    }
+
+    @ParameterizedTest
+    @MethodSource("deniedActors")
+    @Tag("H4Y-25-AC-8")
+    void onEditRoom_throwAccessDenied_whenActorIsNotManager(User actor) {
+        Room saved = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        assertThrows(AccessDeniedException.class,
+                () -> roomService.editRoom(new Room(saved.getId(), 203, 2, "duplo"), actor));
+
+        assertRoom(repository.findAll().getFirst(), saved.getId(), 202, 2, "duplo");
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-9")
+    void onEditRoom_throw_whenRoomIdIsUnknownOrNull() {
+        repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> roomService.editRoom(new Room(99L, 203, 2, "duplo"), manager()));
+        IllegalArgumentException nullId = assertThrows(IllegalArgumentException.class,
+                () -> roomService.editRoom(room(203, 2, "duplo"), manager()));
+        assertEquals("Escolha um quarto na tabela.", nullId.getMessage());
+        assertThrows(IllegalArgumentException.class, () -> roomService.editRoom(null, manager()));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-10")
+    void onRemoveRoom_deleteRoom_whenNoAssociations() {
+        Room first = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+        Room second = repository.save(room(203, 2, "duplo"), FLOOR_LIMIT);
+
+        roomService.removeRoom(first.getId(), manager());
+
+        List<Room> rooms = roomService.listRooms(manager());
+        assertEquals(1, rooms.size());
+        assertEquals(second.getId(), rooms.getFirst().getId());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-11")
+    void onRemoveRoom_throwInUse_whenRoomHasAssociations() {
+        Room saved = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+        repository.markInUse(saved.getId());
+
+        RoomInUseException error = assertThrows(RoomInUseException.class,
+                () -> roomService.removeRoom(saved.getId(), manager()));
+
+        assertEquals("O quarto tem associações e não pode ser removido.", error.getMessage());
+        assertEquals(1, repository.findAll().size());
+    }
+
+    @ParameterizedTest
+    @MethodSource("deniedActors")
+    @Tag("H4Y-25-AC-12")
+    void onRemoveRoom_throwAccessDenied_whenActorIsNotManager(User actor) {
+        Room saved = repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+
+        assertThrows(AccessDeniedException.class, () -> roomService.removeRoom(saved.getId(), actor));
+
+        assertEquals(1, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-13")
+    void onRemoveRoom_throw_whenRoomIdIsUnknown() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> roomService.removeRoom(99L, manager()));
+
+        assertEquals("O quarto indicado não existe.", error.getMessage());
+    }
+
+    private static void assertRoom(Room room, Long id, int number, int floor, String type) {
+        assertEquals(id, room.getId());
+        assertEquals(number, room.getNumber());
+        assertEquals(floor, room.getFloorNumber());
+        assertEquals(type, room.getRoomTypeName());
     }
 
     private void seedPricedRooms() {

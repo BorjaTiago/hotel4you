@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox spacing="30" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+<HBox styleClass="screen" spacing="30" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.StaffController">
-
-    <padding>
-        <Insets top="30" right="30" bottom="30" left="30"/>
-    </padding>
 
     <!-- Create staff form -->
     <VBox spacing="12" prefWidth="320" minWidth="280">

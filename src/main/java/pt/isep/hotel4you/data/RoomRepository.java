@@ -32,4 +32,27 @@ public interface RoomRepository {
      * @throws RoomLimitExceededException if the floor is full
      */
     Room save(Room room, int floorLimit);
+
+    /**
+     * Updates a room only while the other rooms on the target floor are below the limit. The
+     * check and update must be atomic. The room itself does not count against the limit.
+     *
+     * @param room the room to update, with its identifier
+     * @param floorLimit the maximum number of rooms on the floor
+     * @return the saved room
+     * @throws IllegalArgumentException if the room, the floor or the room type does not exist
+     * @throws DuplicateRoomException if the room number is already in use
+     * @throws RoomLimitExceededException if the floor is full
+     */
+    Room update(Room room, int floorLimit);
+
+    /**
+     * Deletes a room.
+     *
+     * @param id the room id
+     * @return true if the room was deleted, false if other data still uses it
+     * @throws IllegalArgumentException if the room does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    boolean delete(long id);
 }

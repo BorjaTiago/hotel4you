@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="12" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.PriceController">
-
-    <padding>
-        <Insets top="30" right="30" bottom="30" left="30"/>
-    </padding>
 
     <Label fx:id="typeLabel" text="Preços base" styleClass="subtitle"/>
     <TableView fx:id="typeTable" VBox.vgrow="ALWAYS" prefWidth="500">

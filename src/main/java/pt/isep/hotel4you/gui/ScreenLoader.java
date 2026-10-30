@@ -7,7 +7,7 @@ import pt.isep.hotel4you.service.HotelFacade;
 
 /**
  * Opens a screen from an FXML file. Every controller gets the HotelFacade in its constructor.
- * All screens use this class.
+ * All screens use this class. It also adds {@code style.css} to each screen.
  *
  * <p>Example: {@code Parent root = new ScreenLoader(facade).load("login.fxml");}
  * The FXML file must be in {@code src/main/resources/pt/isep/hotel4you/gui/}.
@@ -37,7 +37,9 @@ public class ScreenLoader {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlName));
         loader.setControllerFactory(type -> createController(type));
         try {
-            return loader.load();
+            Parent root = loader.load();
+            root.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+            return root;
         } catch (IOException e) {
             throw new IllegalStateException("Não foi possível abrir o ecrã.");
         }

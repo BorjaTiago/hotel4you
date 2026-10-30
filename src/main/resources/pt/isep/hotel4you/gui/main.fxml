@@ -3,8 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefWidth="900" prefHeight="600" styleClass="main-window"
-            stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+<BorderPane prefWidth="900" prefHeight="600" styleClass="main-window" xmlns:fx="http://javafx.com/fxml"
             fx:controller="pt.isep.hotel4you.gui.MainController">
 
     <!-- Top: welcome text and logout -->
@@ -25,8 +24,6 @@
             <Button fx:id="roomsButton" text="Quartos" onAction="#onRoomsClicked"
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
-                    maxWidth="Infinity" visible="false"/>
-            <Button fx:id="roomListButton" text="Lista de quartos" onAction="#onRoomListClicked"
                     maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
