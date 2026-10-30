@@ -39,7 +39,7 @@ class RoomServiceTest {
         for (int floor : List.of(-1, 0, 1, 2, 3, 5)) {
             repository.addFloor(floor);
         }
-        for (String roomType : List.of("single", "double", "family")) {
+        for (String roomType : List.of("individual", "double", "family")) {
             repository.addRoomType(roomType);
         }
         roomService = new RoomService(repository);
@@ -60,7 +60,7 @@ class RoomServiceTest {
     @Tag("H4Y-25-AC-2")
     void onSaveRoom_registerFullDistribution_whenCapacityAllows() {
         for (int i = 0; i < 7; i++) {
-            roomService.saveRoom(room(201 + i, 2, "single"), manager());
+            roomService.saveRoom(room(201 + i, 2, "individual"), manager());
         }
         for (int i = 0; i < 3; i++) {
             roomService.saveRoom(room(208 + i, 2, "double"), manager());
@@ -76,7 +76,7 @@ class RoomServiceTest {
         assertEquals(20, rooms.size());
         assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 2).count());
         assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 3).count());
-        assertEquals(7, rooms.stream().filter(room -> room.roomTypeName().equals("single")).count());
+        assertEquals(7, rooms.stream().filter(room -> room.roomTypeName().equals("individual")).count());
         assertEquals(10, rooms.stream().filter(room -> room.roomTypeName().equals("double")).count());
         assertEquals(3, rooms.stream().filter(room -> room.roomTypeName().equals("family")).count());
     }
@@ -86,7 +86,7 @@ class RoomServiceTest {
     @Tag("H4Y-25-AC-3")
     void onSaveRoom_throw_whenFloorIsNotForRooms(int floorNumber) {
         assertThrows(IllegalArgumentException.class,
-                () -> roomService.saveRoom(room(101, floorNumber, "single"), manager()));
+                () -> roomService.saveRoom(room(101, floorNumber, "individual"), manager()));
 
         assertEquals(0, repository.findAll().size());
     }
@@ -205,7 +205,7 @@ class RoomServiceTest {
     @Test
     @Tag("H4Y-25-AC-1")
     void onListRoomTypes_returnCatalogue_whenActorIsManager() {
-        assertEquals(List.of("double", "family", "single"), roomService.listRoomTypes(manager()));
+        assertEquals(List.of("double", "family", "individual"), roomService.listRoomTypes(manager()));
     }
 
     @ParameterizedTest
