@@ -15,7 +15,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.domain.RoomType;
@@ -45,13 +47,15 @@ class JdbcRoomTypeRepositoryTest {
     }
 
     /**
-     * A fake database. Its query returns one row with a NULL price. Its update returns the given
-     * number of changed rows, so 0 means no row changed.
+     * A fake database. Its query returns one row that answers by column label, and an unknown label
+     * fails as in a real driver. Its update returns the given number of changed rows, so 0 means no
+     * row changed.
      */
     private static class FakeDatabase extends Database {
 
         private final List<String> calls = new ArrayList<>();
         private final int updatedRows;
+        private BigDecimal price;
 
         FakeDatabase(int updatedRows) {
             super(null);
@@ -84,6 +88,11 @@ class JdbcRoomTypeRepositoryTest {
         }
 
         private ResultSet resultSet() {
+            Map<String, Object> row = new HashMap<>();
+            row.put("id", 7L);
+            row.put("name", "duplo");
+            row.put("capacity", 2);
+            row.put("base_price", price);
             int[] rowsLeft = {1};
             return (ResultSet) Proxy.newProxyInstance(
                     ResultSet.class.getClassLoader(),
@@ -92,15 +101,23 @@ class JdbcRoomTypeRepositoryTest {
                         switch (method.getName()) {
                             case "next":
                                 return rowsLeft[0]-- > 0;
+                            case "getLong":
                             case "getString":
-                                return "duplo";
+                            case "getInt":
                             case "getBigDecimal":
-                                return null;
+                                return column(row, (String) args[0]);
                             default:
                                 return method.getReturnType() == boolean.class
                                         ? false : defaultValue(method);
                         }
                     });
+        }
+
+        private static Object column(Map<String, Object> row, String label) throws SQLException {
+            if (!row.containsKey(label)) {
+                throw new SQLException("Invalid column name " + label);
+            }
+            return row.get(label);
         }
 
         private static Object defaultValue(Method method) {
@@ -147,6 +164,19 @@ class JdbcRoomTypeRepositoryTest {
         assertEquals(1, types.size());
         assertEquals("duplo", types.get(0).getName());
         assertNull(types.get(0).getBasePrice());
+    }
+
+    @Test
+    @Tag("H4Y-26-AC-2")
+    void onFindAll_returnPrice_whenPriceIsSet() {
+        FakeDatabase database = new FakeDatabase(0);
+        database.price = new BigDecimal("80.00");
+
+        RoomType type = new JdbcRoomTypeRepository(database).findAll().get(0);
+
+        assertEquals(7L, type.getId());
+        assertEquals(2, type.getCapacity());
+        assertEquals(new BigDecimal("80.00"), type.getBasePrice());
     }
 
     @Test
