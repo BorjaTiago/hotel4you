@@ -2,6 +2,7 @@ package pt.isep.hotel4you.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
@@ -9,6 +10,7 @@ import pt.isep.hotel4you.data.RoomRepository;
 import pt.isep.hotel4you.data.RoomTypeRepository;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
@@ -113,6 +115,28 @@ public class RoomService {
             throw new AccessDeniedException("Só o gestor pode consultar os quartos.");
         }
         return roomRepository.findAll();
+    }
+
+    /**
+     * Lists the rooms with type, floor and base price. Receptionists and managers may see the list.
+     *
+     * @param roomTypeName the room type to show, or null or blank to show all rooms
+     * @param actor the logged-in user
+     * @return the rooms ordered by number, or an empty list if no room matches
+     * @throws AccessDeniedException if the actor is not logged in or may not see the list
+     */
+    public List<RoomSummary> listRoomSummaries(String roomTypeName, User actor) {
+        if (!Permission.LIST_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Não tem permissão para ver a lista de quartos.");
+        }
+        List<RoomSummary> rooms = roomRepository.findSummaries();
+        if (roomTypeName == null || roomTypeName.isBlank()) {
+            return rooms;
+        }
+        String wantedType = roomTypeName.trim().toLowerCase(Locale.ROOT);
+        return rooms.stream()
+                .filter(room -> room.roomTypeName().toLowerCase(Locale.ROOT).equals(wantedType))
+                .toList();
     }
 
     /**
