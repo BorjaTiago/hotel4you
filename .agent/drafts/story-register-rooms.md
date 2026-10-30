@@ -118,7 +118,7 @@ Para que o hotel tenha os 20 quartos disponíveis para reserva.
 ## Notas
 Q-01 (decisão da equipa, não confirmada pelo professor): 20 quartos, 10 por piso, divisão 7/10/3 para o hotel inteiro. Quarto familiar: 3 ou 4 pessoas.
 Dependências (auditoria 2026-10-16): depende da tarefa T5 (pisos e tipos de quarto). Não depende de story-model-hotel-floors.
-Decisão do utilizador (2026-10-30): o gestor pode editar e remover quartos. Editar número, piso e tipo, e remover, não estão no enunciado. AC-5 a AC-13 ainda não estão no Jira.
+Decisão do utilizador (2026-10-30): o gestor pode editar e remover quartos. Editar número, piso e tipo, e remover, não estão no enunciado.
 Regra de associações: Q-36.
 
 points_suggested: 3
