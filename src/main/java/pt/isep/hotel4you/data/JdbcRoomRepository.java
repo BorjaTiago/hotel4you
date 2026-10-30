@@ -120,7 +120,7 @@ public class JdbcRoomRepository implements RoomRepository {
 
     private boolean exists(String sql, int value) {
         try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, value);
+                PreparedStatement statement = prepareInt(connection, sql, value);
                 ResultSet result = statement.executeQuery()) {
             return result.next();
         } catch (SQLException e) {
@@ -131,7 +131,7 @@ public class JdbcRoomRepository implements RoomRepository {
     private static long findFloorIdForUpdate(Connection connection, int floorNumber)
             throws SQLException {
         String sql = "SELECT id FROM floors WITH (UPDLOCK, HOLDLOCK) WHERE number = ?";
-        try (PreparedStatement statement = Database.prepare(connection, sql, floorNumber);
+        try (PreparedStatement statement = prepareInt(connection, sql, floorNumber);
                 ResultSet result = statement.executeQuery()) {
             if (!result.next()) {
                 throw new IllegalArgumentException("O piso indicado não existe.");
@@ -153,7 +153,7 @@ public class JdbcRoomRepository implements RoomRepository {
     }
 
     private static int countByFloorId(Connection connection, long floorId) throws SQLException {
-        try (PreparedStatement statement = Database.prepare(connection,
+        try (PreparedStatement statement = prepareLong(connection,
                 "SELECT COUNT(*) FROM rooms WHERE floor_id = ?", floorId);
                 ResultSet result = statement.executeQuery()) {
             result.next();
@@ -165,14 +165,37 @@ public class JdbcRoomRepository implements RoomRepository {
             Connection connection, Room room, long floorId, long roomTypeId) throws SQLException {
         String sql = "INSERT INTO rooms (number, floor_id, room_type_id) "
                 + "OUTPUT INSERTED.id VALUES (?, ?, ?)";
-        try (PreparedStatement statement = Database.prepare(connection, sql,
-                room.getNumber(), floorId, roomTypeId);
+        try (PreparedStatement statement = prepareInsert(connection, sql, room, floorId, roomTypeId);
                 ResultSet keys = statement.executeQuery()) {
             if (!keys.next()) {
                 throw new SQLException("SQL Server did not return the room identifier.");
             }
             return keys.getLong(1);
         }
+    }
+
+    private static PreparedStatement prepareInt(Connection connection, String sql, int value)
+            throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setInt(1, value);
+        return statement;
+    }
+
+    private static PreparedStatement prepareLong(Connection connection, String sql, long value)
+            throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setLong(1, value);
+        return statement;
+    }
+
+    private static PreparedStatement prepareInsert(
+            Connection connection, String sql, Room room, long floorId, long roomTypeId)
+            throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(sql);
+        statement.setInt(1, room.getNumber());
+        statement.setLong(2, floorId);
+        statement.setLong(3, roomTypeId);
+        return statement;
     }
 
     private static boolean isDuplicateKey(SQLException error) {
