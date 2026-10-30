@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="12" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.PriceController">
+
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+
+    <Label text="Preços base" styleClass="subtitle" labelFor="$typeTable"/>
+    <TableView fx:id="typeTable" VBox.vgrow="ALWAYS" prefWidth="500">
+        <columns>
+            <TableColumn fx:id="typeColumn" text="Tipo" prefWidth="160"/>
+            <TableColumn fx:id="capacityColumn" text="Capacidade" prefWidth="120"/>
+            <TableColumn fx:id="priceColumn" text="Preço base por noite (€)" prefWidth="200"/>
+        </columns>
+        <placeholder>
+            <Label text="Não há tipos de quarto."/>
+        </placeholder>
+    </TableView>
+
+    <Label text="Novo preço (€)" labelFor="$priceField"/>
+    <TextField fx:id="priceField" maxWidth="Infinity"/>
+    <Button text="Guardar" onAction="#onSavePriceClicked" maxWidth="Infinity"
+            styleClass="primary-button"/>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
