@@ -13,6 +13,8 @@ public class RoomService {
     /** The biggest price that fits in DECIMAL(8,2). */
     private static final BigDecimal MAX_PRICE = new BigDecimal("999999.99");
     private static final int PRICE_SCALE = 2;
+    /** Plain ASCII digits only. BigDecimal alone also accepts exponents and non-ASCII digits. */
+    private static final String PRICE_TEXT = "-?\\d+(\\.\\d+)?";
 
     private final RoomTypeRepository roomTypeRepository;
 
@@ -48,14 +50,14 @@ public class RoomService {
      * @throws IllegalArgumentException if the text is null, blank or not a number
      */
     public BigDecimal parsePrice(String text) {
-        if (text == null || text.isBlank()) {
+        if (text == null) {
             throw new IllegalArgumentException("O preço tem de ser um número.");
         }
-        try {
-            return new BigDecimal(text.trim().replace(',', '.'));
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("O preço tem de ser um número.", e);
+        String number = text.trim().replace(',', '.');
+        if (!number.matches(PRICE_TEXT)) {
+            throw new IllegalArgumentException("O preço tem de ser um número.");
         }
+        return new BigDecimal(number);
     }
 
     /**
