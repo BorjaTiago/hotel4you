@@ -8,7 +8,7 @@ This folder holds the Hotel4You UML diagrams and supporting documents.
 - [class-diagram.md](class-diagram.md): UML class diagram with types, visibility and multiplicities.
 - [classes.md](classes.md): all classes by layer, with attributes, methods and requirements.
 - [traceability.md](traceability.md): requirements to classes.
-- [use-cases.md](use-cases.md): use-case diagrams for all 50 use cases, by area, with include and extend relations (H4Y-7).
+- [use-cases.md](use-cases.md): use-case diagrams for all 53 use cases, by area, with include and extend relations (H4Y-7).
 - [use-case-catalog.md](use-case-catalog.md): short descriptions, actors, permissions and requirement links.
 - [component-diagram.md](component-diagram.md): components, interfaces and external systems (H4Y-9).
 - [component-guide.md](component-guide.md): guide to defend the component diagram (H4Y-9).

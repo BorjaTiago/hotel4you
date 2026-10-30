@@ -45,13 +45,15 @@ Phase: "1st" = 1st delivery, "final" = final delivery (Q-06, Q-27). "backlog" = 
 | UC-37 | Add paid services to reservation | Receptionist | The receptionist adds or removes food, cultural events, private pools, spa or conference rooms. Extends UC-03. | Until check-in only (Q-40). These services give no card access (Q-20). | backlog | RF-09; Q-20, Q-40 |
 | UC-38 | Include restaurant and pool in reservation | Receptionist | The receptionist adds the restaurant or the pool to the reservation, so that the card opens them. Extends UC-03. | Until check-in only (Q-40). Only zones with both card flags (Q-45). | final | RF-11, RF-18; Q-42, Q-45 |
 | UC-04 | Cancel reservation | Receptionist | The receptionist cancels a reservation and the system keeps it in history. | Receptionist only. Refused after check-in. | 1st | RF-12; Q-05, Q-40 |
-| UC-05 | Delete reservation | Manager | The manager deletes a reservation for good, before check-in. | Manager only. Refused after check-in and for other roles. | 1st | RF-22; Q-05 |
+| UC-05 | Delete reservation | Manager | The manager deletes a reservation for good, before check-in. | Manager only. Refused after check-in and for other roles. Includes UC-51. | 1st | RF-22; Q-05 |
+| UC-51 | Check reservation has check-in | Via UC-05 | The system checks if the reservation has a check-in. Included in UC-05. | Automatic. With a check-in, the system refuses the delete. | 1st | RF-22; Q-05 |
 
 ## 4. Stay and guest services
 
 | ID | Use case | Actor(s) | Short description | Permission rules | Phase | Requirements and decisions |
 |---|---|---|---|---|---|---|
-| UC-06 | Check-in | Receptionist | The receptionist checks in the client of a reservation. | Receptionist only. A reservation must exist. | 1st | RF-13 |
+| UC-06 | Check-in | Receptionist | The receptionist checks in the client of a reservation. | Receptionist only. A reservation must exist. Includes UC-52. | 1st | RF-13 |
+| UC-52 | Check client has reservation | Via UC-06 | The system checks if the client has a reservation. Included in UC-06. | Automatic. Without a reservation, the system refuses the check-in. | 1st | RF-13 |
 | UC-39 | Issue guest card | Via UC-06 | The system gives one numbered card per reservation and links it to the room and the reserved zones. Included in UC-06. | One card per reservation (Q-09). | final | RF-13, RF-16, RF-17, RF-18; Q-09 |
 | UC-07 | Check-out | Receptionist | The receptionist checks out the client and the system saves the check-out. | Receptionist only. | 1st | RF-14; Q-30 |
 | UC-40 | Deactivate guest card | Via UC-07 | The card stops working at check-out. No door opens. The log is kept. Included in UC-07. | Automatic. | final | RF-14, RF-16; Q-30 |
@@ -76,11 +78,12 @@ Phase: "1st" = 1st delivery, "final" = final delivery (Q-06, Q-27). "backlog" = 
 
 | ID | Use case | Actor(s) | Short description | Permission rules | Phase | Requirements and decisions |
 |---|---|---|---|---|---|---|
-| UC-15 | Enter supplier delivery in stock | Receptionist, manager (supplier: secondary) | The supplier sends an XML delivery file. Hotel staff or the manager loads it. The system imports every item from a valid file, creates missing catalogue items and records the entries. | Supplier does not log in or load the file. No permission or invalid XML changes no data. A failed save undoes the whole import, including new catalogue items. No preview or confirmation (PR #20 decision, 2026-10-21). | final | RF-28, RF-29; Q-10, Q-17, Q-38 |
+| UC-15 | Enter supplier delivery in stock | Receptionist, manager (supplier: secondary) | The supplier sends an XML delivery file. Hotel staff or the manager loads it. The system shows a preview of the items. After the user confirms, it imports every item, creates missing catalogue items and records the entries. | Includes UC-47, UC-50 and UC-53. Supplier does not log in or load the file. No permission, invalid XML or cancel changes no data. A failed save undoes the whole import, including new catalogue items. Preview with confirm and cancel before any save (teacher feedback, 2026-10-30, Jira H4Y-8). | final | RF-28, RF-29; Q-10, Q-17, Q-38 |
 | UC-47 | Show import report | Via UC-15 | The system shows the result of the XML import. Included in UC-15. | Automatic. | final | RF-28; Q-10 |
 | UC-19 | Create stock item | Manager | The manager creates a catalogue item with its name and unit. | Manager only. Invalid data is not saved. | final | RF-28, RF-29; Q-38, Q-43 |
 | UC-48 | Edit stock item | Manager | The manager changes the name or unit of a catalogue item. | Manager only. Removal is not defined (Q-38). | final | RF-28, RF-29; Q-38 |
-| UC-50 | Record stock entry | Receptionist, manager | Staff record an entry of a catalogue item with quantity and date. The balance goes up. | Hotel staff or manager. | final | RF-29; Q-21 |
+| UC-50 | Record stock entry | Receptionist, manager | Staff record an entry of a catalogue item with quantity and date. The balance goes up. UC-15 includes it for each item of the supplier XML file. | Hotel staff or manager. | final | RF-28, RF-29; Q-21, Q-53 |
+| UC-53 | Read supplier XML stock file | Via UC-15 | The system reads the XML stock file of the supplier: each item and its quantity. Included in UC-15. | Automatic. Invalid XML changes no data. | final | RF-28; Q-10, Q-17 |
 | UC-16 | Record stock use | Receptionist, manager | Staff record a consumption in the hotel with quantity and date. The balance goes down. | Hotel staff or manager. Quantity above the stock is not defined. | final | RF-29; Q-21, Q-34 |
 | UC-49 | Record stock exit | Receptionist, manager | Staff record a removal (discard, return, loss) with quantity and date. The balance goes down. | Hotel staff or manager. Quantity above the stock is not defined. | final | RF-29; Q-21, Q-34 |
 
@@ -102,4 +105,4 @@ Phase: "1st" = 1st delivery, "final" = final delivery (Q-06, Q-27). "backlog" = 
 - `docs/requirements/questions.md`
 - `.agent/drafts/story-*.md` (story actors and scope)
 
-Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-7 review (50 use cases by area, phase column, include and extend notes) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-7 review (50 use cases by area, phase column, include and extend notes) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29; UC-50 XML-only entry and UC-15 include by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-50 manual entry back, UC-15 includes UC-50 and UC-53 after PR-36 review by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-15 XML preview with confirm and cancel by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
