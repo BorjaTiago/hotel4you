@@ -22,7 +22,7 @@ class JdbcRoomRepositoryTest {
 
     private final RecordingDatabase database = new RecordingDatabase();
     private final JdbcRoomRepository repository = new JdbcRoomRepository(database);
-    private final Room room = new Room(null, 202, 2, "double");
+    private final Room room = new Room(null, 202, 2, "duplo");
 
     @Test
     @Tag("H4Y-25-AC-1")
@@ -31,7 +31,7 @@ class JdbcRoomRepositoryTest {
 
         assertEquals(List.of(
                 new Binding("setInt", 1, 2),
-                new Binding("setString", 1, "double"),
+                new Binding("setString", 1, "duplo"),
                 new Binding("setLong", 1, 1L),
                 new Binding("setInt", 1, 202),
                 new Binding("setLong", 2, 1L),
@@ -54,7 +54,7 @@ class JdbcRoomRepositoryTest {
     void onSave_commitAndClose_whenRoomIsValid() {
         Room saved = repository.save(room, 10);
 
-        assertEquals(new Room(42L, 202, 2, "double"), saved);
+        assertEquals(new Room(42L, 202, 2, "duplo"), saved);
         assertEquals(List.of("begin", "lock floor", "find type", "count", "insert", "commit", "close"),
                 database.events);
         assertEquals(4, database.closedStatements);
