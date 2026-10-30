@@ -103,6 +103,53 @@ public class RoomService {
     }
 
     /**
+     * Edits a room. Only a manager may edit rooms.
+     * The repository checks the floor, room type, floor limit and room number inside its update
+     * transaction.
+     *
+     * @param room the room to edit, with its identifier
+     * @param actor the logged-in user
+     * @return the saved room
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room, floor or room type is invalid
+     * @throws DuplicateRoomException if the room number is already in use
+     * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws IllegalStateException if the database is not available
+     */
+    public Room editRoom(Room room, User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode editar quartos.");
+        }
+        if (room == null || room.getId() == null) {
+            throw new IllegalArgumentException("Escolha um quarto na tabela.");
+        }
+        Integer floorLimit = ROOM_FLOOR_LIMITS.get(room.getFloorNumber());
+        if (floorLimit == null) {
+            throw new IllegalArgumentException("Só os pisos 2 e 3 têm quartos.");
+        }
+        return roomRepository.update(room, floorLimit);
+    }
+
+    /**
+     * Removes a room. Only a manager may remove rooms.
+     *
+     * @param id the room id
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room does not exist
+     * @throws RoomInUseException if other data still uses the room
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeRoom(long id, User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode remover quartos.");
+        }
+        if (!roomRepository.delete(id)) {
+            throw new RoomInUseException();
+        }
+    }
+
+    /**
      * Lists saved rooms.
      *
      * @param actor the logged-in user

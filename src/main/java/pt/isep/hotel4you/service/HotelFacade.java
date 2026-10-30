@@ -184,6 +184,36 @@ public class HotelFacade {
     }
 
     /**
+     * Edits a room.
+     *
+     * @param room the room to edit, with its identifier
+     * @param actor the logged-in user
+     * @return the saved room
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room, floor or room type is invalid
+     * @throws DuplicateRoomException if the room number is already in use
+     * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws IllegalStateException if the database is not available
+     */
+    public Room editRoom(Room room, User actor) {
+        return roomService.editRoom(room, actor);
+    }
+
+    /**
+     * Removes a room.
+     *
+     * @param id the room id
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room does not exist
+     * @throws RoomInUseException if other data still uses the room
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeRoom(long id, User actor) {
+        roomService.removeRoom(id, actor);
+    }
+
+    /**
      * Returns the room floors and limits from the statement.
      *
      * @return an immutable map from floor number to maximum room count

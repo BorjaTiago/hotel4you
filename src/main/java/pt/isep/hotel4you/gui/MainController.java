@@ -37,9 +37,6 @@ public class MainController {
     private Button pricesButton;
 
     @FXML
-    private Button roomListButton;
-
-    @FXML
     private StackPane contentPane;
 
     /**
@@ -64,11 +61,9 @@ public class MainController {
         floorsButton.managedProperty().bind(floorsButton.visibleProperty());
         floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
         roomsButton.managedProperty().bind(roomsButton.visibleProperty());
-        roomsButton.setVisible(facade.canUse(user, Permission.MANAGE_ROOMS));
+        roomsButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
-        roomListButton.managedProperty().bind(roomListButton.visibleProperty());
-        roomListButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
     }
@@ -95,12 +90,6 @@ public class MainController {
     private void onPricesClicked() {
         Parent pricesScreen = new ScreenLoader(facade).load("prices.fxml");
         contentPane.getChildren().setAll(pricesScreen);
-    }
-
-    @FXML
-    private void onRoomListClicked() {
-        Parent roomListScreen = new ScreenLoader(facade).load("room-list.fxml");
-        contentPane.getChildren().setAll(roomListScreen);
     }
 
     @FXML
