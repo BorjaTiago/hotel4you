@@ -44,13 +44,18 @@ class JdbcRoomTypeRepositoryTest {
         }
     }
 
-    /** A database whose statement answers like one row with a NULL price, or like no row changed. */
+    /**
+     * A fake database. Its query returns one row with a NULL price. Its update returns the given
+     * number of changed rows, so 0 means no row changed.
+     */
     private static class FakeDatabase extends Database {
 
         private final List<String> calls = new ArrayList<>();
+        private final int updatedRows;
 
-        FakeDatabase() {
+        FakeDatabase(int updatedRows) {
             super(null);
+            this.updatedRows = updatedRows;
         }
 
         @Override
@@ -68,8 +73,13 @@ class JdbcRoomTypeRepositoryTest {
                     new Class<?>[] {PreparedStatement.class},
                     (proxy, method, args) -> {
                         calls.add(method.getName());
-                        return method.getName().equals("executeQuery")
-                                ? resultSet() : defaultValue(method);
+                        if (method.getName().equals("executeUpdate")) {
+                            return updatedRows;
+                        }
+                        if (method.getName().equals("executeQuery")) {
+                            return resultSet();
+                        }
+                        return defaultValue(method);
                     });
         }
 
@@ -132,7 +142,7 @@ class JdbcRoomTypeRepositoryTest {
     @Test
     @Tag("H4Y-26-AC-1")
     void onFindAll_returnNullPrice_whenPriceIsNotSet() {
-        List<RoomType> types = new JdbcRoomTypeRepository(new FakeDatabase()).findAll();
+        List<RoomType> types = new JdbcRoomTypeRepository(new FakeDatabase(0)).findAll();
 
         assertEquals(1, types.size());
         assertEquals("duplo", types.get(0).getName());
@@ -142,7 +152,7 @@ class JdbcRoomTypeRepositoryTest {
     @Test
     @Tag("H4Y-26-AC-3")
     void onUpdateBasePrice_returnFalse_whenNoRowChanges() {
-        FakeDatabase database = new FakeDatabase();
+        FakeDatabase database = new FakeDatabase(0);
 
         boolean updated = new JdbcRoomTypeRepository(database)
                 .updateBasePrice(99L, new BigDecimal("80.00"));
@@ -150,5 +160,14 @@ class JdbcRoomTypeRepositoryTest {
         assertFalse(updated);
         assertTrue(database.calls.contains("setBigDecimal"));
         assertTrue(database.calls.contains("setLong"));
+    }
+
+    @Test
+    @Tag("H4Y-26-AC-1")
+    void onUpdateBasePrice_returnTrue_whenRowChanges() {
+        boolean updated = new JdbcRoomTypeRepository(new FakeDatabase(1))
+                .updateBasePrice(1L, new BigDecimal("80.00"));
+
+        assertTrue(updated);
     }
 }
