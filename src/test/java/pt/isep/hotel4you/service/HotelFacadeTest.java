@@ -54,6 +54,21 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-25-AC-1")
+    void onListRooms_passActorToService_whenReadingRooms() {
+        assertEquals(List.of(), facade.listRooms(new Manager(1L, "Rui", "rui", "hash")));
+        assertThrows(AccessDeniedException.class,
+                () -> facade.listRooms(new Receptionist(2L, "Ana", "ana", "hash")));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_passActorToService_whenReadingCatalogue() {
+        assertEquals(List.of(), facade.listRoomTypes(new Manager(1L, "Rui", "rui", "hash")));
+        assertThrows(AccessDeniedException.class, () -> facade.listRoomTypes(null));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
     void onCanUse_allowRooms_whenActorIsManager() {
         assertTrue(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_ROOMS));
         assertFalse(facade.canUse(new Receptionist(2L, "Ana", "ana", "hash"), Permission.MANAGE_ROOMS));

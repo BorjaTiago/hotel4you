@@ -26,6 +26,31 @@ class JdbcRoomRepositoryTest {
 
     @Test
     @Tag("H4Y-25-AC-1")
+    void onSave_bindNumbersWithJdbcTypes_whenRoomIsValid() {
+        repository.save(room, 10);
+
+        assertEquals(List.of(
+                new Binding("setInt", 1, 2),
+                new Binding("setString", 1, "double"),
+                new Binding("setLong", 1, 1L),
+                new Binding("setInt", 1, 202),
+                new Binding("setLong", 2, 1L),
+                new Binding("setLong", 3, 2L)), database.bindings);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onRead_bindNumbersWithJdbcTypes_whenCheckingRoomAndFloor() {
+        repository.floorExists(2);
+        repository.existsByNumber(202);
+        repository.countByFloor(2);
+
+        assertEquals(List.of(new Binding("setInt", 1, 2), new Binding("setInt", 1, 202),
+                new Binding("setInt", 1, 2)), database.bindings);
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
     void onSave_commitAndClose_whenRoomIsValid() {
         Room saved = repository.save(room, 10);
 
@@ -101,9 +126,12 @@ class JdbcRoomRepositoryTest {
         assertEquals(1, database.closedResults);
     }
 
+    private record Binding(String method, int position, Object value) { }
+
     /** Records JDBC calls and provides one row per successful query. */
     private static class RecordingDatabase extends Database {
         private final List<String> events = new ArrayList<>();
+        private final List<Binding> bindings = new ArrayList<>();
         private int roomCount;
         private int closedStatements;
         private int closedResults;
@@ -142,7 +170,13 @@ class JdbcRoomRepositoryTest {
         private PreparedStatement statement(String sql) {
             return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
                     new Class<?>[] {PreparedStatement.class}, (proxy, method, args) -> {
+                        if (method.getName().startsWith("set")) {
+                            bindings.add(new Binding(method.getName(), (int) args[0], args[1]));
+                        }
                         if (method.getName().equals("executeQuery")) {
+                            if (sql.startsWith("SELECT 1")) {
+                                return result(1, true);
+                            }
                             if (sql.contains("UPDLOCK")) {
                                 assertTrue(sql.contains("HOLDLOCK"));
                                 events.add("lock floor");

@@ -8,16 +8,19 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.User;
 
@@ -69,7 +72,7 @@ class RoomServiceTest {
             roomService.saveRoom(room(308 + i, 3, "family"), manager());
         }
 
-        List<Room> rooms = roomService.listRooms();
+        List<Room> rooms = roomService.listRooms(manager());
         assertEquals(20, rooms.size());
         assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 2).count());
         assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 3).count());
@@ -189,6 +192,39 @@ class RoomServiceTest {
         }
 
         assertEquals(FLOOR_LIMIT, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRooms_returnSavedRooms_whenActorIsManager() {
+        Room saved = roomService.saveRoom(room(202, 2, "double"), manager());
+
+        assertEquals(List.of(saved), roomService.listRooms(manager()));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_returnCatalogue_whenActorIsManager() {
+        assertEquals(List.of("double", "family", "single"), roomService.listRoomTypes(manager()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("deniedActors")
+    @Tag("H4Y-25-AC-1")
+    void onListRooms_throwAccessDenied_whenActorIsNotManager(User actor) {
+        assertThrows(AccessDeniedException.class, () -> roomService.listRooms(actor));
+    }
+
+    @ParameterizedTest
+    @MethodSource("deniedActors")
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_throwAccessDenied_whenActorIsNotManager(User actor) {
+        assertThrows(AccessDeniedException.class, () -> roomService.listRoomTypes(actor));
+    }
+
+    private static Stream<User> deniedActors() {
+        return Stream.of(null, new Receptionist(2L, "Ana", "ana", HASH),
+                new RestaurantStaff(3L, "João", "joao", HASH));
     }
 
     private boolean trySave(Room room) {
