@@ -62,22 +62,9 @@ public class Database {
     public static PreparedStatement prepare(Connection connection, String sql, String... values)
             throws SQLException {
         PreparedStatement statement = connection.prepareStatement(sql);
-        try {
-            for (int i = 0; i < values.length; i++) {
-                statement.setString(i + 1, values[i]);
-            }
-        } catch (SQLException error) {
-            closeAfterBindingFailure(statement, error);
-            throw error;
+        for (int i = 0; i < values.length; i++) {
+            statement.setString(i + 1, values[i]);
         }
         return statement;
-    }
-
-    private static void closeAfterBindingFailure(PreparedStatement statement, SQLException cause) {
-        try {
-            statement.close();
-        } catch (SQLException closeError) {
-            cause.addSuppressed(closeError);
-        }
     }
 }
