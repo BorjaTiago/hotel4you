@@ -6,12 +6,42 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.lang.reflect.Proxy;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.config.AppConfig;
 
 /** Tests the message when the database is down. */
 class DatabaseTest {
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onPrepare_closeStatement_whenParameterBindingFails() {
+        SQLException failure = new SQLException("Invalid parameter");
+        boolean[] closed = {false};
+        PreparedStatement statement = (PreparedStatement) Proxy.newProxyInstance(
+                PreparedStatement.class.getClassLoader(), new Class<?>[] {PreparedStatement.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("setString")) {
+                        throw failure;
+                    }
+                    if (method.getName().equals("close")) {
+                        closed[0] = true;
+                    }
+                    return null;
+                });
+        Connection connection = (Connection) Proxy.newProxyInstance(
+                Connection.class.getClassLoader(), new Class<?>[] {Connection.class},
+                (proxy, method, args) -> statement);
+
+        SQLException error = assertThrows(SQLException.class,
+                () -> Database.prepare(connection, "SELECT ?", "value"));
+
+        assertEquals(failure, error);
+        assertEquals(true, closed[0]);
+    }
 
     @Test
     @Tag("H4Y-32-AC-9")
