@@ -11,7 +11,7 @@
         <Insets top="30" right="30" bottom="30" left="30"/>
     </padding>
 
-    <Label text="Preços base" styleClass="subtitle" labelFor="$typeTable"/>
+    <Label fx:id="typeLabel" text="Preços base" styleClass="subtitle"/>
     <TableView fx:id="typeTable" VBox.vgrow="ALWAYS" prefWidth="500">
         <columns>
             <TableColumn fx:id="typeColumn" text="Tipo" prefWidth="160"/>
@@ -23,7 +23,7 @@
         </placeholder>
     </TableView>
 
-    <Label text="Novo preço (€)" labelFor="$priceField"/>
+    <Label fx:id="priceLabel" text="Novo preço (€)"/>
     <TextField fx:id="priceField" maxWidth="Infinity"/>
     <Button text="Guardar" onAction="#onSavePriceClicked" maxWidth="Infinity"
             styleClass="primary-button"/>

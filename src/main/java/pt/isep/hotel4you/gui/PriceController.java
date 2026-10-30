@@ -16,6 +16,9 @@ public class PriceController {
     private final HotelFacade facade;
 
     @FXML
+    private Label typeLabel;
+
+    @FXML
     private TableView<RoomType> typeTable;
 
     @FXML
@@ -26,6 +29,9 @@ public class PriceController {
 
     @FXML
     private TableColumn<RoomType, String> priceColumn;
+
+    @FXML
+    private Label priceLabel;
 
     @FXML
     private TextField priceField;
@@ -44,6 +50,8 @@ public class PriceController {
 
     @FXML
     private void initialize() {
+        typeLabel.setLabelFor(typeTable);
+        priceLabel.setLabelFor(priceField);
         typeColumn.setCellValueFactory(data -> new SimpleStringProperty(typeText(data.getValue())));
         capacityColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(String.valueOf(data.getValue().getCapacity())));
