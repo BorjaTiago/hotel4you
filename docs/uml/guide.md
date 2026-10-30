@@ -44,10 +44,16 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Each screen loads its own FXML. Not done: the same code many times.
 
 ### RoomController
-- **What:** Room search, room save, room items and prices.
-- **Why:** RF-04 to RF-08.
-- **Why this way:** One screen group for rooms and room prices.
+- **What:** Room search, room save and room items.
+- **Why:** RF-04, RF-05, RF-08.
+- **Why this way:** One screen group for rooms.
 - **Other option:** One controller per action. Not done: more files for little gain.
+
+### PriceController
+- **What:** Show the room types with capacity and base price. Set the base price of the selected type with the price field and "Guardar" (H4Y-26).
+- **Why:** RF-06. The manager sets one price for each room type.
+- **Why this way:** Own screen with `prices.fxml`. One controller class cannot serve two FXML files with different fields, so `RoomController` cannot hold this screen. The controller has no price rule: `HotelFacade.parsePrice` and `setBasePrice` refuse a bad price and the screen shows the message (RNF-07).
+- **Other option:** Put the prices in `RoomController`. Not done: `rooms.fxml` has other fields, and the price fields would be null on that screen.
 
 ### ClientController
 - **What:** Client registration and search.
@@ -135,6 +141,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Check if a room is free. Search rooms. Save a room. Set prices. Configure room items.
 - **Why:** RF-04 to RF-09.
 - **Why this way:** Room and price rules in one place.
+- **Prices:** Only a manager sets or lists base prices (`Permission.MANAGE_PRICES`, else `AccessDeniedException`). `setBasePrice` refuses a missing type, a price below 0 or above 999999.99, a price with more than 2 decimals, and an unknown type. `parsePrice` turns text such as `80,50` into a price.
 - **Other option:** Put rules in `Room`. Not done: `Room` would need reservation data.
 
 ### ReservationService
@@ -191,7 +198,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
 
 ### Main
-- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService`, `JdbcFloorRepository`, `JdbcLocationRepository`, `LocationService`, `JdbcRoomTypeRepository`, `RoomService` and `HotelFacade`. Then it starts `HotelApp`.
 - **Why:** RF-01, RNF-12. One place builds the objects.
 
 ## Data
@@ -275,10 +282,16 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Other option:** Room type as text. Not done: the type has a capacity and a price.
 
 ### RoomType
-- **What:** A type (single, double, family) with capacity and `basePrice`.
+- **What:** A type (`individual`, `duplo`, `familiar`) with capacity and `basePrice`. These are the stored names in the database schema.
 - **Why:** RF-04, RF-06.
 - **Why this way:** The manager sets the price once for each type.
 - **Other option:** Price on each `Room`. Not done: many rooms share one price.
+
+### JdbcRoomTypeRepository
+- **What:** Implements `RoomTypeRepository` with SQL on the table `room_types`. Reads all types and updates `base_price`.
+- **Why:** RF-06, RNF-12. Room types and prices are saved in SQL Server.
+- **Why this way:** It gives `RoomType` objects to `RoomService`. A NULL price becomes `null` in Java. `updateBasePrice` returns false when no row has the id.
+- **Other option:** SQL inside `RoomService`. Not done: rules and SQL would mix.
 
 ### RoomItem
 - **What:** How many units of one stock item a room has.
@@ -382,6 +395,7 @@ Enums have fixed values. They stop typing errors.
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
 | MANAGE_FLOORS | View the floors and create, edit and remove zones (H4Y-28) | yes | no | no |
+| MANAGE_PRICES | View and set the base price of the room types (H4Y-26) | yes | no | no |
 
 Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
 
@@ -446,4 +460,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
