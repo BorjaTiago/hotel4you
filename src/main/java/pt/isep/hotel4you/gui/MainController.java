@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.gui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,6 +15,7 @@ import pt.isep.hotel4you.service.HotelFacade;
 /**
  * Controller of the main window. It shows the menu of the logged-in user and opens each
  * function in the centre. The menu asks the facade which functions the user may see.
+ * Without a logged-in user, it shows no function and opens the login screen.
  */
 public class MainController {
 
@@ -52,7 +54,11 @@ public class MainController {
     @FXML
     private void initialize() {
         User user = HotelApp.currentUser;
-        welcomeLabel.setText("Bem-vindo, " + user.getName());
+        if (user == null) {
+            welcomeLabel.setText("");
+            Platform.runLater(this::openLogin);
+            return;
+        }
         staffButton.managedProperty().bind(staffButton.visibleProperty());
         staffButton.setVisible(facade.canUse(user, Permission.MANAGE_STAFF));
         floorsButton.managedProperty().bind(floorsButton.visibleProperty());
@@ -63,6 +69,8 @@ public class MainController {
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         roomListButton.managedProperty().bind(roomListButton.visibleProperty());
         roomListButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
+        welcomeLabel.setText(
+                "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
     }
 
     @FXML
@@ -98,8 +106,15 @@ public class MainController {
     @FXML
     private void onLogoutClicked() {
         HotelApp.currentUser = null;
+        openLogin();
+    }
+
+    private void openLogin() {
+        Scene scene = contentPane.getScene();
+        if (scene == null || !(scene.getWindow() instanceof Stage stage)) {
+            return;
+        }
         Parent root = new ScreenLoader(facade).load("login.fxml");
-        Stage stage = (Stage) contentPane.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.sizeToScene();
         stage.centerOnScreen();
