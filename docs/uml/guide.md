@@ -141,7 +141,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Check if a room is free. Search rooms. Save a room. Set prices. Configure room items.
 - **Why:** RF-04 to RF-09.
 - **Why this way:** Room and price rules in one place.
-- **Prices:** Only a manager sets or lists base prices (`Permission.MANAGE_PRICES`, else `AccessDeniedException`). `setBasePrice` refuses a missing type, a price below 0 or with more than 2 decimals, and an unknown type. `parsePrice` turns text such as `80,50` into a price.
+- **Prices:** Only a manager sets or lists base prices (`Permission.MANAGE_PRICES`, else `AccessDeniedException`). `setBasePrice` refuses a missing type, a price below 0 or above 999999.99, a price with more than 2 decimals, and an unknown type. `parsePrice` turns text such as `80,50` into a price.
 - **Other option:** Put rules in `Room`. Not done: `Room` would need reservation data.
 
 ### ReservationService
@@ -198,7 +198,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
 
 ### Main
-- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService`, `JdbcRoomTypeRepository`, `RoomService` and `HotelFacade`. Then it starts `HotelApp`.
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService`, `JdbcFloorRepository`, `JdbcLocationRepository`, `LocationService`, `JdbcRoomTypeRepository`, `RoomService` and `HotelFacade`. Then it starts `HotelApp`.
 - **Why:** RF-01, RNF-12. One place builds the objects.
 
 ## Data
@@ -460,4 +460,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
