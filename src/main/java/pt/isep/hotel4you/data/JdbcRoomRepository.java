@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomSummary;
 
 /** Stores rooms in SQL Server. */
 public class JdbcRoomRepository implements RoomRepository {
@@ -37,6 +38,28 @@ public class JdbcRoomRepository implements RoomRepository {
                         result.getInt("number"),
                         result.getInt("floor_number"),
                         result.getString("room_type_name")));
+            }
+            return List.copyOf(rooms);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public List<RoomSummary> findSummaries() {
+        String sql = "SELECT r.number, f.number AS floor_number, t.name AS room_type_name, "
+                + "t.base_price FROM rooms r JOIN floors f ON f.id = r.floor_id "
+                + "JOIN room_types t ON t.id = r.room_type_id ORDER BY r.number";
+        List<RoomSummary> rooms = new ArrayList<>();
+        try (Connection connection = database.connect();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                ResultSet result = statement.executeQuery()) {
+            while (result.next()) {
+                rooms.add(new RoomSummary(
+                        result.getInt("number"),
+                        result.getInt("floor_number"),
+                        result.getString("room_type_name"),
+                        result.getBigDecimal("base_price")));
             }
             return List.copyOf(rooms);
         } catch (SQLException e) {

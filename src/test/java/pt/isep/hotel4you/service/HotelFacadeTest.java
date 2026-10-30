@@ -23,6 +23,8 @@ import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
+import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
@@ -36,6 +38,7 @@ class HotelFacadeTest {
     private AuthService authService;
     private InMemoryFloorRepository floorRepository;
     private InMemoryLocationRepository locationRepository;
+    private InMemoryRoomRepository roomRepository;
     private InMemoryRoomTypeRepository roomTypeRepository;
     private HotelFacade facade;
 
@@ -47,8 +50,9 @@ class HotelFacadeTest {
         floorRepository = new InMemoryFloorRepository();
         locationRepository = new InMemoryLocationRepository();
         LocationService locationService = new LocationService(floorRepository, locationRepository);
+        roomRepository = new InMemoryRoomRepository();
         roomTypeRepository = new InMemoryRoomTypeRepository();
-        RoomService roomService = new RoomService(new InMemoryRoomRepository(), roomTypeRepository);
+        RoomService roomService = new RoomService(roomRepository, roomTypeRepository);
         facade = new HotelFacade(authService, staffService, locationService, roomService);
     }
 
@@ -78,6 +82,28 @@ class HotelFacadeTest {
         assertTrue(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_ROOMS));
         assertFalse(facade.canUse(new Receptionist(2L, "Ana", "ana", "hash"), Permission.MANAGE_ROOMS));
         assertEquals(Map.of(2, 10, 3, 10), facade.roomFloorLimits());
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-2")
+    void onListRoomSummaries_returnRoomsFromRoomService_whenReceptionistFiltersByType() {
+        roomRepository.addFloor(3);
+        roomRepository.addRoomType("familiar");
+        roomRepository.addRoomType("duplo");
+        roomRepository.setBasePrice("familiar", new BigDecimal("180.00"));
+        roomRepository.save(new Room(null, 301, 3, "familiar"), 10);
+        roomRepository.save(new Room(null, 302, 3, "duplo"), 10);
+        User ana = new Receptionist(2L, "Ana", "ana", "hash");
+
+        assertTrue(facade.canUse(ana, Permission.LIST_ROOMS));
+        assertEquals(List.of(new RoomSummary(301, 3, "familiar", new BigDecimal("180.00"))),
+                facade.listRoomSummaries("familiar", ana));
+    }
+
+    @Test
+    @Tag("H4Y-50-AC-4")
+    void onListRoomSummaries_throwAccessDenied_whenActorIsNotLoggedIn() {
+        assertThrows(AccessDeniedException.class, () -> facade.listRoomSummaries(null, null));
     }
 
     @Test

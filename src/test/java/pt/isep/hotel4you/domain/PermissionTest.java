@@ -43,6 +43,12 @@ class PermissionTest {
         assertFalse(Permission.MANAGE_PRICES.allows(RECEPTIONIST));
     }
 
+    @Test
+    @Tag("H4Y-50-AC-1")
+    void onAllows_returnTrue_whenReceptionistListsRooms() {
+        assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));
+    }
+
     @ParameterizedTest
     @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")
