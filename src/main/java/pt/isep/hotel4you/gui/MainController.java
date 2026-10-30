@@ -54,6 +54,11 @@ public class MainController {
     @FXML
     private void initialize() {
         User user = HotelApp.currentUser;
+        if (user == null) {
+            welcomeLabel.setText("");
+            Platform.runLater(this::openLogin);
+            return;
+        }
         staffButton.managedProperty().bind(staffButton.visibleProperty());
         staffButton.setVisible(facade.canUse(user, Permission.MANAGE_STAFF));
         floorsButton.managedProperty().bind(floorsButton.visibleProperty());
@@ -64,11 +69,6 @@ public class MainController {
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         roomListButton.managedProperty().bind(roomListButton.visibleProperty());
         roomListButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
-        if (user == null) {
-            welcomeLabel.setText("");
-            Platform.runLater(this::openLogin);
-            return;
-        }
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
     }
@@ -110,8 +110,11 @@ public class MainController {
     }
 
     private void openLogin() {
+        Scene scene = contentPane.getScene();
+        if (scene == null || !(scene.getWindow() instanceof Stage stage)) {
+            return;
+        }
         Parent root = new ScreenLoader(facade).load("login.fxml");
-        Stage stage = (Stage) contentPane.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.sizeToScene();
         stage.centerOnScreen();
