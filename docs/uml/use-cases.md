@@ -4,7 +4,7 @@ Hotel4You has 5 actors and 53 use cases. The overview table shows which actor ta
 
 Review for H4Y-7 (teacher feedback, sprint 2): the old diagrams had 19 large use cases. The review splits them into the real user goals, adds the missing use cases, and adds the `«include»` and `«extend»` relations.
 
-Sprint 2 retrospective fixes for H4Y-7 (sprint 3): UC-51 (included in UC-05), UC-52 (included in UC-06) and UC-53 (included in UC-50).
+Sprint 2 retrospective fixes for H4Y-7 (sprint 3): UC-51 (included in UC-05), UC-52 (included in UC-06) and UC-53 (included in UC-15). UC-15 also includes UC-50.
 
 ## Notation
 
@@ -305,7 +305,7 @@ flowchart LR
 
   UC15 -.->|"«include»"| UC47
   UC15 -.->|"«include»"| UC53
-  UC50 -.->|"«include»"| UC53
+  UC15 -.->|"«include»"| UC50
   UC53 ~~~ Supplier
 
   classDef actor fill:none,stroke:none,font-size:18px
@@ -315,7 +315,7 @@ flowchart LR
 
 The supplier is a secondary actor in UC-15. The supplier sends the XML file. The receptionist or the manager loads it (Q-17).
 
-UC-50 and UC-15 always include UC-53. The supplier XML stock file gives every stock entry (RF-28). There is no manual entry (sprint 2 retrospective, action A15).
+UC-15 always includes UC-53 and UC-50. The system reads the supplier XML stock file (RF-28) and records one stock entry for each item with UC-50. UC-50 alone is a manual entry of one existing item (RF-29). The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (team decision, 2026-10-30).
 
 ## Changes from the first version
 
@@ -338,4 +338,4 @@ UC-50 and UC-15 always include UC-53. The supplier XML stock file gives every st
 
 UC-02, UC-04, UC-05, UC-10, UC-11 and UC-12 keep their name. The IDs UC-01 to UC-19 do not change, because the sequence diagrams and the requirements use them.
 
-Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29; UC-50 XML-only entry and UC-15 include by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29; UC-50 XML-only entry and UC-15 include by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-50 manual entry back, UC-15 includes UC-50 and UC-53 after PR-36 review by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
