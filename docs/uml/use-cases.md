@@ -304,6 +304,7 @@ flowchart LR
   UC47 ~~~ Supplier
 
   UC15 -.->|"«include»"| UC47
+  UC15 -.->|"«include»"| UC53
   UC50 -.->|"«include»"| UC53
   UC53 ~~~ Supplier
 
@@ -314,7 +315,7 @@ flowchart LR
 
 The supplier is a secondary actor in UC-15. The supplier sends the XML file. The receptionist or the manager loads it (Q-17).
 
-UC-50 always includes UC-53. The supplier XML stock file gives the stock entry (RF-28).
+UC-50 and UC-15 always include UC-53. The supplier XML stock file gives every stock entry (RF-28). There is no manual entry (sprint 2 retrospective, action A15).
 
 ## Changes from the first version
 
@@ -337,4 +338,4 @@ UC-50 always includes UC-53. The supplier XML stock file gives the stock entry (
 
 UC-02, UC-04, UC-05, UC-10, UC-11 and UC-12 keep their name. The IDs UC-01 to UC-19 do not change, because the sequence diagrams and the requirements use them.
 
-Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29; UC-50 XML-only entry and UC-15 include by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.

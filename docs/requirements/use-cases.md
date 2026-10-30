@@ -68,7 +68,7 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Phase: 1st delivery (reservations, Q-06).
 - Main flow:
   1. The manager finds the reservation.
-  2. The system checks that the client has not done check-in.
+  2. The system checks that the client has not done check-in (UC-51, included).
   3. The manager deletes the reservation for good (Q-05, team decision).
 - Alternative flows:
   - 2a. Check-in is done. The system refuses the deletion.
@@ -79,7 +79,7 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - RF links: RF-13, RF-16, RF-17, RF-18.
 - Phase: check-in in 1st delivery (Q-06). Step 3 (card): final delivery.
 - Main flow:
-  1. The receptionist finds the reservation of the client.
+  1. The receptionist finds the reservation of the client. The system checks that the client has a reservation (UC-52, included).
   2. The receptionist does the check-in.
   3. The system issues the guest card (UC-39, included).
 - Alternative flows:
@@ -183,7 +183,7 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Main flow:
   1. The supplier delivers goods and sends the XML file.
   2. Staff or the manager loads the XML file into the system (Q-17, team decision).
-  3. The system checks permission and validates the XML. For every item in a valid file, it finds or creates the catalogue item and adds the delivered quantity to stock (Q-10, Q-38; PR #20 decision, 2026-10-21).
+  3. The system checks permission and reads and validates the XML (UC-53, included). For every item in a valid file, it finds or creates the catalogue item and adds the delivered quantity to stock (Q-10, Q-38; PR #20 decision, 2026-10-21).
   4. The system saves the import, catalogue changes, ENTRY movements and balances together. It shows the import report (UC-47, included).
 - Alternative flows:
   - 3a. The file is not valid XML. The system refuses it and records nothing.
@@ -568,14 +568,49 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 
 ## UC-50 Record stock entry
 - Actors: receptionist, manager.
-- RF links: RF-29.
+- RF links: RF-28, RF-29.
 - Phase: final delivery (Q-06).
 - Main flow:
-  1. Staff or the manager selects a stock item.
-  2. The user records an entry with the quantity and the date (Q-21, team decision).
-  3. The system saves the record and raises the balance.
+  1. Staff or the manager loads the supplier XML stock file (Q-17, team decision).
+  2. The system reads the file (UC-53, included).
+  3. The system records an entry for each item, with the quantity and the date (Q-21, team decision).
+  4. The system saves the entries and raises the balances.
 - Alternative flows:
-  - 2a. The quantity is not valid. The system shows the error and does not save.
-  - Supplier deliveries use UC-15.
+  - 2a. The file is not valid XML. The system refuses it and records nothing.
+  - 3a. A quantity is not valid. The system shows the error and records nothing.
+  - Every stock entry comes from the supplier XML file. There is no manual entry (sprint 2 retrospective, action A15; statement section on stock). UC-15 reads the same file with UC-53.
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-7 review (renamed UC-08, UC-09, UC-13, UC-14, UC-16 to UC-19, include and extend steps, new UC-20 to UC-50) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+## UC-51 Check reservation has check-in
+- Actors: via UC-05 (manager).
+- RF links: RF-22.
+- Phase: 1st delivery (reservations, Q-06).
+- Included in: UC-05.
+- Main flow:
+  1. The system checks if the reservation has a check-in.
+  2. Without a check-in, the delete continues.
+- Alternative flows:
+  - 1a. The reservation has a check-in. The system refuses the delete (RF-22).
+
+## UC-52 Check client has reservation
+- Actors: via UC-06 (receptionist).
+- RF links: RF-13.
+- Phase: 1st delivery (Q-06).
+- Included in: UC-06.
+- Main flow:
+  1. The system checks if the client has a reservation.
+  2. With a reservation, the check-in continues.
+- Alternative flows:
+  - 1a. The client has no reservation. The system refuses the check-in.
+
+## UC-53 Read supplier XML stock file
+- Actors: via UC-50 and UC-15 (receptionist, manager).
+- RF links: RF-28, RF-29.
+- Phase: final delivery (Q-06).
+- Included in: UC-50, UC-15.
+- Main flow:
+  1. The system opens the supplier XML stock file.
+  2. The system reads each item and its quantity.
+- Alternative flows:
+  - 1a. The file is not valid XML. The system refuses it and changes no data (Q-10).
+
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-7 review (renamed UC-08, UC-09, UC-13, UC-14, UC-16 to UC-19, include and extend steps, new UC-20 to UC-50) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53, UC-50 XML-only entry) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
