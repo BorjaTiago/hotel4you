@@ -26,9 +26,9 @@ Para que as reservas usem o preço correto do quarto.
   E a consulta de preços mostra 80,00 para o tipo duplo
 
 ### Cenário AC-2: Alterar um preço existente
-  Dado que o tipo simples tem preço base 50,00
-  Quando o gestor altera o preço base do tipo simples para 55,00
-  Então o sistema mostra 55,00 para o tipo simples
+  Dado que o tipo individual tem preço base 50,00
+  Quando o gestor altera o preço base do tipo individual para 55,00
+  Então o sistema mostra 55,00 para o tipo individual
 
 ### Cenário AC-3: Preço inválido
   Dado que o gestor está autenticado
@@ -62,4 +62,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by jira-publisher, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
