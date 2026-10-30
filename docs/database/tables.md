@@ -77,6 +77,8 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 | 2 | duplo | 2 | 90.00 |
 | 3 | familiar | 4 | 140.00 |
 
+`database/v5-create-room-types.sql` creates the three rows with `base_price` NULL. The manager sets the prices (H4Y-26). The prices above are examples.
+
 ### rooms
 **What:** One row for each physical room.
 **Why:** A reservation needs a real room. The room has a floor and a type.
@@ -353,4 +355,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.

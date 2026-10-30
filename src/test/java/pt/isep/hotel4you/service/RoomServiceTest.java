@@ -42,7 +42,7 @@ class RoomServiceTest {
         for (String roomType : List.of("individual", "duplo", "familiar")) {
             repository.addRoomType(roomType);
         }
-        roomService = new RoomService(repository);
+        roomService = new RoomService(repository, new pt.isep.hotel4you.data.InMemoryRoomTypeRepository());
     }
 
     @Test
@@ -167,7 +167,7 @@ class RoomServiceTest {
         List<Callable<Boolean>> attempts = List.of(
                 () -> trySave(room(210, 2, "duplo")),
                 () -> {
-                    RoomService second = new RoomService(repository);
+                    RoomService second = new RoomService(repository, new pt.isep.hotel4you.data.InMemoryRoomTypeRepository());
                     try {
                         second.saveRoom(room(211, 2, "duplo"), manager());
                         return true;

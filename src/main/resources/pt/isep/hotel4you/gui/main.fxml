@@ -24,6 +24,8 @@
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="roomsButton" text="Registar quartos" onAction="#onRoomsClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
+                    maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
 
