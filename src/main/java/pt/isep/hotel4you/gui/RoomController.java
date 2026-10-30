@@ -1,7 +1,6 @@
 package pt.isep.hotel4you.gui;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -14,12 +13,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.RoomService.RoomTypeTarget;
 
 /** Controller for room registration and the room list. */
 public class RoomController {
 
     private final HotelFacade facade;
     private Map<Integer, Integer> floorLimits;
+    private List<RoomTypeTarget> typeTargets;
 
     @FXML
     private TextField numberField;
@@ -60,13 +61,14 @@ public class RoomController {
     @FXML
     private void initialize() {
         floorLimits = facade.roomFloorLimits();
+        typeTargets = facade.roomTypeTargets();
         floorBox.getItems().setAll(floorLimits.keySet().stream().sorted().toList());
         numberColumn.setCellValueFactory(
-                data -> new ReadOnlyObjectWrapper<>(data.getValue().number()));
+                data -> new ReadOnlyObjectWrapper<>(data.getValue().getNumber()));
         floorColumn.setCellValueFactory(
-                data -> new ReadOnlyObjectWrapper<>(data.getValue().floorNumber()));
+                data -> new ReadOnlyObjectWrapper<>(data.getValue().getFloorNumber()));
         roomTypeColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(data.getValue().roomTypeName()));
+                data -> new SimpleStringProperty(data.getValue().getRoomTypeName()));
         loadRoomTypes();
         loadRooms();
     }
@@ -125,29 +127,20 @@ public class RoomController {
         for (int floor : floorBox.getItems()) {
             summary.add("Piso " + floor + ": " + countOnFloor(rooms, floor) + "/" + floorLimits.get(floor));
         }
-        for (String type : roomTypeBox.getItems()) {
-            summary.add(typeLabel(type) + ": " + countOfType(rooms, type));
+        for (RoomTypeTarget type : typeTargets) {
+            summary.add(type.label() + " " + countOfType(rooms, type.name()) + "/" + type.total());
         }
         summaryLabel.setText(summary.toString());
     }
 
     private static long countOnFloor(List<Room> rooms, int floorNumber) {
-        return rooms.stream().filter(room -> room.floorNumber() == floorNumber).count();
+        return rooms.stream().filter(room -> room.getFloorNumber() == floorNumber).count();
     }
 
     private static long countOfType(List<Room> rooms, String roomTypeName) {
         return rooms.stream()
-                .filter(room -> room.roomTypeName().equalsIgnoreCase(roomTypeName))
+                .filter(room -> room.getRoomTypeName().equalsIgnoreCase(roomTypeName))
                 .count();
-    }
-
-    private static String typeLabel(String roomTypeName) {
-        return switch (roomTypeName.toLowerCase(Locale.ROOT)) {
-            case "individual" -> "Individual";
-            case "duplo" -> "Duplo";
-            case "familiar" -> "Familiar";
-            default -> roomTypeName;
-        };
     }
 
     private void showMessage(String message, boolean success) {

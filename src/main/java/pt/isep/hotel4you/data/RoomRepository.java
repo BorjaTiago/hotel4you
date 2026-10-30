@@ -38,14 +38,6 @@ public interface RoomRepository {
     boolean existsByNumber(int roomNumber);
 
     /**
-     * Counts rooms on a floor.
-     *
-     * @param floorNumber the floor number
-     * @return the number of rooms on the floor
-     */
-    int countByFloor(int floorNumber);
-
-    /**
      * Returns all rooms.
      *
      * @return an immutable list of rooms

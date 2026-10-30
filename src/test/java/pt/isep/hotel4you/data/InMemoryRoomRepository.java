@@ -41,12 +41,11 @@ public class InMemoryRoomRepository implements RoomRepository {
 
     @Override
     public synchronized boolean existsByNumber(int roomNumber) {
-        return rooms.stream().anyMatch(room -> room.number() == roomNumber);
+        return rooms.stream().anyMatch(room -> room.getNumber() == roomNumber);
     }
 
-    @Override
-    public synchronized int countByFloor(int floorNumber) {
-        return (int) rooms.stream().filter(room -> room.floorNumber() == floorNumber).count();
+    private int countByFloor(int floorNumber) {
+        return (int) rooms.stream().filter(room -> room.getFloorNumber() == floorNumber).count();
     }
 
     @Override
@@ -56,20 +55,20 @@ public class InMemoryRoomRepository implements RoomRepository {
 
     @Override
     public synchronized Room save(Room room, int floorLimit) {
-        if (!floorExists(room.floorNumber())) {
+        if (!floorExists(room.getFloorNumber())) {
             throw new IllegalArgumentException("O piso indicado não existe.");
         }
-        if (!roomTypeExists(room.roomTypeName())) {
+        if (!roomTypeExists(room.getRoomTypeName())) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
-        if (existsByNumber(room.number())) {
+        if (existsByNumber(room.getNumber())) {
             throw new DuplicateRoomException();
         }
-        if (countByFloor(room.floorNumber()) >= floorLimit) {
+        if (countByFloor(room.getFloorNumber()) >= floorLimit) {
             throw new RoomLimitExceededException(floorLimit);
         }
-        Room saved = new Room((long) rooms.size() + 1, room.number(),
-                room.floorNumber(), room.roomTypeName());
+        Room saved = new Room((long) rooms.size() + 1, room.getNumber(),
+                room.getFloorNumber(), room.getRoomTypeName());
         rooms.add(saved);
         return saved;
     }

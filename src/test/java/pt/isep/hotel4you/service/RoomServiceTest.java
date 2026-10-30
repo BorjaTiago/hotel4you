@@ -87,7 +87,7 @@ class RoomServiceTest {
     void onSaveRoom_throw_whenFloorIsNotForRooms(int floorNumber) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> roomService.saveRoom(room(101, floorNumber, "individual"), manager()));
-        assertEquals("S? os pisos 2 e 3 t?m quartos", error.getMessage());
+        assertEquals("Só os pisos 2 e 3 têm quartos", error.getMessage());
 
         assertEquals(0, repository.findAll().size());
     }

@@ -61,20 +61,6 @@ public class JdbcRoomRepository implements RoomRepository {
     }
 
     @Override
-    public int countByFloor(int floorNumber) {
-        String sql = "SELECT COUNT(*) FROM rooms r JOIN floors f ON f.id = r.floor_id "
-                + "WHERE f.number = ?";
-        try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, floorNumber);
-                ResultSet result = statement.executeQuery()) {
-            result.next();
-            return result.getInt(1);
-        } catch (SQLException e) {
-            throw persistenceError(e);
-        }
-    }
-
-    @Override
     public List<Room> findAll() {
         String sql = "SELECT r.id, r.number, f.number AS floor_number, t.name AS room_type_name "
                 + "FROM rooms r JOIN floors f ON f.id = r.floor_id "
@@ -112,14 +98,14 @@ public class JdbcRoomRepository implements RoomRepository {
             throws SQLException {
         connection.setAutoCommit(false);
         try {
-            long floorId = findFloorIdForUpdate(connection, room.floorNumber());
-            long roomTypeId = findRoomTypeId(connection, room.roomTypeName());
+            long floorId = findFloorIdForUpdate(connection, room.getFloorNumber());
+            long roomTypeId = findRoomTypeId(connection, room.getRoomTypeName());
             if (countByFloorId(connection, floorId) >= floorLimit) {
                 throw new RoomLimitExceededException(floorLimit);
             }
             long roomId = insertRoom(connection, room, floorId, roomTypeId);
             connection.commit();
-            return new Room(roomId, room.number(), room.floorNumber(), room.roomTypeName());
+            return new Room(roomId, room.getNumber(), room.getFloorNumber(), room.getRoomTypeName());
         } catch (SQLException e) {
             rollback(connection, e);
             if (isDuplicateKey(e)) {
@@ -180,7 +166,7 @@ public class JdbcRoomRepository implements RoomRepository {
         String sql = "INSERT INTO rooms (number, floor_id, room_type_id) "
                 + "OUTPUT INSERTED.id VALUES (?, ?, ?)";
         try (PreparedStatement statement = Database.prepare(connection, sql,
-                room.number(), floorId, roomTypeId);
+                room.getNumber(), floorId, roomTypeId);
                 ResultSet keys = statement.executeQuery()) {
             if (!keys.next()) {
                 throw new SQLException("SQL Server did not return the room identifier.");

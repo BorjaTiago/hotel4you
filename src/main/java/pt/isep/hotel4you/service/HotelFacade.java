@@ -192,6 +192,15 @@ public class HotelFacade {
     }
 
     /**
+     * Returns the labels and provisional room type totals for the summary.
+     *
+     * @return immutable display targets, not registration limits
+     */
+    public List<RoomService.RoomTypeTarget> roomTypeTargets() {
+        return roomService.roomTypeTargets();
+    }
+
+    /**
      * Lists saved rooms.
      *
      * @param actor the logged-in user

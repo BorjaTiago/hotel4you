@@ -11,7 +11,7 @@
         <Insets top="24" right="24" bottom="24" left="24"/>
     </padding>
 
-    <Label text="Registar quartos" styleClass="subtitle"/>
+    <Label text="Quartos" styleClass="subtitle"/>
     <HBox spacing="10">
         <TextField fx:id="numberField" promptText="Número" prefWidth="150"/>
         <ComboBox fx:id="floorBox" promptText="Piso" prefWidth="120"/>

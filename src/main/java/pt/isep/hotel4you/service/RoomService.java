@@ -25,10 +25,23 @@ public class RoomService {
     /** Plain ASCII digits only. BigDecimal alone also accepts exponents and non-ASCII digits. */
     private static final String PRICE_TEXT = "-?\\d+(\\.\\d+)?";
 
-    private final RoomTypeRepository roomTypeRepository;
+    /** Fixed labels and provisional Q-01 targets for the room summary. */
+    private static final List<RoomTypeTarget> ROOM_TYPE_TARGETS = List.of(
+            new RoomTypeTarget("individual", "Individuais", 7),
+            new RoomTypeTarget("duplo", "Duplos", 10),
+            new RoomTypeTarget("familiar", "Familiares", 3));
 
+    /**
+     * Fixed summary data. A target is not a registration limit.
+     *
+     * @param name the catalogue name
+     * @param label the Portuguese summary label
+     * @param total the provisional total for the hotel
+     */
+    public record RoomTypeTarget(String name, String label, int total) { }
 
     private final RoomRepository roomRepository;
+    private final RoomTypeRepository roomTypeRepository;
 
     /**
      * Creates the service.
@@ -51,8 +64,17 @@ public class RoomService {
     }
 
     /**
-     * Saves a room. Only a manager may register a room. Calls are serialized in this service, and
-     * the repository checks the floor limit again in its save operation.
+     * Returns the labels and provisional type totals for the room summary.
+     *
+     * @return immutable summary data, not enforced type limits
+     */
+    public List<RoomTypeTarget> roomTypeTargets() {
+        return ROOM_TYPE_TARGETS;
+    }
+
+    /**
+     * Saves a room. Only a manager may register a room.
+     * The repository checks the floor limit inside its save transaction.
      *
      * @param room the room to save
      * @param actor the logged-in user
@@ -63,28 +85,25 @@ public class RoomService {
      * @throws RoomLimitExceededException if the floor already has 10 rooms
      * @throws IllegalStateException if the database is not available
      */
-    public synchronized Room saveRoom(Room room, User actor) {
+    public Room saveRoom(Room room, User actor) {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode registar quartos.");
         }
         if (room == null) {
             throw new IllegalArgumentException("Indique os dados do quarto.");
         }
-        if (!roomRepository.floorExists(room.floorNumber())) {
+        if (!roomRepository.floorExists(room.getFloorNumber())) {
             throw new IllegalArgumentException("O piso indicado não existe.");
         }
-        Integer floorLimit = ROOM_FLOOR_LIMITS.get(room.floorNumber());
+        Integer floorLimit = ROOM_FLOOR_LIMITS.get(room.getFloorNumber());
         if (floorLimit == null) {
-            throw new IllegalArgumentException("O piso indicado não tem quartos.");
+            throw new IllegalArgumentException("Só os pisos 2 e 3 têm quartos");
         }
-        if (!roomRepository.roomTypeExists(room.roomTypeName())) {
+        if (!roomRepository.roomTypeExists(room.getRoomTypeName())) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
-        if (roomRepository.existsByNumber(room.number())) {
+        if (roomRepository.existsByNumber(room.getNumber())) {
             throw new DuplicateRoomException();
-        }
-        if (roomRepository.countByFloor(room.floorNumber()) >= floorLimit) {
-            throw new RoomLimitExceededException(floorLimit);
         }
         return roomRepository.save(room, floorLimit);
     }
@@ -118,6 +137,7 @@ public class RoomService {
         }
         return roomRepository.findRoomTypeNames();
     }
+
     /**
      * Lists the room types with their base price.
      *
