@@ -160,13 +160,23 @@ class RoomServiceBasePriceTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {" ", "abc", "1.000,50"})
+    @ValueSource(strings = {" ", "abc", "1.000,50", "1e2", "8e1", "٨٠", "100e2147483647"})
     @Tag("H4Y-26-AC-3")
     void onParsePrice_throw_whenTextIsNotNumber(String text) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> service.parsePrice(text));
 
         assertEquals(NUMBER_MESSAGE, error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-26-AC-3")
+    void onSetBasePrice_throw_whenParsedPriceIsNegative() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.setBasePrice(individual, service.parsePrice("-10"), MANAGER));
+
+        assertEquals(PRICE_MESSAGE, error.getMessage());
+        assertEquals(new BigDecimal("50.00"), priceOf("individual"));
     }
 
     @Test
