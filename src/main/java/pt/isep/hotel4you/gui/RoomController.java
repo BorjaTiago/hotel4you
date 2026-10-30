@@ -144,8 +144,8 @@ public class RoomController {
     private static String typeLabel(String roomTypeName) {
         return switch (roomTypeName.toLowerCase(Locale.ROOT)) {
             case "individual" -> "Individual";
-            case "double" -> "Duplo";
-            case "family" -> "Familiar";
+            case "duplo" -> "Duplo";
+            case "familiar" -> "Familiar";
             default -> roomTypeName;
         };
     }

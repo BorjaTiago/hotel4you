@@ -66,7 +66,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 | 5 | 3 | Quartos |
 
 ### room_types
-**What:** The kinds of room: individual, double, family. The hotel has 20 rooms: 7 individual, 10 double, 3 family (RF-04).
+**What:** The stored room type names are `individual`, `duplo`, `familiar` (aligned with H4Y-26, user decision, 2026-10-30). They mean individual, double and family rooms. The hotel has 20 rooms: 7 individual, 10 double, 3 family (RF-04).
 **Why:** All rooms of one kind have the same capacity and base price.
 **Why this way:** We store capacity and price once. To change a price, we edit one row. `base_price` can be NULL (price not set yet).
 **Other option:** Put `capacity` and `base_price` in `rooms`. We did not, because 20 rooms would repeat the same values, and one edit could be forgotten.
@@ -74,8 +74,8 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 | id | name | capacity | base_price |
 |---|---|---|---|
 | 1 | individual | 1 | 60.00 |
-| 2 | double | 2 | 90.00 |
-| 3 | family | 4 | 140.00 |
+| 2 | duplo | 2 | 90.00 |
+| 3 | familiar | 4 | 140.00 |
 
 ### rooms
 **What:** One row for each physical room.
@@ -353,4 +353,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
