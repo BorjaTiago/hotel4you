@@ -45,7 +45,7 @@ class PermissionTest {
 
     @Test
     @Tag("H4Y-50-AC-1")
-    void allows_receptionistListsRooms_returnsTrue() {
+    void onAllows_returnTrue_whenReceptionistListsRooms() {
         assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));
     }
 

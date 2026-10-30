@@ -285,7 +285,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-1")
-    void listRoomSummaries_receptionistAsksWithoutFilter_returnsEveryRoomWithTypeFloorAndPrice() {
+    void onListRoomSummaries_returnEveryRoomWithTypeFloorAndPrice_whenReceptionistAsksWithoutFilter() {
         seedPricedRooms();
 
         List<RoomSummary> rooms = roomService.listRoomSummaries(null, receptionist());
@@ -298,7 +298,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-1")
-    void listRoomSummaries_managerAsks_returnsEveryRoom() {
+    void onListRoomSummaries_returnEveryRoom_whenManagerAsks() {
         seedPricedRooms();
 
         assertEquals(3, roomService.listRoomSummaries(null, manager()).size());
@@ -306,7 +306,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-1")
-    void listRoomSummaries_roomTypeHasNoBasePrice_returnsRoomWithNullPrice() {
+    void onListRoomSummaries_returnNullPrice_whenRoomTypeHasNoBasePrice() {
         repository.save(room(203, 2, "duplo"), FLOOR_LIMIT);
 
         RoomSummary summary = roomService.listRoomSummaries(null, receptionist()).getFirst();
@@ -317,7 +317,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-2")
-    void listRoomSummaries_filterByFamilyType_returnsOnlyFamilyRooms() {
+    void onListRoomSummaries_returnOnlyFamilyRooms_whenFilterIsFamily() {
         seedPricedRooms();
         repository.save(room(302, 3, "familiar"), FLOOR_LIMIT);
 
@@ -329,7 +329,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-2")
-    void listRoomSummaries_filterHasOtherCaseAndSpaces_returnsMatchingRooms() {
+    void onListRoomSummaries_returnMatchingRooms_whenFilterHasOtherCaseAndSpaces() {
         seedPricedRooms();
 
         List<RoomSummary> rooms = roomService.listRoomSummaries("  FAMILIAR ", receptionist());
@@ -339,7 +339,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-2")
-    void listRoomSummaries_filterIsBlank_returnsEveryRoom() {
+    void onListRoomSummaries_returnEveryRoom_whenFilterIsBlank() {
         seedPricedRooms();
 
         assertEquals(3, roomService.listRoomSummaries("  ", receptionist()).size());
@@ -347,13 +347,13 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-3")
-    void listRoomSummaries_noRoomsRegistered_returnsEmptyList() {
+    void onListRoomSummaries_returnEmptyList_whenNoRoomsRegistered() {
         assertEquals(List.of(), roomService.listRoomSummaries(null, receptionist()));
     }
 
     @Test
     @Tag("H4Y-50-AC-3")
-    void listRoomSummaries_filterMatchesNoRoom_returnsEmptyList() {
+    void onListRoomSummaries_returnEmptyList_whenFilterMatchesNoRoom() {
         seedPricedRooms();
 
         assertEquals(List.of(), roomService.listRoomSummaries("suite", receptionist()));
@@ -361,7 +361,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-4")
-    void listRoomSummaries_actorIsNotLoggedIn_throwsAccessDenied() {
+    void onListRoomSummaries_throwAccessDenied_whenActorIsNotLoggedIn() {
         seedPricedRooms();
 
         assertThrows(AccessDeniedException.class, () -> roomService.listRoomSummaries(null, null));
@@ -369,7 +369,7 @@ class RoomServiceTest {
 
     @Test
     @Tag("H4Y-50-AC-4")
-    void listRoomSummaries_actorIsRestaurantStaff_throwsAccessDenied() {
+    void onListRoomSummaries_throwAccessDenied_whenActorIsRestaurantStaff() {
         RestaurantStaff joao = new RestaurantStaff(3L, "Joao Lima", "joao", HASH);
 
         assertThrows(AccessDeniedException.class, () -> roomService.listRoomSummaries(null, joao));

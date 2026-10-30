@@ -86,7 +86,7 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-50-AC-2")
-    void listRoomSummaries_receptionistFiltersByType_returnsRoomsFromRoomService() {
+    void onListRoomSummaries_returnRoomsFromRoomService_whenReceptionistFiltersByType() {
         roomRepository.addFloor(3);
         roomRepository.addRoomType("familiar");
         roomRepository.addRoomType("duplo");
@@ -102,7 +102,7 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-50-AC-4")
-    void listRoomSummaries_actorIsNotLoggedIn_throwsAccessDenied() {
+    void onListRoomSummaries_throwAccessDenied_whenActorIsNotLoggedIn() {
         assertThrows(AccessDeniedException.class, () -> facade.listRoomSummaries(null, null));
     }
 

@@ -28,7 +28,7 @@ class JdbcRoomSummaryQueryTest {
 
     @Test
     @Tag("H4Y-50-AC-1")
-    void findSummaries_rowsHaveTypeFloorAndPrice_returnsOneSummaryPerRow() {
+    void onFindSummaries_returnOneSummaryPerRow_whenRowsHaveTypeFloorAndPrice() {
         database.rows = List.of(
                 row(201, 2, "single", new BigDecimal("80.00")),
                 row(301, 3, "family", null));
@@ -45,13 +45,13 @@ class JdbcRoomSummaryQueryTest {
 
     @Test
     @Tag("H4Y-50-AC-3")
-    void findSummaries_tableHasNoRooms_returnsEmptyList() {
+    void onFindSummaries_returnEmptyList_whenTableHasNoRooms() {
         assertEquals(List.of(), repository.findSummaries());
     }
 
     @Test
     @Tag("H4Y-50-AC-1")
-    void findSummaries_queryFails_throwsIllegalStateWithSqlCause() {
+    void onFindSummaries_throwIllegalStateWithSqlCause_whenQueryFails() {
         database.failure = new SQLException("Query failed");
 
         IllegalStateException error =
