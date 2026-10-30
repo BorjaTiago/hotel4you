@@ -36,4 +36,6 @@ Responsável proposto: Antonio Martinho (a equipa decide).
 - Ecrã `room-list.fxml`: tabela só de leitura (número, piso, tipo, preço base por noite) e caixa de escolha "Tipo" com "Todos", individual, duplo, familiar.
 - Sem quartos: a tabela vazia mostra "Não há quartos." (AC-3).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Nota: por decisão de Tiago Borja (2026-10-30), o ecrã `room-list.fxml` (`RoomListController`) foi fundido com o ecrã de quartos `rooms.fxml` (`RoomController`). O ecrã único, "Quartos", substitui `room-list.fxml`. Mostra a tabela e o filtro por tipo. O botão "Quartos" aparece com `LIST_ROOMS`. O formulário de registo e o resumo só aparecem com `MANAGE_ROOMS`.
+
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
