@@ -15,6 +15,7 @@ import javafx.scene.control.TableView;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.RoomService;
 
 /** Controller for the read-only room list with the room type filter. */
 public class RoomListController {
@@ -85,10 +86,8 @@ public class RoomListController {
         List<String> choices = new ArrayList<>();
         choices.add(ALL_TYPES);
         try {
-            facade.listRoomSummaries(ALL_TYPES, HotelApp.currentUser).stream()
-                    .map(RoomSummary::roomTypeName)
-                    .distinct()
-                    .sorted()
+            facade.roomTypeTargets().stream()
+                    .map(RoomService.RoomTypeTarget::name)
                     .forEach(choices::add);
         } catch (RuntimeException e) {
             showError(e.getMessage());
