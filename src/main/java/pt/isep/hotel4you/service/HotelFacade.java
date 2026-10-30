@@ -2,10 +2,14 @@ package pt.isep.hotel4you.service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import pt.isep.hotel4you.data.DuplicateRoomException;
+import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Role;
+import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
@@ -23,7 +27,7 @@ public class HotelFacade {
      * @param authService the login service
      * @param staffService the staff service
      * @param locationService the floor and zone service
-     * @param roomService the room service
+     * @param roomService the room registration service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService) {
@@ -162,6 +166,63 @@ public class HotelFacade {
         locationService.removeLocation(id, actor);
     }
 
+    /**
+     * Saves a room.
+     *
+     * @param room the room to save
+     * @param actor the logged-in user
+     * @return the saved room
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room data, floor or room type is invalid
+     * @throws DuplicateRoomException if the room number is already in use
+     * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws IllegalStateException if the database is not available
+     */
+    public Room saveRoom(Room room, User actor) {
+        return roomService.saveRoom(room, actor);
+    }
+
+    /**
+     * Returns the room floors and limits from the statement.
+     *
+     * @return an immutable map from floor number to maximum room count
+     */
+    public Map<Integer, Integer> roomFloorLimits() {
+        return roomService.roomFloorLimits();
+    }
+
+    /**
+     * Returns the labels and provisional room type totals for the summary.
+     *
+     * @return immutable display targets, not registration limits
+     */
+    public List<RoomService.RoomTypeTarget> roomTypeTargets() {
+        return roomService.roomTypeTargets();
+    }
+
+    /**
+     * Lists saved rooms.
+     *
+     * @param actor the logged-in user
+     * @return all saved rooms
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Room> listRooms(User actor) {
+        return roomService.listRooms(actor);
+    }
+
+    /**
+     * Lists the room types from the catalogue.
+     *
+     * @param actor the logged-in user
+     * @return all room type names
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<String> listRoomTypes(User actor) {
+        return roomService.listRoomTypes(actor);
+    }
     /**
      * Lists the room types with their base price.
      *
