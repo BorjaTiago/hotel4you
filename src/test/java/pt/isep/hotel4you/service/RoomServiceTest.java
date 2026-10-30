@@ -12,19 +12,23 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
+import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests room registration rules. */
@@ -34,6 +38,7 @@ class RoomServiceTest {
     private static final String HASH = "$2a$12$abcdefghijklmnopqrstuuAbCdEfGhIjKlMnOpQrStUvWxYz01234";
 
     private InMemoryRoomRepository repository;
+    private InMemoryRoomTypeRepository roomTypeRepository;
     private RoomService roomService;
 
     @BeforeEach
@@ -42,54 +47,59 @@ class RoomServiceTest {
         for (int floor : List.of(-1, 0, 1, 2, 3, 5)) {
             repository.addFloor(floor);
         }
-        for (String roomType : List.of("single", "double", "family")) {
+        for (String roomType : List.of("individual", "duplo", "familiar")) {
             repository.addRoomType(roomType);
         }
-        roomService = new RoomService(repository);
+        roomTypeRepository = new InMemoryRoomTypeRepository();
+        roomTypeRepository.add(new RoomType(1L, "duplo", 2, null));
+        roomTypeRepository.add(new RoomType(2L, "familiar", 4, null));
+        roomTypeRepository.add(new RoomType(3L, "individual", 1, null));
+        roomService = new RoomService(repository, roomTypeRepository);
     }
 
     @Test
     @Tag("H4Y-25-AC-1")
     void onSaveRoom_saveRoom_whenFloorAndTypeAreValid() {
-        Room saved = roomService.saveRoom(room(202, 2, "double"), manager());
+        Room saved = roomService.saveRoom(room(202, 2, "duplo"), manager());
 
         assertEquals(1, repository.findAll().size());
-        assertEquals(202, saved.number());
-        assertEquals(2, saved.floorNumber());
-        assertEquals("double", saved.roomTypeName());
+        assertEquals(202, saved.getNumber());
+        assertEquals(2, saved.getFloorNumber());
+        assertEquals("duplo", saved.getRoomTypeName());
     }
 
     @Test
     @Tag("H4Y-25-AC-2")
     void onSaveRoom_registerFullDistribution_whenCapacityAllows() {
         for (int i = 0; i < 7; i++) {
-            roomService.saveRoom(room(201 + i, 2, "single"), manager());
+            roomService.saveRoom(room(201 + i, 2, "individual"), manager());
         }
         for (int i = 0; i < 3; i++) {
-            roomService.saveRoom(room(208 + i, 2, "double"), manager());
+            roomService.saveRoom(room(208 + i, 2, "duplo"), manager());
         }
         for (int i = 0; i < 7; i++) {
-            roomService.saveRoom(room(301 + i, 3, "double"), manager());
+            roomService.saveRoom(room(301 + i, 3, "duplo"), manager());
         }
         for (int i = 0; i < 3; i++) {
-            roomService.saveRoom(room(308 + i, 3, "family"), manager());
+            roomService.saveRoom(room(308 + i, 3, "familiar"), manager());
         }
 
-        List<Room> rooms = roomService.listRooms();
+        List<Room> rooms = roomService.listRooms(manager());
         assertEquals(20, rooms.size());
-        assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 2).count());
-        assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 3).count());
-        assertEquals(7, rooms.stream().filter(room -> room.roomTypeName().equals("single")).count());
-        assertEquals(10, rooms.stream().filter(room -> room.roomTypeName().equals("double")).count());
-        assertEquals(3, rooms.stream().filter(room -> room.roomTypeName().equals("family")).count());
+        assertEquals(10, rooms.stream().filter(room -> room.getFloorNumber() == 2).count());
+        assertEquals(10, rooms.stream().filter(room -> room.getFloorNumber() == 3).count());
+        assertEquals(7, rooms.stream().filter(room -> room.getRoomTypeName().equals("individual")).count());
+        assertEquals(10, rooms.stream().filter(room -> room.getRoomTypeName().equals("duplo")).count());
+        assertEquals(3, rooms.stream().filter(room -> room.getRoomTypeName().equals("familiar")).count());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {-1, 0, 1, 5})
     @Tag("H4Y-25-AC-3")
     void onSaveRoom_throw_whenFloorIsNotForRooms(int floorNumber) {
-        assertThrows(IllegalArgumentException.class,
-                () -> roomService.saveRoom(room(101, floorNumber, "single"), manager()));
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> roomService.saveRoom(room(101, floorNumber, "individual"), manager()));
+        assertEquals("Só os pisos 2 e 3 têm quartos.", error.getMessage());
 
         assertEquals(0, repository.findAll().size());
     }
@@ -101,7 +111,7 @@ class RoomServiceTest {
         seedRooms(floorNumber, 301, FLOOR_LIMIT);
 
         assertThrows(RoomLimitExceededException.class,
-                () -> roomService.saveRoom(room(311, floorNumber, "double"), manager()));
+                () -> roomService.saveRoom(room(311, floorNumber, "duplo"), manager()));
 
         assertEquals(FLOOR_LIMIT, repository.findAll().size());
     }
@@ -112,9 +122,28 @@ class RoomServiceTest {
         seedRooms(2, 202, 1);
 
         assertThrows(DuplicateRoomException.class,
-                () -> roomService.saveRoom(room(202, 3, "double"), manager()));
+                () -> roomService.saveRoom(room(202, 3, "duplo"), manager()));
 
         assertEquals(1, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-4")
+    void onSaveRoom_throwLimit_whenFloorIsFullAndNumberExists() {
+        seedRooms(2, 301, FLOOR_LIMIT);
+
+        assertThrows(RoomLimitExceededException.class,
+                () -> roomService.saveRoom(room(301, 2, "duplo"), manager()));
+
+        assertEquals(FLOOR_LIMIT, repository.findAll().size());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_returnRoomTypeRepositoryNames_whenRoomRepositoryHasNone() {
+        RoomService service = new RoomService(new InMemoryRoomRepository(), roomTypeRepository);
+
+        assertEquals(List.of("duplo", "familiar", "individual"), service.listRoomTypes(manager()));
     }
 
     @Test
@@ -130,7 +159,7 @@ class RoomServiceTest {
     @Tag("H4Y-25-AC-1")
     void onSaveRoom_throw_whenFloorDoesNotExist() {
         assertThrows(IllegalArgumentException.class,
-                () -> roomService.saveRoom(room(402, 4, "double"), manager()));
+                () -> roomService.saveRoom(room(402, 4, "duplo"), manager()));
 
         assertEquals(0, repository.findAll().size());
     }
@@ -147,7 +176,7 @@ class RoomServiceTest {
     @Tag("H4Y-25-AC-1")
     void onSaveRoom_throwAccessDenied_whenActorIsNull() {
         assertThrows(AccessDeniedException.class,
-                () -> roomService.saveRoom(room(202, 2, "double"), null));
+                () -> roomService.saveRoom(room(202, 2, "duplo"), null));
         assertEquals(0, repository.findAll().size());
     }
 
@@ -157,7 +186,7 @@ class RoomServiceTest {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", HASH);
 
         assertThrows(AccessDeniedException.class,
-                () -> roomService.saveRoom(room(202, 2, "double"), receptionist));
+                () -> roomService.saveRoom(room(202, 2, "duplo"), receptionist));
 
         assertEquals(0, repository.findAll().size());
     }
@@ -168,11 +197,11 @@ class RoomServiceTest {
             throws InterruptedException, ExecutionException {
         seedRooms(2, 201, FLOOR_LIMIT - 1);
         List<Callable<Boolean>> attempts = List.of(
-                () -> trySave(room(210, 2, "double")),
+                () -> trySave(room(210, 2, "duplo")),
                 () -> {
-                    RoomService second = new RoomService(repository);
+                    RoomService second = new RoomService(repository, roomTypeRepository);
                     try {
-                        second.saveRoom(room(211, 2, "double"), manager());
+                        second.saveRoom(room(211, 2, "duplo"), manager());
                         return true;
                     } catch (RoomLimitExceededException e) {
                         return false;
@@ -198,6 +227,63 @@ class RoomServiceTest {
     }
 
     @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRooms_returnSavedRooms_whenActorIsManager() {
+        Room saved = roomService.saveRoom(room(202, 2, "duplo"), manager());
+
+        assertEquals(List.of(saved), roomService.listRooms(manager()));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_returnCatalogue_whenActorIsManager() {
+        assertEquals(List.of("duplo", "familiar", "individual"), roomService.listRoomTypes(manager()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("deniedActors")
+    @Tag("H4Y-25-AC-1")
+    void onListRooms_throwAccessDenied_whenActorIsNotManager(User actor) {
+        assertThrows(AccessDeniedException.class, () -> roomService.listRooms(actor));
+    }
+
+    @ParameterizedTest
+    @MethodSource("deniedActors")
+    @Tag("H4Y-25-AC-1")
+    void onListRoomTypes_throwAccessDenied_whenActorIsNotManager(User actor) {
+        assertThrows(AccessDeniedException.class, () -> roomService.listRoomTypes(actor));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-2")
+    void onRoomTypeTargets_returnImmutableSummaryData_whenScreenReadsTargets() {
+        var targets = roomService.roomTypeTargets();
+
+        assertEquals(List.of("individual", "duplo", "familiar"),
+                targets.stream().map(RoomService.RoomTypeTarget::name).toList());
+        assertEquals(List.of("Individuais", "Duplos", "Familiares"),
+                targets.stream().map(RoomService.RoomTypeTarget::label).toList());
+        assertEquals(List.of(7, 10, 3),
+                targets.stream().map(RoomService.RoomTypeTarget::total).toList());
+        assertThrows(UnsupportedOperationException.class, () -> targets.clear());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-2")
+    void onSaveRoom_allowMoreThanTypeTarget_whenFloorHasCapacity() {
+        for (int i = 0; i < 8; i++) {
+            roomService.saveRoom(room(201 + i, 2, "individual"), manager());
+        }
+
+        assertEquals(8, repository.findAll().size());
+    }
+
+    private static Stream<User> deniedActors() {
+        return Stream.of(null, new Receptionist(2L, "Ana", "ana", HASH),
+                new RestaurantStaff(3L, "João", "joao", HASH));
+    }
+
+    @Test
     @Tag("H4Y-50-AC-1")
     void listRoomSummaries_receptionistAsksWithoutFilter_returnsEveryRoomWithTypeFloorAndPrice() {
         seedPricedRooms();
@@ -205,9 +291,9 @@ class RoomServiceTest {
         List<RoomSummary> rooms = roomService.listRoomSummaries(null, receptionist());
 
         assertEquals(List.of(
-                new RoomSummary(201, 2, "single", new BigDecimal("80.00")),
-                new RoomSummary(202, 2, "double", new BigDecimal("120.00")),
-                new RoomSummary(301, 3, "family", new BigDecimal("180.00"))), rooms);
+                new RoomSummary(201, 2, "individual", new BigDecimal("80.00")),
+                new RoomSummary(202, 2, "duplo", new BigDecimal("120.00")),
+                new RoomSummary(301, 3, "familiar", new BigDecimal("180.00"))), rooms);
     }
 
     @Test
@@ -221,7 +307,7 @@ class RoomServiceTest {
     @Test
     @Tag("H4Y-50-AC-1")
     void listRoomSummaries_roomTypeHasNoBasePrice_returnsRoomWithNullPrice() {
-        repository.save(room(203, 2, "double"), FLOOR_LIMIT);
+        repository.save(room(203, 2, "duplo"), FLOOR_LIMIT);
 
         RoomSummary summary = roomService.listRoomSummaries(null, receptionist()).getFirst();
 
@@ -233,12 +319,12 @@ class RoomServiceTest {
     @Tag("H4Y-50-AC-2")
     void listRoomSummaries_filterByFamilyType_returnsOnlyFamilyRooms() {
         seedPricedRooms();
-        repository.save(room(302, 3, "family"), FLOOR_LIMIT);
+        repository.save(room(302, 3, "familiar"), FLOOR_LIMIT);
 
-        List<RoomSummary> rooms = roomService.listRoomSummaries("family", receptionist());
+        List<RoomSummary> rooms = roomService.listRoomSummaries("familiar", receptionist());
 
         assertEquals(List.of(301, 302), rooms.stream().map(RoomSummary::number).toList());
-        assertTrue(rooms.stream().allMatch(room -> room.roomTypeName().equals("family")));
+        assertTrue(rooms.stream().allMatch(room -> room.roomTypeName().equals("familiar")));
     }
 
     @Test
@@ -246,7 +332,7 @@ class RoomServiceTest {
     void listRoomSummaries_filterHasOtherCaseAndSpaces_returnsMatchingRooms() {
         seedPricedRooms();
 
-        List<RoomSummary> rooms = roomService.listRoomSummaries("  FAMILY ", receptionist());
+        List<RoomSummary> rooms = roomService.listRoomSummaries("  FAMILIAR ", receptionist());
 
         assertEquals(List.of(301), rooms.stream().map(RoomSummary::number).toList());
     }
@@ -290,12 +376,12 @@ class RoomServiceTest {
     }
 
     private void seedPricedRooms() {
-        repository.setBasePrice("single", new BigDecimal("80.00"));
-        repository.setBasePrice("double", new BigDecimal("120.00"));
-        repository.setBasePrice("family", new BigDecimal("180.00"));
-        repository.save(room(202, 2, "double"), FLOOR_LIMIT);
-        repository.save(room(301, 3, "family"), FLOOR_LIMIT);
-        repository.save(room(201, 2, "single"), FLOOR_LIMIT);
+        repository.setBasePrice("individual", new BigDecimal("80.00"));
+        repository.setBasePrice("duplo", new BigDecimal("120.00"));
+        repository.setBasePrice("familiar", new BigDecimal("180.00"));
+        repository.save(room(202, 2, "duplo"), FLOOR_LIMIT);
+        repository.save(room(301, 3, "familiar"), FLOOR_LIMIT);
+        repository.save(room(201, 2, "individual"), FLOOR_LIMIT);
     }
 
     private static Receptionist receptionist() {
@@ -314,7 +400,7 @@ class RoomServiceTest {
     private void seedRooms(int floorNumber, int firstRoomNumber, int count) {
         for (int i = 0; i < count; i++) {
             repository.save(
-                    room(firstRoomNumber + i, floorNumber, "double"), FLOOR_LIMIT);
+                    room(firstRoomNumber + i, floorNumber, "duplo"), FLOOR_LIMIT);
         }
     }
 

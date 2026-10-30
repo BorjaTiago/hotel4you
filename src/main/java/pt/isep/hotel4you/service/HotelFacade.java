@@ -1,13 +1,17 @@
 package pt.isep.hotel4you.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import pt.isep.hotel4you.data.DuplicateRoomException;
+import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
 /** Single entry point for the GUI. */
@@ -169,6 +173,11 @@ public class HotelFacade {
      * @param room the room to save
      * @param actor the logged-in user
      * @return the saved room
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room data, floor or room type is invalid
+     * @throws DuplicateRoomException if the room number is already in use
+     * @throws RoomLimitExceededException if the floor already has 10 rooms
+     * @throws IllegalStateException if the database is not available
      */
     public Room saveRoom(Room room, User actor) {
         return roomService.saveRoom(room, actor);
@@ -184,12 +193,24 @@ public class HotelFacade {
     }
 
     /**
+     * Returns the labels and provisional room type totals for the summary.
+     *
+     * @return immutable display targets, not registration limits
+     */
+    public List<RoomService.RoomTypeTarget> roomTypeTargets() {
+        return roomService.roomTypeTargets();
+    }
+
+    /**
      * Lists saved rooms.
      *
+     * @param actor the logged-in user
      * @return all saved rooms
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<Room> listRooms() {
-        return roomService.listRooms();
+    public List<Room> listRooms(User actor) {
+        return roomService.listRooms(actor);
     }
 
     /**
@@ -208,9 +229,48 @@ public class HotelFacade {
     /**
      * Lists the room types from the catalogue.
      *
+     * @param actor the logged-in user
      * @return all room type names
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<String> listRoomTypes() {
-        return roomService.listRoomTypes();
+    public List<String> listRoomTypes(User actor) {
+        return roomService.listRoomTypes(actor);
+    }
+    /**
+     * Lists the room types with their base price.
+     *
+     * @param actor the logged-in user who asks
+     * @return the room types ordered by id
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<RoomType> listBasePrices(User actor) {
+        return roomService.listBasePrices(actor);
+    }
+
+    /**
+     * Sets the base price per night of a room type.
+     *
+     * @param type the room type
+     * @param price the new price
+     * @param actor the logged-in user who asks
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the type or the price is not valid, or the type does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public void setBasePrice(RoomType type, BigDecimal price, User actor) {
+        roomService.setBasePrice(type, price, actor);
+    }
+
+    /**
+     * Converts the text of the screen to a price.
+     *
+     * @param text the text typed by the user
+     * @return the price
+     * @throws IllegalArgumentException if the text is null, blank or not a number
+     */
+    public BigDecimal parsePrice(String text) {
+        return roomService.parsePrice(text);
     }
 }

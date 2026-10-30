@@ -85,7 +85,11 @@ public class RoomListController {
         List<String> choices = new ArrayList<>();
         choices.add(ALL_TYPES);
         try {
-            choices.addAll(facade.listRoomTypes());
+            facade.listRoomSummaries(ALL_TYPES, HotelApp.currentUser).stream()
+                    .map(RoomSummary::roomTypeName)
+                    .distinct()
+                    .sorted()
+                    .forEach(choices::add);
         } catch (RuntimeException e) {
             showError(e.getMessage());
         }
@@ -105,9 +109,9 @@ public class RoomListController {
 
     private static String typeLabel(String roomTypeName) {
         return switch (roomTypeName.toLowerCase(Locale.ROOT)) {
-            case "single", "individual" -> "Individual";
-            case "double", "duplo" -> "Duplo";
-            case "family", "familiar" -> "Familiar";
+            case "individual" -> "Individual";
+            case "duplo" -> "Duplo";
+            case "familiar" -> "Familiar";
             default -> roomTypeName;
         };
     }

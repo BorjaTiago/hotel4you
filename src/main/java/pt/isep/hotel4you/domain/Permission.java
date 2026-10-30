@@ -14,6 +14,9 @@ public enum Permission {
     /** Register and list rooms. */
     MANAGE_ROOMS(Role.MANAGER),
 
+    /** View and set the base price of the room types. */
+    MANAGE_PRICES(Role.MANAGER),
+
     /** See the room list with type, floor and base price. */
     LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER);
 

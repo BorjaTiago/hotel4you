@@ -12,8 +12,8 @@ floors
 
 room_types
   id                    TINYINT IDENTITY PK             -- Internal room type ID.
-  name                  VARCHAR(20) NOT NULL UNIQUE     -- Type name: individual, double, family.
-  capacity              TINYINT NOT NULL                -- Maximum number of people (family: up to 4).
+  name                  VARCHAR(20) NOT NULL UNIQUE     -- Stored type name: individual, duplo, familiar.
+  capacity              TINYINT NOT NULL                -- Maximum number of people (familiar: up to 4).
   base_price            DECIMAL(8,2) NULL               -- Base price per night for this type. NULL = not set yet.
 
 rooms
@@ -131,7 +131,7 @@ feedback
 
 ### Building and rooms
 - `floors`: floors of the hotel. `number` is `SMALLINT` because it can be negative (-1 to 3). `description` is the name the manager sees.
-- `room_types`: individual, double or family. Holds `capacity` and `base_price` per night.
+- `room_types`: stored names `individual`, `duplo`, `familiar` (aligned with H4Y-26, user decision, 2026-10-30). Holds `capacity` and `base_price` per night.
 - `rooms`: one row per room. Links to one floor and one room type. The view is not here. It is a service of the reservation (see below).
 - `locations`: places with a card reader (pool, restaurant, bar). Each one is on one floor. Used to check staff access. `guest_card_access = 0` means a client card never opens the place. `requires_reservation = 1` means the zone needs a reservation to open with the client card. The name is unique per floor.
 - `reservation_locations`: locations included in a reservation. Composite PK (`reservation_id`, `location_id`).
@@ -266,4 +266,4 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). Import every item from a valid XML file and create missing `items` rows (Q-10, Q-38; PR #20 decision, 2026-10-21). Save the new catalogue items, import, ENTRY movements and balances in one transaction. A failed save undoes the whole import. No rejected-item field is needed. This updates the schema documentation; no database migration is applied here. `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
 13. **Zone removal**: the backend deletes the `locations` row. If another row references it (FK NO ACTION, SQL error 547), the delete fails and the backend shows 'A zona tem associações e não pode ser removida.' (Q-36, H4Y-28).
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.

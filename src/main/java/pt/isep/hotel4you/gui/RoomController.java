@@ -1,7 +1,6 @@
 package pt.isep.hotel4you.gui;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -12,14 +11,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.RoomService.RoomTypeTarget;
 
 /** Controller for room registration and the room list. */
 public class RoomController {
 
     private final HotelFacade facade;
     private Map<Integer, Integer> floorLimits;
+    private List<RoomTypeTarget> typeTargets;
 
     @FXML
     private TextField numberField;
@@ -60,13 +62,25 @@ public class RoomController {
     @FXML
     private void initialize() {
         floorLimits = facade.roomFloorLimits();
+        typeTargets = facade.roomTypeTargets();
         floorBox.getItems().setAll(floorLimits.keySet().stream().sorted().toList());
         numberColumn.setCellValueFactory(
-                data -> new ReadOnlyObjectWrapper<>(data.getValue().number()));
+                data -> new ReadOnlyObjectWrapper<>(data.getValue().getNumber()));
         floorColumn.setCellValueFactory(
-                data -> new ReadOnlyObjectWrapper<>(data.getValue().floorNumber()));
+                data -> new ReadOnlyObjectWrapper<>(data.getValue().getFloorNumber()));
         roomTypeColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(data.getValue().roomTypeName()));
+                data -> new SimpleStringProperty(typeText(data.getValue().getRoomTypeName())));
+        roomTypeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(String name) {
+                return name == null ? "" : typeText(name);
+            }
+
+            @Override
+            public String fromString(String text) {
+                return null;
+            }
+        });
         loadRoomTypes();
         loadRooms();
     }
@@ -102,7 +116,7 @@ public class RoomController {
 
     private void loadRoomTypes() {
         try {
-            roomTypeBox.getItems().setAll(facade.listRoomTypes());
+            roomTypeBox.getItems().setAll(facade.listRoomTypes(HotelApp.currentUser));
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
         }
@@ -110,7 +124,7 @@ public class RoomController {
 
     private void loadRooms() {
         try {
-            List<Room> rooms = facade.listRooms();
+            List<Room> rooms = facade.listRooms(HotelApp.currentUser);
             roomTable.getItems().setAll(rooms);
             updateSummary(rooms);
         } catch (RuntimeException e) {
@@ -125,29 +139,24 @@ public class RoomController {
         for (int floor : floorBox.getItems()) {
             summary.add("Piso " + floor + ": " + countOnFloor(rooms, floor) + "/" + floorLimits.get(floor));
         }
-        for (String type : roomTypeBox.getItems()) {
-            summary.add(typeLabel(type) + ": " + countOfType(rooms, type));
+        for (RoomTypeTarget type : typeTargets) {
+            summary.add(type.label() + " " + countOfType(rooms, type.name()) + "/" + type.total());
         }
         summaryLabel.setText(summary.toString());
     }
 
+    private static String typeText(String name) {
+        return name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
     private static long countOnFloor(List<Room> rooms, int floorNumber) {
-        return rooms.stream().filter(room -> room.floorNumber() == floorNumber).count();
+        return rooms.stream().filter(room -> room.getFloorNumber() == floorNumber).count();
     }
 
     private static long countOfType(List<Room> rooms, String roomTypeName) {
         return rooms.stream()
-                .filter(room -> room.roomTypeName().equalsIgnoreCase(roomTypeName))
+                .filter(room -> room.getRoomTypeName().equalsIgnoreCase(roomTypeName))
                 .count();
-    }
-
-    private static String typeLabel(String roomTypeName) {
-        return switch (roomTypeName.toLowerCase(Locale.ROOT)) {
-            case "single", "individual" -> "Individual";
-            case "double", "duplo" -> "Duplo";
-            case "family", "familiar" -> "Familiar";
-            default -> roomTypeName;
-        };
     }
 
     private void showMessage(String message, boolean success) {

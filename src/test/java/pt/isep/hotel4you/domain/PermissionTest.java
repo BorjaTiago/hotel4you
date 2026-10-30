@@ -38,6 +38,12 @@ class PermissionTest {
     }
 
     @Test
+    @Tag("H4Y-26-AC-4")
+    void onAllows_returnFalse_whenReceptionistManagesPrices() {
+        assertFalse(Permission.MANAGE_PRICES.allows(RECEPTIONIST));
+    }
+
+    @Test
     @Tag("H4Y-50-AC-1")
     void allows_receptionistListsRooms_returnsTrue() {
         assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));

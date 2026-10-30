@@ -35,29 +35,20 @@ public class InMemoryRoomRepository implements RoomRepository {
         basePrices.put(roomTypeName.toLowerCase(Locale.ROOT), basePrice);
     }
 
-    @Override
-    public synchronized boolean floorExists(int floorNumber) {
+    private boolean floorExists(int floorNumber) {
         return floors.contains(floorNumber);
     }
 
-    @Override
-    public synchronized boolean roomTypeExists(String roomTypeName) {
+    private boolean roomTypeExists(String roomTypeName) {
         return roomTypeName != null && roomTypes.contains(roomTypeName.toLowerCase(Locale.ROOT));
     }
 
-    @Override
-    public synchronized List<String> findRoomTypeNames() {
-        return roomTypes.stream().sorted().toList();
+    private boolean existsByNumber(int roomNumber) {
+        return rooms.stream().anyMatch(room -> room.getNumber() == roomNumber);
     }
 
-    @Override
-    public synchronized boolean existsByNumber(int roomNumber) {
-        return rooms.stream().anyMatch(room -> room.number() == roomNumber);
-    }
-
-    @Override
-    public synchronized int countByFloor(int floorNumber) {
-        return (int) rooms.stream().filter(room -> room.floorNumber() == floorNumber).count();
+    private int countByFloor(int floorNumber) {
+        return (int) rooms.stream().filter(room -> room.getFloorNumber() == floorNumber).count();
     }
 
     @Override
@@ -68,28 +59,28 @@ public class InMemoryRoomRepository implements RoomRepository {
     @Override
     public synchronized List<RoomSummary> findSummaries() {
         return rooms.stream()
-                .sorted(Comparator.comparingInt(Room::number))
-                .map(room -> new RoomSummary(room.number(), room.floorNumber(), room.roomTypeName(),
-                        basePrices.get(room.roomTypeName().toLowerCase(Locale.ROOT))))
+                .sorted(Comparator.comparingInt(Room::getNumber))
+                .map(room -> new RoomSummary(room.getNumber(), room.getFloorNumber(), room.getRoomTypeName(),
+                        basePrices.get(room.getRoomTypeName().toLowerCase(Locale.ROOT))))
                 .toList();
     }
 
     @Override
     public synchronized Room save(Room room, int floorLimit) {
-        if (!floorExists(room.floorNumber())) {
+        if (!floorExists(room.getFloorNumber())) {
             throw new IllegalArgumentException("O piso indicado não existe.");
         }
-        if (!roomTypeExists(room.roomTypeName())) {
+        if (!roomTypeExists(room.getRoomTypeName())) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
-        if (existsByNumber(room.number())) {
-            throw new DuplicateRoomException();
-        }
-        if (countByFloor(room.floorNumber()) >= floorLimit) {
+        if (countByFloor(room.getFloorNumber()) >= floorLimit) {
             throw new RoomLimitExceededException(floorLimit);
         }
-        Room saved = new Room((long) rooms.size() + 1, room.number(),
-                room.floorNumber(), room.roomTypeName());
+        if (existsByNumber(room.getNumber())) {
+            throw new DuplicateRoomException();
+        }
+        Room saved = new Room((long) rooms.size() + 1, room.getNumber(),
+                room.getFloorNumber(), room.getRoomTypeName());
         rooms.add(saved);
         return saved;
     }
