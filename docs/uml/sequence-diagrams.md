@@ -1,172 +1,204 @@
 # H4Y-8 - Sequence Diagrams
 
-These diagrams show calls between the classes in [classes.md](classes.md) and [class-diagram.md](class-diagram.md). Read [sequence-guide.md](sequence-guide.md) to defend the flows and their limits.
+These sequences refine SD-04 and SD-06. Read [sequence-guide.md](sequence-guide.md) for the decisions and the classroom explanation.
 
-Sources: [use cases](../requirements/use-cases.md), [requirements](../requirements/requirements.md), [domain model](domain-model.md), [schema](../database/schema.md) and [table guide](../database/tables.md). This carry-over review uses `origin/main` at `44ccc4d`. The latest [PR #20 decision](https://github.com/BorjaTiago/hotel4you/pull/20#issuecomment-6322549129), dated 2026-10-21, replaces the earlier preview request: import all items from a valid XML file and create missing catalogue items. SD-06 replaces the simpler SD-05 card flow. Diagram IDs are not reassigned.
+Sources: `origin/main` at `ddd8757`; [class diagram](class-diagram.md), [class methods](classes.md), [use cases](../requirements/use-cases.md), [requirements](../requirements/requirements.md) and [schema](../database/schema.md). The professor feedback supplied by the user on 2026-10-30 requires database transactions, hierarchical message numbering and XML preview with confirmation. It corrects the earlier interpretation of numbering as association cardinality.
 
 ## Reading rules
 
-- Time goes from top to bottom. Solid arrows are method calls. Dashed arrows show data, errors or completion. A completion signal does not change a `void` return type.
-- Each actor and participant uses a class name from the class diagram. Short IDs only make the source easier to read.
-- A controller calls `HotelFacade`. The facade calls a service. Services hold business rules. Controllers never call SQL Server.
-- Notes describe required internal work, model multiplicities or a missing contract. They are not new methods. Only call arrows claim method coverage.
-- SQL Server work appears in notes. The class model includes `Database`, `UserRepository` and `JdbcUserRepository` (H4Y-32). It has no persistence contracts for reservations or stock. See G-01.
-- Each diagram covers one existing use case. SD-04 is detailed. SD-06 is a general view of the import workflow. It keeps parsing and storage details in notes.
-- SD-06 uses the existing one-step `importStock()` API. It has no preview or confirmation stage.
-- The latest PR decision accepts every item from a valid XML file, including items missing from the catalogue. This replaces the earlier unknown-item rejection rule for this flow.
-- A lifeline shows a participant in one scenario. It does not set the number of stored objects. Notes inside each diagram show the relevant model multiplicities. `*` in the canonical UML is written as `0..*` here.
-
-**Implementation boundary:** Both sequences are design flows. The six called methods exist in the class model. The reservation and stock controllers, service operations and persistence flows are not implemented in Java at this baseline. No implemented transaction, lock, commit or rollback is shown. Error and success branches describe required outcomes, not tested runtime behavior (G-01, G-02).
+- Time goes from top to bottom. Each arrow has an explicit hierarchical message ID. No `autonumber` or numbering table is used. IDs identify the drawn messages, not a runtime counter. An alternative skips the other branch; a loop repeats its labeled interaction.
+- Existing modeled calls keep their names. `[proposed G-xx]` identifies a missing class-model method. The complete receiver and signature are listed under Gaps. A dashed arrow is data, completion or an error; it does not add a method or change a modeled `void` return.
+- Controllers call `HotelFacade`, which calls services. Services apply rules. Proposed repositories own database connections and transactions. Controllers never call the database.
+- `Database` is the existing Java connection factory. `SQLServer` is the external database, not a Java class. Arrows marked `[SQL G-01]` summarize proposed parameterized SQL or transaction commands. They are not new methods on `Database` or executable SQL scripts.
+- Both reservation and stock runtime flows are missing at this baseline. Every repository and transaction interaction below is proposed. The diagrams show the required design, not implemented persistence or tested rollback.
+- Each repository operation uses one operation-scoped connection. A failed database call stops the remaining work and takes the error path. Rollback is attempted only for an active transaction. Connections must close on every exit; failure handling still needs implementation (G-01).
+- SD-05 stays removed. The requested numbering is unrelated to UML association multiplicities.
 
 ## SD-04 - Detailed: delete a reservation
 
-- **Use case name:** UC-05 Delete reservation.
-- **Actor:** Manager. Other signed-in `User` roles exercise the denied branch.
-- **Goal:** Delete a booking and its dependent rows only before check-in.
-- **Preconditions:** The caller is signed in. The selected booking may be missing or stale. The service must read its current state.
+- **Use case:** UC-05 Delete reservation.
+- **Actor:** Manager; another signed-in User takes the unauthorized branch.
+- **Goal:** Delete a reservation only before check-in, using the permanent deletion required by RF-22 and Q-05.
 - **Requirements:** RF-02, RF-22; RNF-07, RNF-12.
+- **Status:** The controller, facade and service call names exist in the class model. The helpers, repository and transaction context are proposed (G-01, G-02).
 
 ```mermaid
-%%{init: {"theme":"neutral","fontFamily":"Arial","sequence":{"actorFontFamily":"Arial","noteFontFamily":"Arial","messageFontFamily":"Arial","width":200,"wrap":false}}}%%
+%%{init: {"theme":"neutral","fontFamily":"Arial","sequence":{"width":170,"wrap":false}}}%%
 sequenceDiagram
     actor User
     participant RC as ReservationController
     participant F as HotelFacade
     participant RS as ReservationService
-    User->>RC: onDeleteReservationClicked()
-    RC->>F: deleteReservation(reservation, user)
-    F->>RS: delete(reservation, user)
-    activate RS
-    Note over RC,RS: Design only: calls exist in the class model.<br/>This reservation flow and its transactions<br/>are not implemented (G-01, G-02).
-    Note over RS: Model multiplicities:<br/>Reservation 1 - 0..* ReservationExtra<br/>ReservationExtra 0..* - 1 ExtraService
+    participant RR as ReservationRepository<br/>(proposed G-01)
+    participant D as Database
+    participant SQL as SQLServer<br/>(external database)
+    Note over RS,SQL: Proposed persistence design. No reservation transaction is implemented.<br/>tx identifies one operation-scoped connection, owned by the repository.
+    User->>RC: 1. onDeleteReservationClicked()
+    RC->>F: 1.1. deleteReservation(reservation, user)
+    F->>RS: 1.1.1. delete(reservation, user)
+    RS->>RS: 1.1.1.1. authorizeDelete(user) [proposed G-02]
     alt User is not a Manager
-        RS-->>F: User not allowed. No data deleted
+        Note over RS: Refuse access. No repository or SQL call.
     else User is a Manager
-        Note over RS: Required: find the current Reservation.<br/>The lookup and protection against<br/>concurrent check-in are missing (G-02).
-        alt Reservation not found
-            RS-->>F: Reservation not found. No data deleted
-        else checkedInAt is not null
-            RS-->>F: Check-in already done. No data deleted
-        else Reservation found and no check-in
-            Note over RS: Model multiplicities:<br/>Reservation 0..* - 0..* Location<br/>Reservation 0..1 - 0..1 MagneticCard<br/>The schema does not enforce the card limit (G-03).
-            Note over RS: Required deletion order:<br/>this booking's extra rows, its zone links,<br/>then the booking. Keep shared objects.<br/>Persistence is not implemented (G-01).
-            alt A protected link or storage error stops deletion
-                Note over RS: Required failure outcome: keep all original rows.<br/>No rollback is implemented (G-01).
-                RS-->>F: Deletion failed. No data deleted
-            else Every deletion succeeds
-                RS-->>F: Deletion complete
+        RS->>RR: 1.1.1.2. beginDelete(reservation.id) [proposed G-01]
+        RR->>D: 1.1.1.2.1. connect()
+        D-->>RR: 1.1.1.2.2. Connection or connection error
+        opt Connection opened
+            RR->>SQL: 1.1.1.2.3. BEGIN TRANSACTION [SQL G-01]
+            SQL-->>RR: 1.1.1.2.4. Transaction opened or SQL error
+            opt Transaction opened
+                RR->>SQL: 1.1.1.2.5. SELECT id, checked_in_at FROM reservations<br/>WITH (UPDLOCK, HOLDLOCK) WHERE id = ? [SQL G-01]
+                SQL-->>RR: 1.1.1.2.6. Current row, no row or SQL error
             end
         end
+        RR-->>RS: 1.1.1.3. tx and lookup result, or database error
+        RS->>RS: 1.1.1.4. validateDeleteResult(result) [proposed G-02]
+        alt Read failed, reservation missing or checkedInAt is not null
+            Note over RS: Return DatabaseError, ReservationNotFound or AlreadyCheckedIn.<br/>Do not run a DELETE statement.
+            opt Transaction is still active
+                RS->>RR: 1.1.1.5. rollback(tx) [proposed G-01]
+                RR->>SQL: 1.1.1.5.1. ROLLBACK [SQL G-01]
+                SQL-->>RR: 1.1.1.5.2. Rollback result
+                RR-->>RS: 1.1.1.6. Completion or rollback error
+            end
+        else Current reservation exists and has no check-in
+            RS->>RR: 1.1.1.7. delete(tx, reservation.id) [proposed G-01]
+            RR->>SQL: 1.1.1.7.1. DELETE FROM reservation_services WHERE reservation_id = ?<br/>DELETE FROM reservation_locations WHERE reservation_id = ?<br/>DELETE FROM reservations WHERE id = ? [SQL G-01]
+            SQL-->>RR: 1.1.1.7.2. Delete batch completed or SQL error
+            alt SQL operation fails
+                opt Transaction is still active
+                    RR->>SQL: 1.1.1.7.3. ROLLBACK [SQL G-01]
+                    SQL-->>RR: 1.1.1.7.4. Rollback result
+                end
+            else Delete batch succeeds
+                RR->>SQL: 1.1.1.7.5. COMMIT [SQL G-01]
+                SQL-->>RR: 1.1.1.7.6. Commit result
+            end
+            Note over RR: Close the connection on every exit.<br/>Report success only after commit is confirmed (G-01).
+            RR-->>RS: 1.1.1.8. Completion or persistence error
+        end
     end
-    deactivate RS
-    F-->>RC: Deletion complete or deletion error
-    RC-->>User: Deletion complete or deletion error
+    RS-->>F: 1.1.2. Completion or authorization, lookup, check-in or database error
+    F-->>RC: 1.2. Completion or deletion error
+    RC-->>User: 2. Deletion result
 ```
 
-**Required error cases:** User is not a manager. The booking is missing. Check-in has occurred, including a completed stay. A protected card link or storage error stops deletion. Every failure must keep the original data.
+**Required error cases:** Unauthorized user, missing reservation, any check-in history and database failure. No DELETE follows a failed role or state check. A protected card FK can make the delete batch fail; cards and access history are never deleted to force success.
 
-The notes expand the required work of the modeled `ReservationService.delete()`. They are not extra method calls or implemented database operations. Delete only this booking's `reservation_services` rows and `reservation_locations` links before the booking. Keep the shared room, locations and service catalogue. Never delete cards or access history to force a booking deletion.
+The schema documents permanent deletion, not a reservation soft-delete flag. Only this reservation's extra rows, zone links and reservation row are removed. Rooms, locations and service catalogue rows stay shared. The proposed protected read and the DELETE batch use the same `tx`. Check-in must respect the same row protection before this design can be claimed safe (G-02).
 
-A transaction would be needed to save all deletions together or undo them all. It does not by itself stop a concurrent check-in. A shared protection contract would also be needed for check-in and deletion. Neither contract is implemented, so the diagram does not show transaction or lock calls (G-01, G-02).
-
-Required example: booking R17 has two extra rows and one pool link. Success must delete those three rows and the booking together. The room, pool and service catalogue must remain. Failure must keep all four original rows. These are design outcomes to implement, not results verified against SQL Server.
-
-Deletion is permanent (Q-05). `cancel()` keeps the booking in history. Neither operation is a user deactivation flag.
+A transaction protects the group of writes; a protected current-state read also prevents a concurrent check-in from invalidating the decision. These are explicit proposed database interactions, not the old combined note "check state and delete in one transaction". Connection, commit and rollback failures still need an implemented policy (G-01).
 
 ## SD-06 - General: import supplier XML
 
-- **Use case name:** UC-15 Enter supplier delivery in stock.
-- **Actor:** A signed-in hotel staff user or Manager. The supplier sends the XML and does not log in (Q-17).
-- **Goal:** Import every item from a valid supplier XML file. Create missing catalogue items, update stock and show the report.
-- **Preconditions:** The user selected an XML file and is signed in. The service must check permission and validate the XML before writing stock.
-- **Requirements:** RF-28, RF-29; RNF-07, RNF-08. Updated import rule: PR #20 decision, 2026-10-21.
+- **Use case:** UC-15 Enter supplier delivery in stock, with the preview revision requested on 2026-10-30.
+- **Actor:** Signed-in hotel staff or Manager. The supplier sends the file and does not log in (Q-17).
+- **Goal:** Review the validated XML, confirm it, then save the import and stock changes together.
+- **Requirements:** RF-28, RF-29; RNF-07, RNF-08; new preview instruction from the professor, supplied by the user.
+- **Status:** The current class model has only `importStock(file, user)`. The two-phase API, preview data, view and repository below are proposed (G-01, G-03, G-04). UC-15 still says no preview; this discrepancy is explicit in G-05.
 
-This general design view shows file selection, one import call and the required result. Notes expand parsing, validation and item processing without adding helper methods. Every item in a valid file must enter stock. A missing catalogue item must be created, not rejected. The service and storage operations are not implemented (G-01).
+Phase A is read-only parsing and validation. It prepares an immutable snapshot of supplier, item names, units and quantities. Phase B displays that snapshot and offers Confirm and Cancel. Phase C saves only the confirmed snapshot after final checks; it does not read the file again. Catalogue lookup is done during save, so no preview database read is needed in this design.
 
 ```mermaid
-%%{init: {"theme":"neutral","fontFamily":"Arial","sequence":{"actorFontFamily":"Arial","noteFontFamily":"Arial","messageFontFamily":"Arial","width":200,"wrap":false}}}%%
+%%{init: {"theme":"neutral","fontFamily":"Arial","sequence":{"width":170,"wrap":false}}}%%
 sequenceDiagram
     actor User
     participant SC as StockController
+    participant PV as StockImportPreviewView<br/>(proposed G-04)
     participant F as HotelFacade
     participant SS as StockService
-    Note over User,SC: Receive and select the supplier XML file.
-    User->>SC: onImportXmlClicked()
-    SC->>F: importStock(file, user)
-    F->>SS: importStock(file, user)
-    activate SS
-    Note over SC,SS: Design only: calls exist in the class model.<br/>XML processing and persistence<br/>are not implemented (G-01).
-    Note over SS: Model multiplicities:<br/>StockImport 0..* - 1 User<br/>StockMovement 0..* - 1 User
-    alt User not allowed
-        SS-->>F: Permission error. No data changed
-    else User allowed
-        Note over SS: Required: parse the XML<br/>and validate the whole file<br/>before any stock write.
-        alt XML or its contents are invalid
-            SS-->>F: Invalid XML. No data changed
-        else XML valid
-            Note over SS: Model multiplicities:<br/>StockItem 1 - 0..* StockMovement<br/>StockMovement 0..* - 0..1 StockImport
-            loop Each item in the valid XML
-                Note over SS: Required: find the catalogue item.
-                opt Item missing from the catalogue
-                    Note over SS: Required: create the StockItem.<br/>This is not an error (PR 20).
+    participant SR as StockRepository<br/>(proposed G-01)
+    participant D as Database
+    participant SQL as SQLServer<br/>(external database)
+    Note over SC,SQL: Proposed preview and persistence design, not implemented Java behavior.<br/>No connection or write transaction is held while the user reviews the preview.
+    User->>SC: 1. onImportXmlClicked()
+    SC->>F: 1.1. prepareImport(file, user) [proposed G-03]
+    F->>SS: 1.1.1. prepareImport(file, user) [proposed G-03]
+    SS->>SS: 1.1.1.1. parseAndValidate(file, user) [proposed G-03]
+    SS-->>F: 1.1.2. Immutable preview or permission/XML/data error
+    F-->>SC: 1.2. Preview or validation error
+    alt No permission or invalid XML or imported data
+        SC-->>User: 1.3. Validation error. No data saved
+    else Preview is valid
+        SC->>PV: 1.4. showPreview(preview) [proposed G-04]
+        PV-->>User: 1.4.1. Review supplier, items, units and quantities.<br/>Choose Confirm or Cancel. Nothing has been saved
+        User->>SC: 2. onPreviewDecision(CONFIRM or CANCEL) [proposed G-04]
+        alt User selects Cancel
+            SC->>PV: 2.1. closePreview() [proposed G-04]
+            PV-->>User: 2.1.1. Preview closed. No database writes
+        else User selects Confirm
+            SC->>F: 2.2. confirmImport(preview, user) [proposed G-03]
+            F->>SS: 2.2.1. confirmImport(preview, user) [proposed G-03]
+            SS->>SS: 2.2.1.1. validateConfirmation(preview, user) [proposed G-03]
+            alt Permission or confirmed data is no longer valid
+                Note over SS: Refuse the save. No repository or SQL call.
+            else Final checks pass
+                SS->>SR: 2.2.1.2. saveImport(preview, user) [proposed G-01]
+                SR->>D: 2.2.1.2.1. connect()
+                D-->>SR: 2.2.1.2.2. Connection or connection error
+                opt Connection opened
+                    SR->>SQL: 2.2.1.2.3. BEGIN TRANSACTION [SQL G-01]
+                    SQL-->>SR: 2.2.1.2.4. Transaction opened or SQL error
+                    opt Transaction opened
+                        SR->>SQL: 2.2.1.2.5. INSERT stock_imports(supplier_name, loaded_at, user_id)<br/>and return INSERTED.id [SQL G-01]
+                        SQL-->>SR: 2.2.1.2.6. importId or SQL error
+                        loop Each confirmed item while previous SQL succeeded
+                            SR->>SQL: 2.2.1.2.7. SELECT item by name. INSERT it if missing<br/>UPDATE items SET stock_quantity = stock_quantity + ? WHERE id = ?<br/>INSERT stock_movements(item_id, type='in', quantity, moved_at, user_id, import_id) [SQL G-01]
+                            SQL-->>SR: 2.2.1.2.8. Item batch completed or SQL error
+                        end
+                        alt Any SQL operation fails
+                            opt Transaction is still active
+                                SR->>SQL: 2.2.1.2.9. ROLLBACK [SQL G-01]
+                                SQL-->>SR: 2.2.1.2.10. Rollback result
+                            end
+                        else All writes succeed
+                            SR->>SQL: 2.2.1.2.11. COMMIT [SQL G-01]
+                            SQL-->>SR: 2.2.1.2.12. Commit result
+                        end
+                    end
                 end
-                Note over SS: Required: add the quantity to stock.<br/>Record an ENTRY StockMovement<br/>linked to this StockImport and User.
+                Note over SR: Stop at the first error. skip remaining writes.<br/>Close the connection on every exit.<br/>Return StockImport only after confirmed commit (G-01).
+                SR-->>SS: 2.2.1.3. StockImport or persistence error
             end
-            alt A save fails
-                Note over SS: Required failure outcome:<br/>keep original stock and no partial writes,<br/>including new items. No transaction<br/>or rollback is implemented (G-01).
-                SS-->>F: Import error. No data changed
-            else All writes succeed
-                SS-->>F: report: StockImport
-            end
+            SS-->>F: 2.2.2. StockImport or validation/persistence error
+            F-->>SC: 2.3. Report or import error
+            SC->>PV: 2.4. showImportResult(result) [proposed G-04]
+            PV-->>User: 2.4.1. Import result
         end
     end
-    deactivate SS
-    F-->>SC: Report or import error
-    SC-->>User: Show report or import error
 ```
 
-**Error cases covered:** User not allowed. Invalid XML or invalid contents. A storage failure. UC-15 requires each error to leave the original stock unchanged, with no new catalogue items left by a failed import. The failure branch records this requirement; it does not prove that rollback exists.
+**Required error cases:** No permission, invalid XML or imported data, failed final validation and database failure. Cancel never calls `confirmImport` or `saveImport`. All import writes and the proposed BEGIN occur inside the Confirm branch. A connection failure does not start a transaction. A failed write must not leave partial stock, new items or an import row; that guarantee still needs code (G-01).
 
-**Report:** The result identifies the supplier and import time. Linked ENTRY movements record every imported item and quantity. The class, domain and database documents no longer keep a rejected-item list.
+Unknown items are created, not rejected, under RF-28 and the retained PR #20 item rule. A new item starts with the schema's default stock quantity before the delivered quantity is added. The `stock_imports` row is created before movements use its ID. Catalogue changes, stock increments, the import and ENTRY movements share one transaction. SQL type `in` represents the model's ENTRY movement. Item lookup uses the unique `items.name`; XML name/unit matching details still need a contract (G-01, G-03).
 
-Required example: soap has balance 10. The XML contains soap +5 and a new catalogue item, towels +3. Success must leave soap at 15, create towels with balance 3, and save two ENTRY movements linked to one import. A failed save must leave soap at 10 without a new towels item. Atomic persistence is still G-01.
+**Contract change:** The latest preview instruction replaces the earlier no-preview workflow for this proposed sequence. It does not mean that the current UC-15 text, class diagram, JavaFX screen or two-phase API have already been updated. See G-03 to G-05.
 
-## Cardinality review
+## Message numbering
 
-These counts come from the existing class and domain models. They are visible in the notes inside SD-04 and SD-06. A lifeline represents one participant in a scenario, not the number of stored objects. The canonical multiplicities already match the requirements; no class association is changed. The schema has an unresolved enforcement gap for cards (G-03). No database constraint or index is changed.
-
-| Relationship | Existing multiplicity | Effect on the sequence |
-|--------------|-----------------------|------------------------|
-| Reservation and ReservationExtra | One booking has `0..*` extra rows; each row has one booking. | SD-04 removes the selected booking's rows only. |
-| ReservationExtra and ExtraService | One service per extra row; `0..*` extra rows per service. | SD-04 keeps the shared service catalogue. |
-| Reservation and Location | `0..*` on both sides, through link rows. | SD-04 removes links, not shared locations. |
-| Reservation and MagneticCard | `0..1` on both sides in UML and Q-09. | SD-04 keeps a protected card link. The schema does not enforce one card per reservation (G-03). |
-| StockItem and StockMovement | One item per movement; `0..*` movements per item. | Each XML item adds an ENTRY movement, including an item created during import. |
-| StockImport and StockMovement | `0..*` movements per import; `0..1` import per movement. | XML movements share one import. A manual movement can have no import link. |
-| User and StockImport | One user per import; `0..*` imports per user. | The supplier does not log in. The authorized hotel user records the import. |
-| User and StockMovement | One user per movement; `0..*` movements per user. | SD-06 records the hotel user, not the supplier account. |
+Every request, SQL command and significant response has an explicit number on its arrow. A caller's sub-call adds a level; its next interaction uses the next sibling number. Each diagram starts at `1`. SD-06 uses `2` for the user's preview decision. Alternative branches have distinct IDs, and repeated loop messages retain their static interaction IDs. No association multiplicities or separate numbering table are used.
 
 ## Traceability
 
-Each call below names a method of its receiving class. Dashed arrows show data, errors or completion. They are not new methods. See [classes.md](classes.md) and [class-diagram.md](class-diagram.md).
-
-| Use case | Diagram | Class methods used | Requirement IDs |
-|----------|---------|--------------------|-----------------|
-| UC-05 Delete reservation | SD-04 (detailed) | `ReservationController.onDeleteReservationClicked`; `HotelFacade.deleteReservation`; `ReservationService.delete` | RF-02, RF-22; RNF-07, RNF-12 |
-| UC-15 Enter supplier delivery in stock | SD-06 (general, XML selection, import and report) | `StockController.onImportXmlClicked`; `HotelFacade.importStock`; `StockService.importStock` | RF-28, RF-29; RNF-07, RNF-08 |
+| Use case | Existing modeled or implemented calls used | Proposed calls | Sources |
+|----------|--------------------------------------------|----------------|---------|
+| UC-05 Delete reservation | ReservationController.onDeleteReservationClicked; HotelFacade.deleteReservation; ReservationService.delete; Database.connect | ReservationService authorization/state helpers; ReservationRepository transaction and deletion methods | RF-22, Q-05; G-01, G-02 |
+| UC-15 Supplier XML import, proposed preview revision | StockController.onImportXmlClicked; Database.connect | HotelFacade/StockService prepareImport and confirmImport; StockService validation helpers; StockController.onPreviewDecision; StockImportPreviewView; StockRepository.saveImport | RF-28, RF-29; professor feedback 2026-10-30; G-01, G-03 to G-05 |
 
 ## Gaps
 
-These gaps are not implemented behavior. No absent class-model method is used as a call arrow. Card readers and denied-access audit remain outside these diagrams. Q-49 stays open. The preview gap is not needed under the latest import decision.
+All proposed participants and methods are named here. They are not claims about existing code or class-model methods. SQL labels are abbreviated, parameterized operation summaries supported by the schema; they are not runnable scripts. No Java code, SQL script or unrelated UML diagram changes in this task.
 
-| ID | Gap | Effect and next step |
-|----|-----|----------------------|
-| G-01 | The modeled reservation and stock flows are not implemented | Controllers, facade operations, services, XML processing and persistence contracts are missing for these flows in Java. Define atomic deletion and import contracts before claiming save, commit or rollback support. A `Database.connect()` method elsewhere does not implement either transaction. |
-| G-02 | No current-state read or shared check-in protection contract | Define how deletion reads the latest booking and prevents a concurrent check-in from invalidating that decision. A transaction alone is not enough. No lookup or lock method is invented. |
-| G-03 | The schema does not enforce the one-card rule | RF-16 and Q-09 agree with UML `0..1 / 0..1`. `access_cards.reservation_id` is nullable and its filtered index is not unique in `schema.md`, so the schema permits several cards per reservation. The team must define enforcement. This review does not change the schema or restore SD-05. |
+| ID | Missing or inconsistent contract | Proposed design and required follow-up |
+|----|----------------------------------|-----------------------------------------|
+| G-01 | No ReservationRepository or StockRepository, transaction context or database implementation for these flows | Proposed ReservationRepository.beginDelete(id), delete(tx, id), rollback(tx); StockRepository.saveImport(preview, user). Repositories use the existing Database.connect and own one operation-scoped connection. Define the context, parameterized statements, locking, connection closure and commit/rollback error handling before implementation. BEGIN/COMMIT/ROLLBACK are proposed database boundaries, not Database methods. |
+| G-02 | Reservation runtime flow and validation helpers are missing | The three deletion call names exist only in the class model. Proposed ReservationService.authorizeDelete(user) and validateDeleteResult(result) implement RF-22 checks before writes. The protected read and deletion share tx; check-in must honor the same row protection. |
+| G-03 | No two-phase XML API, immutable preview object or parser contract | Proposed HotelFacade.prepareImport(file, user), confirmImport(preview, user); StockService.prepareImport(file, user), parseAndValidate(file, user), confirmImport(preview, user), validateConfirmation(preview, user); new StockImportPreview snapshot. It must contain the reviewed data and cannot trigger a later file re-read. Confirm must recheck permission and data. Split or revise the current one-step importStock API explicitly in the class model before coding. |
+| G-04 | No preview screen or decision handler | Proposed StockImportPreviewView.showPreview(preview), closePreview(), showImportResult(result), and StockController.onPreviewDecision(decision). Define the JavaFX screen with Confirm/Cancel buttons. Cancel discards the preview and never reaches persistence. No screen or Java class is created by this documentation task. |
+| G-05 | Current UC-15 and class documentation still describe no preview | The 2026-10-30 instruction supplied by the user requires preview and confirmation. Current UC-15 explicitly forbids these stages and the model exposes only importStock(file, user). The proposed sequence follows the new feedback while retaining unknown-item creation. The use-case and class-model owners must align these contracts; no unrelated requirements are silently rewritten here. |
 
 ## Validation boundary
 
-There are exactly two Mermaid `sequenceDiagram` blocks: SD-04 detailed and SD-06 general. Both contain visible model multiplicities. All call arrows use public methods already in the class model; the Java flows are not implemented. No separate class diagram, preview API or card-access flow is added. G-01 to G-03 remain implementation or schema-enforcement gaps. Q-49 stays open outside this scope. Human review is required.
+Only SD-04 and SD-06 are shown. The arrows distinguish existing modeled calls, the implemented connection factory, missing proposed APIs and external SQL operations. Preview and transactions are documentation proposals. No association-cardinality diagram or SD-05 is added. Rendering and static checks cannot establish runtime transaction safety or full Definition of Done approval.
 
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
