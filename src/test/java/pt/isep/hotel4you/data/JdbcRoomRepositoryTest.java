@@ -43,10 +43,9 @@ class JdbcRoomRepositoryTest {
     void onRead_bindNumbersWithJdbcTypes_whenCheckingRoomAndFloor() {
         repository.floorExists(2);
         repository.existsByNumber(202);
-        repository.countByFloor(2);
 
-        assertEquals(List.of(new Binding("setInt", 1, 2), new Binding("setInt", 1, 202),
-                new Binding("setInt", 1, 2)), database.bindings);
+        assertEquals(List.of(new Binding("setInt", 1, 2), new Binding("setInt", 1, 202)),
+                database.bindings);
     }
 
     @Test
@@ -54,7 +53,10 @@ class JdbcRoomRepositoryTest {
     void onSave_commitAndClose_whenRoomIsValid() {
         Room saved = repository.save(room, 10);
 
-        assertEquals(new Room(42L, 202, 2, "duplo"), saved);
+        assertEquals(42L, saved.getId());
+        assertEquals(202, saved.getNumber());
+        assertEquals(2, saved.getFloorNumber());
+        assertEquals("duplo", saved.getRoomTypeName());
         assertEquals(List.of("begin", "lock floor", "find type", "count", "insert", "commit", "close"),
                 database.events);
         assertEquals(4, database.closedStatements);

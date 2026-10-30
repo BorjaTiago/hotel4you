@@ -51,9 +51,9 @@ class RoomServiceTest {
         Room saved = roomService.saveRoom(room(202, 2, "duplo"), manager());
 
         assertEquals(1, repository.findAll().size());
-        assertEquals(202, saved.number());
-        assertEquals(2, saved.floorNumber());
-        assertEquals("duplo", saved.roomTypeName());
+        assertEquals(202, saved.getNumber());
+        assertEquals(2, saved.getFloorNumber());
+        assertEquals("duplo", saved.getRoomTypeName());
     }
 
     @Test
@@ -74,19 +74,20 @@ class RoomServiceTest {
 
         List<Room> rooms = roomService.listRooms(manager());
         assertEquals(20, rooms.size());
-        assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 2).count());
-        assertEquals(10, rooms.stream().filter(room -> room.floorNumber() == 3).count());
-        assertEquals(7, rooms.stream().filter(room -> room.roomTypeName().equals("individual")).count());
-        assertEquals(10, rooms.stream().filter(room -> room.roomTypeName().equals("duplo")).count());
-        assertEquals(3, rooms.stream().filter(room -> room.roomTypeName().equals("familiar")).count());
+        assertEquals(10, rooms.stream().filter(room -> room.getFloorNumber() == 2).count());
+        assertEquals(10, rooms.stream().filter(room -> room.getFloorNumber() == 3).count());
+        assertEquals(7, rooms.stream().filter(room -> room.getRoomTypeName().equals("individual")).count());
+        assertEquals(10, rooms.stream().filter(room -> room.getRoomTypeName().equals("duplo")).count());
+        assertEquals(3, rooms.stream().filter(room -> room.getRoomTypeName().equals("familiar")).count());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {-1, 0, 1, 5})
     @Tag("H4Y-25-AC-3")
     void onSaveRoom_throw_whenFloorIsNotForRooms(int floorNumber) {
-        assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> roomService.saveRoom(room(101, floorNumber, "individual"), manager()));
+        assertEquals("S? os pisos 2 e 3 t?m quartos", error.getMessage());
 
         assertEquals(0, repository.findAll().size());
     }
@@ -220,6 +221,30 @@ class RoomServiceTest {
     @Tag("H4Y-25-AC-1")
     void onListRoomTypes_throwAccessDenied_whenActorIsNotManager(User actor) {
         assertThrows(AccessDeniedException.class, () -> roomService.listRoomTypes(actor));
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-2")
+    void onRoomTypeTargets_returnImmutableSummaryData_whenScreenReadsTargets() {
+        var targets = roomService.roomTypeTargets();
+
+        assertEquals(List.of("individual", "duplo", "familiar"),
+                targets.stream().map(RoomService.RoomTypeTarget::name).toList());
+        assertEquals(List.of("Individuais", "Duplos", "Familiares"),
+                targets.stream().map(RoomService.RoomTypeTarget::label).toList());
+        assertEquals(List.of(7, 10, 3),
+                targets.stream().map(RoomService.RoomTypeTarget::total).toList());
+        assertThrows(UnsupportedOperationException.class, () -> targets.clear());
+    }
+
+    @Test
+    @Tag("H4Y-25-AC-2")
+    void onSaveRoom_allowMoreThanTypeTarget_whenFloorHasCapacity() {
+        for (int i = 0; i < 8; i++) {
+            roomService.saveRoom(room(201 + i, 2, "individual"), manager());
+        }
+
+        assertEquals(8, repository.findAll().size());
     }
 
     private static Stream<User> deniedActors() {
