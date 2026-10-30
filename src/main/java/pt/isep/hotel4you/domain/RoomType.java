@@ -2,7 +2,7 @@ package pt.isep.hotel4you.domain;
 
 import java.math.BigDecimal;
 
-/** A type of room, for example single or double, with its base price per night. */
+/** A type of room, for example individual or duplo, with its base price per night. */
 public class RoomType {
 
     private final Long id;
