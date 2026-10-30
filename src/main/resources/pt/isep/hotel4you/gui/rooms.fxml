@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="16" stylesheets="@style.css" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.RoomController">
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+
+    <Label text="Quartos" styleClass="subtitle"/>
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <TextField fx:id="numberField" promptText="Número" prefWidth="150"/>
+        <ComboBox fx:id="floorBox" promptText="Piso" prefWidth="120"/>
+        <ComboBox fx:id="roomTypeBox" promptText="Tipo" prefWidth="180"/>
+        <Button text="Registar" onAction="#onSaveRoomClicked" styleClass="primary-button"/>
+    </HBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true"/>
+    <Label fx:id="summaryLabel" wrapText="true"/>
+    <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefHeight="360">
+        <columns>
+            <TableColumn fx:id="numberColumn" text="Número" prefWidth="160"/>
+            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="130"/>
+            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="190"/>
+        </columns>
+        <placeholder>
+            <Label text="Ainda não existem quartos registados."/>
+        </placeholder>
+    </TableView>
+</VBox>

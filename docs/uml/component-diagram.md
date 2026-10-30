@@ -15,62 +15,67 @@ The diagram reads from left to right, from input to output, as in the class 1 sl
 - Right side, output: `data` stores the data in SQL Server.
 - The big box `«subsystem» Hotel4You` is the structured classifier. Its inside is the internal structure.
 - A box `«component» :name` inside the subsystem is a part. Each part is one Java package of our code.
-- A small box labelled `port` is a port. A port sits on the border of a subsystem or an external component.
-- A circle is a provided interface (ball). A solid line joins the circle to the component that provides it.
-- A dashed arrow labelled `requires` goes to the interface that a component needs. Mermaid cannot draw the socket, so this arrow is the socket. A required interface and a provided interface together are one assembly connector (ball and socket).
-- A solid arrow labelled `delegation` is a delegation connector. It joins a port to the part that does the work.
-- A solid arrow labelled `input` shows the supplier XML file going in through a port. `service` (`StockService`) reads it.
+- A small empty box is a port. Each part has its own ports. Mermaid cannot put a box on a border, so the ports of the subsystem are the small boxes next to its border.
+- A `○` is a provided interface (ball).
+- A `(` is a required interface (socket). Mermaid has no socket shape, so the socket is a text character.
+- A `(○` with a name is an assembly connector (ball and socket) between two parts.
+- The line from a port of the subsystem to the port of a part is a delegation connector.
+- A dashed arrow from a socket to a ball is a dependency. The `SQL` arrow goes from the subsystem to SQL Server.
+- A solid arrow shows the supplier XML file going in through a port. `service` (`StockService`) reads it.
 - A box with `«external»` is outside our code. SQL Server is an external component. The supplier XML file is an external artifact.
 - Libraries (JavaFX, JUnit) and the JDBC driver are not components. They are not in the diagram. See [libraries.md](../libraries.md).
-- A dashed arrow labelled `uses` is a dependency. `gui`, `service` and `data` use the `domain` types.
+- A dashed arrow to `:domain` is a dependency. `gui`, `service` and `data` use the `domain` types.
 - `config` creates all parts at start-up. These links are wiring, not dependencies, so they are not drawn.
 
 ```mermaid
-%%{init: {"theme":"neutral","fontFamily":"Arial"}}%%
+%%{init: {"theme":"neutral","fontFamily":"Arial","flowchart":{"padding":6,"nodeSpacing":28,"rankSpacing":22}}}%%
 flowchart LR
-    UI(("HotelUI"))
+    BUI@{ shape: text, label: "○" }
     XML["«external» «artifact»<br/>Supplier XML stock file"]
-    subgraph H4Y["«subsystem» Hotel4You"]
+    subgraph H4Y["«subsystem» Hotel4You : internal structure"]
         direction LR
-        PUI["port"]
-        PXML["port"]
+        PUI[" "]
+        BGUI@{ shape: text, label: "○" }
+        PG1[" "]
         GUI["«component»<br/>:gui"]
-        FAC(("HotelFacade"))
+        PG2[" "]
+        AFAC@{ shape: text, label: "HotelFacade<br/>(○" }
+        PS1[" "]
         SVC["«component»<br/>:service"]
-        DOM["«component»<br/>:domain"]
-        REPO(("Repositories"))
+        PS2[" "]
+        AREPO@{ shape: text, label: "Repositories<br/>(○" }
+        PD1[" "]
         DATA["«component»<br/>:data"]
-        CFGI(("AppConfig"))
+        PD2[" "]
+        PD3[" "]
+        ACFG@{ shape: text, label: "AppConfig<br/>(○" }
+        PC1[" "]
         CFG["«component»<br/>:config"]
-        PDB["port"]
+        DOM["«component»<br/>:domain"]
+        SDB@{ shape: text, label: "(" }
+        PDB[" "]
+        PXML[" "]
+        PS3[" "]
     end
-    SQLI(("SQL"))
-    subgraph DBS["«external» SQL Server"]
-        direction LR
-        PSQL["port"]
-        DBE["«component»<br/>:database"]
-    end
+    RSQL@{ shape: text, label: "(" }
+    BSQL@{ shape: text, label: "○" }
+    PSQL[" "]
+    SQL["«external» «component»<br/>SQL Server"]
 
-    UI --- PUI
-    PUI -->|delegation| GUI
-    GUI -.->|requires| FAC
-    FAC --- SVC
-    SVC -.->|requires| REPO
-    REPO --- DATA
-    DATA -.->|requires| CFGI
-    CFGI --- CFG
-    SVC -.->|uses| DOM
-    GUI -.->|uses| DOM
-    DATA -.->|uses| DOM
-    DATA -->|delegation| PDB
-    PDB -.->|requires| SQLI
-    SQLI --- PSQL
-    PSQL -->|delegation| DBE
-    XML -->|input| PXML
-    PXML -->|delegation| SVC
+    BUI ---|HotelUI| PUI
+    PUI --- BGUI --- PG1 --- GUI --- PG2 --- AFAC --- PS1 --- SVC --- PS2 --- AREPO --- PD1 --- DATA --- PD2 --- SDB --- PDB --- RSQL
+    RSQL -.->|SQL| BSQL
+    BSQL --- PSQL --- SQL
+    DATA --- PD3 --- ACFG --- PC1 --- CFG
+    XML --> PXML --> PS3 --> SVC
+    GUI -.-> DOM
+    SVC -.-> DOM
+    DATA -.-> DOM
 
     classDef port fill:#fff,stroke:#333,stroke-width:1px
-    class PUI,PDB,PXML,PSQL port
+    class PUI,PG1,PG2,PS1,PS2,PS3,PD1,PD2,PD3,PC1,PDB,PXML,PSQL port
+    classDef symbol font-size:26px,font-weight:bold
+    class BUI,BGUI,BSQL,AFAC,AREPO,ACFG,SDB,RSQL symbol
 ```
 
 ## Components
@@ -80,7 +85,7 @@ flowchart LR
 | `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | `HotelUI` (screens for the actors), through the subsystem port. | `HotelFacade`, `domain` (read only). | RNF-06, RNF-07 |
 | `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, the supplier XML file (through a port). | RNF-07, RNF-08 |
 | `domain` | Domain classes and enums (`User`, `Room`, `Reservation`, `MagneticCard`, `StockItem`, `Role` and the others). No SQL and no JavaFX. | Data types for the other packages. | None. | RNF-07, RNF-08 |
-| `data` | Repository interfaces, for example `UserRepository`, and the JDBC version for SQL Server (`JdbcUserRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC version maps table rows to domain objects. Unit tests use an in-memory repository in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, `SQL` of SQL Server (through a port). | RNF-01, RNF-10, RNF-12 |
+| `data` | Repository interfaces, including `UserRepository` and `RoomRepository`, and the JDBC versions for SQL Server (`JdbcUserRepository`, `JdbcRoomRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC versions map table rows to domain objects. Unit tests use in-memory repositories in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, `SQL` of SQL Server (through a port). | RF-04, RNF-01, RNF-10, RNF-12 |
 | `config` | Reads the settings from the `application.properties` file (`AppConfig`). Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. The start-up links are not drawn. | `AppConfig`. | `gui`, `service`, `data` (start-up only). | RNF-08, RNF-12 |
 
 ## Interfaces
@@ -113,4 +118,4 @@ These gaps need team review. They are not approved requirements.
 | C-04 | There was no Java code (H4Y-32). | Closed for the classes that exist now. The five packages exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17). |
 | C-03 | The package of `HotelFacade` was not named in H4Y-32. | Closed. `HotelFacade` is in `service`, as in the Java code. |
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: jmbcruz. Updated by: pedrocostaisep. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.

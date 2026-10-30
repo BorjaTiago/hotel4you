@@ -76,6 +76,8 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v2-create-roles-users.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v3-insert-test-users.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v4-create-floors-locations.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v5-create-room-types.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v6-create-rooms.sql
 ```
 
 Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
@@ -85,7 +87,11 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v1-creat
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v2-create-roles-users.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v3-insert-test-users.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v4-create-floors-locations.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v5-create-room-types.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v6-create-rooms.sql
 ```
+
+`v5-create-room-types.sql` from H4Y-26 creates `individual`, `duplo` and `familiar`. Run it before `v6-create-rooms.sql`. The manager then uses "Quartos" to register rooms. The separate "Preços" screen sets base prices. No room registration requires a base price to be set.
 
 `v3-insert-test-users.sql` adds one test user for each staff role. Use it only on a local test database. The usernames and passwords are in the script header.
 
@@ -152,4 +158,4 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.

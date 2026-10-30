@@ -9,7 +9,7 @@ status: published
 jira_key: H4Y-66
 labels: [rooms, pricing, gui, 1st-delivery]
 sprint: 03
-branch: feat/H4Y-66-base-price-screen
+branch: feat/H4Y-26-base-price
 ---
 
 # set-base-price: ecrã
@@ -31,4 +31,4 @@ Responsável proposto: José Cruz (a equipa decide).
 - Ao escolher um tipo: campo "Novo preço (€)" e botão "Guardar". Depois de guardar, a tabela mostra o valor novo (AC-1, AC-2).
 - Preço inválido: mensagem de erro e o valor antigo fica na tabela (AC-3).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.

@@ -22,6 +22,10 @@
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="floorsButton" text="Pisos e zonas" onAction="#onFloorsClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button fx:id="roomsButton" text="Quartos" onAction="#onRoomsClicked"
+                    maxWidth="Infinity" visible="false"/>
+            <Button fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
+                    maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
 

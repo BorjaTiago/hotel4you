@@ -44,10 +44,17 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Each screen loads its own FXML. Not done: the same code many times.
 
 ### RoomController
-- **What:** Room search, room save, room items and prices.
-- **Why:** RF-04 to RF-08.
-- **Why this way:** One screen group for rooms and room prices.
+- **What:** Room search, room save and room items.
+- **Why:** RF-04, RF-05, RF-08.
+- **Why this way:** One screen group for rooms.
+- **Registration summary:** H4Y-64 requires counts by floor and type. The floor choices and denominators come from `HotelFacade.roomFloorLimits()`. The screen counts the loaded rooms for display. It does not choose room floors or enforce limits. `roomTypeTargets()` supplies the stored names, plural labels and provisional 7/10/3 targets from one immutable constant in RoomService. The summary shows `Individuais x/7 · Duplos y/10 · Familiares z/3`. These targets are not enforced.
 - **Other option:** One controller per action. Not done: more files for little gain.
+
+### PriceController
+- **What:** Show the room types with capacity and base price. Set the base price of the selected type with the price field and "Guardar" (H4Y-26).
+- **Why:** RF-06. The manager sets one price for each room type.
+- **Why this way:** Own screen with `prices.fxml`. One controller class cannot serve two FXML files with different fields, so `RoomController` cannot hold this screen. The controller has no price rule: `HotelFacade.parsePrice` and `setBasePrice` refuse a bad price and the screen shows the message (RNF-07).
+- **Other option:** Put the prices in `RoomController`. Not done: `rooms.fxml` has other fields, and the price fields would be null on that screen.
 
 ### ClientController
 - **What:** Client registration and search.
@@ -132,10 +139,15 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Put zones in `RoomService`. Not done: zones are not rooms.
 
 ### RoomService
-- **What:** Check if a room is free. Search rooms. Save a room. Set prices. Configure room items.
-- **Why:** RF-04 to RF-09.
-- **Why this way:** Room and price rules in one place.
-- **Other option:** Put rules in `Room`. Not done: `Room` would need reservation data.
+- **What:** Save and list rooms. Return the room type names for the registration screen. Keep the other room, price and room item operations here.
+- **Why:** RF-04 to RF-09. `Permission.MANAGE_ROOMS` allows only a manager to register rooms, list saved rooms and read the room type catalogue for registration. `listRooms(actor)` and `listRoomTypes(actor)` reject other staff and a null actor before reading the repository.
+- **Why this way:** The controller collects fields and shows results. `RoomService` defines the statement rules as constants: floors 2 and 3, with 10 rooms each. Its `roomFloorLimits()` method supplies the same rules to the screen. `RoomService` checks the permission and the floor, then calls `save`. `save` runs in one transaction. It checks the floor, the type and the floor limit, and the database reports a duplicate number (errors 2601 and 2627). `RoomService.listRoomTypes` reads the types from `RoomTypeRepository`. No service monitor is needed.
+- **Other option:** Put the validation in `RoomController` or only in SQL constraints. Not done: controllers hold no business rules, and a unique number constraint cannot enforce a per-floor count.
+- **Example:** A manager saves room 202 on floor 2 as a double room. The service checks that floor 2 and the type exist, that room 202 is free, then the repository checks that floor 2 has fewer than 10 rooms inside the transaction. The repository saves the room with its floor and type foreign keys. The course statement sets the two room floors and the limit of 10 rooms per floor.
+- **Q-01:** The test can register the proposed 7 individual, 10 double and 3 family rooms. The service does not enforce those type totals because the teacher has not confirmed them.
+- **Integration:** H4Y-28 provides the `floors` table on `main`. PR #40 (H4Y-26) is now merged and provides `room_types`. Main constructs one RoomService with both RoomRepository and RoomTypeRepository. Registration and price operations share the same database catalogue. Run v5 before v6.
+- **Type names:** The chosen stored names are `individual`, `duplo`, `familiar` (user decision, 2026-10-30), as in the merged H4Y-26 script. The summary labels are Individuais, Duplos and Familiares; the type choices show the catalogue names. Tests and database documentation use the same names. The screen does not translate `single`, `double` or `family` as aliases. The existing v5 script supplies the types. No replacement table or migration is added here.
+- **Prices:** Only a manager sets or lists base prices (`Permission.MANAGE_PRICES`, else `AccessDeniedException`). `setBasePrice` refuses a missing type, a price below 0 or above 999999.99, a price with more than 2 decimals, and an unknown type. `parsePrice` turns text such as `80,50` into a price.
 
 ### ReservationService
 - **What:** Create, cancel, delete a reservation. Add and remove an extra. Add and remove a zone. Check-in and check-out.
@@ -191,7 +203,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
 
 ### Main
-- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService` and `HotelFacade`. Then it starts `HotelApp`.
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService`, `JdbcFloorRepository`, `JdbcLocationRepository`, `LocationService`, `JdbcRoomTypeRepository`, `RoomService` and `HotelFacade`. Then it starts `HotelApp`.
 - **Why:** RF-01, RNF-12. One place builds the objects.
 
 ## Data
@@ -205,7 +217,7 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 ### Database
 - **What:** Opens connections to SQL Server with the settings from `AppConfig`. `connect` opens a connection. `check` opens and closes one to test that the database works. `prepare` (static) fills the `?` values of a SQL text.
 - **Why:** RNF-12. One place holds the connection code.
-- **Why this way:** The values go in with `prepare`, not in the SQL text. This stops SQL injection.
+- **Why this way:** The values go in with `prepare`, not in the SQL text. It uses `setInt` for integers, `setLong` for long identifiers and `setString` for text. This stops SQL injection.
 - **Other option:** Each repository opens its own connection. Not done: the same code many times.
 
 ### JdbcUserRepository
@@ -213,6 +225,13 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why:** RNF-01, RNF-12. Users are saved in SQL Server.
 - **Why this way:** It gives domain objects to the services. Services never see SQL.
 - **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
+
+### JdbcRoomRepository
+- **What:** Read the catalogues and save rooms in SQL Server.
+- **Why:** RF-04 and RNF-12. Room numbers must be unique and a full floor must reject new rooms.
+- **Why this way:** `save(room, floorLimit)` opens one transaction. It locks the floor row with `UPDLOCK, HOLDLOCK`, reads the count, inserts with `OUTPUT INSERTED.id` and commits. SQL and runtime errors roll back. A rollback error is kept as a suppressed error. Each statement and result closes with a resource block. Small helper methods avoid nested resource blocks.
+- **Other option:** Check the limit only in the service. This cannot protect two application instances that save at the same time.
+- **Example:** Two requests see nine rooms on a floor with a limit of ten. Only one holds the floor lock. After it commits, the next request sees ten rooms and rolls back without inserting.
 
 ## Users
 
@@ -274,11 +293,23 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why this way:** A room is a real object. A reservation points to it.
 - **Other option:** Room type as text. Not done: the type has a capacity and a price.
 
+### RoomTypeTarget (fixed summary record)
+- **What:** An immutable name, Portuguese label and provisional target from RoomService.
+- **Why:** H4Y-64 needs type counts with targets.
+- **Why this way:** The controller reads fixed display data without repeating catalogue names or choosing limits. This record is fixed data; Room is an entity class with getters. Room validates numbers from 1 to MAX_NUMBER (SQL SMALLINT) and refuses blank types.
+- **Other option:** A switch in the controller. Rejected: it repeats the service configuration.
+
 ### RoomType
-- **What:** A type (single, double, family) with capacity and `basePrice`.
+- **What:** A type (`individual`, `duplo`, `familiar`) with capacity and `basePrice`. These are the stored names in the database schema.
 - **Why:** RF-04, RF-06.
 - **Why this way:** The manager sets the price once for each type.
 - **Other option:** Price on each `Room`. Not done: many rooms share one price.
+
+### JdbcRoomTypeRepository
+- **What:** Implements `RoomTypeRepository` with SQL on the table `room_types`. Reads all types and updates `base_price`.
+- **Why:** RF-06, RNF-12. Room types and prices are saved in SQL Server.
+- **Why this way:** It gives `RoomType` objects to `RoomService`. A NULL price becomes `null` in Java. `updateBasePrice` returns false when no row has the id.
+- **Other option:** SQL inside `RoomService`. Not done: rules and SQL would mix.
 
 ### RoomItem
 - **What:** How many units of one stock item a room has.
@@ -383,6 +414,8 @@ Enums have fixed values. They stop typing errors.
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
 | MANAGE_FLOORS | View the floors and create, edit and remove zones (H4Y-28) | yes | no | no |
+| MANAGE_ROOMS | Register rooms and read the room list and type catalogue (H4Y-25) | yes | no | no |
+| MANAGE_PRICES | View and set the base price of the room types (H4Y-26) | yes | no | no |
 
 Without a logged-in user, no function is allowed. The receptionist and the restaurant staff have no function in the application yet.
 
@@ -447,4 +480,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 // StockMovement with type ENTRY links each item's quantity to the import.
 ```
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-61 role display name, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-61 role display name, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check, Claude Code (claude-opus-5-5), 2026-10-27. Reviewed by: pending.
