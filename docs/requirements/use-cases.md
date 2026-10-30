@@ -579,7 +579,7 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Alternative flows:
   - 2a. The quantity is not valid. The system shows the error and does not save.
   - Supplier deliveries use UC-15. UC-15 reads the XML file (UC-53) and records each item with this use case. Then the item and the quantity come from the file, not from the user.
-  - The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (team decision, 2026-10-30).
+  - The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (Q-53, team decision, 2026-10-30).
 
 ## UC-51 Check reservation has check-in
 - Actors: via UC-05 (manager).

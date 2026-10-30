@@ -315,7 +315,7 @@ flowchart LR
 
 The supplier is a secondary actor in UC-15. The supplier sends the XML file. The receptionist or the manager loads it (Q-17).
 
-UC-15 always includes UC-53 and UC-50. The system reads the supplier XML stock file (RF-28) and records one stock entry for each item with UC-50. UC-50 alone is a manual entry of one existing item (RF-29). The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (team decision, 2026-10-30).
+UC-15 always includes UC-53 and UC-50. The system reads the supplier XML stock file (RF-28) and records one stock entry for each item with UC-50. UC-50 alone is a manual entry of one existing item (RF-29). The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (Q-53, team decision, 2026-10-30).
 
 ## Changes from the first version
 
