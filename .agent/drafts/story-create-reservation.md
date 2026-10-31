@@ -3,12 +3,12 @@ type: story
 summary: Criar uma reserva para um cliente
 parent: epic-reservations
 requirements: [RF-11, RF-05]
-points:
+points: 5
 points_suggested: 5
 status: published
 jira_key: H4Y-56
 labels: [reservations, 1st-delivery]
-sprint: 05
+sprint: 04
 ---
 
 # Título: Criar uma reserva para um cliente
@@ -51,7 +51,7 @@ Para que o cliente fique com o quarto garantido nas noites escolhidas.
 - [ ] AC-4: O preço da reserva é mostrado ao rececionista.
 
 ## Notas
-Q-27 (respondida, decisão da equipa): RF-10 está na 1.ª entrega, a reserva usa o cliente registado. Dependências (auditoria 2026-10-16): uma forte, story-query-free-rooms (reutiliza a mesma regra de sobreposição, `RoomAvailability`; sprint 4 antes do sprint 5). Clientes, quartos e preço base: dados de teste próprios (foundation T4), sem depender das outras histórias. O total com extras fica em epic-extra-services-pricing.
+Q-27 (respondida, decisão da equipa): RF-10 está na 1.ª entrega, a reserva usa o cliente registado. Dependências (auditoria 2026-10-16): uma forte, story-query-free-rooms (reutiliza a mesma regra de sobreposição, `RoomAvailability`; mesmo sprint). Clientes, quartos e preço base: dados de teste próprios (foundation T4), sem depender das outras histórias. O total com extras fica em epic-extra-services-pricing.
 
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
@@ -63,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: jmbcruz. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; sprint 4 scope swap by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-31. Reviewed by: pending.

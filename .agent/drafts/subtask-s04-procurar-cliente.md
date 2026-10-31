@@ -15,7 +15,7 @@ branch: feat/H4Y-71-client-search
 # procurar-cliente: pesquisa
 
 História pai H4Y-53. Usa `ClientService.find(document)` e `ClientController.onSearchClientClicked`. O dado de pesquisa é o documento, porque é o que o diagrama define. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
-Responsável: a definir na planning do sprint 4.
+Responsável: Lukas Sperandio.
 
 ## Checklist
 
@@ -28,8 +28,8 @@ Responsável: a definir na planning do sprint 4.
 ## Interface (UI)
 
 - No mesmo ecrã `client.fxml` de H4Y-70, separador "Procurar": campo "Documento" e botão "Procurar".
-- Resultado: nome, documento e data de nascimento do cliente, e botão "Usar na reserva" (guarda o cliente escolhido para o ecrã de reserva do sprint 5).
+- Resultado: nome, documento e data de nascimento do cliente, e botão "Usar na reserva" (guarda o cliente escolhido para o ecrã de reserva da H4Y-76).
 - Sem resultado: "Sem resultados." e botão "Registar novo cliente", que abre o separador "Registar" com o documento já escrito (AC-2).
 - Pesquisa vazia: "Indique o documento do cliente." (AC-3).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: jmbcruz. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; sprint 4 scope swap by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-31. Reviewed by: pending.

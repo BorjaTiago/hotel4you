@@ -27,9 +27,9 @@ Sprint 1: no Team Leader. RNF-14 holds (team decision, user, 2026-10-16, Q-24).
 | 1 | none (RNF-14, Q-24) | No Team Leader |
 | 2 | 4 | Tiago Borja |
 | 3 | 1 | Lukas Sperandio |
-| 4 | 2 | Pedro Costa |
+| 4 | 5 | José Cruz |
 | 5 | 3 | Antonio Martinho |
-| 6 | 5 | José Cruz |
+| 6 | 2 | Pedro Costa |
 | 7 | 4 | Tiago Borja |
 | 8 | 1 | Lukas Sperandio |
 | 9 | 2 | Pedro Costa |
@@ -40,4 +40,6 @@ Sprint 1: no Team Leader. RNF-14 holds (team decision, user, 2026-10-16, Q-24).
 
 Write each further change here, with the Q-NN that approves it.
 
-AI use: requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of sprint 1 row, rotation table and Q-24 note by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of roster and team size by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16. Reviewed by: pending.
+Change (2026-10-31, Q-07, team decision, user, not confirmed by the teacher): José Cruz and Pedro Costa swap sprints 4 and 6. José leads sprint 4 and Pedro leads sprint 6. The later sprints do not change.
+
+Updated by: jmbcruz. AI use: requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of sprint 1 row, rotation table and Q-24 note by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of roster and team size by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; leader swap of sprints 4 and 6 by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-31. Reviewed by: pending.

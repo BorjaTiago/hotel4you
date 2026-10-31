@@ -8,14 +8,14 @@ points_suggested:
 status: published
 jira_key: H4Y-75
 labels: [reservations, 1st-delivery]
-sprint: 05
+sprint: 04
 branch: feat/H4Y-75-reservation-service
 ---
 
 # create-reservation: regras e gravação
 
-História pai H4Y-56. Usa `ReservationService.create` e `HotelFacade.createReservation`. Reutiliza a regra `RoomService.isAvailable` do sprint 4. Não cria uma segunda regra. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
-Responsável: a definir na planning do sprint 5.
+História pai H4Y-56. Usa `ReservationService.create` e `HotelFacade.createReservation`. Reutiliza a regra `RoomService.isAvailable` da H4Y-72 (mesmo sprint). Não cria uma segunda regra. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+Responsável: António Martinho.
 
 ## Checklist
 
@@ -31,4 +31,4 @@ Responsável: a definir na planning do sprint 5.
 
 Sem ecrã nesta subtask. O ecrã está em H4Y-76.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: jmbcruz. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; sprint 4 scope swap by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-31. Reviewed by: pending.

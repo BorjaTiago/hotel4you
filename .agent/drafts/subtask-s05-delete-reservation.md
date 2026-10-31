@@ -25,11 +25,13 @@ Responsável: a definir na planning do sprint 5.
 - [ ] AC-2: o quarto volta a aparecer na pesquisa de quartos livres.
 - [ ] AC-3: apagar uma reserva que não existe mostra "A reserva não existe".
 - [ ] Ecrã: botão de apagar só no menu do gestor (regra de H4Y-23).
+- [ ] Ecrã: o botão "Reservas" também aparece no menu do gestor. A H4Y-76 mostra-o só ao rececionista.
 
 ## Interface (UI)
 
-- No ecrã `reservations.fxml` (H4Y-74): botão "Apagar reserva" na linha selecionada, visível só para o gestor (regra de H4Y-23).
+- Botão "Reservas" também no menu do gestor (regra de H4Y-23).
+- No ecrã `reservations.fxml` (H4Y-76): botão "Apagar reserva" na linha selecionada, visível só para o gestor (regra de H4Y-23).
 - Pergunta de confirmação: "Apagar de vez a reserva do quarto 201? Esta ação não pode ser desfeita."
 - Depois de apagar: a reserva sai da tabela (AC-1). Reserva inexistente: "A reserva não existe." (AC-3).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: jmbcruz. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; sprint 4 scope swap by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-31. Reviewed by: pending.
