@@ -11,11 +11,13 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.InMemoryClientRepository;
 import pt.isep.hotel4you.data.InMemoryFloorRepository;
 import pt.isep.hotel4you.data.InMemoryLocationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
+import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Manager;
@@ -53,7 +55,8 @@ class HotelFacadeTest {
         roomRepository = new InMemoryRoomRepository();
         roomTypeRepository = new InMemoryRoomTypeRepository();
         RoomService roomService = new RoomService(roomRepository, roomTypeRepository);
-        facade = new HotelFacade(authService, staffService, locationService, roomService);
+        ClientService clientService = new ClientService(new InMemoryClientRepository());
+        facade = new HotelFacade(authService, staffService, locationService, roomService, clientService);
     }
 
     private User saveAna() {
@@ -362,5 +365,25 @@ class HotelFacadeTest {
     @Tag("H4Y-26-AC-3")
     void onParsePrice_returnPrice_whenTextHasComma() {
         assertEquals(new BigDecimal("80.50"), facade.parsePrice("80,50"));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-1")
+    void onRegisterClient_saveClient_whenReceptionist() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+
+        Client client = facade.registerClient("Maria Santos", "12345678", receptionist);
+
+        assertEquals("Maria Santos", client.getName());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-3")
+    void onRegisterClient_throw_whenDocumentExists() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+        facade.registerClient("Maria Santos", "12345678", receptionist);
+
+        assertThrows(ClientExistsException.class,
+                () -> facade.registerClient("Outra Pessoa", "12345678", receptionist));
     }
 }
