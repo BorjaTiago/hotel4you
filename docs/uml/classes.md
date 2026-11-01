@@ -5,7 +5,7 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 Notes:
 
 - Constructors and getters are not shown.
-- Unit tests use `InMemoryUserRepository`, `InMemoryFloorRepository`, `InMemoryLocationRepository` and `InMemoryRoomRepository` (in `src/test`). They are test helpers, so they are not in this diagram. `InMemoryLocationRepository.delete` returns false when other rows use the zone.
+- Unit tests use `InMemoryUserRepository`, `InMemoryFloorRepository`, `InMemoryLocationRepository`, `InMemoryRoomRepository` and `InMemoryClientRepository` (in `src/test`). They are test helpers, so they are not in this diagram. `InMemoryLocationRepository.delete` returns false when other rows use the zone.
 
 ## Interface (JavaFX controllers)
 
@@ -37,7 +37,7 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | AuthService | Business - Services | - | login(), hashPassword(), isValidPassword() (private) | RF-01, RNF-02 |
-| ClientService | Business - Services | - | register(), find() | RF-10, RNF-03 |
+| ClientService | Business - Services | - | register(name, document, actor) (checks MANAGE_CLIENTS, blank and long fields, duplicate document), find() | RF-10, RNF-03 |
 | LocationService | Business - Services | - | createLocation(floor, name, flags, actor), editLocation(id, floor, name, flags, actor), removeLocation(id, actor), listFloors(), findFloor() | RF-03, RF-18 |
 | RoomService | Business - Services | ROOMS_PER_FLOOR, ROOM_FLOOR_LIMITS (statement rules), ROOM_TYPE_TARGETS (provisional Q-01 display data) | isAvailable(), searchRooms(), roomFloorLimits(), roomTypeTargets(), saveRoom(room, actor), editRoom(room, actor), removeRoom(id, actor) (checks MANAGE_ROOMS, throws RoomInUseException), listRooms(actor), listRoomSummaries(roomTypeName, actor) (checks LIST_ROOMS), listRoomTypes(actor), configureItem(), setBasePrice(type, price, actor), listBasePrices(actor), parsePrice(text), setExtraPrice() | RF-04, RF-05, RF-06, RF-07, RF-08, RF-09 |
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
@@ -51,6 +51,7 @@ Notes:
 | FloorNotFoundException | Business - Exception | - | - (the floor number does not exist) | RF-03 |
 | LocationNotFoundException | Business - Exception | - | - (the zone does not exist) | RF-03 |
 | LocationNameTakenException | Business - Exception | - | - (the floor already has a zone with this name) | RF-03 |
+| ClientExistsException | Business - Exception | - | - (a client with this document already exists) | RF-10 |
 | LocationInUseException | Business - Exception | - | - (the zone has links and cannot be removed, Q-36) | RF-03 |
 | RoomInUseException | Business - Exception | - | - (the room has links and cannot be removed, Q-36) | RF-04 |
 
@@ -59,7 +60,7 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | AppConfig | Config (record) | dbUrl, dbUser, dbPassword | load() (static), toString() (hides the passwords) | RNF-12 |
-| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, JdbcFloorRepository, JdbcLocationRepository, JdbcRoomRepository, JdbcRoomTypeRepository, AuthService, StaffService, LocationService, RoomService, HotelFacade. Starts HotelApp | RF-01, RF-03, RF-04, RF-06, RNF-12 |
+| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, JdbcFloorRepository, JdbcLocationRepository, JdbcRoomRepository, JdbcRoomTypeRepository, JdbcClientRepository, AuthService, StaffService, LocationService, RoomService, ClientService, HotelFacade. Starts HotelApp | RF-01, RF-03, RF-04, RF-06, RNF-12 |
 
 ## Data
 
@@ -67,12 +68,14 @@ Notes:
 |-------|-------|-----------------|--------------|-------------|
 | UserRepository | Data - Repository interface | - | findByUsername(), existsByUsername(), save() | RF-01, RNF-01, RNF-12 |
 | FloorRepository | Data - Repository interface | - | findAll(), findByNumber() | RF-03 |
+| ClientRepository | Data - Repository interface | - | findByDocument() (not case sensitive), save() | RF-10 |
 | LocationRepository | Data - Repository interface | - | findById(), findByFloorAndName(), save(), update(), delete() (false when other rows use the zone) | RF-03 |
 | RoomRepository | Data - Repository interface | - | findAll(), findSummaries(), save(room, floorLimit) (checks the limit and saves atomically), update(room, floorLimit) (checks the floor, type, limit and number in one transaction; the room does not count against the limit), delete(id) (false when other data uses the room) | RF-04 |
 | RoomTypeRepository | Data - Repository interface | - | findAll(), updateBasePrice() (false when no row has the id) | RF-04, RF-06 |
 | Database | Data | NOT_AVAILABLE (static) | connect(), check(), prepare() (static) | RNF-12 |
 | JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), save() | RNF-01, RNF-12 |
 | JdbcFloorRepository | Data - Repository (SQL Server) | - | findAll(), findByNumber() | RF-03, RNF-12 |
+| JdbcClientRepository | Data - Repository (SQL Server) | - | findByDocument(), save() on the `customers` table | RF-10, RNF-12 |
 | JdbcLocationRepository | Data - Repository (SQL Server) | - | findById(), findByFloorAndName(), save(), update(), delete() | RF-03, RNF-12 |
 | JdbcRoomRepository | Data - Repository (SQL Server) | - | findAll(), findSummaries(), save(room, floorLimit), update(room, floorLimit), delete(id) (false on SQL Server error 547) | RF-04, RF-06, RNF-12 |
 | DuplicateRoomException | Data - Exception | - | - | RF-04 |
@@ -87,7 +90,7 @@ Notes:
 | Receptionist | Domain | (inherits User) | (inherits User) | RF-02, RF-24 |
 | Manager | Domain | (inherits User) | (inherits User) | RF-02, RF-23, RF-26, RF-30 |
 | RestaurantStaff | Domain | (inherits User) | (inherits User) | RF-02, RF-25 |
-| Client | Domain | id, name, document, birthday | - | RF-02, RF-10 |
+| Client | Domain | id, name, document | - | RF-02, RF-10 |
 | Floor | Domain (record) | number, description | - | RF-03 |
 | Location | Domain (class) | id, name, guestCardAccess, requiresReservation | - | RF-03, RF-18 |
 | Room | Domain - entity class | MAX_NUMBER, id, number, floorNumber, roomTypeName | Room(id, number, floorNumber, roomTypeName), getId(), getNumber(), getFloorNumber(), getRoomTypeName() | RF-04, RF-05 |
@@ -112,11 +115,11 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | Role | Enum | CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER; displayName | displayName() | RF-02 |
-| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS, MANAGE_ROOMS, MANAGE_PRICES, LIST_ROOMS; allowedRoles | allows(actor) | RF-02, RF-04, RF-06 |
+| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS, MANAGE_ROOMS, MANAGE_PRICES, LIST_ROOMS, MANAGE_CLIENTS; allowedRoles | allows(actor) | RF-02, RF-04, RF-06, RF-10 |
 | ReservationStatus | Enum | RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT | - | RF-12, RF-13, RF-14 |
 | CardType | Enum | CLIENT, MASTER | - | RF-16, RF-23 |
 | FeedbackType | Enum | SUGGESTION, COMPLAINT | - | RF-27 |
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: lukassperandio. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01. Reviewed by: pending.

@@ -28,8 +28,8 @@ Responsável: a definir na planning do sprint 4.
 ## Interface (UI)
 
 - No mesmo ecrã `client.fxml` de H4Y-70, separador "Procurar": campo "Documento" e botão "Procurar".
-- Resultado: nome, documento e data de nascimento do cliente, e botão "Usar na reserva" (guarda o cliente escolhido para o ecrã de reserva do sprint 5).
+- Resultado: nome e documento do cliente, e botão "Usar na reserva" (guarda o cliente escolhido para o ecrã de reserva do sprint 5).
 - Sem resultado: "Sem resultados." e botão "Registar novo cliente", que abre o separador "Registar" com o documento já escrito (AC-2).
 - Pesquisa vazia: "Indique o documento do cliente." (AC-3).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01. Reviewed by: pending.
