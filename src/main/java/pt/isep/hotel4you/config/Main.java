@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import javafx.application.Application;
 import pt.isep.hotel4you.data.Database;
 import pt.isep.hotel4you.data.JdbcFloorRepository;
+import pt.isep.hotel4you.data.JdbcItemRepository;
 import pt.isep.hotel4you.data.JdbcLocationRepository;
 import pt.isep.hotel4you.data.JdbcRoomRepository;
 import pt.isep.hotel4you.data.JdbcRoomTypeRepository;
@@ -14,6 +15,7 @@ import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.LocationService;
 import pt.isep.hotel4you.service.RoomService;
 import pt.isep.hotel4you.service.StaffService;
+import pt.isep.hotel4you.service.StockService;
 
 /** Starts the Hotel4You application. */
 public class Main {
@@ -37,7 +39,9 @@ public class Main {
                     new JdbcFloorRepository(database), new JdbcLocationRepository(database));
             RoomService roomService = new RoomService(
                     new JdbcRoomRepository(database), new JdbcRoomTypeRepository(database));
-            HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService);
+            StockService stockService = new StockService(new JdbcItemRepository(database));
+            HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
+                    stockService);
 
             // Check now that the database works.
             database.check();
