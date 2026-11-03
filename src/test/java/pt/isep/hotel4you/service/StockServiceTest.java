@@ -208,6 +208,13 @@ class StockServiceTest {
     }
 
     @Test
+    @Tag("H4Y-51-AC-8")
+    void onEditItem_throwNotFound_whenIdNull() {
+        assertThrows(StockItemNotFoundException.class,
+                () -> service.editItem(new StockItem(null, "toalhas", "unidade", 0), manager()));
+    }
+
+    @Test
     @Tag("H4Y-51-AC-6")
     void onEditItem_throw_whenNameBlank() {
         StockItem item = service.createItem("toalhas", "unidade", manager());
