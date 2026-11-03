@@ -26,7 +26,7 @@ public class JdbcItemRepository implements ItemRepository {
     @Override
     public Optional<StockItem> findById(long id) {
         String sql = "SELECT id, name, unit, stock_quantity FROM items WHERE id = ?";
-        return query(sql, String.valueOf(id)).stream().findFirst();
+        return query(sql, id).stream().findFirst();
     }
 
     @Override
@@ -49,7 +49,7 @@ public class JdbcItemRepository implements ItemRepository {
                 """;
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, item.getName(),
-                        item.getUnit(), String.valueOf(item.getStockQuantity()));
+                        item.getUnit(), item.getStockQuantity());
                 ResultSet row = statement.executeQuery()) {
             row.next();
             return new StockItem(row.getLong("id"), item.getName(), item.getUnit(),
@@ -64,14 +64,14 @@ public class JdbcItemRepository implements ItemRepository {
         String sql = "UPDATE items SET name = ?, unit = ? WHERE id = ?";
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, item.getName(),
-                        item.getUnit(), String.valueOf(item.getId()))) {
+                        item.getUnit(), item.getId())) {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 
-    private List<StockItem> query(String sql, String... values) {
+    private List<StockItem> query(String sql, Object... values) {
         List<StockItem> items = new ArrayList<>();
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, values);
