@@ -122,7 +122,7 @@ class StockServiceTest {
     }
 
     @Test
-    @Tag("H4Y-51-AC-8")
+    @Tag("H4Y-51-AC-6")
     void onEditItem_throw_whenNameTooLong() {
         StockItem item = service.createItem("toalhas", "unidade", manager());
         String longName = "a".repeat(101);
@@ -169,7 +169,7 @@ class StockServiceTest {
     }
 
     @Test
-    @Tag("H4Y-51-AC-6")
+    @Tag("H4Y-51-AC-5")
     void onEditItem_keepStock_whenEdited() {
         StockItem saved = repository.save(new StockItem(null, "toalhas", "unidade", 15));
 
@@ -207,7 +207,7 @@ class StockServiceTest {
     }
 
     @Test
-    @Tag("H4Y-51-AC-8")
+    @Tag("H4Y-51-AC-6")
     void onEditItem_throw_whenNameBlank() {
         StockItem item = service.createItem("toalhas", "unidade", manager());
 
