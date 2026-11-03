@@ -61,6 +61,9 @@ public class StockService {
         checkManage(actor);
         String cleanName = checkText(item.getName(), "nome", MAX_NAME_LENGTH);
         String cleanUnit = checkText(item.getUnit(), "unidade", MAX_UNIT_LENGTH);
+        if (item.getId() == null) {
+            throw new StockItemNotFoundException();
+        }
         StockItem stored = itemRepository.findById(item.getId()).orElseThrow(StockItemNotFoundException::new);
         checkNameFree(cleanName, stored.getId());
         itemRepository.update(new StockItem(stored.getId(), cleanName, cleanUnit, stored.getStockQuantity()));
