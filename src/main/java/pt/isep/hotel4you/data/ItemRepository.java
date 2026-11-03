@@ -17,7 +17,8 @@ public interface ItemRepository {
     Optional<StockItem> findById(long id);
 
     /**
-     * Finds an item by name. The name match is not case sensitive.
+     * Finds an item by name. The match is not case sensitive,
+     * because the database uses the CI_AS collation.
      *
      * @param name the item name
      * @return the item, or empty if no item has this name
@@ -38,6 +39,7 @@ public interface ItemRepository {
      *
      * @param item the new item, its id is ignored
      * @return the saved item with its new id
+     * @throws DuplicateItemException if another item has this name
      * @throws IllegalStateException if the database is not available
      */
     StockItem save(StockItem item);
@@ -46,7 +48,9 @@ public interface ItemRepository {
      * Changes the name and the unit of a saved item. The quantity stays the same.
      *
      * @param item the item with its id and new values
+     * @return true if the item was changed, false if no item has this id
+     * @throws DuplicateItemException if another item has this name
      * @throws IllegalStateException if the database is not available
      */
-    void update(StockItem item);
+    boolean update(StockItem item);
 }

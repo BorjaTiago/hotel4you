@@ -20,11 +20,11 @@
     <VBox spacing="12">
         <HBox spacing="12">
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label fx:id="nameLabel" text="Nome" labelFor="$nameField"/>
+                <Label fx:id="nameLabel" text="Nome"/>
                 <TextField fx:id="nameField" promptText="Nome" maxWidth="Infinity"/>
             </VBox>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label fx:id="unitLabel" text="Unidade" labelFor="$unitField"/>
+                <Label fx:id="unitLabel" text="Unidade"/>
                 <TextField fx:id="unitField" promptText="Unidade (unidade, kg, litro)" maxWidth="Infinity"/>
             </VBox>
         </HBox>

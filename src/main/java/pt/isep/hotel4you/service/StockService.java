@@ -2,6 +2,7 @@ package pt.isep.hotel4you.service;
 
 import java.util.List;
 import java.util.Optional;
+import pt.isep.hotel4you.data.DuplicateItemException;
 import pt.isep.hotel4you.data.ItemRepository;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.StockItem;
@@ -34,7 +35,8 @@ public class StockService {
      * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalArgumentException if the name is blank or longer than 100 characters,
      *         or the unit is blank or longer than 20 characters
-     * @throws StockItemNameTakenException if another item has this name
+     * @throws StockItemNameTakenException if another item has this name,
+     *         also when the database finds the same name at save time
      * @throws IllegalStateException if the database is not available
      */
     public StockItem createItem(String name, String unit, User actor) {
@@ -42,7 +44,11 @@ public class StockService {
         String cleanName = checkText(name, "nome", MAX_NAME_LENGTH);
         String cleanUnit = checkText(unit, "unidade", MAX_UNIT_LENGTH);
         checkNameFree(cleanName, null);
-        return itemRepository.save(new StockItem(null, cleanName, cleanUnit, 0));
+        try {
+            return itemRepository.save(new StockItem(null, cleanName, cleanUnit, 0));
+        } catch (DuplicateItemException e) {
+            throw new StockItemNameTakenException();
+        }
     }
 
     /**
@@ -54,7 +60,8 @@ public class StockService {
      * @throws IllegalArgumentException if the name is blank or longer than 100 characters,
      *         or the unit is blank or longer than 20 characters
      * @throws StockItemNotFoundException if the item does not exist
-     * @throws StockItemNameTakenException if another item has this name
+     * @throws StockItemNameTakenException if another item has this name,
+     *         also when the database finds the same name at save time
      * @throws IllegalStateException if the database is not available
      */
     public void editItem(StockItem item, User actor) {
@@ -66,7 +73,16 @@ public class StockService {
         }
         StockItem stored = itemRepository.findById(item.getId()).orElseThrow(StockItemNotFoundException::new);
         checkNameFree(cleanName, stored.getId());
-        itemRepository.update(new StockItem(stored.getId(), cleanName, cleanUnit, stored.getStockQuantity()));
+        StockItem changed = new StockItem(stored.getId(), cleanName, cleanUnit, stored.getStockQuantity());
+        boolean updated;
+        try {
+            updated = itemRepository.update(changed);
+        } catch (DuplicateItemException e) {
+            throw new StockItemNameTakenException();
+        }
+        if (!updated) {
+            throw new StockItemNotFoundException();
+        }
     }
 
     /**

@@ -66,18 +66,24 @@ public class JdbcItemRepository implements ItemRepository {
             return new StockItem(row.getLong("id"), item.getName(), item.getUnit(),
                     item.getStockQuantity());
         } catch (SQLException e) {
+            if (isDuplicateKey(e)) {
+                throw new DuplicateItemException();
+            }
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 
     @Override
-    public void update(StockItem item) {
+    public boolean update(StockItem item) {
         String sql = "UPDATE items SET name = ?, unit = ? WHERE id = ?";
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, item.getName(),
                         item.getUnit(), item.getId())) {
-            statement.executeUpdate();
+            return statement.executeUpdate() > 0;
         } catch (SQLException e) {
+            if (isDuplicateKey(e)) {
+                throw new DuplicateItemException();
+            }
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
@@ -93,6 +99,10 @@ public class JdbcItemRepository implements ItemRepository {
         } catch (SQLException e) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
+    }
+
+    private static boolean isDuplicateKey(SQLException error) {
+        return error.getErrorCode() == 2601 || error.getErrorCode() == 2627;
     }
 
     private static StockItem toItem(ResultSet row) throws SQLException {
