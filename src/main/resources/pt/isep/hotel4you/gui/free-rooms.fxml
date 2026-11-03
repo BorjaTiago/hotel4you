@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.FreeRoomController">
+
+    <Label text="Quartos livres" styleClass="subtitle"/>
+    <HBox spacing="12">
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Tipo" labelFor="$typeBox"/>
+            <ComboBox fx:id="typeBox" maxWidth="Infinity"/>
+        </VBox>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Entrada" labelFor="$startPicker"/>
+            <DatePicker fx:id="startPicker" maxWidth="Infinity"/>
+        </VBox>
+        <VBox spacing="4" HBox.hgrow="ALWAYS">
+            <Label text="Saída" labelFor="$endPicker"/>
+            <DatePicker fx:id="endPicker" maxWidth="Infinity"/>
+        </VBox>
+    </HBox>
+    <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefWidth="500">
+        <columns>
+            <TableColumn fx:id="numberColumn" text="Número" prefWidth="100"/>
+            <TableColumn fx:id="floorColumn" text="Piso" prefWidth="100"/>
+            <TableColumn fx:id="roomTypeColumn" text="Tipo" prefWidth="140"/>
+            <TableColumn fx:id="priceColumn" text="Preço por noite" prefWidth="140"/>
+            <TableColumn fx:id="totalColumn" text="Total" prefWidth="140"/>
+        </columns>
+        <placeholder>
+            <Label text="Escolha o tipo e as datas e clique em Procurar."/>
+        </placeholder>
+    </TableView>
+    <HBox spacing="12">
+        <Button text="Procurar" onAction="#onSearchClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="Escolher quarto" onAction="#onChooseRoomClicked" styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
