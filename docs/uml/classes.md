@@ -5,14 +5,14 @@ One table per layer. Every class of [class-diagram.md](class-diagram.md) appears
 Notes:
 
 - Constructors and getters are not shown.
-- Unit tests use `InMemoryUserRepository`, `InMemoryFloorRepository`, `InMemoryLocationRepository` and `InMemoryRoomRepository` (in `src/test`). They are test helpers, so they are not in this diagram. `InMemoryLocationRepository.delete` returns false when other rows use the zone.
+- Unit tests use `InMemoryUserRepository`, `InMemoryFloorRepository`, `InMemoryLocationRepository`, `InMemoryRoomRepository` and `InMemoryItemRepository` (in `src/test`). They are test helpers, so they are not in this diagram. `InMemoryLocationRepository.delete` returns false when other rows use the zone.
 
 ## Interface (JavaFX controllers)
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | LoginController | Interface | - | onLoginClicked() (private) | RF-01 |
-| MainController | Interface | - | initialize(), onStaffClicked(), onFloorsClicked(), onRoomsClicked(), onPricesClicked(), onLogoutClicked(), openLogin() (private) | RF-03, RF-04, RF-06, RNF-06, RNF-07 |
+| MainController | Interface | - | initialize(), onStaffClicked(), onFloorsClicked(), onRoomsClicked(), onPricesClicked(), onStockClicked(), onLogoutClicked(), openLogin() (private). The stock button shows only when `canUse(actor, MANAGE_STOCK)` allows it (H4Y-51) | RF-03, RF-04, RF-06, RF-28, RNF-06, RNF-07 |
 | HotelApp | Interface | facade (static), currentUser (static), startError (static) | start() | RNF-06, RNF-07 |
 | ScreenLoader | Interface | - | load() (applies style.css to the screen) | RNF-06, RNF-07 |
 | RoomController | Interface | - | initialize() (private). One screen "Quartos": table with a type filter, and the registration form, edit form and summary for MANAGE_ROOMS only. The manager selects a row, changes it and clicks "Guardar alterações". The floor box is a `ComboBox<Floor>` filled by listFloors(actor) and limited to roomFloorLimits(). Also onSearchClicked(), onSaveRoomClicked(), onSaveRoomChangesClicked(), onRemoveRoomClicked(), onClearClicked() (private, H4Y-50), onConfigureRoomItemClicked() | RF-04, RF-05, RF-06, RF-08 |
@@ -21,7 +21,7 @@ Notes:
 | CheckInOutController | Interface | - | onCheckInClicked(), onCheckOutClicked() | RF-13, RF-14 |
 | StaffController | Interface | - | initialize(), onCreateStaffClicked(), onEditStaffClicked(), onRemoveStaffClicked(), onListUsersClicked() | RF-26, RNF-01 |
 | CardController | Interface | - | onIssueCardClicked(), onIssueMasterCardClicked(), onBlockMasterCardClicked(), onShowPlacesByCardClicked(), onShowPassesByRoomClicked() | RF-16, RF-20, RF-21, RF-23, RF-30 |
-| StockController | Interface | - | onImportXmlClicked(), onSaveItemClicked(), onRegisterMovementClicked() | RF-28, RF-29 |
+| StockController | Interface | - | initialize() (private, loads the item table), onImportXmlClicked(), onSaveItemClicked() (create), onEditItemClicked() (edit the selected item), onRegisterMovementClicked() | RF-28, RF-29 |
 | FeedbackController | Interface | - | onSaveFeedbackClicked(), onListFeedbackClicked() | RF-27 |
 | FloorController | Interface | - | initialize(), onSearchClicked(), onCreateLocationClicked(), onSaveLocationClicked(), onRemoveLocationClicked() (all private). One screen for floors and zones | RF-03 |
 | PriceController | Interface | - | initialize(), onSavePriceClicked() (private). Own screen, because RoomController uses another FXML file | RF-06 |
@@ -30,7 +30,7 @@ Notes:
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
-| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canUse(actor, permission), editStaff(), removeStaff(), listUsers(), searchRooms(), roomFloorLimits(), roomTypeTargets(), saveRoom(room, actor), editRoom(room, actor), removeRoom(id, actor), listRooms(actor), listRoomSummaries(roomTypeName, actor), listRoomTypes(actor), configureRoomItem(), setBasePrice(type, price, actor), listBasePrices(actor), parsePrice(text), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(), editItem(), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback(), listFloors(), findFloor() | All RF and RNF-07 (entry point) |
+| HotelFacade | Business - Facade | - | login(), createReservation(), cancelReservation(), deleteReservation(), addExtra(), removeExtra(), addLocation(), removeLocation(reservation, location), registerClient(), findClient(), checkIn(), checkOut(), issueCard(), issueMasterCard(), blockMasterCard(), getPlacesByCard(), getPassesByRoom(), createStaff(name, username, password, role, actor), canUse(actor, permission), editStaff(), removeStaff(), listUsers(), searchRooms(), roomFloorLimits(), roomTypeTargets(), saveRoom(room, actor), editRoom(room, actor), removeRoom(id, actor), listRooms(actor), listRoomSummaries(roomTypeName, actor), listRoomTypes(actor), configureRoomItem(), setBasePrice(type, price, actor), listBasePrices(actor), parsePrice(text), setExtraPrice(), createLocation(), editLocation(), removeLocation(location), importStock(), createItem(name, unit, actor), editItem(item, actor), listItems(actor), registerMovement() (takes exitReason and user), saveFeedback(), listFeedback(), listFloors(), findFloor() | All RF and RNF-07 (entry point) |
 
 ## Business - Services
 
@@ -43,7 +43,7 @@ Notes:
 | ReservationService | Business - Services | - | create(), cancel(), delete(), addExtra(), removeExtra(), addLocation(), removeLocation(), checkIn(), checkOut() | RF-05, RF-07, RF-11, RF-12, RF-13, RF-14, RF-15, RF-18, RF-22 |
 | StaffService | Business - Services | - | createStaff(name, username, password, role, actor), editStaff(), removeStaff(), listUsers() | RF-02, RF-26, RNF-01 |
 | CardAccessService | Business - Services | - | issueCard(), issueMasterCard(), blockCard(), canOpen(), register(), getPlacesByCard(), getPassesByRoom(), canOpenRoom() (access rules in the diagram note) | RF-16, RF-17, RF-18, RF-19, RF-20, RF-21, RF-23, RF-24, RF-25, RF-30 |
-| StockService | Business - Services | - | importStock(), createItem(), editItem(), registerMovement(), applyMovement() (both take exitReason and user) | RF-28, RF-29 |
+| StockService | Business - Services | - | importStock(), createItem(name, unit, actor), editItem(item, actor), listItems(actor), registerMovement(), applyMovement() (both take exitReason and user). createItem, editItem and listItems check MANAGE_STOCK (H4Y-51) | RF-28, RF-29 |
 | FeedbackService | Business - Services | - | save(), list() | RF-27 |
 | LoginFailedException | Business - Exception | - | - (one fixed message for unknown user and wrong password) | RF-01 |
 | UsernameTakenException | Business - Exception | - | - | RF-26 |
@@ -53,13 +53,15 @@ Notes:
 | LocationNameTakenException | Business - Exception | - | - (the floor already has a zone with this name) | RF-03 |
 | LocationInUseException | Business - Exception | - | - (the zone has links and cannot be removed, Q-36) | RF-03 |
 | RoomInUseException | Business - Exception | - | - (the room has links and cannot be removed, Q-36) | RF-04 |
+| StockItemNameTakenException | Business - Exception | - | - (another stock item already has this name) | RF-28, RF-29 |
+| StockItemNotFoundException | Business - Exception | - | - (the stock item does not exist) | RF-28, RF-29 |
 
 ## Config
 
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | AppConfig | Config (record) | dbUrl, dbUser, dbPassword | load() (static), toString() (hides the passwords) | RNF-12 |
-| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, JdbcFloorRepository, JdbcLocationRepository, JdbcRoomRepository, JdbcRoomTypeRepository, AuthService, StaffService, LocationService, RoomService, HotelFacade. Starts HotelApp | RF-01, RF-03, RF-04, RF-06, RNF-12 |
+| Main | Config | - | main() (static). Uses AppConfig. Creates Database, JdbcUserRepository, JdbcFloorRepository, JdbcLocationRepository, JdbcRoomRepository, JdbcRoomTypeRepository, JdbcItemRepository, AuthService, StaffService, LocationService, RoomService, StockService, HotelFacade. Starts HotelApp | RF-01, RF-03, RF-04, RF-06, RF-28, RNF-12 |
 
 ## Data
 
@@ -70,6 +72,7 @@ Notes:
 | LocationRepository | Data - Repository interface | - | findById(), findByFloorAndName(), save(), update(), delete() (false when other rows use the zone) | RF-03 |
 | RoomRepository | Data - Repository interface | - | findAll(), findSummaries(), save(room, floorLimit) (checks the limit and saves atomically), update(room, floorLimit) (checks the floor, type, limit and number in one transaction; the room does not count against the limit), delete(id) (false when other data uses the room) | RF-04 |
 | RoomTypeRepository | Data - Repository interface | - | findAll(), updateBasePrice() (false when no row has the id) | RF-04, RF-06 |
+| ItemRepository | Data - Repository interface | - | findById(), findByName(), findAll(), save(), update() (stock catalogue, H4Y-51) | RF-28, RF-29 |
 | Database | Data | NOT_AVAILABLE (static) | connect(), check(), prepare() (static) | RNF-12 |
 | JdbcUserRepository | Data - Repository (SQL Server) | - | findByUsername(), existsByUsername(), save() | RNF-01, RNF-12 |
 | JdbcFloorRepository | Data - Repository (SQL Server) | - | findAll(), findByNumber() | RF-03, RNF-12 |
@@ -78,6 +81,7 @@ Notes:
 | DuplicateRoomException | Data - Exception | - | - | RF-04 |
 | RoomLimitExceededException | Data - Exception | - | - | RF-04 |
 | JdbcRoomTypeRepository | Data - Repository (SQL Server) | - | findAll(), updateBasePrice() | RF-06, RNF-12 |
+| JdbcItemRepository | Data - Repository (SQL Server) | - | findById(), findByName(), findAll(), save(), update() (table `items`) | RF-28, RF-29, RNF-12 |
 
 ## Domain
 
@@ -100,7 +104,7 @@ Notes:
 | ExtraService | Domain | id, name, price | - | RF-07, RF-09 |
 | MagneticCard | Domain | id, number, type, active, blockedAt | - | RF-16, RF-17, RF-23, RF-30 |
 | CardAccessRecord | Domain | entryDateTime | - | RF-19, RF-20, RF-21 |
-| StockItem | Domain | id, name, unit, stockQuantity | - | RF-28, RF-29 |
+| StockItem | Domain (class) | id (null until saved), name, unit, stockQuantity (0 when created) | - | RF-28, RF-29 |
 | StockMovement | Domain | type, quantity, dateTime, exitReason | - | RF-29 |
 | StockImport | Domain | supplierName, importedAt | - | RF-28 |
 | Feedback | Domain | type, description, createdAt (client may be null: anonymous) | - | RF-27 |
@@ -112,11 +116,11 @@ Notes:
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | Role | Enum | CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER; displayName | displayName() | RF-02 |
-| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS, MANAGE_ROOMS, MANAGE_PRICES, LIST_ROOMS; allowedRoles | allows(actor) | RF-02, RF-04, RF-06 |
+| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS, MANAGE_ROOMS, MANAGE_PRICES, LIST_ROOMS, MANAGE_STOCK; allowedRoles | allows(actor) | RF-02, RF-04, RF-06, RF-28, RF-29 |
 | ReservationStatus | Enum | RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT | - | RF-12, RF-13, RF-14 |
 | CardType | Enum | CLIENT, MASTER | - | RF-16, RF-23 |
 | FeedbackType | Enum | SUGGESTION, COMPLAINT | - | RF-27 |
 | MovementType | Enum | ENTRY, USE, EXIT | - | RF-29 |
 | ExitReason | Enum | DISCARD, RETURN, LOSS | - | RF-29 |
 
-Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03. Reviewed by: pending.
