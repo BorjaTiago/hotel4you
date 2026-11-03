@@ -9,12 +9,15 @@
     <!-- Item form -->
     <VBox spacing="12" prefWidth="320" minWidth="280">
         <Label text="Item de stock" styleClass="subtitle"/>
+        <Label fx:id="nameLabel" text="Nome"/>
         <TextField fx:id="nameField" promptText="Nome" maxWidth="Infinity"/>
+        <Label fx:id="unitLabel" text="Unidade"/>
         <TextField fx:id="unitField" promptText="Unidade (unidade, kg, litro)" maxWidth="Infinity"/>
-        <Button text="Registar item" onAction="#onSaveItemClicked" maxWidth="Infinity"
-                styleClass="primary-button"/>
-        <Button text="Guardar alterações" onAction="#onEditItemClicked" maxWidth="Infinity"/>
-        <Button text="Limpar" onAction="#onClearClicked" maxWidth="Infinity"/>
+        <HBox spacing="12">
+            <Button text="Registar item" onAction="#onSaveItemClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Guardar alterações" onAction="#onEditItemClicked" styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        </HBox>
         <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
     </VBox>
 
@@ -23,7 +26,7 @@
     <!-- Item list -->
     <VBox spacing="12" HBox.hgrow="ALWAYS">
         <Label text="Catálogo de stock" styleClass="subtitle"/>
-        <TableView fx:id="itemTable" VBox.vgrow="ALWAYS" prefWidth="500">
+        <TableView fx:id="itemTable" accessibleText="Catálogo de stock" VBox.vgrow="ALWAYS" prefWidth="500">
             <columns>
                 <TableColumn fx:id="nameColumn" text="Nome" prefWidth="180"/>
                 <TableColumn fx:id="unitColumn" text="Unidade" prefWidth="120"/>

@@ -15,6 +15,12 @@ public class StockController {
     private final HotelFacade facade;
 
     @FXML
+    private Label nameLabel;
+
+    @FXML
+    private Label unitLabel;
+
+    @FXML
     private TextField nameField;
 
     @FXML
@@ -46,6 +52,8 @@ public class StockController {
 
     @FXML
     private void initialize() {
+        nameLabel.setLabelFor(nameField);
+        unitLabel.setLabelFor(unitField);
         nameColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().getName()));
         unitColumn.setCellValueFactory(
@@ -69,29 +77,29 @@ public class StockController {
         try {
             itemTable.getItems().setAll(facade.listItems(HotelApp.currentUser));
         } catch (RuntimeException e) {
-            messageLabel.setText(e.getMessage());
+            showMessage(e.getMessage(), false);
         }
     }
 
     @FXML
     private void onSaveItemClicked() {
-        messageLabel.setText("");
+        showMessage("", false);
         try {
             facade.createItem(nameField.getText(), unitField.getText(), HotelApp.currentUser);
             loadItems();
             clearForm();
-            messageLabel.setText("Item registado.");
+            showMessage("Item registado.", true);
         } catch (RuntimeException e) {
-            messageLabel.setText(e.getMessage());
+            showMessage(e.getMessage(), false);
         }
     }
 
     @FXML
     private void onEditItemClicked() {
-        messageLabel.setText("");
+        showMessage("", false);
         StockItem selected = itemTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            messageLabel.setText("Escolha um item na tabela.");
+            showMessage("Escolha um item na tabela.", false);
             return;
         }
         try {
@@ -100,16 +108,24 @@ public class StockController {
             facade.editItem(edited, HotelApp.currentUser);
             loadItems();
             clearForm();
-            messageLabel.setText("Item guardado.");
+            showMessage("Item guardado.", true);
         } catch (RuntimeException e) {
-            messageLabel.setText(e.getMessage());
+            showMessage(e.getMessage(), false);
         }
     }
 
     @FXML
     private void onClearClicked() {
         clearForm();
-        messageLabel.setText("");
+        showMessage("", false);
+    }
+
+    private void showMessage(String message, boolean success) {
+        messageLabel.setText(message);
+        messageLabel.getStyleClass().remove("message-success");
+        if (success) {
+            messageLabel.getStyleClass().add("message-success");
+        }
     }
 
     private void clearForm() {
