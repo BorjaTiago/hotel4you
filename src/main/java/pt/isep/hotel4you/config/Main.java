@@ -6,6 +6,7 @@ import pt.isep.hotel4you.data.Database;
 import pt.isep.hotel4you.data.JdbcFloorRepository;
 import pt.isep.hotel4you.data.JdbcLocationRepository;
 import pt.isep.hotel4you.data.JdbcRoomRepository;
+import pt.isep.hotel4you.data.JdbcReservationRepository;
 import pt.isep.hotel4you.data.JdbcRoomTypeRepository;
 import pt.isep.hotel4you.data.JdbcUserRepository;
 import pt.isep.hotel4you.gui.HotelApp;
@@ -36,7 +37,8 @@ public class Main {
             LocationService locationService = new LocationService(
                     new JdbcFloorRepository(database), new JdbcLocationRepository(database));
             RoomService roomService = new RoomService(
-                    new JdbcRoomRepository(database), new JdbcRoomTypeRepository(database));
+                    new JdbcRoomRepository(database), new JdbcRoomTypeRepository(database),
+                    new JdbcReservationRepository(database));
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService);
 
             // Check now that the database works.

@@ -18,7 +18,10 @@ public enum Permission {
     MANAGE_PRICES(Role.MANAGER),
 
     /** See the room list with type, floor and base price. */
-    LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER);
+    LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
+
+    /** Search free rooms by type and dates. */
+    SEARCH_ROOMS(Role.RECEPTIONIST, Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 
