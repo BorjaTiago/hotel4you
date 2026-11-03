@@ -39,8 +39,12 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public void update(StockItem item) {
+    public boolean update(StockItem item) {
+        if (!items.containsKey(item.getId())) {
+            return false;
+        }
         items.put(item.getId(), item);
+        return true;
     }
 
     /**

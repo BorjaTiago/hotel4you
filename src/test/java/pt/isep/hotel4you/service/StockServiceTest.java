@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.DuplicateItemException;
 import pt.isep.hotel4you.data.InMemoryItemRepository;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
@@ -273,5 +275,64 @@ class StockServiceTest {
                 () -> service.listItems(actor));
 
         assertEquals(DENIED_MESSAGE, error.getMessage());
+    }
+
+    /** A repository whose save fails with a duplicate error, as when another user saves first. */
+    private static class DuplicateOnSaveRepository extends InMemoryItemRepository {
+
+        @Override
+        public StockItem save(StockItem item) {
+            throw new DuplicateItemException();
+        }
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-3")
+    void onCreateItem_throwNameTaken_whenRepositoryReportsDuplicate() {
+        StockService duplicateAtSave = new StockService(new DuplicateOnSaveRepository());
+
+        assertThrows(StockItemNameTakenException.class,
+                () -> duplicateAtSave.createItem("toalhas", "unidade", manager()));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-7")
+    void onEditItem_throwNameTaken_whenRepositoryReportsDuplicate() {
+        StockService sameNameAtUpdate = new StockService(new FoundRepository(true));
+
+        assertThrows(StockItemNameTakenException.class,
+                () -> sameNameAtUpdate.editItem(new StockItem(1L, "toalhas", "unidade", 0), manager()));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-8")
+    void onEditItem_throwNotFound_whenUpdateChangesNoRow() {
+        StockService goneAtUpdate = new StockService(new FoundRepository(false));
+
+        assertThrows(StockItemNotFoundException.class,
+                () -> goneAtUpdate.editItem(new StockItem(1L, "toalhas", "unidade", 0), manager()));
+    }
+
+    /** A repository that finds item 1 but fails at update, as when another user changes it. */
+    private static class FoundRepository extends InMemoryItemRepository {
+
+        private final boolean duplicate;
+
+        FoundRepository(boolean duplicate) {
+            this.duplicate = duplicate;
+        }
+
+        @Override
+        public Optional<StockItem> findById(long id) {
+            return Optional.of(new StockItem(id, "velho", "unidade", 0));
+        }
+
+        @Override
+        public boolean update(StockItem item) {
+            if (duplicate) {
+                throw new DuplicateItemException();
+            }
+            return false;
+        }
     }
 }
