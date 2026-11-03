@@ -101,6 +101,9 @@ public class FreeRoomController {
     @FXML
     private void onSearchClicked() {
         messageLabel.setText("");
+        HotelApp.chosenRoom = null;
+        HotelApp.chosenStart = null;
+        HotelApp.chosenEnd = null;
         try {
             RoomSearchResult result = facade.searchRoomsWithMessage(startPicker.getValue(),
                     endPicker.getValue(), typeBox.getValue(), HotelApp.currentUser);
