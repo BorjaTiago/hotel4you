@@ -24,20 +24,20 @@ public class HotelApp extends Application {
     public static User currentUser;
 
     /**
-     * The room chosen on the free-room screen. The reservation screen reads it.
-     * Null when nothing is chosen.
+     * The room chosen on the free-room screen, for the reservation screen (H4Y-76).
+     * A new search and logout set it to null. Null when nothing is chosen.
      */
     public static Room chosenRoom;
 
     /**
-     * The first night chosen on the free-room screen. The reservation screen reads it.
-     * Null when nothing is chosen.
+     * The first night chosen on the free-room screen, for the reservation screen (H4Y-76).
+     * A new search and logout set it to null. Null when nothing is chosen.
      */
     public static LocalDate chosenStart;
 
     /**
-     * The check-out date chosen on the free-room screen. The reservation screen reads it.
-     * Null when nothing is chosen.
+     * The check-out date chosen on the free-room screen, for the reservation screen (H4Y-76).
+     * A new search and logout set it to null. Null when nothing is chosen.
      */
     public static LocalDate chosenEnd;
 
