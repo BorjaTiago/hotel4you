@@ -191,12 +191,13 @@ class StockServiceTest {
     @Test
     @Tag("H4Y-51-AC-7")
     void onEditItem_throwNameTaken_whenOtherItemHasName() {
-        service.createItem("toalhas", "unidade", manager());
+        StockItem towels = service.createItem("toalhas", "unidade", manager());
         StockItem sheets = service.createItem("lençóis", "unidade", manager());
 
         assertThrows(StockItemNameTakenException.class,
                 () -> service.editItem(new StockItem(sheets.getId(), "toalhas", "unidade", 0), manager()));
         assertEquals("lençóis", repository.findById(sheets.getId()).get().getName());
+        assertEquals("toalhas", repository.findById(towels.getId()).get().getName());
     }
 
     @Test
@@ -216,6 +217,18 @@ class StockServiceTest {
 
         assertTrue(error.getMessage().contains("nome"));
         assertEquals("toalhas", repository.findById(item.getId()).get().getName());
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-6")
+    void onEditItem_throw_whenUnitBlank() {
+        StockItem item = service.createItem("toalhas", "unidade", manager());
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.editItem(new StockItem(item.getId(), "toalhas", " ", 0), manager()));
+
+        assertTrue(error.getMessage().contains("unidade"));
+        assertEquals("unidade", repository.findById(item.getId()).get().getUnit());
     }
 
     @Test
