@@ -26,18 +26,29 @@ public class JdbcItemRepository implements ItemRepository {
     @Override
     public Optional<StockItem> findById(long id) {
         String sql = "SELECT id, name, unit, stock_quantity FROM items WHERE id = ?";
-        return query(sql, id).stream().findFirst();
+        return findOne(sql, id);
     }
 
     @Override
     public Optional<StockItem> findByName(String name) {
         String sql = "SELECT id, name, unit, stock_quantity FROM items WHERE name = ?";
-        return query(sql, name).stream().findFirst();
+        return findOne(sql, name);
     }
 
     @Override
     public List<StockItem> findAll() {
-        return query("SELECT id, name, unit, stock_quantity FROM items ORDER BY name");
+        String sql = "SELECT id, name, unit, stock_quantity FROM items ORDER BY name";
+        List<StockItem> items = new ArrayList<>();
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql);
+                ResultSet rows = statement.executeQuery()) {
+            while (rows.next()) {
+                items.add(toItem(rows));
+            }
+            return items;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
     }
 
     @Override
@@ -71,18 +82,21 @@ public class JdbcItemRepository implements ItemRepository {
         }
     }
 
-    private List<StockItem> query(String sql, Object... values) {
-        List<StockItem> items = new ArrayList<>();
+    private Optional<StockItem> findOne(String sql, Object... values) {
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, values);
                 ResultSet rows = statement.executeQuery()) {
-            while (rows.next()) {
-                items.add(new StockItem(rows.getLong("id"), rows.getString("name"),
-                        rows.getString("unit"), rows.getInt("stock_quantity")));
+            if (!rows.next()) {
+                return Optional.empty();
             }
-            return items;
+            return Optional.of(toItem(rows));
         } catch (SQLException e) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
+    }
+
+    private static StockItem toItem(ResultSet row) throws SQLException {
+        return new StockItem(row.getLong("id"), row.getString("name"), row.getString("unit"),
+                row.getInt("stock_quantity"));
     }
 }
