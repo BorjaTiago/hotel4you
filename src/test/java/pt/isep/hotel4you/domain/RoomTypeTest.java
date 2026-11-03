@@ -21,8 +21,7 @@ class RoomTypeTest {
 
         BigDecimal total = type.totalFor(START, END);
 
-        // compareTo ignores scale, so 161 and 161.00 are both accepted
-        assertEquals(0, new BigDecimal("161.00").compareTo(total));
+        assertEquals(new BigDecimal("161.00"), total);
     }
 
     @Test
@@ -32,7 +31,27 @@ class RoomTypeTest {
 
         BigDecimal total = type.totalFor(START, START.plusDays(1));
 
-        assertEquals(0, new BigDecimal("80.50").compareTo(total));
+        assertEquals(new BigDecimal("80.50"), total);
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-1")
+    void onTotalFor_countNights_whenPeriodCrossesNewYear() {
+        RoomType type = new RoomType(1L, "Double", 2, new BigDecimal("100.00"));
+
+        BigDecimal total = type.totalFor(LocalDate.of(2026, 12, 30), LocalDate.of(2027, 1, 2));
+
+        assertEquals(new BigDecimal("300.00"), total);
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-1")
+    void onTotalFor_countLeapDay_whenPeriodCrossesFebruary() {
+        RoomType type = new RoomType(1L, "Double", 2, new BigDecimal("50.00"));
+
+        BigDecimal total = type.totalFor(LocalDate.of(2028, 2, 27), LocalDate.of(2028, 3, 1));
+
+        assertEquals(new BigDecimal("150.00"), total);
     }
 
     @Test
