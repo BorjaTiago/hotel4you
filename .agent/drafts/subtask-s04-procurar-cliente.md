@@ -17,6 +17,8 @@ branch: feat/H4Y-71-client-search
 História pai H4Y-53. Usa `ClientService.find(document)` e `ClientController.onSearchClientClicked`. O dado de pesquisa é o documento, porque é o que o diagrama define. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 4.
 
+**Atualização (Q-54, 2026-11-04):** a pesquisa de clientes passou para a história H4Y-52 (critério AC-4: procurar por parte do nome ou do documento; uma pesquisa vazia mostra todos). O ticket no Jira fica como está até a equipa decidir.
+
 ## Checklist
 
 - [ ] Escrever primeiro os testes e ver que falham, com `@Tag("H4Y-53-AC-n")`.
@@ -32,4 +34,4 @@ Responsável: a definir na planning do sprint 4.
 - Sem resultado: "Sem resultados." e botão "Registar novo cliente", que abre o separador "Registar" com o documento já escrito (AC-2).
 - Pesquisa vazia: "Indique o documento do cliente." (AC-3).
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01. Reviewed by: pending.
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.

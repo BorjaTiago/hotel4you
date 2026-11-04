@@ -86,7 +86,13 @@ erDiagram
     customers {
         INT id PK
         NVARCHAR100 name
-        VARCHAR20 document UK
+        VARCHAR10 document_type UK "with document"
+        VARCHAR20 document UK "with document_type"
+        DATE birth_date
+        VARCHAR20 phone
+        CHAR2 nationality
+        VARCHAR100 email "nullable"
+        CHAR9 tax_number "nullable"
     }
     roles {
         TINYINT id PK
@@ -147,4 +153,4 @@ erDiagram
     }
 ```
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.
