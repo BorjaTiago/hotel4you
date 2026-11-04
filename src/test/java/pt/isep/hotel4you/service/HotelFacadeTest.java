@@ -52,7 +52,8 @@ class HotelFacadeTest {
         LocationService locationService = new LocationService(floorRepository, locationRepository);
         roomRepository = new InMemoryRoomRepository();
         roomTypeRepository = new InMemoryRoomTypeRepository();
-        RoomService roomService = new RoomService(roomRepository, roomTypeRepository);
+        RoomService roomService = new RoomService(roomRepository, roomTypeRepository,
+                new pt.isep.hotel4you.data.InMemoryReservationRepository());
         facade = new HotelFacade(authService, staffService, locationService, roomService);
     }
 
