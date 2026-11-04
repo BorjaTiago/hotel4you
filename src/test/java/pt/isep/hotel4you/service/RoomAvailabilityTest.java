@@ -92,6 +92,15 @@ class RoomAvailabilityTest {
         assertEquals(List.of(second), service.searchRooms(START, END, TYPE, RECEPTIONIST));
     }
 
+    @Test
+    @Tag("H4Y-54-AC-2")
+    void onSearchRooms_queryOnce_whenTypeHasSeveralRooms() {
+        reservations.add(new Reservation(1L, first.getId(), START, END, ReservationStatus.RESERVED));
+        assertEquals(List.of(second), service.searchRooms(START, END, TYPE, RECEPTIONIST));
+        assertEquals(1, reservations.findByRoomsCalls);
+        assertEquals(0, reservations.findByRoomCalls);
+    }
+
     @ParameterizedTest
     @MethodSource("invalidPeriods")
     @Tag("H4Y-54-AC-4")
