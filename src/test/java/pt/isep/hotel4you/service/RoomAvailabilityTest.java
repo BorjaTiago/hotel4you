@@ -166,6 +166,7 @@ class RoomAvailabilityTest {
         var result = service.searchRoomsWithMessage(START, END, single, RECEPTIONIST);
         assertTrue(result.rooms().isEmpty());
         assertEquals("Não há quartos livres para estas datas.", result.message());
+        assertEquals(1, reservations.findByRoomsCalls);
         assertEquals(0, reservations.findByRoomCalls);
     }
 
@@ -201,6 +202,20 @@ class RoomAvailabilityTest {
                 () -> service.searchRooms(START, END, null, RECEPTIONIST));
         assertThrows(IllegalArgumentException.class, () -> service.searchRooms(START, END,
                 new RoomType(99L, "suite", 2, null), RECEPTIONIST));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidTypes")
+    @Tag("H4Y-54-AC-1")
+    void onSearchRooms_throwTypeMessage_whenTypeIsInvalid(RoomType type) {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.searchRooms(START, END, type, RECEPTIONIST));
+        assertEquals("Escolha um tipo de quarto válido.", error.getMessage());
+    }
+
+    private static Stream<RoomType> invalidTypes() {
+        return Stream.of(new RoomType(null, "duplo", 2, null),
+                new RoomType(1L, "other", 2, null));
     }
 
     private static Stream<org.junit.jupiter.params.provider.Arguments> invalidPeriods() {
