@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import pt.isep.hotel4you.data.ClientExistsException;
+import pt.isep.hotel4you.data.ClientInUseException;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Client;
@@ -53,17 +54,70 @@ public class HotelFacade {
     /**
      * Registers a new client.
      *
-     * @param name the full name
-     * @param document the ID document number
+     * @param client the new client data
      * @param actor the logged-in user who asks
      * @return the saved client with its id
-     * @throws AccessDeniedException if the actor is not a receptionist
-     * @throws IllegalArgumentException if a field is missing or too long; the message names the field
-     * @throws ClientExistsException if a client with this document already exists
+     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws IllegalArgumentException if a field is missing or not valid; the message names the field
+     * @throws ClientExistsException if a client with this document type and number already exists
      * @throws IllegalStateException if the database is not available
      */
-    public Client registerClient(String name, String document, User actor) {
-        return clientService.register(name, document, actor);
+    public Client registerClient(Client client, User actor) {
+        return clientService.register(client, actor);
+    }
+
+    /**
+     * Lists all clients.
+     *
+     * @param actor the logged-in user who asks
+     * @return the clients ordered by name
+     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Client> listClients(User actor) {
+        return clientService.listClients(actor);
+    }
+
+    /**
+     * Finds the clients whose name or document number contains the text.
+     *
+     * @param text the text to find; a blank text lists all clients
+     * @param actor the logged-in user who asks
+     * @return the matching clients ordered by name
+     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Client> searchClients(String text, User actor) {
+        return clientService.searchClients(text, actor);
+    }
+
+    /**
+     * Changes the data of a saved client.
+     *
+     * @param client the client with its id and the new data
+     * @param actor the logged-in user who asks
+     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws ClientNotFoundException if the client does not exist
+     * @throws IllegalArgumentException if a field is missing or not valid; the message names the field
+     * @throws ClientExistsException if another client has this document type and number
+     * @throws IllegalStateException if the database is not available
+     */
+    public void editClient(Client client, User actor) {
+        clientService.editClient(client, actor);
+    }
+
+    /**
+     * Removes a client.
+     *
+     * @param id the client id
+     * @param actor the logged-in user who asks
+     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws ClientNotFoundException if the client does not exist
+     * @throws ClientInUseException if the client has reservations
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeClient(long id, User actor) {
+        clientService.removeClient(id, actor);
     }
 
     /**

@@ -3,20 +3,59 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane styleClass="screen" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="pt.isep.hotel4you.gui.ClientController">
+<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.ClientController">
 
-    <!-- Register a client -->
-    <Tab text="Registar">
-        <VBox spacing="12" maxWidth="320">
-            <Label text="Registar cliente" styleClass="subtitle"/>
+    <Label text="Clientes" styleClass="subtitle"/>
+    <HBox spacing="16" VBox.vgrow="ALWAYS">
+
+        <!-- Search and client table -->
+        <VBox spacing="12" HBox.hgrow="ALWAYS">
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Label fx:id="searchLabel" text="Procurar"/>
+                <TextField fx:id="searchField" promptText="Nome ou documento"
+                           onAction="#onSearchClientClicked" HBox.hgrow="ALWAYS"/>
+                <Button text="Procurar" onAction="#onSearchClientClicked" styleClass="primary-button"/>
+            </HBox>
+            <TableView fx:id="clientTable" accessibleText="Clientes" VBox.vgrow="ALWAYS" prefWidth="520">
+                <columns>
+                    <TableColumn fx:id="nameColumn" text="Nome" prefWidth="180"/>
+                    <TableColumn fx:id="documentColumn" text="Documento" prefWidth="160"/>
+                    <TableColumn fx:id="phoneColumn" text="Telefone" prefWidth="120"/>
+                    <TableColumn fx:id="nationalityColumn" text="Nacionalidade" prefWidth="120"/>
+                </columns>
+                <placeholder>
+                    <Label text="Não há clientes."/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Client form -->
+        <VBox spacing="6" prefWidth="320" minWidth="280">
             <Label fx:id="nameLabel" text="Nome"/>
             <TextField fx:id="nameField" maxWidth="Infinity"/>
+            <Label fx:id="documentTypeLabel" text="Tipo de documento"/>
+            <ComboBox fx:id="documentTypeBox" maxWidth="Infinity"/>
             <Label fx:id="documentLabel" text="Documento"/>
             <TextField fx:id="documentField" maxWidth="Infinity"/>
-            <Button text="Registar" onAction="#onRegisterClientClicked" maxWidth="Infinity"
-                    styleClass="primary-button" defaultButton="true"/>
-            <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+            <Label fx:id="birthDateLabel" text="Data de nascimento"/>
+            <DatePicker fx:id="birthDatePicker" promptText="dd/mm/aaaa" maxWidth="Infinity"/>
+            <Label fx:id="phoneLabel" text="Telefone"/>
+            <TextField fx:id="phoneField" maxWidth="Infinity"/>
+            <Label fx:id="nationalityLabel" text="Nacionalidade"/>
+            <ComboBox fx:id="nationalityBox" maxWidth="Infinity"/>
+            <Label fx:id="emailLabel" text="Email (opcional)"/>
+            <TextField fx:id="emailField" maxWidth="Infinity"/>
+            <Label fx:id="taxNumberLabel" text="NIF (opcional)"/>
+            <TextField fx:id="taxNumberField" maxWidth="Infinity"/>
         </VBox>
-    </Tab>
-</TabPane>
+    </HBox>
+
+    <HBox spacing="12">
+        <Button text="Registar" onAction="#onRegisterClientClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="Guardar alterações" onAction="#onSaveClientChangesClicked" styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="Remover" onAction="#onRemoveClientClicked" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
