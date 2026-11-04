@@ -69,7 +69,7 @@ class RoomTypeTest {
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> type.totalFor(START, START));
-        assertEquals("Período inválido", error.getMessage());
+        assertEquals("A data de saída tem de ser depois da data de entrada.", error.getMessage());
     }
 
     @Test
@@ -79,7 +79,7 @@ class RoomTypeTest {
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> type.totalFor(END, START));
-        assertEquals("Período inválido", error.getMessage());
+        assertEquals("A data de saída tem de ser depois da data de entrada.", error.getMessage());
     }
 
     @Test
@@ -89,7 +89,7 @@ class RoomTypeTest {
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> type.totalFor(null, END));
-        assertEquals("Período inválido", error.getMessage());
+        assertEquals("Escolha a data de entrada e a data de saída.", error.getMessage());
     }
 
     @Test
@@ -99,6 +99,6 @@ class RoomTypeTest {
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> type.totalFor(START, null));
-        assertEquals("Período inválido", error.getMessage());
+        assertEquals("Escolha a data de entrada e a data de saída.", error.getMessage());
     }
 }

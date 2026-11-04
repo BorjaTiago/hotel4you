@@ -49,6 +49,30 @@ class ReservationTest {
         Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> reservation.overlaps(START, START));
-        assertEquals("Período inválido", error.getMessage());
+        assertEquals("A data de saída tem de ser depois da data de entrada.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-4")
+    void onValidatePeriod_throw_whenStartIsNull() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> Reservation.validatePeriod(null, END));
+        assertEquals("Escolha a data de entrada e a data de saída.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-4")
+    void onValidatePeriod_throw_whenEndIsNull() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> Reservation.validatePeriod(START, null));
+        assertEquals("Escolha a data de entrada e a data de saída.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-4")
+    void onValidatePeriod_throw_whenEndIsBeforeStart() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> Reservation.validatePeriod(END, START));
+        assertEquals("A data de saída tem de ser depois da data de entrada.", error.getMessage());
     }
 }

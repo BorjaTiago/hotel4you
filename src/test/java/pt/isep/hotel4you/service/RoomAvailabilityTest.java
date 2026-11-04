@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
@@ -29,9 +30,12 @@ import pt.isep.hotel4you.domain.User;
 class RoomAvailabilityTest {
     private static final LocalDate START = LocalDate.of(2026, 11, 10);
     private static final LocalDate END = LocalDate.of(2026, 11, 12);
+    private static final String CHOOSE = "Escolha a data de entrada e a data de saída.";
+    private static final String AFTER = "A data de saída tem de ser depois da data de entrada.";
     private static final User RECEPTIONIST = new Receptionist(1L, "Ana", "ana", "hash");
     private static final RoomType TYPE = new RoomType(1L, "duplo", 2, null);
     private InMemoryReservationRepository reservations;
+    private InMemoryRoomTypeRepository types;
     private RoomService service;
     private Room first;
     private Room second;
@@ -45,7 +49,7 @@ class RoomAvailabilityTest {
         first = rooms.save(new Room(null, 201, 2, "duplo"), 10);
         second = rooms.save(new Room(null, 202, 2, "duplo"), 10);
         rooms.save(new Room(null, 203, 2, "familiar"), 10);
-        InMemoryRoomTypeRepository types = new InMemoryRoomTypeRepository();
+        types = new InMemoryRoomTypeRepository();
         types.add(TYPE);
         types.add(new RoomType(2L, "familiar", 4, null));
         reservations = new InMemoryReservationRepository();
@@ -77,6 +81,30 @@ class RoomAvailabilityTest {
     }
 
     @Test
+    @Tag("H4Y-54-AC-2")
+    void onSearchRooms_offerRoom_whenNextGuestArrivesOnDeparture() {
+        reservations.add(new Reservation(1L, first.getId(), END, END.plusDays(2),
+                ReservationStatus.RESERVED));
+        assertEquals(List.of(first, second), service.searchRooms(START, END, TYPE, RECEPTIONIST));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"0,0", "-1,-1", "1,1", "-1,1"})
+    @Tag("H4Y-54-AC-2")
+    void onSearchRooms_excludeRoom_whenPeriodOverlapsReservation(int startShift, int endShift) {
+        reservations.add(new Reservation(1L, first.getId(), START, END, ReservationStatus.RESERVED));
+        assertEquals(List.of(second), service.searchRooms(START.plusDays(startShift),
+                END.plusDays(endShift), TYPE, RECEPTIONIST));
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-2")
+    void onSearchRooms_excludeRoom_whenGuestIsCheckedIn() {
+        reservations.add(new Reservation(1L, first.getId(), START, END, ReservationStatus.CHECKED_IN));
+        assertEquals(List.of(second), service.searchRooms(START, END, TYPE, RECEPTIONIST));
+    }
+
+    @Test
     @Tag("H4Y-54-AC-3")
     void onSearchRooms_offerRoom_whenOnlyReservationIsCancelled() {
         reservations.add(new Reservation(1L, first.getId(), START, END, ReservationStatus.CANCELLED));
@@ -104,10 +132,10 @@ class RoomAvailabilityTest {
     @ParameterizedTest
     @MethodSource("invalidPeriods")
     @Tag("H4Y-54-AC-4")
-    void onSearchRooms_throw_whenPeriodIsInvalid(LocalDate start, LocalDate end) {
+    void onSearchRooms_throw_whenPeriodIsInvalid(LocalDate start, LocalDate end, String message) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> service.searchRooms(start, end, TYPE, RECEPTIONIST));
-        assertEquals("Período inválido", error.getMessage());
+        assertEquals(message, error.getMessage());
     }
 
     @Test
@@ -127,6 +155,18 @@ class RoomAvailabilityTest {
         var result = service.searchRoomsWithMessage(START, END, TYPE, RECEPTIONIST);
         assertTrue(result.rooms().isEmpty());
         assertEquals("Não há quartos livres para estas datas.", result.message());
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-5")
+    void onSearchRoomsWithMessage_returnEmptyResultAndMessage_whenTypeHasNoRooms() {
+        RoomType single = new RoomType(3L, "individual", 1, null);
+        types.add(single);
+
+        var result = service.searchRoomsWithMessage(START, END, single, RECEPTIONIST);
+        assertTrue(result.rooms().isEmpty());
+        assertEquals("Não há quartos livres para estas datas.", result.message());
+        assertEquals(0, reservations.findByRoomCalls);
     }
 
     @Test
@@ -164,9 +204,9 @@ class RoomAvailabilityTest {
     }
 
     private static Stream<org.junit.jupiter.params.provider.Arguments> invalidPeriods() {
-        return Stream.of(org.junit.jupiter.params.provider.Arguments.of(START, START),
-                org.junit.jupiter.params.provider.Arguments.of(END, START),
-                org.junit.jupiter.params.provider.Arguments.of(null, END),
-                org.junit.jupiter.params.provider.Arguments.of(START, null));
+        return Stream.of(org.junit.jupiter.params.provider.Arguments.of(START, START, AFTER),
+                org.junit.jupiter.params.provider.Arguments.of(END, START, AFTER),
+                org.junit.jupiter.params.provider.Arguments.of(null, END, CHOOSE),
+                org.junit.jupiter.params.provider.Arguments.of(START, null, CHOOSE));
     }
 }
