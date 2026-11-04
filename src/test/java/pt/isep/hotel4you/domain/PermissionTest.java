@@ -44,6 +44,12 @@ class PermissionTest {
     }
 
     @Test
+    @Tag("H4Y-52-AC-1")
+    void onAllows_returnTrue_whenReceptionistManagesClients() {
+        assertTrue(Permission.MANAGE_CLIENTS.allows(RECEPTIONIST));
+    }
+
+    @Test
     @Tag("H4Y-50-AC-1")
     void onAllows_returnTrue_whenReceptionistListsRooms() {
         assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));

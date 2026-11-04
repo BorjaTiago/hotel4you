@@ -61,6 +61,15 @@ class ClientServiceTest {
     }
 
     @Test
+    @Tag("H4Y-52-AC-2")
+    void onRegister_saveClient_whenNameAndDocumentAtMaxLength() {
+        Client client = service.register("a".repeat(100), "1".repeat(20), receptionist());
+
+        assertNotNull(client.getId());
+        assertEquals(1, repository.count());
+    }
+
+    @Test
     @Tag("H4Y-52-AC-1")
     void onRegister_trimNameAndDocument_whenSpacesAround() {
         Client client = service.register("  " + NAME + " ", " " + DOCUMENT + "  ", receptionist());

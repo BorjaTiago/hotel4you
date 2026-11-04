@@ -423,6 +423,18 @@ class HotelFacadeTest {
 
     @Test
     @Tag("H4Y-52-AC-1")
+    void onCanUse_returnTrue_whenReceptionistManagesClients() {
+        assertTrue(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"), Permission.MANAGE_CLIENTS));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-1")
+    void onCanUse_returnFalse_whenManagerManagesClients() {
+        assertFalse(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_CLIENTS));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-1")
     void onRegisterClient_saveClient_whenReceptionist() {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
 

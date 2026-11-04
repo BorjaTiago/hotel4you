@@ -63,6 +63,16 @@ class JdbcClientRepositoryTest {
 
     @Test
     @Tag("H4Y-52-AC-3")
+    void onSave_throwClientExists_whenDatabaseErrorIs2601() {
+        JdbcClientRepository duplicate = new JdbcClientRepository(
+                new FailingDatabase(new SQLException("dup", "23000", 2601)));
+        Client client = new Client(null, "Maria Santos", "12345678");
+
+        assertThrows(ClientExistsException.class, () -> duplicate.save(client));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-3")
     void onSave_throwClientExists_whenDatabaseFindsSameDocument() {
         JdbcClientRepository duplicate = new JdbcClientRepository(
                 new FailingDatabase(new SQLException("dup", "23000", 2627)));
