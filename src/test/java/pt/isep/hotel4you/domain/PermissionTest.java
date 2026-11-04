@@ -49,6 +49,30 @@ class PermissionTest {
         assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));
     }
 
+    @Test
+    @Tag("H4Y-51-AC-4")
+    void onAllows_returnFalse_whenReceptionistManagesStock() {
+        assertFalse(Permission.MANAGE_STOCK.allows(RECEPTIONIST));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-4")
+    void onAllows_returnFalse_whenRestaurantStaffManagesStock() {
+        assertFalse(Permission.MANAGE_STOCK.allows(RESTAURANT_STAFF));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-4")
+    void onAllows_returnFalse_whenNullManagesStock() {
+        assertFalse(Permission.MANAGE_STOCK.allows(null));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-1")
+    void onAllows_returnTrue_whenManagerManagesStock() {
+        assertTrue(Permission.MANAGE_STOCK.allows(MANAGER));
+    }
+
     @ParameterizedTest
     @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")

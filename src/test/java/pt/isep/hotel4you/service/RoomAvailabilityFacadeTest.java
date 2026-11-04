@@ -29,7 +29,7 @@ class RoomAvailabilityFacadeTest {
         var types = new InMemoryRoomTypeRepository();
         types.add(type);
         var service = new RoomService(rooms, types, new InMemoryReservationRepository());
-        var facade = new HotelFacade(null, null, null, service);
+        var facade = new HotelFacade(null, null, null, service, null);
         User actor = new Receptionist(1L, "Ana", "ana", "hash");
         LocalDate start = LocalDate.of(2026, 11, 10);
 

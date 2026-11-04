@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.StockController">
+
+    <Label text="Catálogo de stock" styleClass="subtitle"/>
+    <TableView fx:id="itemTable" accessibleText="Catálogo de stock" VBox.vgrow="ALWAYS" prefWidth="500">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Nome" prefWidth="180"/>
+            <TableColumn fx:id="unitColumn" text="Unidade" prefWidth="120"/>
+            <TableColumn fx:id="quantityColumn" text="Quantidade em stock" prefWidth="160"/>
+        </columns>
+        <placeholder>
+            <Label text="Não há itens no catálogo."/>
+        </placeholder>
+    </TableView>
+    <VBox spacing="12">
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="nameLabel" text="Nome"/>
+                <TextField fx:id="nameField" promptText="Nome" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="unitLabel" text="Unidade"/>
+                <TextField fx:id="unitField" promptText="Unidade (unidade, kg, litro)" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="12">
+            <Button text="Registar item" onAction="#onSaveItemClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Guardar alterações" onAction="#onEditItemClicked" styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </VBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
