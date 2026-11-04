@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.InMemoryClientRepository;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.Manager;
@@ -24,7 +25,7 @@ class ClientServiceTest {
     private static final String NAME = "Maria Santos";
     private static final String DOCUMENT = "12345678";
 
-    private static final String DENIED_MESSAGE = "Só o rececionista ou o gestor pode registar clientes.";
+    private static final String DENIED_MESSAGE = "Só o rececionista pode registar clientes.";
     private static final String NAME_MISSING_MESSAGE = "Escreva o nome do cliente.";
     private static final String DOCUMENT_MISSING_MESSAGE = "Escreva o documento do cliente.";
     private static final String NAME_LONG_MESSAGE = "O nome do cliente tem no máximo 100 caracteres.";
@@ -142,10 +143,12 @@ class ClientServiceTest {
 
     @Test
     @Tag("H4Y-52-AC-1")
-    void onRegister_saveClient_whenActorIsManager() {
-        Client client = service.register(NAME, DOCUMENT, manager());
+    void onRegister_throw_whenActorIsManager() {
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> service.register(NAME, DOCUMENT, manager()));
 
-        assertNotNull(client.getId());
+        assertEquals(DENIED_MESSAGE, error.getMessage());
+        assertEquals(0, repository.count());
     }
 
     @Test

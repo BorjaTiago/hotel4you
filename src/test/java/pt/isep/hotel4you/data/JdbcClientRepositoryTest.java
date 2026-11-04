@@ -11,14 +11,17 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.domain.Client;
 
-/** Tests that the client repository keeps the SQL error as the cause. */
+/** Tests how the client repository handles SQL errors. */
 class JdbcClientRepositoryTest {
 
-    /** A database that gives a connection where each SQL statement fails. */
+    /** A database that gives a connection where each SQL statement fails with the given error. */
     private static class FailingDatabase extends Database {
 
-        FailingDatabase() {
+        private final SQLException error;
+
+        FailingDatabase(SQLException error) {
             super(null);
+            this.error = error;
         }
 
         @Override
@@ -28,14 +31,15 @@ class JdbcClientRepositoryTest {
                     new Class<?>[] {Connection.class},
                     (proxy, method, args) -> {
                         if (method.getName().equals("prepareStatement")) {
-                            throw new SQLException("Table not found");
+                            throw error;
                         }
                         return null;
                     });
         }
     }
 
-    private final JdbcClientRepository repository = new JdbcClientRepository(new FailingDatabase());
+    private final JdbcClientRepository repository = new JdbcClientRepository(
+            new FailingDatabase(new SQLException("Table not found")));
 
     private static void assertSqlCause(IllegalStateException error) {
         assertEquals(Database.NOT_AVAILABLE, error.getMessage());
@@ -55,5 +59,18 @@ class JdbcClientRepositoryTest {
         Client client = new Client(null, "Maria Santos", "12345678");
 
         assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.save(client)));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-3")
+    void onSave_throwClientExists_whenDatabaseFindsSameDocument() {
+        JdbcClientRepository duplicate = new JdbcClientRepository(
+                new FailingDatabase(new SQLException("dup", "23000", 2627)));
+        Client client = new Client(null, "Maria Santos", "12345678");
+
+        ClientExistsException error = assertThrows(ClientExistsException.class,
+                () -> duplicate.save(client));
+
+        assertEquals("O cliente já existe.", error.getMessage());
     }
 }

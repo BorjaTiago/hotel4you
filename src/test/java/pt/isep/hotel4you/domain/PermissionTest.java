@@ -49,8 +49,14 @@ class PermissionTest {
         assertTrue(Permission.LIST_ROOMS.allows(RECEPTIONIST));
     }
 
+    @Test
+    @Tag("H4Y-52-AC-1")
+    void onAllows_returnFalse_whenManagerRegistersClients() {
+        assertFalse(Permission.MANAGE_CLIENTS.allows(MANAGER));
+    }
+
     @ParameterizedTest
-    @EnumSource(Permission.class)
+    @EnumSource(value = Permission.class, mode = EnumSource.Mode.EXCLUDE, names = "MANAGE_CLIENTS")
     @Tag("H4Y-23-AC-1")
     void onAllows_returnTrue_whenActorIsManager(Permission permission) {
         assertTrue(permission.allows(MANAGER));
