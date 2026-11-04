@@ -37,6 +37,9 @@ public class MainController {
     private Button pricesButton;
 
     @FXML
+    private Button stockButton;
+
+    @FXML
     private Button clientsButton;
 
     @FXML
@@ -67,6 +70,8 @@ public class MainController {
         roomsButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
+        stockButton.managedProperty().bind(stockButton.visibleProperty());
+        stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
         clientsButton.managedProperty().bind(clientsButton.visibleProperty());
         clientsButton.setVisible(facade.canUse(user, Permission.MANAGE_CLIENTS));
         welcomeLabel.setText(
@@ -95,6 +100,12 @@ public class MainController {
     private void onPricesClicked() {
         Parent pricesScreen = new ScreenLoader(facade).load("prices.fxml");
         contentPane.getChildren().setAll(pricesScreen);
+    }
+
+    @FXML
+    private void onStockClicked() {
+        Parent stockScreen = new ScreenLoader(facade).load("stock.fxml");
+        contentPane.getChildren().setAll(stockScreen);
     }
 
     @FXML

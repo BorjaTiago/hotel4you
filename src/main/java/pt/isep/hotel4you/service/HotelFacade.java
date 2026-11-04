@@ -16,6 +16,7 @@ import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
+import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.User;
 
 /** Single entry point for the GUI. */
@@ -25,6 +26,7 @@ public class HotelFacade {
     private final StaffService staffService;
     private final LocationService locationService;
     private final RoomService roomService;
+    private final StockService stockService;
     private final ClientService clientService;
 
     /**
@@ -34,14 +36,17 @@ public class HotelFacade {
      * @param staffService the staff service
      * @param locationService the floor and zone service
      * @param roomService the room registration service
+     * @param stockService the stock item service
      * @param clientService the client registration service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
-            LocationService locationService, RoomService roomService, ClientService clientService) {
+            LocationService locationService, RoomService roomService, StockService stockService,
+            ClientService clientService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
         this.roomService = roomService;
+        this.stockService = stockService;
         this.clientService = clientService;
     }
 
@@ -367,5 +372,48 @@ public class HotelFacade {
      */
     public BigDecimal parsePrice(String text) {
         return roomService.parsePrice(text);
+    }
+
+    /**
+     * Creates a stock item with zero stock.
+     *
+     * @param name the item name
+     * @param unit the unit of measure
+     * @param actor the logged-in user who asks
+     * @return the new item with its id
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the name or the unit is blank or too long
+     * @throws StockItemNameTakenException if another item has this name
+     * @throws IllegalStateException if the database is not available
+     */
+    public StockItem createItem(String name, String unit, User actor) {
+        return stockService.createItem(name, unit, actor);
+    }
+
+    /**
+     * Changes the name and the unit of a stock item.
+     *
+     * @param item the item with its id and the new name and unit
+     * @param actor the logged-in user who asks
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the name or the unit is blank or too long
+     * @throws StockItemNotFoundException if the item does not exist
+     * @throws StockItemNameTakenException if another item has this name
+     * @throws IllegalStateException if the database is not available
+     */
+    public void editItem(StockItem item, User actor) {
+        stockService.editItem(item, actor);
+    }
+
+    /**
+     * Lists all stock items.
+     *
+     * @param actor the logged-in user who asks
+     * @return the items ordered by name
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<StockItem> listItems(User actor) {
+        return stockService.listItems(actor);
     }
 }
