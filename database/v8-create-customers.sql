@@ -1,5 +1,5 @@
--- v7: create customers. The receptionist registers the clients (H4Y-52).
--- Run after v6. The document is unique, so the same client is not saved twice.
+-- v8: create customers. The receptionist registers the clients (H4Y-52).
+-- Run after v7. The document is unique, so the same client is not saved twice.
 
 USE hotel4you;
 

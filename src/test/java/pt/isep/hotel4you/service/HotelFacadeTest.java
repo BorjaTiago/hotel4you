@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.InMemoryClientRepository;
 import pt.isep.hotel4you.data.InMemoryFloorRepository;
+import pt.isep.hotel4you.data.InMemoryItemRepository;
 import pt.isep.hotel4you.data.InMemoryLocationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
@@ -29,6 +30,7 @@ import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
+import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests that the facade passes calls to the services. */
@@ -43,6 +45,7 @@ class HotelFacadeTest {
     private InMemoryLocationRepository locationRepository;
     private InMemoryRoomRepository roomRepository;
     private InMemoryRoomTypeRepository roomTypeRepository;
+    private InMemoryItemRepository itemRepository;
     private HotelFacade facade;
 
     @BeforeEach
@@ -58,7 +61,10 @@ class HotelFacadeTest {
         RoomService roomService = new RoomService(roomRepository, roomTypeRepository,
                 new pt.isep.hotel4you.data.InMemoryReservationRepository());
         ClientService clientService = new ClientService(new InMemoryClientRepository());
-        facade = new HotelFacade(authService, staffService, locationService, roomService, clientService);
+        itemRepository = new InMemoryItemRepository();
+        StockService stockService = new StockService(itemRepository);
+        facade = new HotelFacade(authService, staffService, locationService, roomService,
+                clientService, stockService);
     }
 
     private User saveAna() {
@@ -387,5 +393,51 @@ class HotelFacadeTest {
 
         assertThrows(ClientExistsException.class,
                 () -> facade.registerClient("Outra Pessoa", "12345678", receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-1")
+    void onCreateItem_returnItemWithZeroStock_whenManager() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+
+        StockItem item = facade.createItem("toalhas", "unidade", manager);
+
+        assertEquals("toalhas", item.getName());
+        assertEquals(0, item.getStockQuantity());
+        assertEquals(1, itemRepository.count());
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-5")
+    void onEditItem_changeItemThroughStockService_whenManagerEdits() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        StockItem item = facade.createItem("toalhas", "unidade", manager);
+
+        facade.editItem(new StockItem(item.getId(), "lençóis", "caixa", 0), manager);
+
+        assertEquals("lençóis", itemRepository.findById(item.getId()).get().getName());
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-1")
+    void onListItems_returnItems_whenManager() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        facade.createItem("toalhas", "unidade", manager);
+
+        assertEquals(1, facade.listItems(manager).size());
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-4")
+    void onListItems_throwAccessDenied_whenReceptionist() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+
+        assertThrows(AccessDeniedException.class, () -> facade.listItems(receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-51-AC-4")
+    void onCanUse_returnFalse_whenReceptionistManagesStock() {
+        assertFalse(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"), Permission.MANAGE_STOCK));
     }
 }
