@@ -43,10 +43,10 @@ public class Main {
             RoomService roomService = new RoomService(
                     new JdbcRoomRepository(database), new JdbcRoomTypeRepository(database),
                     new JdbcReservationRepository(database));
-            ClientService clientService = new ClientService(new JdbcClientRepository(database));
             StockService stockService = new StockService(new JdbcItemRepository(database));
+            ClientService clientService = new ClientService(new JdbcClientRepository(database));
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
-                    clientService, stockService);
+                    stockService, clientService);
 
             // Check now that the database works.
             database.check();

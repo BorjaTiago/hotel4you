@@ -60,11 +60,11 @@ class HotelFacadeTest {
         roomTypeRepository = new InMemoryRoomTypeRepository();
         RoomService roomService = new RoomService(roomRepository, roomTypeRepository,
                 new pt.isep.hotel4you.data.InMemoryReservationRepository());
-        ClientService clientService = new ClientService(new InMemoryClientRepository());
         itemRepository = new InMemoryItemRepository();
         StockService stockService = new StockService(itemRepository);
+        ClientService clientService = new ClientService(new InMemoryClientRepository());
         facade = new HotelFacade(authService, staffService, locationService, roomService,
-                clientService, stockService);
+                stockService, clientService);
     }
 
     private User saveAna() {
@@ -376,26 +376,6 @@ class HotelFacadeTest {
     }
 
     @Test
-    @Tag("H4Y-52-AC-1")
-    void onRegisterClient_saveClient_whenReceptionist() {
-        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
-
-        Client client = facade.registerClient("Maria Santos", "12345678", receptionist);
-
-        assertEquals("Maria Santos", client.getName());
-    }
-
-    @Test
-    @Tag("H4Y-52-AC-3")
-    void onRegisterClient_throw_whenDocumentExists() {
-        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
-        facade.registerClient("Maria Santos", "12345678", receptionist);
-
-        assertThrows(ClientExistsException.class,
-                () -> facade.registerClient("Outra Pessoa", "12345678", receptionist));
-    }
-
-    @Test
     @Tag("H4Y-51-AC-1")
     void onCreateItem_returnItemWithZeroStock_whenManager() {
         User manager = new Manager(1L, "Rui Costa", "rui", "hash");
@@ -439,5 +419,37 @@ class HotelFacadeTest {
     @Tag("H4Y-51-AC-4")
     void onCanUse_returnFalse_whenReceptionistManagesStock() {
         assertFalse(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"), Permission.MANAGE_STOCK));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-1")
+    void onCanUse_returnTrue_whenReceptionistManagesClients() {
+        assertTrue(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"), Permission.MANAGE_CLIENTS));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-1")
+    void onCanUse_returnFalse_whenManagerManagesClients() {
+        assertFalse(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_CLIENTS));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-1")
+    void onRegisterClient_saveClient_whenReceptionist() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+
+        Client client = facade.registerClient("Maria Santos", "12345678", receptionist);
+
+        assertEquals("Maria Santos", client.getName());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-3")
+    void onRegisterClient_throw_whenDocumentExists() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+        facade.registerClient("Maria Santos", "12345678", receptionist);
+
+        assertThrows(ClientExistsException.class,
+                () -> facade.registerClient("Outra Pessoa", "12345678", receptionist));
     }
 }

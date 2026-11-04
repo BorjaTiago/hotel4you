@@ -40,6 +40,9 @@ public class MainController {
     private Button stockButton;
 
     @FXML
+    private Button clientsButton;
+
+    @FXML
     private StackPane contentPane;
 
     /**
@@ -69,6 +72,8 @@ public class MainController {
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
         stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
+        clientsButton.managedProperty().bind(clientsButton.visibleProperty());
+        clientsButton.setVisible(facade.canUse(user, Permission.MANAGE_CLIENTS));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
     }
@@ -101,6 +106,12 @@ public class MainController {
     private void onStockClicked() {
         Parent stockScreen = new ScreenLoader(facade).load("stock.fxml");
         contentPane.getChildren().setAll(stockScreen);
+    }
+
+    @FXML
+    private void onClientsClicked() {
+        Parent clientScreen = new ScreenLoader(facade).load("client.fxml");
+        contentPane.getChildren().setAll(clientScreen);
     }
 
     @FXML

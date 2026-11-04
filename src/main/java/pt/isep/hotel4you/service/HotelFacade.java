@@ -26,8 +26,8 @@ public class HotelFacade {
     private final StaffService staffService;
     private final LocationService locationService;
     private final RoomService roomService;
-    private final ClientService clientService;
     private final StockService stockService;
+    private final ClientService clientService;
 
     /**
      * Creates the facade.
@@ -36,18 +36,18 @@ public class HotelFacade {
      * @param staffService the staff service
      * @param locationService the floor and zone service
      * @param roomService the room registration service
-     * @param clientService the client registration service
      * @param stockService the stock item service
+     * @param clientService the client registration service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
-            LocationService locationService, RoomService roomService, ClientService clientService,
-            StockService stockService) {
+            LocationService locationService, RoomService roomService, StockService stockService,
+            ClientService clientService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
         this.roomService = roomService;
-        this.clientService = clientService;
         this.stockService = stockService;
+        this.clientService = clientService;
     }
 
     /**
