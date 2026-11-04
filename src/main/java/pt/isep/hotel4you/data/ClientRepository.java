@@ -20,6 +20,7 @@ public interface ClientRepository {
      *
      * @param client the new client, its id is ignored
      * @return the saved client with its new id
+     * @throws ClientExistsException if another client has this document
      * @throws IllegalStateException if the database is not available
      */
     Client save(Client client);

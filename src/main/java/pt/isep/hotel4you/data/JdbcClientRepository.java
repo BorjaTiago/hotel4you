@@ -51,7 +51,14 @@ public class JdbcClientRepository implements ClientRepository {
             row.next();
             return new Client(row.getLong("id"), client.getName(), client.getDocument());
         } catch (SQLException e) {
+            if (isDuplicateKey(e)) {
+                throw new ClientExistsException();
+            }
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
+    }
+
+    private static boolean isDuplicateKey(SQLException error) {
+        return error.getErrorCode() == 2601 || error.getErrorCode() == 2627;
     }
 }

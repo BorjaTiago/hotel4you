@@ -1,11 +1,12 @@
 package pt.isep.hotel4you.service;
 
+import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.ClientRepository;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
 
-/** Registers the hotel clients. Only the receptionist or the manager may use it. */
+/** Registers the hotel clients. Only the receptionist may use it (Q-13). */
 public class ClientService {
 
     private static final int MAX_NAME_LENGTH = 100;
@@ -29,14 +30,15 @@ public class ClientService {
      * @param document the ID document number, the service trims it
      * @param actor the logged-in user who asks
      * @return the saved client with its id
-     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws AccessDeniedException if the actor is not a receptionist
      * @throws IllegalArgumentException if a field is missing or too long; the message names the field
-     * @throws ClientExistsException if a client with this document already exists
+     * @throws ClientExistsException if a client with this document already exists,
+     *         also when the database finds the same document at save time
      * @throws IllegalStateException if the database is not available
      */
     public Client register(String name, String document, User actor) {
         if (!Permission.MANAGE_CLIENTS.allows(actor)) {
-            throw new AccessDeniedException("Só o rececionista ou o gestor pode registar clientes.");
+            throw new AccessDeniedException("Só o rececionista pode registar clientes.");
         }
         String cleanName = checkName(name);
         String cleanDocument = checkDocument(document);

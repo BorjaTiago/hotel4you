@@ -21,7 +21,7 @@ public enum Permission {
     LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
 
     /** Register and find clients. Clients do not log in (Q-13), so staff registers them. */
-    MANAGE_CLIENTS(Role.RECEPTIONIST, Role.MANAGER);
+    MANAGE_CLIENTS(Role.RECEPTIONIST);
 
     private final Set<Role> allowedRoles;
 

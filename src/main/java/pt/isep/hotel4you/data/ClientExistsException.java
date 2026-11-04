@@ -1,4 +1,4 @@
-package pt.isep.hotel4you.service;
+package pt.isep.hotel4you.data;
 
 /** Signals that a client with the same ID document is already registered. */
 public class ClientExistsException extends RuntimeException {

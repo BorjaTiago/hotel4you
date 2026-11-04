@@ -3,6 +3,7 @@ package pt.isep.hotel4you.service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.domain.Client;
@@ -49,7 +50,7 @@ public class HotelFacade {
      * @param document the ID document number
      * @param actor the logged-in user who asks
      * @return the saved client with its id
-     * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws AccessDeniedException if the actor is not a receptionist
      * @throws IllegalArgumentException if a field is missing or too long; the message names the field
      * @throws ClientExistsException if a client with this document already exists
      * @throws IllegalStateException if the database is not available
