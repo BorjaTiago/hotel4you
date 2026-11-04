@@ -28,6 +28,8 @@
 - Q-01 is a team decision, not confirmed by the teacher. The 7/10/3 split is a provisional summary target and test scenario. `RoomService` does not enforce room type totals.
 - `Floor` is a record: the floors are fixed (RF-03). `Location` is a class: the manager creates, edits and removes zones (Q-32). `FloorController` is the one screen for floors and zones (H4Y-28): it has the zone form, so there is no `LocationController` for zone CRUD. `createLocation`, `editLocation` and `removeLocation` need a manager. `removeLocation` throws `LocationInUseException` when `LocationRepository.delete` returns false (Q-36). `HotelFacade.removeLocation(reservation, location)` is the reservation method and stays.
 
+H4Y-72 (RF-05) adds read-only reservation periods and one half-open overlap rule. `searchRooms` and the search type catalogue require `SEARCH_ROOMS` (receptionist or manager). The actor parameter protects the public entry point. `isAvailable` is an internal business query. `Reservation` implements only the listed read getters, period validation and `overlaps` in this task; its write/lifecycle methods remain planned. `checkedInAt` and `checkedOutAt` remain planned domain fields and are not read by this projection. The new `RoomSearchResult` supplies the AC-5 message without JavaFX. No H4Y-73 screen changes.
+
 ```mermaid
 classDiagram
     %% ==========================================
@@ -141,7 +143,9 @@ classDiagram
         +editStaff(user: User) void
         +removeStaff(user: User) void
         +listUsers() List~User~
-        +searchRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +searchRooms(start: LocalDate, end: LocalDate, type: RoomType, actor: User) List~Room~
+        +searchRoomsWithMessage(start: LocalDate, end: LocalDate, type: RoomType, actor: User) RoomSearchResult
+        +listSearchRoomTypes(actor: User) List~RoomType~
         +roomFloorLimits() Map
         +roomTypeTargets() List~RoomTypeTarget~
         +saveRoom(room: Room, actor: User) Room
@@ -192,9 +196,11 @@ classDiagram
         -ROOMS_PER_FLOOR: int$
         -ROOM_FLOOR_LIMITS: Map$
         -ROOM_TYPE_TARGETS: List~RoomTypeTarget~$
-        +RoomService(roomRepository: RoomRepository, roomTypeRepository: RoomTypeRepository)
+        +RoomService(roomRepository: RoomRepository, roomTypeRepository: RoomTypeRepository, reservationRepository: ReservationRepository)
         +isAvailable(room: Room, start: LocalDate, end: LocalDate) boolean
-        +searchRooms(start: LocalDate, end: LocalDate, type: RoomType) List~Room~
+        +searchRooms(start: LocalDate, end: LocalDate, type: RoomType, actor: User) List~Room~
+        +searchRoomsWithMessage(start: LocalDate, end: LocalDate, type: RoomType, actor: User) RoomSearchResult
+        +listSearchRoomTypes(actor: User) List~RoomType~
         +roomFloorLimits() Map
         +roomTypeTargets() List~RoomTypeTarget~
         +saveRoom(room: Room, actor: User) Room
@@ -324,6 +330,11 @@ classDiagram
         +save(client: Client) Client
     }
     class JdbcClientRepository
+    class ReservationRepository {
+        <<interface>>
+        +findByRoom(roomId: long) List~Reservation~
+    }
+    class JdbcReservationRepository
     class Database {
         +NOT_AVAILABLE String$
         +connect() Connection
@@ -402,6 +413,13 @@ classDiagram
         +label() String
         +total() int
     }
+    class RoomSearchResult {
+        <<record>>
+        -rooms: List~Room~
+        -message: String
+        +rooms() List~Room~
+        +message() String
+    }
     class RoomSummary {
         <<record>>
         -id: long
@@ -422,6 +440,14 @@ classDiagram
     }
     class Reservation {
         -id: Long
+        -roomId: long
+        +Reservation(id: Long, roomId: long, startDate: LocalDate, endDate: LocalDate, status: ReservationStatus)
+        +getId() Long
+        +getRoomId() long
+        +getStartDate() LocalDate
+        +getEndDate() LocalDate
+        +getStatus() ReservationStatus
+        +validatePeriod(start: LocalDate, end: LocalDate) void$
         -startDate: LocalDate
         -endDate: LocalDate
         -status: ReservationStatus
@@ -508,10 +534,12 @@ classDiagram
         MANAGE_PRICES
         LIST_ROOMS
         MANAGE_CLIENTS
+        SEARCH_ROOMS
         -allowedRoles: Set~Role~
         +allows(actor: User) boolean
     }
     class ReservationStatus {
+        +fromDatabase(value: String) ReservationStatus$
         <<enumeration>>
         RESERVED
         CANCELLED
@@ -629,6 +657,12 @@ classDiagram
     RoomController ..> RoomTypeTarget : displays
     RoomController ..> RoomSummary : displays
     RoomController ..> Floor : displays
+    RoomService ..> RoomSearchResult : returns
+    RoomSearchResult ..> Room : contains
+    RoomService ..> ReservationRepository : reads booking periods
+    ReservationRepository ..> Reservation : reads
+    JdbcReservationRepository ..|> ReservationRepository : implements
+    JdbcReservationRepository ..> Database : uses
     RoomService ..> RoomRepository : uses
     RoomRepository ..> Room : stores
     JdbcRoomRepository ..|> RoomRepository : implements
@@ -665,6 +699,7 @@ classDiagram
     Main ..> JdbcUserRepository : creates
     Main ..> JdbcFloorRepository : creates
     Main ..> JdbcLocationRepository : creates
+    Main ..> JdbcReservationRepository : creates
     Main ..> JdbcRoomRepository : creates
     Main ..> AuthService : creates
     Main ..> StaffService : creates
@@ -692,4 +727,4 @@ classDiagram
     note for RoomService "MANAGE_ROOMS allows a manager to save a room.<br/>Constants enforce floors 2 and 3 with 10 rooms each, as stated in the course statement.<br/>Only the repository checks the room count, inside its save transaction.<br/>Q-01 targets 7/10/3 appear in the summary but are not enforced."
 ```
 
-Created by: antonioprmartinho. Updated by: jmbcruz. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; H4Y-69 review fixes by main session, Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: jmbcruz. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; H4Y-69 review fixes by main session, Claude Code (claude-opus-5-5), 2026-11-04; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.

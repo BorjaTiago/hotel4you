@@ -44,7 +44,8 @@ class RoomServiceBasePriceTest {
         duplo = new RoomType(2L, "duplo", 2, null);
         repository.add(individual);
         repository.add(duplo);
-        service = new RoomService(new pt.isep.hotel4you.data.InMemoryRoomRepository(), repository);
+        service = new RoomService(new pt.isep.hotel4you.data.InMemoryRoomRepository(), repository,
+                new pt.isep.hotel4you.data.InMemoryReservationRepository());
     }
 
     private BigDecimal priceOf(String name) {
