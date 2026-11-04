@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane styleClass="screen" tabClosingPolicy="UNAVAILABLE" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="pt.isep.hotel4you.gui.ClientController">
+
+    <!-- Register a client -->
+    <Tab text="Registar">
+        <VBox spacing="12" maxWidth="320">
+            <Label text="Registar cliente" styleClass="subtitle"/>
+            <Label fx:id="nameLabel" text="Nome"/>
+            <TextField fx:id="nameField" maxWidth="Infinity"/>
+            <Label fx:id="documentLabel" text="Documento"/>
+            <TextField fx:id="documentField" maxWidth="Infinity"/>
+            <Button text="Registar" onAction="#onRegisterClientClicked" maxWidth="Infinity"
+                    styleClass="primary-button" defaultButton="true"/>
+            <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+        </VBox>
+    </Tab>
+</TabPane>

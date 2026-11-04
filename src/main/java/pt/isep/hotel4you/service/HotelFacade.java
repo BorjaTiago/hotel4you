@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
+import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
@@ -25,6 +27,7 @@ public class HotelFacade {
     private final LocationService locationService;
     private final RoomService roomService;
     private final StockService stockService;
+    private final ClientService clientService;
 
     /**
      * Creates the facade.
@@ -34,14 +37,33 @@ public class HotelFacade {
      * @param locationService the floor and zone service
      * @param roomService the room registration service
      * @param stockService the stock item service
+     * @param clientService the client registration service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
-            LocationService locationService, RoomService roomService, StockService stockService) {
+            LocationService locationService, RoomService roomService, StockService stockService,
+            ClientService clientService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
         this.roomService = roomService;
         this.stockService = stockService;
+        this.clientService = clientService;
+    }
+
+    /**
+     * Registers a new client.
+     *
+     * @param name the full name
+     * @param document the ID document number
+     * @param actor the logged-in user who asks
+     * @return the saved client with its id
+     * @throws AccessDeniedException if the actor is not a receptionist
+     * @throws IllegalArgumentException if a field is missing or too long; the message names the field
+     * @throws ClientExistsException if a client with this document already exists
+     * @throws IllegalStateException if the database is not available
+     */
+    public Client registerClient(String name, String document, User actor) {
+        return clientService.register(name, document, actor);
     }
 
     /**

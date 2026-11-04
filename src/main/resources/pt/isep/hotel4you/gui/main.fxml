@@ -27,6 +27,8 @@
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="stockButton" text="Stock" onAction="#onStockClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button fx:id="clientsButton" text="Clientes" onAction="#onClientsClicked"
+                    maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
 
