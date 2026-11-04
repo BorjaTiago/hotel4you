@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -8,9 +9,12 @@ import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomRepository;
 import pt.isep.hotel4you.data.RoomTypeRepository;
+import pt.isep.hotel4you.data.ReservationRepository;
 import pt.isep.hotel4you.domain.Permission;
+import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
@@ -44,16 +48,100 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final RoomTypeRepository roomTypeRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * Creates the service.
      *
      * @param roomRepository the room store
      * @param roomTypeRepository the room type store
+     * @param reservationRepository the booking period reader
      */
-    public RoomService(RoomRepository roomRepository, RoomTypeRepository roomTypeRepository) {
+    public RoomService(RoomRepository roomRepository, RoomTypeRepository roomTypeRepository,
+            ReservationRepository reservationRepository) {
         this.roomRepository = roomRepository;
         this.roomTypeRepository = roomTypeRepository;
+        this.reservationRepository = reservationRepository;
+    }
+
+    /**
+     * Checks a persisted room against the shared booking overlap rule.
+     * Internal business callers must check the actor at their entry point.
+     * @param room the persisted room
+     * @param start the arrival
+     * @param end the departure
+     * @return true if no non-cancelled booking overlaps
+     * @throws IllegalArgumentException if the room or period is invalid
+     * @throws IllegalStateException if reservation data cannot be read
+     */
+    public boolean isAvailable(Room room, LocalDate start, LocalDate end) {
+        Reservation.validatePeriod(start, end);
+        if (room == null || room.getId() == null) {
+            throw new IllegalArgumentException("Escolha um quarto registado.");
+        }
+        return reservationRepository.findByRoom(room.getId()).stream()
+                .noneMatch(reservation -> reservation.overlaps(start, end));
+    }
+
+    /**
+     * Searches free rooms of one catalogue type for one or more nights.
+     * The result is a current observation, not a held or guaranteed booking.
+     * @param start the arrival
+     * @param end the departure
+     * @param type the selected catalogue type
+     * @param actor the signed-in receptionist or manager
+     * @return matching free rooms, or an empty list when none is free
+     * @throws AccessDeniedException if the actor cannot search
+     * @throws IllegalArgumentException if the period or type is invalid
+     * @throws IllegalStateException if data cannot be read
+     */
+    public List<Room> searchRooms(LocalDate start, LocalDate end, RoomType type, User actor) {
+        if (!Permission.SEARCH_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Não tem permissão para procurar quartos livres.");
+        }
+        Reservation.validatePeriod(start, end);
+        if (type == null || type.getId() == null || roomTypeRepository.findAll().stream()
+                .noneMatch(value -> value.getId().equals(type.getId())
+                        && value.getName().equals(type.getName()))) {
+            throw new IllegalArgumentException("Escolha um tipo de quarto válido.");
+        }
+        return roomRepository.findAll().stream()
+                .filter(room -> room.getRoomTypeName().equalsIgnoreCase(type.getName()))
+                .filter(room -> isAvailable(room, start, end))
+                .toList();
+    }
+
+    /**
+     * Supplies the same search with the AC-5 message for a screen.
+     * @param start the arrival
+     * @param end the departure
+     * @param type the selected catalogue type
+     * @param actor the signed-in receptionist or manager
+     * @return immutable rooms and the no-room message, if needed
+     * @throws AccessDeniedException if the actor cannot search
+     * @throws IllegalArgumentException if the period or type is invalid
+     * @throws IllegalStateException if data cannot be read
+     */
+    public RoomSearchResult searchRoomsWithMessage(LocalDate start, LocalDate end,
+            RoomType type, User actor) {
+        List<Room> rooms = searchRooms(start, end, type, actor);
+        return new RoomSearchResult(rooms,
+                rooms.isEmpty() ? "Não há quartos livres para estas datas." : "");
+    }
+
+    /**
+     * Lists catalogue types for search, including current base prices.
+     * This does not grant permission to change prices or manage rooms.
+     * @param actor the signed-in receptionist or manager
+     * @return the catalogue types
+     * @throws AccessDeniedException if the actor cannot search
+     * @throws IllegalStateException if data cannot be read
+     */
+    public List<RoomType> listSearchRoomTypes(User actor) {
+        if (!Permission.SEARCH_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Não tem permissão para procurar quartos livres.");
+        }
+        return roomTypeRepository.findAll();
     }
 
     /**

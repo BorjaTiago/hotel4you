@@ -54,7 +54,8 @@ class RoomServiceTest {
         roomTypeRepository.add(new RoomType(1L, "duplo", 2, null));
         roomTypeRepository.add(new RoomType(2L, "familiar", 4, null));
         roomTypeRepository.add(new RoomType(3L, "individual", 1, null));
-        roomService = new RoomService(repository, roomTypeRepository);
+        roomService = new RoomService(repository, roomTypeRepository,
+                new pt.isep.hotel4you.data.InMemoryReservationRepository());
     }
 
     @Test
@@ -141,7 +142,8 @@ class RoomServiceTest {
     @Test
     @Tag("H4Y-25-AC-1")
     void onListRoomTypes_returnRoomTypeRepositoryNames_whenRoomRepositoryHasNone() {
-        RoomService service = new RoomService(new InMemoryRoomRepository(), roomTypeRepository);
+        RoomService service = new RoomService(new InMemoryRoomRepository(), roomTypeRepository,
+                new pt.isep.hotel4you.data.InMemoryReservationRepository());
 
         assertEquals(List.of("duplo", "familiar", "individual"), service.listRoomTypes(manager()));
     }
@@ -199,7 +201,8 @@ class RoomServiceTest {
         List<Callable<Boolean>> attempts = List.of(
                 () -> trySave(room(210, 2, "duplo")),
                 () -> {
-                    RoomService second = new RoomService(repository, roomTypeRepository);
+                    RoomService second = new RoomService(repository, roomTypeRepository,
+                new pt.isep.hotel4you.data.InMemoryReservationRepository());
                     try {
                         second.saveRoom(room(211, 2, "duplo"), manager());
                         return true;
