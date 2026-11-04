@@ -26,7 +26,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Check the password in the controller. Not done: the GUI would hold security code.
 
 ### MainController
-- **What:** Main window after login. Top: "Olá, <name> (<role>)" and Logout. The role name comes from `Role.displayName()`. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen (`openLogin()`). Without a logged-in user, no button shows and the window opens the login screen (H4Y-23 AC-3, H4Y-61).
+- **What:** Main window after login. Top: "Olá, <name> (<role>)" and Logout. The role name comes from `Role.displayName()`. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen (`openLogin()`). Without a logged-in user, no button shows and the window opens the login screen (H4Y-23 AC-3, H4Y-61). The stock button shows only when `canUse(actor, MANAGE_STOCK)` allows it (H4Y-51).
 - **Why:** RNF-06, RNF-07. Each user finds the functions of the role in one place.
 - **Why this way:** The menu asks `HotelFacade.canUse(actor, permission)` which buttons to show. The screen has no role check of its own.
 - **Other option:** A `Session` or `PermissionPolicy` class for the menu. Not done: the facade already holds the rules, and the extra class adds no value now.
@@ -94,9 +94,9 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Separate report screens. Not done: few reports, one controller is enough.
 
 ### StockController
-- **What:** Import the XML file. Save an item. Register a movement.
+- **What:** Import the XML file. Create an item (`onSaveItemClicked`). Edit the selected item (`onEditItemClicked`). Show the item table (`initialize`). Register a movement. The item form and table are for the manager only (`MANAGE_STOCK`, H4Y-51).
 - **Why:** RF-28, RF-29.
-- **Why this way:** One screen group for stock.
+- **Why this way:** One screen group for stock. The controller has no rules. The service refuses a user who is not a manager, even if the button shows by mistake.
 - **Other option:** Separate import screen. Not done: same data and same user.
 
 ### FeedbackController
@@ -204,6 +204,7 @@ Services hold the rules. Each service works on the domain classes.
 
 ### StockService
 - **What:** Import the XML file. Create and edit items. Register and apply a movement. Each movement takes an exit reason (`ExitReason`) and the user.
+- **Rules (H4Y-51):** Only a manager (`Permission.MANAGE_STOCK`) creates, edits or lists items. Other users get `AccessDeniedException`. The name and the unit are trimmed and required. The name has at most 100 characters and the unit at most 20 (the `items` columns). A name that another item uses throws `StockItemNameTakenException`. If the database `UNIQUE` refuses the name at save time, the repository throws `DuplicateItemException` and the service throws `StockItemNameTakenException`. If `update` changes no row, `editItem` throws `StockItemNotFoundException`. A new item starts with stock 0. `editItem` changes the name and the unit only, so the stock and the movements stay. An unknown item throws `StockItemNotFoundException`. No item is removed (Q-38).
 - **Why:** RF-28, RF-29.
 - **Why this way:** Import every item from a valid XML file. Create missing catalogue items as part of the import (Q-10, Q-38; PR #20 decision, 2026-10-21). One transaction covers those items, the import, ENTRY movements and balances. A failure undoes all of them. No preview or confirmation API is needed.
 - **Other option:** Put the import in `StockImport`. Not done: the import has many items and rules.
@@ -235,7 +236,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Other option:** Environment variables. Not done: the team uses one settings file.
 
 ### Main
-- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService`, `JdbcFloorRepository`, `JdbcLocationRepository`, `LocationService`, `JdbcRoomTypeRepository`, `RoomService` and `HotelFacade`. Then it starts `HotelApp`.
+- **What:** Starts the application. Reads `AppConfig`. Creates `Database`, `JdbcUserRepository`, `AuthService`, `StaffService`, `JdbcFloorRepository`, `JdbcLocationRepository`, `LocationService`, `JdbcRoomTypeRepository`, `JdbcItemRepository`, `RoomService`, `StockService` and `HotelFacade`. Then it starts `HotelApp`.
 - **Why:** RF-01, RNF-12. One place builds the objects.
 
 ## Data
@@ -264,6 +265,18 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Why this way:** `save(room, floorLimit)` opens one transaction. It locks the floor row with `UPDLOCK, HOLDLOCK`, reads the count, inserts with `OUTPUT INSERTED.id` and commits. SQL and runtime errors roll back. A rollback error is kept as a suppressed error. Each statement and result closes with a resource block. Small helper methods avoid nested resource blocks.
 - **Other option:** Check the limit only in the service. This cannot protect two application instances that save at the same time.
 - **Example:** Two requests see nine rooms on a floor with a limit of ten. Only one holds the floor lock. After it commits, the next request sees ten rooms and rolls back without inserting.
+
+### ItemRepository
+- **What:** Interface for the stock catalogue. Finds an item by id or by name, lists all items, saves a new item and updates an item.
+- **Why:** RF-28, RF-29 (H4Y-51). Services depend on this interface, not on SQL. `JdbcItemRepository` is the SQL Server version.
+- **Why this way:** The service checks the name with `findByName` before the save, so the user gets a clear message. The `UNIQUE` on `items.name` stays as the last check. The repository turns that database error into `DuplicateItemException`, and the service turns it into `StockItemNameTakenException`.
+- **Other option:** Let the database refuse a repeated name only. Not done: the user gets a database error, not a clear message.
+
+### JdbcItemRepository
+- **What:** Implements `ItemRepository` with SQL on the table `items`.
+- **Why:** RF-28, RF-29, RNF-12. Stock items are saved in SQL Server.
+- **Why this way:** It gives `StockItem` objects to the service. Services never see SQL.
+- **Other option:** SQL inside `StockService`. Not done: rules and SQL would mix.
 
 ## Users
 
@@ -399,7 +412,7 @@ A staff card never opens a guest room. Only the master card does.
 ## Stock
 
 ### StockItem
-- **What:** A stock item with a unit and `stockQuantity`.
+- **What:** A stock item with a name, a unit and `stockQuantity`. `id` is null until the item is saved. A new item starts with stock 0 (H4Y-51).
 - **Why:** RF-28, RF-29.
 - **Why this way:** The balance is kept on the item. It is not summed each time.
 - **Other option:** Sum all movements each time. Not done: slower, and the DB keeps `stock_quantity` with a check `>= 0`.
@@ -449,6 +462,7 @@ Enums have fixed values. They stop typing errors.
 | MANAGE_ROOMS | Register, edit and remove rooms, see the room summary and read the type catalogue, on the "Quartos" screen (H4Y-25) | yes | no | no |
 | MANAGE_PRICES | View and set the base price of the room types (H4Y-26) | yes | no | no |
 | LIST_ROOMS | See the rooms table with type, floor and base price, on the "Quartos" screen (H4Y-50) | yes | yes | no |
+| MANAGE_STOCK | Create, edit and list stock items on the stock screen (H4Y-51) | yes | no | no |
 
 Without a logged-in user, no function is allowed. The restaurant staff has no function in the application yet.
 
@@ -521,4 +535,4 @@ StockImport report = hotelFacade.importStock("delivery-0412.xml", user);
 - Mermaid CLI rendered the changed class diagram to a temporary SVG. Static checks matched implemented method owners/names to the diagram, found AC-1 through AC-5 tags, checked local documentation links and attribution footers, and confirmed that SQL does not repeat the overlap rule. `git diff --check` passed.
 - No JavaFX screen or application was launched. No SQL script was run and no stored data changed. Real SQL Server validation waits for the agreed shared v7 with Lukas; the reservations fragment alone is not a deployable migration. Human review, the H4Y-73 screen and real database validation remain pending. The service work is ready for review, not full-story Done.
 
-Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-haiku-5-5, 2026-10-16; edited by Claude Code, claude-haiku-5-5, 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.
