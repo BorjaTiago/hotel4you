@@ -4,6 +4,7 @@ import java.text.Collator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ClientController {
 
     private static final String FIELD_ERROR = "field-error";
     private static final Locale PORTUGUESE = Locale.forLanguageTag("pt-PT");
-    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     private final HotelFacade facade;
 
