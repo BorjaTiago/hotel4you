@@ -14,11 +14,11 @@
         </VBox>
         <VBox spacing="4" HBox.hgrow="ALWAYS">
             <Label text="Entrada" labelFor="$startPicker"/>
-            <DatePicker fx:id="startPicker" maxWidth="Infinity"/>
+            <DatePicker fx:id="startPicker" editable="false" maxWidth="Infinity"/>
         </VBox>
         <VBox spacing="4" HBox.hgrow="ALWAYS">
             <Label text="Saída" labelFor="$endPicker"/>
-            <DatePicker fx:id="endPicker" maxWidth="Infinity"/>
+            <DatePicker fx:id="endPicker" editable="false" maxWidth="Infinity"/>
         </VBox>
     </HBox>
     <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefWidth="500">

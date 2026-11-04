@@ -61,8 +61,11 @@ public class Reservation {
      * @throws IllegalArgumentException if a date is missing or departure is not after arrival
      */
     public static void validatePeriod(LocalDate start, LocalDate end) {
-        if (start == null || end == null || !end.isAfter(start)) {
-            throw new IllegalArgumentException("Período inválido");
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("Escolha a data de entrada e a data de saída.");
+        }
+        if (!end.isAfter(start)) {
+            throw new IllegalArgumentException("A data de saída tem de ser depois da data de entrada.");
         }
     }
 }
