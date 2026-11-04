@@ -102,9 +102,7 @@ public class RoomService {
             throw new AccessDeniedException("Não tem permissão para procurar quartos livres.");
         }
         Reservation.validatePeriod(start, end);
-        if (type == null || type.getId() == null || roomTypeRepository.findAll().stream()
-                .noneMatch(value -> value.getId().equals(type.getId())
-                        && value.getName().equals(type.getName()))) {
+        if (!isCatalogueType(type)) {
             throw new IllegalArgumentException("Escolha um tipo de quarto válido.");
         }
         List<Room> rooms = roomRepository.findAll().stream()
@@ -353,6 +351,16 @@ public class RoomService {
         if (!roomTypeRepository.updateBasePrice(type.getId(), price.setScale(PRICE_SCALE))) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
+    }
+
+    /** Tells if the type has an id and the catalogue holds a type with the same id and name. */
+    private boolean isCatalogueType(RoomType type) {
+        if (type == null || type.getId() == null) {
+            return false;
+        }
+        return roomTypeRepository.findAll().stream()
+                .anyMatch(value -> value.getId().equals(type.getId())
+                        && value.getName().equals(type.getName()));
     }
 
     private static boolean isValidPrice(BigDecimal price) {
