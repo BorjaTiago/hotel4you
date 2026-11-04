@@ -13,4 +13,13 @@ public interface ReservationRepository {
      * @throws IllegalStateException if the database cannot be read
      */
     List<Reservation> findByRoom(long roomId);
+
+    /**
+     * Reads all booking periods of several rooms in one query, including cancelled bookings.
+     * An empty id list gives an empty result and no query.
+     * @param roomIds the room identifiers
+     * @return the periods ordered by room and start date, or an empty list
+     * @throws IllegalStateException if the database cannot be read
+     */
+    List<Reservation> findByRooms(List<Long> roomIds);
 }

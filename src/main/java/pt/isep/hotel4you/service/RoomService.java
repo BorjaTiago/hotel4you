@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomRepository;
@@ -105,10 +107,15 @@ public class RoomService {
                         && value.getName().equals(type.getName()))) {
             throw new IllegalArgumentException("Escolha um tipo de quarto válido.");
         }
-        return roomRepository.findAll().stream()
+        List<Room> rooms = roomRepository.findAll().stream()
                 .filter(room -> room.getRoomTypeName().equalsIgnoreCase(type.getName()))
-                .filter(room -> isAvailable(room, start, end))
                 .toList();
+        List<Long> roomIds = rooms.stream().map(Room::getId).toList();
+        Set<Long> busyRoomIds = reservationRepository.findByRooms(roomIds).stream()
+                .filter(reservation -> reservation.overlaps(start, end))
+                .map(Reservation::getRoomId)
+                .collect(Collectors.toSet());
+        return rooms.stream().filter(room -> !busyRoomIds.contains(room.getId())).toList();
     }
 
     /**
