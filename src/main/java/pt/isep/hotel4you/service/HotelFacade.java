@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import pt.isep.hotel4you.data.ClientExistsException;
@@ -13,6 +14,7 @@ import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.User;
 
@@ -81,6 +83,48 @@ public class HotelFacade {
      */
     public boolean canUse(User actor, Permission permission) {
         return permission.allows(actor);
+    }
+
+    /**
+     * Finds free rooms of one catalogue type for the requested nights.
+     * @param start the arrival
+     * @param end the departure
+     * @param type the selected catalogue type
+     * @param actor the signed-in user
+     * @return the free rooms, or an empty list
+     * @throws AccessDeniedException if the actor cannot search
+     * @throws IllegalArgumentException if the dates or type are invalid
+     * @throws IllegalStateException if the database cannot be read
+     */
+    public List<Room> searchRooms(LocalDate start, LocalDate end, RoomType type, User actor) {
+        return roomService.searchRooms(start, end, type, actor);
+    }
+
+    /**
+     * Supplies the free rooms and the service's no-room message to a screen.
+     * @param start the arrival
+     * @param end the departure
+     * @param type the selected catalogue type
+     * @param actor the signed-in user
+     * @return the search result and optional message
+     * @throws AccessDeniedException if the actor cannot search
+     * @throws IllegalArgumentException if the dates or type are invalid
+     * @throws IllegalStateException if the database cannot be read
+     */
+    public RoomSearchResult searchRoomsWithMessage(LocalDate start, LocalDate end,
+            RoomType type, User actor) {
+        return roomService.searchRoomsWithMessage(start, end, type, actor);
+    }
+
+    /**
+     * Lists types and prices for availability search.
+     * @param actor the signed-in user
+     * @return the catalogue types
+     * @throws AccessDeniedException if the actor cannot search
+     * @throws IllegalStateException if the database cannot be read
+     */
+    public List<RoomType> listSearchRoomTypes(User actor) {
+        return roomService.listSearchRoomTypes(actor);
     }
 
     /**
