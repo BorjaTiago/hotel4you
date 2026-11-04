@@ -56,7 +56,9 @@ public class ClientService {
     public Client register(Client client, User actor) {
         checkManage(actor);
         Client clean = validate(null, client);
-        checkDocumentFree(clean, null);
+        if (clientRepository.findByDocument(clean.getDocumentType(), clean.getDocument()).isPresent()) {
+            throw new ClientExistsException();
+        }
         return clientRepository.save(clean);
     }
 
@@ -108,7 +110,11 @@ public class ClientService {
         }
         Client clean = validate(client.getId(), client);
         clientRepository.findById(client.getId()).orElseThrow(ClientNotFoundException::new);
-        checkDocumentFree(clean, clean.getId());
+        Optional<Client> same = clientRepository.findByDocument(clean.getDocumentType(),
+                clean.getDocument());
+        if (same.isPresent() && !same.get().getId().equals(clean.getId())) {
+            throw new ClientExistsException();
+        }
         if (!clientRepository.update(clean)) {
             throw new ClientNotFoundException();
         }
@@ -134,15 +140,6 @@ public class ClientService {
     private static void checkManage(User actor) {
         if (!Permission.MANAGE_CLIENTS.allows(actor)) {
             throw new AccessDeniedException("Só o rececionista ou o gestor podem gerir clientes.");
-        }
-    }
-
-    /** Throws if another client (not the one with {@code ownId}) has the same document. */
-    private void checkDocumentFree(Client client, Long ownId) {
-        Optional<Client> same = clientRepository.findByDocument(client.getDocumentType(),
-                client.getDocument());
-        if (same.isPresent() && !same.get().getId().equals(ownId)) {
-            throw new ClientExistsException();
         }
     }
 

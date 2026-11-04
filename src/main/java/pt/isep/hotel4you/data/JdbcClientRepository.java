@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.Client;
@@ -35,19 +34,49 @@ public class JdbcClientRepository implements ClientRepository {
 
     @Override
     public Optional<Client> findById(long id) {
-        List<Client> clients = query("SELECT " + COLUMNS + " FROM customers WHERE id = ?", id);
-        return clients.stream().findFirst();
+        String sql = "SELECT " + COLUMNS + " FROM customers WHERE id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, id);
+                ResultSet row = statement.executeQuery()) {
+            if (!row.next()) {
+                return Optional.empty();
+            }
+            return Optional.of(toClient(row));
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
     }
 
     @Override
     public Optional<Client> findByDocument(DocumentType documentType, String document) {
         String sql = "SELECT " + COLUMNS + " FROM customers WHERE document_type = ? AND document = ?";
-        return query(sql, documentType.name(), document).stream().findFirst();
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, documentType.name(),
+                        document);
+                ResultSet row = statement.executeQuery()) {
+            if (!row.next()) {
+                return Optional.empty();
+            }
+            return Optional.of(toClient(row));
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
     }
 
     @Override
     public List<Client> findAll() {
-        return query("SELECT " + COLUMNS + " FROM customers ORDER BY name");
+        String sql = "SELECT " + COLUMNS + " FROM customers ORDER BY name";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql);
+                ResultSet rows = statement.executeQuery()) {
+            List<Client> clients = new ArrayList<>();
+            while (rows.next()) {
+                clients.add(toClient(rows));
+            }
+            return clients;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
     }
 
     @Override
@@ -55,7 +84,17 @@ public class JdbcClientRepository implements ClientRepository {
         String sql = "SELECT " + COLUMNS + " FROM customers"
                 + " WHERE name LIKE ? ESCAPE '\\' OR document LIKE ? ESCAPE '\\' ORDER BY name";
         String pattern = "%" + escapeLike(text) + "%";
-        return query(sql, pattern, pattern);
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, pattern, pattern);
+                ResultSet rows = statement.executeQuery()) {
+            List<Client> clients = new ArrayList<>();
+            while (rows.next()) {
+                clients.add(toClient(rows));
+            }
+            return clients;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
     }
 
     @Override
@@ -67,10 +106,15 @@ public class JdbcClientRepository implements ClientRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, values(client));
+                PreparedStatement statement = Database.prepare(connection, sql,
+                        client.getName(), client.getDocumentType().name(), client.getDocument(),
+                        Date.valueOf(client.getBirthDate()), client.getPhone(),
+                        client.getNationality(), client.getEmail(), client.getTaxNumber());
                 ResultSet row = statement.executeQuery()) {
             row.next();
-            return withId(row.getLong("id"), client);
+            return new Client(row.getLong("id"), client.getName(), client.getDocumentType(),
+                    client.getDocument(), client.getBirthDate(), client.getPhone(),
+                    client.getNationality(), client.getEmail(), client.getTaxNumber());
         } catch (SQLException e) {
             if (isDuplicateKey(e)) {
                 throw new ClientExistsException();
@@ -89,7 +133,10 @@ public class JdbcClientRepository implements ClientRepository {
                 """;
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql,
-                        values(client, client.getId()))) {
+                        client.getName(), client.getDocumentType().name(), client.getDocument(),
+                        Date.valueOf(client.getBirthDate()), client.getPhone(),
+                        client.getNationality(), client.getEmail(), client.getTaxNumber(),
+                        client.getId())) {
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             if (isDuplicateKey(e)) {
@@ -113,29 +160,6 @@ public class JdbcClientRepository implements ClientRepository {
         }
     }
 
-    private List<Client> query(String sql, Object... values) {
-        try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, values);
-                ResultSet rows = statement.executeQuery()) {
-            List<Client> clients = new ArrayList<>();
-            while (rows.next()) {
-                clients.add(toClient(rows));
-            }
-            return clients;
-        } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
-        }
-    }
-
-    /** Returns the column values of the client in SQL order, then the extra values. */
-    private static Object[] values(Client client, Object... extra) {
-        List<Object> values = new ArrayList<>(Arrays.asList(client.getName(),
-                client.getDocumentType().name(), client.getDocument(), Date.valueOf(client.getBirthDate()),
-                client.getPhone(), client.getNationality(), client.getEmail(), client.getTaxNumber()));
-        values.addAll(Arrays.asList(extra));
-        return values.toArray();
-    }
-
     /** Escapes the LIKE wildcards, so the text matches as plain text. */
     private static String escapeLike(String text) {
         return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_").replace("[", "\\[");
@@ -150,11 +174,5 @@ public class JdbcClientRepository implements ClientRepository {
                 DocumentType.fromDatabase(row.getString("document_type")), row.getString("document"),
                 row.getDate("birth_date").toLocalDate(), row.getString("phone"),
                 row.getString("nationality"), row.getString("email"), row.getString("tax_number"));
-    }
-
-    private static Client withId(long id, Client client) {
-        return new Client(id, client.getName(), client.getDocumentType(), client.getDocument(),
-                client.getBirthDate(), client.getPhone(), client.getNationality(), client.getEmail(),
-                client.getTaxNumber());
     }
 }
