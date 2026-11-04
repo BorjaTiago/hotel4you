@@ -32,7 +32,7 @@ public class ClientController {
 
     private static final String FIELD_ERROR = "field-error";
     private static final Locale PORTUGUESE = Locale.forLanguageTag("pt-PT");
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final HotelFacade facade;
 
