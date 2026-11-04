@@ -14,7 +14,7 @@ branch: feat/H4Y-69-client-service
 
 # registar-cliente: regras e gravação
 
-História pai H4Y-52. Usa `ClientService.register(name, document, birthday)` e `HotelFacade.registerClient` do diagrama de classes. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
+História pai H4Y-52. Usa `ClientService.register(name, document, actor)` e `HotelFacade.registerClient` do diagrama de classes. Sem data de nascimento: a tabela `customers` não tem essa coluna (decisão em `docs/database/tables.md`). Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 4.
 
 ## Checklist
@@ -31,4 +31,4 @@ Responsável: a definir na planning do sprint 4.
 
 Sem ecrã nesta subtask. O ecrã está em H4Y-70.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01. Reviewed by: pending.
