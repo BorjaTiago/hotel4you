@@ -117,9 +117,9 @@ docker compose down -v     # stop and delete the data
 
 The service searches a room type and a date period. The H4Y-73 search screen is a separate task. No new menu or screen is added here.
 
-The Sprint 04 planning assigns H4Y-72 to Pedro and H4Y-69 to Lukas. It requires one shared v7 with customers and reservations, not separate v7/v8 migrations. Pedro's reservation section is prepared in database/fragments/h4y72-reservations.sql. This is an integration fragment, not a numbered migration to run separately. Combine it with Lukas's customer section in the shared v7 after scripts v1 to v6. The customer section must come first. No customer table or client service is implemented by H4Y-72.
+Run the scripts in order, v1 to v9. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
 
-Pending coordination: agree the shared v7 with Lukas and merge both sections. Until then, availability tests use their own in-memory reservations and JDBC doubles. SQL Server integration and the sprint checkpoint are not verified. Do not skip the customer foreign key or create a replacement customer table.
+Availability tests use their own in-memory reservations and JDBC doubles. SQL Server integration is not verified.
 
 The overlap rule excludes the departure date and ignores cancelled reservations. Future booking creation must reuse it and recheck availability in its own transaction. The search does not hold a room.
 
@@ -168,4 +168,4 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04. Reviewed by: pending.
