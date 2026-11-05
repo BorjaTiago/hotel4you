@@ -23,7 +23,7 @@ Responsável: a definir na planning do sprint 4.
 - [x] A tabela mostra os 8 campos.
 - [x] As mensagens de erro vêm do serviço. Nenhuma regra no controlador (RNF-07).
 - [x] Botão "Clientes" no menu do rececionista e do gestor. Texto em português.
-- [ ] Verificação manual dos cenários.
+- [x] Verificação manual dos cenários.
 
 ## Interface (UI)
 
@@ -35,4 +35,4 @@ Responsável: a definir na planning do sprint 4.
 - Erro: a mensagem indica o campo e o campo fica marcado a vermelho (`field-error`). Cada campo tem `labelFor`. Cliente repetido: "O cliente já existe." Cliente com reservas: a remoção é recusada.
 - Sucesso: mensagem a verde e o formulário fica limpo.
 
-Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; client scope (Q-54) by docs agent, Claude Code (claude-sonnet-5-5), 2026-11-05. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; client scope (Q-54) by docs agent, Claude Code (claude-sonnet-5-5), 2026-11-05; checklist ticked by main session, Claude Code (claude-opus-5-5), 2026-11-05. Reviewed by: pending.
