@@ -353,7 +353,7 @@ public class ClientController {
         }
     }
 
-    private static List<String> countryCodes() {
+    static List<String> countryCodes() {
         Collator collator = Collator.getInstance(PORTUGUESE);
         return Arrays.stream(Locale.getISOCountries())
                 .sorted(Comparator.comparing(ClientController::countryName, collator))
@@ -362,5 +362,9 @@ public class ClientController {
 
     private static String countryName(String code) {
         return Locale.of("", code).getDisplayCountry(PORTUGUESE);
+    }
+
+    static String findCountry(List<String> codes, String typed) {
+        return null;
     }
 }
