@@ -112,7 +112,8 @@
     -fx-text-fill: #2e9e5b;
 }
 
-.text-field.field-error {
+.text-field.field-error,
+.combo-box-base.field-error {
     -fx-border-color: #c0392b;
 }
 

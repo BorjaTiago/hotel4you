@@ -44,7 +44,7 @@ class PermissionTest {
     }
 
     @Test
-    @Tag("H4Y-52-AC-1")
+    @Tag("H4Y-52-AC-8")
     void onAllows_returnTrue_whenReceptionistManagesClients() {
         assertTrue(Permission.MANAGE_CLIENTS.allows(RECEPTIONIST));
     }
@@ -80,13 +80,25 @@ class PermissionTest {
     }
 
     @Test
-    @Tag("H4Y-52-AC-1")
-    void onAllows_returnFalse_whenManagerRegistersClients() {
-        assertFalse(Permission.MANAGE_CLIENTS.allows(MANAGER));
+    @Tag("H4Y-52-AC-8")
+    void onAllows_returnTrue_whenManagerManagesClients() {
+        assertTrue(Permission.MANAGE_CLIENTS.allows(MANAGER));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-8")
+    void onAllows_returnFalse_whenRestaurantStaffManagesClients() {
+        assertFalse(Permission.MANAGE_CLIENTS.allows(RESTAURANT_STAFF));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-8")
+    void onAllows_returnFalse_whenNullManagesClients() {
+        assertFalse(Permission.MANAGE_CLIENTS.allows(null));
     }
 
     @ParameterizedTest
-    @EnumSource(value = Permission.class, mode = EnumSource.Mode.EXCLUDE, names = "MANAGE_CLIENTS")
+    @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")
     void onAllows_returnTrue_whenActorIsManager(Permission permission) {
         assertTrue(permission.allows(MANAGER));

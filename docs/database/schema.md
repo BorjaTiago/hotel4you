@@ -66,7 +66,14 @@ stock_movements
 customers
   id                    INT IDENTITY PK                 -- Internal customer ID.
   name                  NVARCHAR(100) NOT NULL          -- Full name. NVARCHAR to accept foreign names.
-  document              VARCHAR(20) NOT NULL UNIQUE     -- ID document (ID card, passport). Avoids duplicate customers.
+  document_type         VARCHAR(10) NOT NULL            -- CC, PASSPORT or OTHER (CHECK). Java enum DocumentType (Q-54).
+  document              VARCHAR(20) NOT NULL            -- ID document number. UNIQUE (document_type, document) avoids duplicate customers.
+  birth_date            DATE NOT NULL                   -- Date of birth. CHECK: not in the future (Q-54).
+  phone                 VARCHAR(20) NOT NULL            -- Phone number: digits, spaces and one leading '+' (checked in the service).
+  nationality           CHAR(2) NOT NULL                -- ISO 3166 country code, for example PT (CHECK: two letters; the list is Locale.getISOCountries()).
+  email                 VARCHAR(100) NULL               -- Optional email.
+  tax_number            CHAR(9) NULL                    -- Optional tax number (NIF). CHECK: digits only.
+  UNIQUE (document_type, document)                      -- The same number can exist for two document types (v10).
 
 roles
   id                    TINYINT IDENTITY PK             -- Internal role ID.
@@ -143,7 +150,7 @@ feedback
 - `stock_movements`: every stock change. `type` is `in`, `use` or `out`. `quantity` is always positive. `exit_reason` (discard, return, loss) is only for `out`. `import_id` links to the XML load. Linked to the user who recorded it.
 
 ### People and security
-- `customers`: hotel guests. `document` is unique to avoid duplicates.
+- `customers`: hotel guests. The pair (`document_type`, `document`) is unique to avoid duplicates. Birth date, phone and nationality are required; email and tax number are optional (Q-54, v10). A customer with reservations cannot be removed (FK, Q-36).
 - `roles`: the 5 actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER. The seed creates all 5. Only receptionist, manager and restaurant get accounts (Q-13, Q-17).
 - `users`: staff accounts. Store `password_hash` only. There is no `active` column: a user is not disabled by a flag (Q-36).
 
@@ -266,4 +273,4 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 12. **Stock import and exit**: one XML load is one `stock_imports` row. Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). Import every item from a valid XML file and create missing `items` rows (Q-10, Q-38; PR #20 decision, 2026-10-21). Save the new catalogue items, import, ENTRY movements and balances in one transaction. A failed save undoes the whole import. No rejected-item field is needed. This updates the schema documentation; no database migration is applied here. `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
 13. **Zone removal**: the backend deletes the `locations` row. If another row references it (FK NO ACTION, SQL error 547), the delete fails and the backend shows 'A zona tem associações e não pode ser removida.' (Q-36, H4Y-28).
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.

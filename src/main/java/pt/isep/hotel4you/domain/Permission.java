@@ -23,8 +23,11 @@ public enum Permission {
     /** See the room list with type, floor and base price. */
     LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
 
-    /** Register and find clients. Clients do not log in (Q-13), so staff registers them. */
-    MANAGE_CLIENTS(Role.RECEPTIONIST),
+    /**
+     * Register, list, search, edit and remove clients. Clients do not log in (Q-13), so the
+     * receptionist or the manager does it (Q-54).
+     */
+    MANAGE_CLIENTS(Role.RECEPTIONIST, Role.MANAGER),
 
     /** Search free rooms by type and dates. */
     SEARCH_ROOMS(Role.RECEPTIONIST, Role.MANAGER);
