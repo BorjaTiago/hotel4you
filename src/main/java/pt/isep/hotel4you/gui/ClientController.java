@@ -57,13 +57,25 @@ public class ClientController {
     private TableColumn<Client, String> nameColumn;
 
     @FXML
+    private TableColumn<Client, String> documentTypeColumn;
+
+    @FXML
     private TableColumn<Client, String> documentColumn;
+
+    @FXML
+    private TableColumn<Client, String> birthDateColumn;
 
     @FXML
     private TableColumn<Client, String> phoneColumn;
 
     @FXML
     private TableColumn<Client, String> nationalityColumn;
+
+    @FXML
+    private TableColumn<Client, String> emailColumn;
+
+    @FXML
+    private TableColumn<Client, String> taxNumberColumn;
 
     @FXML
     private Label nameLabel;
@@ -138,11 +150,18 @@ public class ClientController {
         taxNumberLabel.setLabelFor(taxNumberField);
 
         nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
-        documentColumn.setCellValueFactory(data -> new SimpleStringProperty(
-                data.getValue().getDocumentType().displayName() + " " + data.getValue().getDocument()));
+        documentTypeColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(data.getValue().getDocumentType().displayName()));
+        documentColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getDocument()));
+        birthDateColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(DATE_FORMAT.format(data.getValue().getBirthDate())));
         phoneColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPhone()));
         nationalityColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(countryName(data.getValue().getNationality())));
+        emailColumn.setCellValueFactory(data -> new SimpleStringProperty(
+                data.getValue().getEmail() == null ? "" : data.getValue().getEmail()));
+        taxNumberColumn.setCellValueFactory(data -> new SimpleStringProperty(
+                data.getValue().getTaxNumber() == null ? "" : data.getValue().getTaxNumber()));
 
         documentTypeBox.getItems().setAll(DocumentType.values());
         documentTypeBox.setConverter(new StringConverter<>() {

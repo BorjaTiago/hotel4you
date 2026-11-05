@@ -20,9 +20,13 @@
             <TableView fx:id="clientTable" accessibleText="Clientes" VBox.vgrow="ALWAYS" prefWidth="520">
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Nome" prefWidth="180"/>
-                    <TableColumn fx:id="documentColumn" text="Documento" prefWidth="160"/>
-                    <TableColumn fx:id="phoneColumn" text="Telefone" prefWidth="120"/>
+                    <TableColumn fx:id="documentTypeColumn" text="Tipo de documento" prefWidth="140"/>
+                    <TableColumn fx:id="documentColumn" text="Documento" prefWidth="120"/>
+                    <TableColumn fx:id="birthDateColumn" text="Data de nascimento" prefWidth="140"/>
+                    <TableColumn fx:id="phoneColumn" text="Telefone" prefWidth="110"/>
                     <TableColumn fx:id="nationalityColumn" text="Nacionalidade" prefWidth="120"/>
+                    <TableColumn fx:id="emailColumn" text="Email" prefWidth="180"/>
+                    <TableColumn fx:id="taxNumberColumn" text="NIF" prefWidth="100"/>
                 </columns>
                 <placeholder>
                     <Label text="Não há clientes."/>
