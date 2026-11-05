@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.gui;
 
 import java.text.Collator;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -20,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.DocumentType;
@@ -36,7 +38,11 @@ public class ClientController {
     static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
+    private static final long TYPING_PAUSE_MILLIS = 1000;
+
     private final HotelFacade facade;
+    private String typedText = "";
+    private long lastKeyMillis;
 
     @FXML
     private Label searchLabel;
@@ -162,6 +168,7 @@ public class ClientController {
                 return null;
             }
         });
+        nationalityBox.addEventFilter(KeyEvent.KEY_TYPED, this::onNationalityKeyTyped);
         birthDatePicker.setConverter(new StringConverter<>() {
             @Override
             public String toString(LocalDate date) {
@@ -364,7 +371,34 @@ public class ClientController {
         return Locale.of("", code).getDisplayCountry(PORTUGUESE);
     }
 
+    private void onNationalityKeyTyped(KeyEvent event) {
+        String character = event.getCharacter();
+        if (character.isBlank() || Character.isISOControl(character.charAt(0))) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now - lastKeyMillis > TYPING_PAUSE_MILLIS) {
+            typedText = "";
+        }
+        lastKeyMillis = now;
+        typedText += character;
+        String code = findCountry(nationalityBox.getItems(), typedText);
+        if (code != null) {
+            nationalityBox.setValue(code);
+        }
+    }
+
     static String findCountry(List<String> codes, String typed) {
-        return null;
+        String start = withoutAccents(typed);
+        return codes.stream()
+                .filter(code -> withoutAccents(countryName(code)).startsWith(start))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private static String withoutAccents(String text) {
+        return Normalizer.normalize(text, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase(PORTUGUESE);
     }
 }
