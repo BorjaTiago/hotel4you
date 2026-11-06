@@ -6,6 +6,7 @@ This policy sets how the team writes and checks diagrams. The Definition of Done
 
 1. Use Mermaid for all diagrams. This includes the domain model, class, ER, use case and sequence diagrams.
 2. Do not use PlantUML, draw.io or image files (PNG, SVG, JPG). Do not add binary diagram files to the repository.
+   - Exception: the component diagram (H4Y-9) uses PlantUML, because Mermaid cannot draw ports on a border or sockets (teacher feedback, Sprint 3). Keep the source in `docs/uml/component-diagram.puml` and the rendered `docs/uml/component-diagram.svg` next to it. Render it again after each change to the source.
 3. Put each diagram in a `mermaid` code block inside a `.md` file.
 
 ## Paths
@@ -39,4 +40,4 @@ Use `mmdc` instead when it is installed. A diagram must render on GitHub. A synt
 
 Every diagram file ends with the footer line from `AGENTS.md`, rule 8 (Created by, Updated by, AI use, Reviewed by). Each agent adds its own name when it edits the file. Never put AI-use text in source code.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code agent, Claude Haiku 5.5, 2026-10-16; docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: jmbcruz. AI use: Claude Code agent, Claude Haiku 5.5, 2026-10-16; docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; PlantUML exception by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
