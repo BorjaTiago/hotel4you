@@ -58,10 +58,60 @@ class JdbcReservationRepositoryTest {
         assertEquals(List.of("statement", "connection"), database.closed);
     }
 
+    @Test
+    @Tag("H4Y-54-AC-1")
+    @Tag("H4Y-54-AC-3")
+    void onFindByRooms_mapRowsOfSeveralRooms_whenRoomsHaveReservations() {
+        database.severalRooms = true;
+        var rows = repository.findByRooms(List.of(8L, 9L));
+        assertEquals(List.of(8L, 9L), database.boundIds);
+        assertEquals(2, rows.size());
+        assertEquals(8L, rows.get(0).getRoomId());
+        assertEquals(9L, rows.get(1).getRoomId());
+        assertEquals(ReservationStatus.RESERVED, rows.get(0).getStatus());
+        assertEquals(ReservationStatus.CANCELLED, rows.get(1).getStatus());
+        assertEquals(LocalDate.of(2026, 11, 10), rows.get(0).getStartDate());
+        assertEquals(LocalDate.of(2026, 11, 12), rows.get(0).getEndDate());
+        assertThrows(UnsupportedOperationException.class, () -> rows.clear());
+        assertEquals(1, database.connects);
+        assertEquals(List.of("result", "statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-1")
+    void onFindByRooms_returnEmpty_whenNoRoomIds() {
+        assertTrue(repository.findByRooms(List.of()).isEmpty());
+        assertEquals(0, database.connects);
+        assertTrue(database.closed.isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-1")
+    void onFindByRooms_useOnePlaceholderPerId_whenSeveralRoomIds() {
+        repository.findByRooms(List.of(8L, 9L, 10L));
+        assertTrue(database.sql.contains("WHERE room_id IN (?, ?, ?)"));
+        assertTrue(database.sql.contains("ORDER BY room_id, start_date, id"));
+        assertEquals(List.of(8L, 9L, 10L), database.boundIds);
+    }
+
+    @Test
+    @Tag("H4Y-54-AC-2")
+    void onFindByRooms_throwAndClose_whenDatabaseReadFails() {
+        database.failure = new SQLException("Read failed");
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> repository.findByRooms(List.of(8L, 9L)));
+        assertEquals("Não foi possível consultar as reservas.", error.getMessage());
+        assertSame(database.failure, error.getCause());
+        assertEquals(List.of("statement", "connection"), database.closed);
+    }
+
     private static class RecordingDatabase extends Database {
         private final List<String> closed = new ArrayList<>();
         private int count = 2;
         private long boundRoomId;
+        private final List<Long> boundIds = new ArrayList<>();
+        private int connects;
+        private boolean severalRooms;
         private String sql;
         private SQLException failure;
 
@@ -69,6 +119,7 @@ class JdbcReservationRepositoryTest {
 
         @Override
         public Connection connect() {
+            connects++;
             return (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(),
                     new Class<?>[] {Connection.class}, (proxy, method, args) -> {
                         if (method.getName().equals("close")) { closed.add("connection"); return null; }
@@ -84,7 +135,11 @@ class JdbcReservationRepositoryTest {
             return (PreparedStatement) Proxy.newProxyInstance(PreparedStatement.class.getClassLoader(),
                     new Class<?>[] {PreparedStatement.class}, (proxy, method, args) -> {
                         return switch (method.getName()) {
-                            case "setLong" -> { boundRoomId = (Long) args[1]; yield null; }
+                            case "setLong" -> {
+                                boundRoomId = (Long) args[1];
+                                boundIds.add(boundRoomId);
+                                yield null;
+                            }
                             case "executeQuery" -> {
                                 if (failure != null) { throw failure; }
                                 yield result();
@@ -95,13 +150,17 @@ class JdbcReservationRepositoryTest {
                     });
         }
 
+        private long roomOf(int row) {
+            return severalRooms ? 7L + row : 8L;
+        }
+
         private ResultSet result() {
             int[] row = {0};
             return (ResultSet) Proxy.newProxyInstance(ResultSet.class.getClassLoader(),
                     new Class<?>[] {ResultSet.class}, (proxy, method, args) -> {
                         return switch (method.getName()) {
                             case "next" -> ++row[0] <= count;
-                            case "getLong" -> "room_id".equals(args[0]) ? 8L : (long) row[0];
+                            case "getLong" -> "room_id".equals(args[0]) ? roomOf(row[0]) : (long) row[0];
                             case "getDate" -> Date.valueOf("start_date".equals(args[0])
                                     ? "2026-11-10" : "2026-11-12");
                             case "getString" -> row[0] == 1 ? "reserved" : "cancelled";

@@ -1,11 +1,10 @@
--- H4Y-72: reservations section for the single shared v7 from Sprint 04 planning.
--- Integration fragment, not a separate numbered migration.
--- Combine with Lukas's H4Y-69 customers section in v7, after that section.
--- The shared script must select the hotel4you database before this section.
--- No customer implementation, seed bookings or changes to existing rows belong here.
+-- v9: create the reservations table and its index, after the customers table.
+-- Run after v8 (customers). You can run it again: it skips what already exists.
+
+USE hotel4you;
 
 IF OBJECT_ID('dbo.customers', 'U') IS NULL
-    THROW 50001, 'A secção customers do v7 tem de preceder reservations.', 1;
+    THROW 50001, 'A secção customers do v8 tem de preceder reservations.', 1;
 IF OBJECT_ID('dbo.rooms', 'U') IS NULL OR OBJECT_ID('dbo.users', 'U') IS NULL
     THROW 50002, 'Execute primeiro os scripts de utilizadores e quartos.', 1;
 

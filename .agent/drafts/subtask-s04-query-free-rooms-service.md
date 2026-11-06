@@ -25,7 +25,7 @@ Responsável: a definir na planning do sprint 4. Proposta: uma pessoa com experi
 - [ ] AC-1: um quarto sem reservas no período é devolvido.
 - [ ] AC-2: um quarto com reserva ativa que se sobrepõe não é devolvido. Testar as fronteiras: a noite de saída fica livre.
 - [ ] AC-3: uma reserva cancelada não ocupa o quarto.
-- [ ] AC-4: saída igual ou anterior à entrada é recusada com "Período inválido".
+- [ ] AC-4: saída igual ou anterior à entrada é recusada com "A data de saída tem de ser depois da data de entrada.".
 - [ ] AC-5: sem quartos livres, a resposta é uma lista vazia com mensagem.
 - [ ] Reservas de teste próprias: uma ativa e uma cancelada.
 
@@ -33,4 +33,4 @@ Responsável: a definir na planning do sprint 4. Proposta: uma pessoa com experi
 
 Sem ecrã nesta subtask. O ecrã está em H4Y-73.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04. Reviewed by: pending.

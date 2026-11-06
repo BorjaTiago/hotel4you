@@ -1,6 +1,8 @@
 package pt.isep.hotel4you.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /** A type of room, for example individual or duplo, with its base price per night. */
 public class RoomType {
@@ -59,5 +61,21 @@ public class RoomType {
      */
     public BigDecimal getBasePrice() {
         return basePrice;
+    }
+
+    /**
+     * Returns the total price for a period: the base price times the number of nights.
+     *
+     * @param start the first night
+     * @param end the check-out date
+     * @return the total price, or null if the base price is not set
+     * @throws IllegalArgumentException if the period is not valid
+     */
+    public BigDecimal totalFor(LocalDate start, LocalDate end) {
+        Reservation.validatePeriod(start, end);
+        if (basePrice == null) {
+            return null;
+        }
+        return basePrice.multiply(BigDecimal.valueOf(ChronoUnit.DAYS.between(start, end)));
     }
 }
