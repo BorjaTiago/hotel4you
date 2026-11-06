@@ -16,6 +16,7 @@ import pt.isep.hotel4you.service.AuthService;
 import pt.isep.hotel4you.service.ClientService;
 import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.LocationService;
+import pt.isep.hotel4you.service.ReservationService;
 import pt.isep.hotel4you.service.RoomService;
 import pt.isep.hotel4you.service.StaffService;
 import pt.isep.hotel4you.service.StockService;
@@ -40,13 +41,16 @@ public class Main {
             StaffService staffService = new StaffService(userRepository, authService);
             LocationService locationService = new LocationService(
                     new JdbcFloorRepository(database), new JdbcLocationRepository(database));
+            JdbcRoomTypeRepository roomTypeRepository = new JdbcRoomTypeRepository(database);
+            JdbcReservationRepository reservationRepository = new JdbcReservationRepository(database);
             RoomService roomService = new RoomService(
-                    new JdbcRoomRepository(database), new JdbcRoomTypeRepository(database),
-                    new JdbcReservationRepository(database));
+                    new JdbcRoomRepository(database), roomTypeRepository, reservationRepository);
             StockService stockService = new StockService(new JdbcItemRepository(database));
             ClientService clientService = new ClientService(new JdbcClientRepository(database));
+            ReservationService reservationService = new ReservationService(reservationRepository,
+                    roomService, roomTypeRepository);
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
-                    stockService, clientService);
+                    stockService, clientService, reservationService);
 
             // Check now that the database works.
             database.check();

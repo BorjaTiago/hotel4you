@@ -131,7 +131,7 @@ H4Y-72 implements a read-only Reservation with id, roomId, startDate, endDate an
 | Class | Layer | Main attributes | Main methods | Requirement |
 |-------|-------|-----------------|--------------|-------------|
 | Role | Enum | CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER; displayName | displayName() | RF-02 |
-| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS, MANAGE_ROOMS, MANAGE_PRICES, LIST_ROOMS, MANAGE_STOCK, MANAGE_CLIENTS, SEARCH_ROOMS, MANAGE_RESERVATIONS (receptionist; manager in H4Y-77); allowedRoles | allows(actor) | RF-02, RF-04, RF-06, RF-10, RF-11, RF-28, RF-29 |
+| Permission | Enum | MANAGE_STAFF, MANAGE_FLOORS, MANAGE_ROOMS, MANAGE_PRICES, LIST_ROOMS, MANAGE_STOCK, MANAGE_CLIENTS, SEARCH_ROOMS, MANAGE_RESERVATIONS (receptionist and manager); allowedRoles | allows(actor) | RF-02, RF-04, RF-06, RF-10, RF-11, RF-28, RF-29 |
 | ReservationStatus | Enum | RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT | fromDatabase(value) | RF-05, RF-11 to RF-15 |
 | DocumentType | Enum | CC, PASSPORT, OTHER; displayName | displayName(), fromDatabase(value) | RF-10 |
 | CardType | Enum | CLIENT, MASTER | - | RF-16, RF-23 |

@@ -3,13 +3,15 @@ package pt.isep.hotel4you.domain;
 import java.time.LocalDate;
 import java.util.Objects;
 
-/** The persisted booking fields needed to decide room availability. */
+/** A room booking of a client for a period of nights. */
 public class Reservation {
     private final Long id;
+    private final Long clientId;
     private final long roomId;
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final ReservationStatus status;
+    private final Long createdByUserId;
 
     /**
      * Reads a booking period. This constructor does not create a database booking.
@@ -22,16 +24,36 @@ public class Reservation {
      */
     public Reservation(Long id, long roomId, LocalDate startDate, LocalDate endDate,
             ReservationStatus status) {
+        this(id, null, roomId, startDate, endDate, status, null);
+    }
+
+    /**
+     * Creates a booking with its client and the user who made it.
+     * @param id the booking identifier, or null before it is saved
+     * @param clientId the client identifier, or null when the read does not need it
+     * @param roomId the reserved room identifier
+     * @param startDate the first occupied night
+     * @param endDate the departure date, which is not occupied
+     * @param status the state
+     * @param createdByUserId the user who created the booking, or null when the read does not need it
+     * @throws IllegalArgumentException if the period is invalid
+     */
+    public Reservation(Long id, Long clientId, long roomId, LocalDate startDate, LocalDate endDate,
+            ReservationStatus status, Long createdByUserId) {
         validatePeriod(startDate, endDate);
         this.id = id;
+        this.clientId = clientId;
         this.roomId = roomId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = Objects.requireNonNull(status);
+        this.createdByUserId = createdByUserId;
     }
 
     /** @return the booking identifier */
     public Long getId() { return id; }
+    /** @return the client identifier, or null when the read does not need it */
+    public Long getClientId() { return clientId; }
     /** @return the room identifier */
     public long getRoomId() { return roomId; }
     /** @return the first occupied night */
@@ -40,6 +62,8 @@ public class Reservation {
     public LocalDate getEndDate() { return endDate; }
     /** @return the stored state */
     public ReservationStatus getStatus() { return status; }
+    /** @return the user who created the booking, or null when the read does not need it */
+    public Long getCreatedByUserId() { return createdByUserId; }
 
     /**
      * Tests half-open periods. Cancelled bookings never occupy a night.
