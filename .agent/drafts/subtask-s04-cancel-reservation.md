@@ -28,10 +28,8 @@ Responsável: a definir na planning do sprint 4.
 
 ## Interface (UI)
 
-Esta subtask cria o ecrã de reservas (ainda não existe). H4Y-76 e H4Y-77 acrescentam botões ao mesmo ecrã.
-- Botão "Reservas" no menu do rececionista e do gestor.
-- Ecrã `reservations.fxml`: campo "Documento do cliente" e botão "Procurar"; tabela com as reservas do cliente (quarto, entrada, saída, estado), incluindo as canceladas (histórico).
+O ecrã de reservas já existe. H4Y-56 criou `reservations.fxml`, o botão "Reservas" no menu do rececionista e do gestor, a pesquisa do cliente pelo documento e a tabela com as reservas do cliente (quarto, entrada, saída, estado), incluindo as canceladas (histórico). Esta subtask só acrescenta o botão "Cancelar reserva" a esse ecrã.
 - Botão "Cancelar reserva" na linha selecionada, com pergunta de confirmação ("Cancelar a reserva do quarto 201 de 10 a 12?").
 - O botão fica desativado em reservas canceladas ou com check-in (AC-3, AC-4). Depois de cancelar, o estado na tabela muda para "Cancelada".
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: antonioprmartinho. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
