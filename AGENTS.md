@@ -12,7 +12,7 @@ This file is for any AI tool. It is plain Markdown.
    - `definition-of-ready.md`, `definition-of-done.md`
    - `story-format.md`, `estimation.md`
    - `git-and-jira-conventions.md`
-   - `diagrams.md`: Mermaid rules for diagrams.
+   - `diagrams.md`: Mermaid rules for diagrams. Exception: the component diagram uses PlantUML.
 3. Pick an agent from `.agent/agents/` or a skill from `.agent/skills/`.
 4. See `.agent/examples/` for one sample of each document. Samples are EXAMPLES, not real backlog.
 
@@ -108,4 +108,4 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 - Codex: reads `AGENTS.md`. It may look for skills in `.agents/skills` (unconfirmed). Fallback: tell Codex to read the file named in the pipeline above, for example "Read `.agent/agents/refiner.md` and refine `.agent/drafts/story-x.md`".
 - Other tools: read this file, then the agent file for the step.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: jmbcruz. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PlantUML exception note by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
