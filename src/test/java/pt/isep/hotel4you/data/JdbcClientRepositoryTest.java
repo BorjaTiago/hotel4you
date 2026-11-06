@@ -16,6 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 
 /** Tests how the client repository handles SQL errors, row counts and search text. */
@@ -136,7 +137,7 @@ class JdbcClientRepositoryTest {
     @Test
     @Tag("H4Y-52-AC-4")
     void onSearch_keepSqlCause_whenSqlFails() {
-        assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.search("Maria")));
+        assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.search(ClientSearchField.NAME, "Maria")));
     }
 
     @Test
@@ -241,11 +242,11 @@ class JdbcClientRepositoryTest {
         StatementDatabase database = new StatementDatabase(new SQLException("stop"), 0);
 
         assertThrows(IllegalStateException.class,
-                () -> new JdbcClientRepository(database).search("Maria"));
+                () -> new JdbcClientRepository(database).search(ClientSearchField.NAME, "Maria"));
 
         assertTrue(database.sql.contains("LIKE ?"));
         assertFalse(database.sql.contains("Maria"));
-        assertEquals(List.of("%Maria%", "%Maria%"), database.boundValues);
+        assertEquals(List.of("%Maria%"), database.boundValues);
     }
 
     @Test
@@ -254,9 +255,33 @@ class JdbcClientRepositoryTest {
         StatementDatabase database = new StatementDatabase(new SQLException("stop"), 0);
 
         assertThrows(IllegalStateException.class,
-                () -> new JdbcClientRepository(database).search("50%_[a]\\"));
+                () -> new JdbcClientRepository(database).search(ClientSearchField.NAME, "50%_[a]\\"));
 
         assertTrue(database.sql.contains("ESCAPE '\\'"));
         assertEquals("%50\\%\\_\\[a]\\\\%", database.boundValues.get(0));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearch_usePhoneColumn_whenFieldIsPhone() {
+        StatementDatabase database = new StatementDatabase(new SQLException("stop"), 0);
+
+        assertThrows(IllegalStateException.class,
+                () -> new JdbcClientRepository(database).search(ClientSearchField.PHONE, "912"));
+
+        assertTrue(database.sql.contains("phone LIKE ?"));
+        assertEquals(List.of("%912%"), database.boundValues);
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearch_useDocumentColumn_whenFieldIsDocument() {
+        StatementDatabase database = new StatementDatabase(new SQLException("stop"), 0);
+
+        assertThrows(IllegalStateException.class,
+                () -> new JdbcClientRepository(database).search(ClientSearchField.DOCUMENT, "123"));
+
+        assertTrue(database.sql.contains("document LIKE ?"));
+        assertFalse(database.sql.contains("name LIKE"));
     }
 }

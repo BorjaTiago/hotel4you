@@ -22,6 +22,7 @@ import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
@@ -481,10 +482,22 @@ class HotelFacadeTest {
         facade.registerClient(newClient("Maria Santos", "12345678"), receptionist);
         facade.registerClient(newClient("João Pereira", "87654321"), receptionist);
 
-        List<Client> clients = facade.searchClients("pereira", receptionist);
+        List<Client> clients = facade.searchClients(ClientSearchField.NAME, "pereira", receptionist);
 
         assertEquals(1, clients.size());
         assertEquals("João Pereira", clients.get(0).getName());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearchClients_returnMatch_whenFieldIsPhone() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+        facade.registerClient(newClient("Maria Santos", "12345678"), receptionist);
+
+        List<Client> clients = facade.searchClients(ClientSearchField.PHONE, "912 345", receptionist);
+
+        assertEquals(1, clients.size());
+        assertEquals("Maria Santos", clients.get(0).getName());
     }
 
     @Test
@@ -497,7 +510,7 @@ class HotelFacadeTest {
 
         facade.editClient(edited, receptionist);
 
-        assertEquals("Maria Silva", facade.searchClients("12345678", receptionist).get(0).getName());
+        assertEquals("Maria Silva", facade.searchClients(ClientSearchField.DOCUMENT, "12345678", receptionist).get(0).getName());
     }
 
     @Test
