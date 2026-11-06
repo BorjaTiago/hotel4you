@@ -8,6 +8,7 @@ import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.ClientInUseException;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
+import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Floor;

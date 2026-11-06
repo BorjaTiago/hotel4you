@@ -25,9 +25,12 @@ public interface ReservationRepository {
     List<Reservation> findByRooms(List<Long> roomIds);
 
     /**
-     * Saves a new booking. The service checks the rules before the call.
+     * Saves a new booking. The service checks the rules before the call. The save checks
+     * again that no other booking of the room overlaps the nights, in the same step as the insert,
+     * so two saves at the same moment cannot both succeed.
      * @param reservation the new booking, with client, room, period, state and creator
      * @return the saved booking with its id
+     * @throws RoomNotAvailableException if another booking of the room overlaps the nights
      * @throws IllegalStateException if the database cannot save the booking
      */
     Reservation save(Reservation reservation);

@@ -1,4 +1,4 @@
-package pt.isep.hotel4you.service;
+package pt.isep.hotel4you.data;
 
 /** Signals that the room already has a reservation in the chosen nights. */
 public class RoomNotAvailableException extends RuntimeException {

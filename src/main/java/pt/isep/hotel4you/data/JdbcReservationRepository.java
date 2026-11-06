@@ -59,20 +59,27 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public Reservation save(Reservation reservation) {
+        // The lock hints keep the checked rows and range locked until the insert ends.
         String sql = """
                 INSERT INTO reservations
                     (customer_id, room_id, start_date, end_date, status, created_by_user_id)
                 OUTPUT INSERTED.id
-                VALUES (?, ?, ?, ?, ?, ?)
+                SELECT ?, ?, ?, ?, ?, ?
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM reservations WITH (UPDLOCK, HOLDLOCK)
+                    WHERE room_id = ? AND status <> 'cancelled' AND start_date < ? AND end_date > ?)
                 """;
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql,
                         reservation.getClientId(), reservation.getRoomId(),
                         Date.valueOf(reservation.getStartDate()), Date.valueOf(reservation.getEndDate()),
                         reservation.getStatus().name().toLowerCase(Locale.ROOT),
-                        reservation.getCreatedByUserId());
+                        reservation.getCreatedByUserId(), reservation.getRoomId(),
+                        Date.valueOf(reservation.getEndDate()), Date.valueOf(reservation.getStartDate()));
                 ResultSet row = statement.executeQuery()) {
-            row.next();
+            if (!row.next()) {
+                throw new RoomNotAvailableException();
+            }
             return new Reservation(row.getLong("id"), reservation.getClientId(),
                     reservation.getRoomId(), reservation.getStartDate(), reservation.getEndDate(),
                     reservation.getStatus(), reservation.getCreatedByUserId());

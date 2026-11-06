@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import pt.isep.hotel4you.data.ReservationRepository;
+import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.data.RoomTypeRepository;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ClientReservation;
