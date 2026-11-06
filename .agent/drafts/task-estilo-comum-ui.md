@@ -4,8 +4,8 @@ summary: Aplicar um estilo comum a todos os ecrãs
 parent: H4Y-11
 requirements: [RNF-04]
 points: 1
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-83
 labels: [ui, usability, javafx]
 sprint: 05
 assignee: pedrocostaisep
@@ -37,6 +37,6 @@ Todos os ecrãs têm o mesmo aspeto: mesmas cores, tipos de letra, botões, tabe
 - Nenhuma. Os conflitos com outras edições de FXML são só conflitos de merge. Fazer o ecrã unificado depois de o PR #53 fazer merge.
 - O enunciado não define o aspeto: decisão da equipa (BorjaTiago, 2026-11-06), Q-60.
 
-Nota: as tarefas não têm pontos (regra do backlog).
+Nota: esta tarefa tem 1 ponto (decisão da equipa, BorjaTiago, 2026-11-06).
 
 Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.

@@ -5,8 +5,8 @@ parent: epic-check-in-out
 requirements: [RF-13, RF-14]
 points: 5
 points_suggested: 5
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-82
 labels: [check-in, check-out, 1st-delivery]
 sprint: 05
 assignee: lukassperandio

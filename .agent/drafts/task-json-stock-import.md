@@ -4,8 +4,8 @@ summary: Rever diagramas e documentação da entrada de stock para aceitar fiche
 parent: H4Y-49
 requirements: [RF-28, RF-29]
 points: 1
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-84
 labels: [stock, docs]
 sprint: 05
 assignee: antonioprmartinho
@@ -62,6 +62,6 @@ A documentação e os diagramas descrevem a importação do ficheiro do forneced
 
 - Nenhuma na sprint. Corre em paralelo com as histórias da sprint.
 
-Nota: as tarefas não têm pontos (regra do backlog).
+Nota: esta tarefa tem 1 ponto (decisão da equipa, BorjaTiago, 2026-11-06).
 
 Created by: BorjaTiago. Updated by: BorjaTiago. AI use: general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-06. Reviewed by: pending.

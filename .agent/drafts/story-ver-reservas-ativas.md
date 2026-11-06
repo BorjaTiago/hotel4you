@@ -5,8 +5,8 @@ parent: epic-reservations
 requirements: [RF-13, RF-14, RNF-04]
 points: 8
 points_suggested: 8
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-81
 labels: [reservations, reception]
 sprint: 05
 assignee: BorjaTiago

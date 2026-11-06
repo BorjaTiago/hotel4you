@@ -5,8 +5,8 @@ parent: epic-foundation-architecture
 requirements: [RNF-04, RNF-06]
 points: 2
 points_suggested: 2
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-80
 labels: [ui, usability, javafx]
 sprint: 05
 assignee: BorjaTiago
@@ -68,6 +68,7 @@ Para que o atendimento ao balcão seja simples, sem mudar de ecrã.
 - Este fluxo abre-se pelo botão "+ Nova reserva" do ecrã principal "Reservas" (story-ver-reservas-ativas.md). Não mostra as reservas do hotel.
 - O ecrã já está construído no PR #53 (ramo feat/reservation-single-screen). Não li o PR nem o diff nesta sessão (sem shell); confirmar os AC contra o PR #53 antes de aprovar.
 - O utilizador remove as alterações de CSS do PR #53. Esta história não tem trabalho de estilo (ver task-estilo-comum-ui.md).
+- Publicada em Jira como H4Y-80 (2026-11-06); o código está no PR #53.
 - O PR #53 faz merge no dia 1, porque outras histórias acrescentam botões a este ecrã.
 - O enunciado não define o número de separadores nem o fluxo: decisão da equipa (BorjaTiago, 2026-11-06), Q-60.
 - O RNF-04 e o RNF-06 são "should": o teste de usabilidade é tarefa técnica, não história (Q-41).
