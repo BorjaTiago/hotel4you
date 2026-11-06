@@ -83,7 +83,7 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 9. Sprint numbers in paths have two digits: `sprint-01`, `sprint-02`, ... `sprint-13`.
 10. Commits, PR titles, PR bodies and docs use Simplified Technical English (STE): short sentences, simple words, active voice. Never add an AI as co-author or author: no `Co-Authored-By` trailer, no "Generated with" line, in any commit or PR, by any agent or tool. The AI-use reference (rule 8) goes inside the files, not in the commit trailer. Read `.agent/policies/git-and-jira-conventions.md`, section "Commit and PR rule", before you write a commit or open a PR.
 11. Code follows `docs/uml/` and `docs/database/` exactly (classes, abstractions, signatures, tables, columns). A needed change updates the code and the diagram docs in the same PR.
-12. Write tests first and see them fail. Then write the code. In the PR, the test commit comes before the code commit. Name tests `on<Action>_<result>_<condition>`, for example `onCreateUser_throw_whenUsernameExists`.
+12. TDD always, before anything else. Every change to code (story, sub-task, fix, refactor) starts with tests. Write the tests first and see them fail. Then write the code. In the PR, the test commit comes before the code commit. No code commit comes before its test commit. A refactor keeps the tests green before and after the change. Tasks with no code (docs, diagrams) have no test step. Name tests `on<Action>_<result>_<condition>`, for example `onCreateUser_throw_whenUsernameExists`.
 
 ## Output paths
 
@@ -108,4 +108,4 @@ Skills are thin. They name the inputs and point to the agent file. Rules live in
 - Codex: reads `AGENTS.md`. It may look for skills in `.agents/skills` (unconfirmed). Fallback: tell Codex to read the file named in the pipeline above, for example "Read `.agent/agents/refiner.md` and refine `.agent/drafts/story-x.md`".
 - Other tools: read this file, then the agent file for the step.
 
-Created by: BorjaTiago. Updated by: jmbcruz. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PlantUML exception note by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PlantUML exception note by Claude Code (claude-opus-5-5), 2026-11-06; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06. Reviewed by: pending.
