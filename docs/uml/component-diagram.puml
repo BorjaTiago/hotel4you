@@ -11,8 +11,8 @@ interface "HotelUI" as IUI
 artifact "Supplier XML stock file" <<external>> as XML
 
 component "Hotel4You" <<subsystem>> as H4Y {
-  portin "ui" as pUI
   portin "xml" as pXML
+  portin "ui" as pUI
   portout "db" as pDB
 
   component ":gui" as GUI
@@ -29,6 +29,10 @@ component "Hotel4You" <<subsystem>> as H4Y {
 component "SQL Server" <<external>> as SQL
 interface "SQL" as ISQL
 
+' Input: the supplier XML file comes in through the xml port
+XML --> pXML
+pXML --> SVC : <<delegate>>
+
 ' Input: actors use HotelUI through the ui port, delegated to gui
 IUI -- pUI
 pUI --> GUI : <<delegate>>
@@ -41,10 +45,6 @@ IREPO -- DATA
 DATA --( ICFG
 ICFG -- CFG
 
-' Input: the supplier XML file comes in through the xml port
-XML --> pXML
-pXML --> SVC : <<delegate>>
-
 ' Output: data reaches SQL Server through the db port
 DATA --> pDB : <<delegate>>
 pDB --( ISQL
@@ -54,4 +54,5 @@ ISQL -- SQL
 GUI ..> DOM
 SVC ..> DOM
 DATA ..> DOM
+' Created by: jmbcruz. Updated by: jmbcruz. AI use: PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06; review fixes by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
 @enduml

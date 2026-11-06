@@ -42,8 +42,10 @@ For the PlantUML component diagram, render the SVG again from `docs/uml` and com
 docker run --rm -v "$PWD":/data plantuml/plantuml:1.2024.7 -tsvg /data/component-diagram.puml
 ```
 
+Then check that the committed SVG is the same as a new render of the source: render it again and run `git diff --exit-code docs/uml/component-diagram.svg`. No difference must be shown.
+
 ## AI use
 
 Every diagram file ends with the footer line from `AGENTS.md`, rule 8 (Created by, Updated by, AI use, Reviewed by). Each agent adds its own name when it edits the file. Never put AI-use text in source code.
 
-Created by: BorjaTiago. Updated by: jmbcruz. AI use: Claude Code agent, Claude Haiku 5.5, 2026-10-16; docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; PlantUML exception by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: jmbcruz. AI use: Claude Code agent, Claude Haiku 5.5, 2026-10-16; docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; PlantUML exception by Claude Code (claude-opus-5-5), 2026-11-06; SVG check by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
