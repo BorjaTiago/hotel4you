@@ -22,7 +22,7 @@ Responsável: António Martinho (antonioprmartinho).
 - [x] O rececionista escolhe o cliente, o quarto livre e as datas, e confirma.
 - [x] O ecrã mostra o preço base por noite antes de confirmar (AC-4).
 - [x] Os erros vêm do serviço (RNF-07).
-- [ ] Verificação manual: reservar e ver que o quarto sai da pesquisa de livres. (Pendente: precisa da base de dados.)
+- [x] Verificação manual: reservar e ver que o quarto sai da pesquisa de livres. (2026-11-06, SQL Server local em Docker, scripts v1 a v10, pelo `HotelFacade`: quarto 201 livre antes, reserva `RESERVED`, quarto fora da pesquisa depois. O clique no ecrã fica para a revisão do PR.)
 
 ## Interface (UI)
 
