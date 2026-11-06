@@ -5,7 +5,7 @@ parent: epic-client-registration
 requirements: [RNF-03, RF-10]
 points:
 points_suggested: 3
-status: published
+status: removed
 jira_key: H4Y-59
 labels: [clients, 1st-delivery, usability]
 sprint: 05
@@ -45,6 +45,8 @@ Para que o atendimento demore no máximo 30 segundos.
 - [ ] AC-3: Um erro de preenchimento é corrigido sem repetir os campos já preenchidos.
 
 ## Notas
+REMOVIDA (decisão da equipa, 2026-11-06, Q-56): a história H4Y-59 foi descartada. O utilizador apaga H4Y-59 e a subtask H4Y-79 no Jira. O RNF-03 (30 s) fica sem história (ver Q-56). Texto antigo abaixo, só como histórico.
+
 Âmbito dos 30 s (decisão da equipa, 2026-10-16): desde a abertura do registo de cliente até à reserva criada (Q-12). Esta história é a dona do RNF-03 (Q-29: o tempo de escolha do quarto não conta). Dependências (auditoria 2026-10-16): duas fortes, story-registar-cliente e story-create-reservation. O AC-1 mede o fluxo real dos dois ecrãs; um stub não mede os 30 s. Por isso fica no sprint 5, depois das duas (antes estava no sprint 4, antes da reserva). AC-2 e AC-3 testam-se sozinhos com dados de teste (foundation T4). Como medir o tempo (cronómetro em teste de utilização) é decisão da equipa. AC-1 só é testável quando a reserva existir.
 
 points_suggested: 3
@@ -57,4 +59,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.

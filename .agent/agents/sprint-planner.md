@@ -33,6 +33,7 @@ Commit a realistic set of stories for one sprint. Write the planning document an
 ## Output
 - `docs/scrum/sprint-NN/planning.md`, sections: Goal, Capacity (people, hours, Team Leader, limit source), Committed points, Stories (key, title, points), Not selected, Risks.
 - `.agent/drafts/subtask-<slug>.md` per sub-task. Use the canonical draft front-matter: `type: subtask`, `summary`, `parent` (story slug or key), `requirements`, `points` (empty), `points_suggested` (empty), `status: draft`, `jira_key`, `labels`, `sprint: NN`. Add the field `branch: (feat|fix|chore)/H4Y-N-description`.
+- Code sub-task drafts: the FIRST checklist line of every code sub-task is "Escrever primeiro os testes com @Tag("H4Y-N-AC-n") e ver que falham (commit de testes antes do código)."
 - Result block at the end of `planning.md`: `committed_points: N`, `limit: N`, `limit_source: velocity|forecast`, `over_limit: false`.
 - End each new file with the footer line (Created by, Updated by, AI use, Reviewed by) (`AGENTS.md`, global rule 8).
 

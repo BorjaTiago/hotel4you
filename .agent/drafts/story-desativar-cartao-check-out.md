@@ -44,7 +44,7 @@ Para que o cliente não abra portas depois de sair.
 - [ ] AC-3: Um check-out recusado não altera o estado do cartão.
 
 ## Notas
-Entrega final (Q-06). Q-30 (decisão da equipa): no check-out o cartão deixa de funcionar, nenhuma porta abre, o registo fica guardado. Dependências (auditoria 2026-10-16): uma forte, story-check-out (o cartão é desativado dentro do mesmo fluxo; sprint 6 antes do sprint 10). O cartão vem de dados de teste (foundation T4), sem depender de story-emitir-cartao-check-in. O AC-2 usa o leitor simulado (T6).
+Entrega final (Q-06). Q-30 (decisão da equipa): no check-out o cartão deixa de funcionar, nenhuma porta abre, o registo fica guardado. Dependências (auditoria 2026-10-16): uma forte, story-check-in-check-out (o cartão é desativado dentro do mesmo fluxo; sprint 5 antes do sprint 10). O cartão vem de dados de teste (foundation T4), sem depender de story-emitir-cartao-check-in. O AC-2 usa o leitor simulado (T6).
 points_suggested: 3
 reference: Realizar check-in com cartão magnético (5)
 compared: smaller
@@ -55,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: refiner (split from story-check-out), Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: refiner (split from story-check-out), Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Updated by: BorjaTiago. Reviewed by: pending.

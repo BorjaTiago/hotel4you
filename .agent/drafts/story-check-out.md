@@ -5,7 +5,8 @@ parent: epic-check-in-out
 requirements: [RF-14]
 points: 3
 points_suggested: 3
-status: approved
+status: merged
+merged_into: story-check-in-check-out
 jira_key:
 labels: [check-out, 1st-delivery]
 sprint:
@@ -49,6 +50,8 @@ Para que a estadia termine e o quarto fique disponível.
 - [ ] AC-4: Depois do período da reserva, o quarto volta a ficar livre.
 
 ## Notas
+JUNTA em story-check-in-check-out.md (decisão do utilizador, 2026-11-06). Não implementar aqui.
+
 Entrega 1 (Q-06). Decisão da equipa (2026-10-16): no check-out o cartão deixa de funcionar e o registo de passagens fica guardado. O efeito no cartão (deixa de funcionar, registo mantido) foi separado em story-desativar-cartao-check-out, porque o cartão só existe na entrega final. Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste próprias com e sem check-in e com check-out (foundation T4). O AC-4 verifica com a consulta de quartos livres (sprint 4).
 
 points_suggested: 3
@@ -62,4 +65,4 @@ dor_failed: []
 questions: []
 split_note: cenários do cartão movidos para story-desativar-cartao-check-out
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.

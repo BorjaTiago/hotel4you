@@ -6,7 +6,7 @@ A story is done only when all items are true. Each item needs evidence. `validat
 |------|----------|
 | All acceptance criteria are verified (Given/When/Then). | Tests with `@Tag("H4Y-NN-AC-n")`, at least one per AC. |
 | Code follows `docs/uml/` and `docs/database/` exactly: same classes, abstractions, signatures, tables and columns (R1). | Diagram files in the PR match the code. |
-| Tests are written first and fail. Then the code makes them pass (R2). | In the PR, the test commit comes before the code commit. |
+| Tests are written first and fail. Then the code makes them pass (R2). This applies to every code change, also fixes and refactors. Docs-only tasks have no test step. | In the PR, the test commit comes before the code commit. |
 | Test names follow `on<Action>_<result>_<condition>` (R3). | Test method names, for example `onCreateUser_throw_whenUsernameExists`. |
 | The functional requirement from the statement is met. | Requirement IDs in the story, linked to the tests. |
 | Non-functional rules are met (encrypted passwords, business logic separate from GUI, and so on). | PR link and file or test that shows the rule. |
@@ -22,4 +22,4 @@ A story is done only when all items are true. Each item needs evidence. `validat
 | The Team Leader tested and validated the story against the acceptance tests. | Name of the Team Leader and date. |
 | The Jira issue is up to date. It is "In Review" during validation and moves to Done after PASS. | Jira status. |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06. Reviewed by: pending.

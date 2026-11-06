@@ -1,6 +1,6 @@
 # Laboratory III Project (LP3) - Course Statement
 
-Source: "Enunciado LP3", ISEP, 2026/2027, dated 2026-10-02. Translated from Portuguese into Simplified Technical English. All rules, numbers and dates are kept.
+Source: "Enunciado LP3", ISEP, 2026/2027, dated 2026-10-02. Translated from Portuguese into Simplified Technical English. All rules, numbers and dates are kept. Update: section 2 "New stock entries" added from the teacher on 2026-11-06.
 
 ## 1. Objective and context
 
@@ -63,6 +63,12 @@ The suppliers of Hotel4You give all the support that clients need for a good sta
 When a supplier delivers goods, the supplier sends an XML file (example provided) with the material that enters the Hotel4You stock.
 
 Hotel staff or managers must record all stock management in the system: entry, use and exit (where applicable).
+
+### New stock entries (teacher update, received 2026-11-06)
+
+The market grows. The company analysed its suppliers. Some suppliers have better conditions, but they cannot export XML files for the stock entry in Hotel4You. The company does not want to lose this opportunity. The software needs an extension: it must also import JSON files. The example JSON file follows the same assumptions and rules as the XML file that the other suppliers already use.
+
+Original text (Portuguese): "Novas entradas de Stock. Tendo em conta o crescimento do mercado, foi realizada uma análise dos fornecedores e chegou-se à conclusão de que, alguns deles tinham melhores condições, mas não suportavam exportação de ficheiros XML, para dar entrada de stock na Hotel4You. A empresa não está disposta a perder esta oportunidade e irá necessitar de uma extensão do seu software para que este suporte a importação de ficheiros JSON. O exemplar do ficheiro segue os pressupostos e regras do ficheiro XML, já utilizado pelos outros fornecedores."
 
 All users must access the application with a login (user name and password).
 
