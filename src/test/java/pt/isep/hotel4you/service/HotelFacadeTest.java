@@ -530,8 +530,8 @@ class HotelFacadeTest {
         User ana = new Receptionist(4L, "Ana Silva", "ana", "hash");
         Client client = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
                 LocalDate.of(1990, 5, 1), "912345678", "PT", null, null);
-        LocalDate start = LocalDate.of(2026, 11, 10);
-        LocalDate end = LocalDate.of(2026, 11, 12);
+        LocalDate start = LocalDate.now().plusDays(10);
+        LocalDate end = start.plusDays(2);
 
         var quote = facade.quoteReservation(room, start, end, ana);
         var saved = facade.createReservation(client, room, start, end, ana);

@@ -32,8 +32,8 @@ import pt.isep.hotel4you.domain.User;
 
 /** Acceptance tests for the reservation create (H4Y-56). */
 class ReservationServiceTest {
-    private static final LocalDate START = LocalDate.of(2026, 11, 10);
-    private static final LocalDate END = LocalDate.of(2026, 11, 12);
+    private static final LocalDate START = LocalDate.now().plusDays(10);
+    private static final LocalDate END = START.plusDays(2);
     private static final User RECEPTIONIST = new Receptionist(4L, "Ana", "ana", "hash");
     private static final Client CLIENT = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
             LocalDate.of(1990, 5, 1), "912345678", "PT", null, null);
@@ -131,6 +131,28 @@ class ReservationServiceTest {
         Reservation saved = service.create(CLIENT, room, START, END, RECEPTIONIST);
 
         assertEquals(ReservationStatus.RESERVED, saved.getStatus());
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-5")
+    void onCreateReservation_throw_whenStartIsInThePast() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.create(CLIENT, room, yesterday, yesterday.plusDays(2), RECEPTIONIST));
+        assertEquals("A data de entrada não pode ser antes de hoje.", error.getMessage());
+        assertTrue(reservations.saved().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-5")
+    void onCreateReservation_save_whenStartIsToday() {
+        LocalDate today = LocalDate.now();
+
+        Reservation saved = service.create(CLIENT, room, today, today.plusDays(1), RECEPTIONIST);
+
+        assertEquals(today, saved.getStartDate());
+        assertEquals(1, reservations.saved().size());
     }
 
     @Test
