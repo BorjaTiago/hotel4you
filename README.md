@@ -127,7 +127,7 @@ docker compose down -v     # stop and delete the data
 
 The service searches a room type and a date period. The H4Y-73 screen "Quartos livres" in the main menu uses this search and lists the free rooms. The search does not hold a room.
 
-Run the scripts in order, v1 to v9. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
+Run the scripts in order, v1 to v10. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
 
 Availability tests use their own in-memory reservations and JDBC doubles. SQL Server integration is not verified.
 
@@ -178,4 +178,4 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
