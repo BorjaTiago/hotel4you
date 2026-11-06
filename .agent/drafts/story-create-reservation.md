@@ -43,12 +43,20 @@ Para que o cliente fique com o quarto garantido nas noites escolhidas.
   Quando o rececionista cria a reserva para 2 noites
   Então o sistema mostra o preço base por noite do tipo do quarto
 
+### Cenário AC-5: Entrada antes de hoje
+  Dado que hoje é dia 10
+  Quando o rececionista tenta criar uma reserva com entrada no dia 9
+  Então o sistema recusa a reserva
+  E indica que a data de entrada não pode ser antes de hoje
+  (Uma entrada no próprio dia é aceite. Q-55.)
+
 ## Critérios de aceite (checklist)
 
-- [ ] AC-1: Um quarto livre pode ser reservado.
-- [ ] AC-2: Reservar um quarto já reservado no período é recusado.
-- [ ] AC-3: Dados em falta são recusados com indicação dos campos.
-- [ ] AC-4: O preço da reserva é mostrado ao rececionista.
+- [x] AC-1: Um quarto livre pode ser reservado.
+- [x] AC-2: Reservar um quarto já reservado no período é recusado.
+- [x] AC-3: Dados em falta são recusados com indicação dos campos.
+- [x] AC-4: O preço da reserva é mostrado ao rececionista.
+- [x] AC-5: Uma reserva com entrada antes de hoje é recusada (Q-55).
 
 ## Notas
 Q-27 (respondida, decisão da equipa): RF-10 está na 1.ª entrega, a reserva usa o cliente registado. Dependências (auditoria 2026-10-16): uma forte, story-query-free-rooms (reutiliza a mesma regra de sobreposição, `RoomAvailability`; sprint 4 antes do sprint 5). Clientes, quartos e preço base: dados de teste próprios (foundation T4), sem depender das outras histórias. O total com extras fica em epic-extra-services-pricing.
@@ -63,4 +71,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; AC checklist ticked by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.

@@ -30,7 +30,10 @@ public enum Permission {
     MANAGE_CLIENTS(Role.RECEPTIONIST, Role.MANAGER),
 
     /** Search free rooms by type and dates. */
-    SEARCH_ROOMS(Role.RECEPTIONIST, Role.MANAGER);
+    SEARCH_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
+
+    /** Create reservations and list the reservations of a client. */
+    MANAGE_RESERVATIONS(Role.RECEPTIONIST, Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 

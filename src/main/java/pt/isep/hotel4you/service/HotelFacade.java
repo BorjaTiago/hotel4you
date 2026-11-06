@@ -8,10 +8,14 @@ import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.ClientInUseException;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
+import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
+import pt.isep.hotel4you.domain.Reservation;
+import pt.isep.hotel4you.domain.ReservationQuote;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
@@ -29,6 +33,7 @@ public class HotelFacade {
     private final RoomService roomService;
     private final StockService stockService;
     private final ClientService clientService;
+    private final ReservationService reservationService;
 
     /**
      * Creates the facade.
@@ -39,16 +44,68 @@ public class HotelFacade {
      * @param roomService the room registration service
      * @param stockService the stock item service
      * @param clientService the client registration service
+     * @param reservationService the reservation service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
-            ClientService clientService) {
+            ClientService clientService, ReservationService reservationService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
         this.roomService = roomService;
         this.stockService = stockService;
         this.clientService = clientService;
+        this.reservationService = reservationService;
+    }
+
+    /**
+     * Creates a reservation of a free room for a client.
+     *
+     * @param client the saved client
+     * @param room the room to reserve
+     * @param start the first night
+     * @param end the departure date
+     * @param actor the logged-in user who creates the reservation
+     * @return the saved reservation with the state RESERVED
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalArgumentException if data is missing (the message names all missing fields),
+     *         the departure is not after the arrival, or the arrival is before today
+     * @throws RoomNotAvailableException if the room has a reservation in the nights
+     * @throws IllegalStateException if the database is not available
+     */
+    public Reservation createReservation(Client client, Room room, LocalDate start, LocalDate end,
+            User actor) {
+        return reservationService.create(client, room, start, end, actor);
+    }
+
+    /**
+     * Gives the base price per night of the room type and the number of nights.
+     *
+     * @param room the chosen room
+     * @param start the first night
+     * @param end the departure date
+     * @param actor the logged-in user who asks
+     * @return the price summary; the price is null if the type has no base price yet
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalArgumentException if data is missing or the departure is not after the arrival
+     * @throws IllegalStateException if the database is not available
+     */
+    public ReservationQuote quoteReservation(Room room, LocalDate start, LocalDate end, User actor) {
+        return reservationService.quote(room, start, end, actor);
+    }
+
+    /**
+     * Lists the reservations of a client, with the cancelled ones.
+     *
+     * @param client the saved client
+     * @param actor the logged-in user who asks
+     * @return the reservations, newest arrival first
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalArgumentException if the client is missing
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<ClientReservation> listClientReservations(Client client, User actor) {
+        return reservationService.listClientReservations(client, actor);
     }
 
     /**

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.ReservationController">
+
+    <Label text="Reservas" styleClass="subtitle"/>
+
+    <!-- Client search -->
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Documento do cliente" labelFor="$documentField"/>
+        <TextField fx:id="documentField" onAction="#onFindClientClicked" HBox.hgrow="ALWAYS"/>
+        <Button text="Procurar" onAction="#onFindClientClicked" styleClass="primary-button"/>
+    </HBox>
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Cliente" labelFor="$clientBox"/>
+        <ComboBox fx:id="clientBox" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <!-- Reservations of the client, with the cancelled ones -->
+    <TableView fx:id="reservationTable" accessibleText="Reservas do cliente" VBox.vgrow="ALWAYS"
+               prefHeight="160">
+        <columns>
+            <TableColumn fx:id="roomColumn" text="Quarto" prefWidth="100"/>
+            <TableColumn fx:id="startColumn" text="Entrada" prefWidth="140"/>
+            <TableColumn fx:id="endColumn" text="Saída" prefWidth="140"/>
+            <TableColumn fx:id="statusColumn" text="Estado" prefWidth="160"/>
+        </columns>
+        <placeholder>
+            <Label text="Procure o cliente para ver as reservas."/>
+        </placeholder>
+    </TableView>
+    <Button text="Nova reserva" onAction="#onNewReservationClicked" styleClass="action-button, edit-button"/>
+
+    <!-- New reservation form -->
+    <VBox fx:id="newReservationBox" spacing="8">
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Tipo" labelFor="$typeBox"/>
+                <ComboBox fx:id="typeBox" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Entrada" labelFor="$startPicker"/>
+                <DatePicker fx:id="startPicker" editable="false" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Saída" labelFor="$endPicker"/>
+                <DatePicker fx:id="endPicker" editable="false" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="12" alignment="BOTTOM_LEFT">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Quarto livre" labelFor="$roomBox"/>
+                <ComboBox fx:id="roomBox" maxWidth="Infinity"/>
+            </VBox>
+            <Button text="Procurar quartos livres" onAction="#onFindRoomsClicked" styleClass="primary-button"/>
+        </HBox>
+        <Label fx:id="summaryLabel" wrapText="true" maxWidth="Infinity"/>
+        <Button text="Confirmar reserva" onAction="#onCreateReservationClicked"
+                styleClass="action-button, save-button" maxWidth="Infinity"/>
+    </VBox>
+
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
