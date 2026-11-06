@@ -38,13 +38,37 @@ class JdbcReservationSaveTest {
         assertTrue(database.sql.contains(
                 "(customer_id, room_id, start_date, end_date, status, created_by_user_id)"));
         assertTrue(database.sql.contains("OUTPUT INSERTED.id"));
-        assertEquals(List.of(7L, 8L, Date.valueOf(START), Date.valueOf(END), "reserved", 4L),
-                database.bound);
+        assertEquals(List.of(7L, 8L, Date.valueOf(START), Date.valueOf(END), "reserved", 4L,
+                8L, Date.valueOf(END), Date.valueOf(START)), database.bound);
         assertEquals(55L, saved.getId());
         assertEquals(7L, saved.getClientId());
         assertEquals(8L, saved.getRoomId());
         assertEquals(4L, saved.getCreatedByUserId());
         assertEquals(ReservationStatus.RESERVED, saved.getStatus());
+        assertEquals(List.of("result", "statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-2")
+    void onSave_checkOverlapInSameStatement_whenReservationIsNew() {
+        repository.save(new Reservation(null, 7L, 8L, START, END, ReservationStatus.RESERVED, 4L));
+
+        String sql = database.sql.replaceAll("\\s+", " ");
+        assertTrue(sql.contains("SELECT ?, ?, ?, ?, ?, ? WHERE NOT EXISTS"));
+        assertTrue(sql.contains("FROM reservations WITH (UPDLOCK, HOLDLOCK)"));
+        assertTrue(sql.contains(
+                "WHERE room_id = ? AND status <> 'cancelled' AND start_date < ? AND end_date > ?"));
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-2")
+    void onSave_throwRoomNotAvailable_whenOverlapBlocksInsert() {
+        database.noRow = true;
+
+        RoomNotAvailableException error = assertThrows(RoomNotAvailableException.class,
+                () -> repository.save(
+                        new Reservation(null, 7L, 8L, START, END, ReservationStatus.RESERVED, 4L)));
+        assertEquals("O quarto já está reservado nessas datas.", error.getMessage());
         assertEquals(List.of("result", "statement", "connection"), database.closed);
     }
 
@@ -94,6 +118,7 @@ class JdbcReservationSaveTest {
         private final List<String> closed = new ArrayList<>();
         private final List<Object> bound = new ArrayList<>();
         private boolean clientRows;
+        private boolean noRow;
         private String sql;
         private SQLException failure;
 
@@ -142,7 +167,7 @@ class JdbcReservationSaveTest {
         private ResultSet idResult() {
             return (ResultSet) Proxy.newProxyInstance(ResultSet.class.getClassLoader(),
                     new Class<?>[] {ResultSet.class}, (proxy, method, args) -> switch (method.getName()) {
-                        case "next" -> true;
+                        case "next" -> !noRow;
                         case "getLong" -> 55L;
                         case "close" -> {
                             closed.add("result");

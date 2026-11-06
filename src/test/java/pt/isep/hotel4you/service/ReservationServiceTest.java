@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
+import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.DocumentType;
@@ -99,6 +100,17 @@ class ReservationServiceTest {
                 () -> service.create(CLIENT, room, START.plusDays(1), END.plusDays(1), RECEPTIONIST));
         assertEquals("O quarto já está reservado nessas datas.", error.getMessage());
         assertEquals(1, reservations.saved().size());
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-2")
+    void onCreate_throw_whenAnotherSaveTakesTheRoomFirst() {
+        reservations.loseNextSave = true;
+
+        RoomNotAvailableException error = assertThrows(RoomNotAvailableException.class,
+                () -> service.create(CLIENT, room, START, END, RECEPTIONIST));
+        assertEquals("O quarto já está reservado nessas datas.", error.getMessage());
+        assertTrue(reservations.saved().isEmpty());
     }
 
     @Test

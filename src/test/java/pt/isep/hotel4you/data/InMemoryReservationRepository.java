@@ -16,6 +16,8 @@ public class InMemoryReservationRepository implements ReservationRepository {
     private long nextId = 100;
     public int findByRoomCalls;
     public int findByRoomsCalls;
+    /** When true, the next save acts as if another user saved the same nights first. */
+    public boolean loseNextSave;
 
     /** @param reservation the test reservation to add */
     public void add(Reservation reservation) {
@@ -50,6 +52,10 @@ public class InMemoryReservationRepository implements ReservationRepository {
 
     @Override
     public Reservation save(Reservation reservation) {
+        if (loseNextSave) {
+            loseNextSave = false;
+            throw new RoomNotAvailableException();
+        }
         Reservation stored = new Reservation(nextId++, reservation.getClientId(),
                 reservation.getRoomId(), reservation.getStartDate(), reservation.getEndDate(),
                 reservation.getStatus(), reservation.getCreatedByUserId());
