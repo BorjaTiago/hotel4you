@@ -172,8 +172,6 @@ public class ReservationController {
             Room room = roomBox.getValue();
             Reservation saved = facade.createReservation(clientBox.getValue(), room,
                     startPicker.getValue(), endPicker.getValue(), HotelApp.currentUser);
-            ReservationQuote quote = facade.quoteReservation(room, saved.getStartDate(),
-                    saved.getEndDate(), HotelApp.currentUser);
             HotelApp.chosenRoom = null;
             HotelApp.chosenStart = null;
             HotelApp.chosenEnd = null;
@@ -181,10 +179,20 @@ public class ReservationController {
             showReservations();
             showMessage("Reserva criada: quarto " + room.getNumber() + ", de "
                     + DATE_FORMAT.format(saved.getStartDate()) + " a "
-                    + DATE_FORMAT.format(saved.getEndDate()) + ". Preço base por noite: "
-                    + priceText(quote.pricePerNight()) + ".", true);
+                    + DATE_FORMAT.format(saved.getEndDate()) + "." + priceSentence(room, saved), true);
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
+        }
+    }
+
+    /** The reservation is already saved here, so a failed quote only hides the price. */
+    private String priceSentence(Room room, Reservation saved) {
+        try {
+            ReservationQuote quote = facade.quoteReservation(room, saved.getStartDate(),
+                    saved.getEndDate(), HotelApp.currentUser);
+            return " Preço base por noite: " + priceText(quote.pricePerNight()) + ".";
+        } catch (RuntimeException e) {
+            return "";
         }
     }
 
