@@ -34,7 +34,8 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
   - No CASCADE. All FKs are `NO ACTION`. The backend deletes the reservation children in the same transaction (Q-36, RF-22).
   - `locations.name` is unique per floor: `UNIQUE (floor_id, name)`.
   - `access_logs (room_id, entered_at)` is a plain index.
-- **Removed:** `rooms.view_type`, `rooms.view_surcharge`, `users.active` (Q-36), `customers.birthday`, `floors.description`, `reservation_services.quantity`, `reservations.price_per_night`.
+- **Added later (v10, Q-54):** `customers.document_type`, `birth_date`, `phone`, `nationality`, `email`, `tax_number`. The unique key is now (`document_type`, `document`).
+- **Removed:** `rooms.view_type`, `rooms.view_surcharge`, `users.active` (Q-36), `floors.description`, `reservation_services.quantity`, `reservations.price_per_night`.
 
 **The story:** Ana Silva books room 202 for 3 nights, uses the spa, and leaves feedback.
 
@@ -184,13 +185,13 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 ### customers
 **What:** The hotel guests.
 **Why:** Every reservation and feedback needs a customer.
-**Why this way:** `document` is UNIQUE, so the same person is not created twice. There is no birthday column: it was not needed. `NVARCHAR` accepts foreign names.
+**Why this way:** The pair (`document_type`, `document`) is UNIQUE, so the same person is not created twice, but a passport and a citizen card can have the same number. Birth date, phone and nationality are required. Email and tax number (NIF) are optional (Q-54). `document_type` has a CHECK with the values of the Java `DocumentType` enum. `nationality` is the ISO 3166 two-letter code. `NVARCHAR` accepts foreign names. The FK from `reservations` stops the removal of a customer with reservations (Q-36).
 **Other option:** Use the document as the PK. We did not, because documents can have typos and change, and an `INT` key is smaller in FKs.
 
-| id | name | document |
-|---|---|---|
-| 1 | Ana Silva | 12345678 |
-| 2 | John Müller | X9876543 |
+| id | name | document_type | document | birth_date | phone | nationality | email | tax_number |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Ana Silva | CC | 12345678 | 1990-05-17 | +351 912 345 678 | PT | ana@example.com | 123456789 |
+| 2 | John Müller | PASSPORT | X9876543 | 1982-11-03 | +49 30 1234567 | DE | NULL | NULL |
 
 ### roles
 **What:** The permission groups: the 5 actor types of RF-02 (CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER).
@@ -355,4 +356,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.

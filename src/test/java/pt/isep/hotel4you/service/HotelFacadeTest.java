@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Manager;
@@ -422,15 +424,20 @@ class HotelFacadeTest {
     }
 
     @Test
-    @Tag("H4Y-52-AC-1")
+    @Tag("H4Y-52-AC-8")
     void onCanUse_returnTrue_whenReceptionistManagesClients() {
         assertTrue(facade.canUse(new Receptionist(2L, "Ana Silva", "ana", "hash"), Permission.MANAGE_CLIENTS));
     }
 
     @Test
-    @Tag("H4Y-52-AC-1")
-    void onCanUse_returnFalse_whenManagerManagesClients() {
-        assertFalse(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_CLIENTS));
+    @Tag("H4Y-52-AC-8")
+    void onCanUse_returnTrue_whenManagerManagesClients() {
+        assertTrue(facade.canUse(new Manager(1L, "Rui", "rui", "hash"), Permission.MANAGE_CLIENTS));
+    }
+
+    private static Client newClient(String name, String document) {
+        return new Client(null, name, DocumentType.CC, document, LocalDate.of(1990, 5, 17),
+                "912 345 678", "PT", null, null);
     }
 
     @Test
@@ -438,7 +445,7 @@ class HotelFacadeTest {
     void onRegisterClient_saveClient_whenReceptionist() {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
 
-        Client client = facade.registerClient("Maria Santos", "12345678", receptionist);
+        Client client = facade.registerClient(newClient("Maria Santos", "12345678"), receptionist);
 
         assertEquals("Maria Santos", client.getName());
     }
@@ -447,9 +454,63 @@ class HotelFacadeTest {
     @Tag("H4Y-52-AC-3")
     void onRegisterClient_throw_whenDocumentExists() {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
-        facade.registerClient("Maria Santos", "12345678", receptionist);
+        facade.registerClient(newClient("Maria Santos", "12345678"), receptionist);
 
         assertThrows(ClientExistsException.class,
-                () -> facade.registerClient("Outra Pessoa", "12345678", receptionist));
+                () -> facade.registerClient(newClient("Outra Pessoa", "12345678"), receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onListClients_returnClients_whenManager() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        facade.registerClient(newClient("Maria Santos", "12345678"), manager);
+
+        assertEquals(1, facade.listClients(manager).size());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearchClients_returnMatches_whenReceptionistSearches() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+        facade.registerClient(newClient("Maria Santos", "12345678"), receptionist);
+        facade.registerClient(newClient("João Pereira", "87654321"), receptionist);
+
+        List<Client> clients = facade.searchClients("pereira", receptionist);
+
+        assertEquals(1, clients.size());
+        assertEquals("João Pereira", clients.get(0).getName());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-5")
+    void onEditClient_changeClientThroughClientService_whenReceptionistEdits() {
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
+        Client saved = facade.registerClient(newClient("Maria Santos", "12345678"), receptionist);
+        Client edited = new Client(saved.getId(), "Maria Silva", DocumentType.CC, "12345678",
+                LocalDate.of(1990, 5, 17), "912 345 678", "PT", null, null);
+
+        facade.editClient(edited, receptionist);
+
+        assertEquals("Maria Silva", facade.searchClients("12345678", receptionist).get(0).getName());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-6")
+    void onRemoveClient_deleteClientThroughClientService_whenManagerRemoves() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        Client saved = facade.registerClient(newClient("Maria Santos", "12345678"), manager);
+
+        facade.removeClient(saved.getId(), manager);
+
+        assertTrue(facade.listClients(manager).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-8")
+    void onListClients_throwAccessDenied_whenRestaurantStaff() {
+        User cook = new RestaurantStaff(3L, "Joao Lima", "joao", "hash");
+
+        assertThrows(AccessDeniedException.class, () -> facade.listClients(cook));
     }
 }

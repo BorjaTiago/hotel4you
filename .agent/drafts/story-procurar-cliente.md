@@ -43,6 +43,8 @@ Para que não o registe duas vezes e possa usar os seus dados numa reserva.
 - [ ] AC-3: Uma pesquisa vazia é recusada.
 
 ## Notas
+**Atualização (Q-54, 2026-11-04):** a pesquisa de clientes passou para a história H4Y-52 (critério AC-4: procurar por parte do nome ou do documento; uma pesquisa vazia mostra todos). O ticket no Jira fica como está até a equipa decidir.
+
 Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: clientes de teste próprios (foundation T4). O AC-2 abre o ecrã de registo (mesmo sprint); a ligação ao ecrã faz-se no fim do sprint. Fase: 1.ª entrega (Q-27). O enunciado não define o dado de pesquisa; a equipa escolhe-o na implementação (detalhe negociável).
 
 points_suggested: 2
@@ -55,4 +57,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.
