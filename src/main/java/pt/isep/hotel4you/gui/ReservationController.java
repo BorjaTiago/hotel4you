@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -31,7 +30,7 @@ import pt.isep.hotel4you.service.HotelFacade;
 /** Controller for the reservation screen: find a client, see the reservations, create one. */
 public class ReservationController {
 
-    private static final NumberFormat PRICE_FORMAT =
+    static final NumberFormat PRICE_FORMAT =
             NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-PT"));
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -98,11 +97,40 @@ public class ReservationController {
                 data -> new SimpleStringProperty(DATE_FORMAT.format(data.getValue().endDate())));
         statusColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(statusText(data.getValue().status())));
-        clientBox.setConverter(new LabelConverter<>(
-                client -> client.getName() + " (" + client.getDocument() + ")"));
-        typeBox.setConverter(new LabelConverter<>(type -> typeText(type.getName())));
-        roomBox.setConverter(new LabelConverter<>(room -> "Quarto " + room.getNumber()
-                + " (piso " + room.getFloorNumber() + ", " + typeText(room.getRoomTypeName()) + ")"));
+        clientBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Client client) {
+                return client == null ? "" : client.getName() + " (" + client.getDocument() + ")";
+            }
+
+            @Override
+            public Client fromString(String text) {
+                return null;
+            }
+        });
+        typeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(RoomType type) {
+                return type == null ? "" : typeText(type.getName());
+            }
+
+            @Override
+            public RoomType fromString(String text) {
+                return null;
+            }
+        });
+        roomBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Room room) {
+                return room == null ? "" : "Quarto " + room.getNumber()
+                        + " (piso " + room.getFloorNumber() + ", " + typeText(room.getRoomTypeName()) + ")";
+            }
+
+            @Override
+            public Room fromString(String text) {
+                return null;
+            }
+        });
         clientBox.valueProperty().addListener((value, before, after) -> showReservations());
         roomBox.valueProperty().addListener((value, before, after) -> showSummary());
         startPicker.valueProperty().addListener((value, before, after) -> showSummary());
@@ -114,19 +142,23 @@ public class ReservationController {
     @FXML
     private void onFindClientClicked() {
         messageLabel.setText("");
+        List<Client> clients;
         try {
-            List<Client> clients = facade.searchClients(documentField.getText(), HotelApp.currentUser);
-            clientBox.getItems().setAll(clients);
-            if (clients.size() == 1) {
-                clientBox.setValue(clients.get(0));
-            } else if (clients.isEmpty()) {
-                showMessage("Não há clientes com esse documento.", false);
-            } else {
-                showMessage("Escolha o cliente na lista.", false);
-            }
+            clients = facade.searchClients(documentField.getText(), HotelApp.currentUser);
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
+            return;
         }
+        clientBox.getItems().setAll(clients);
+        if (clients.isEmpty()) {
+            showMessage("Não há clientes com esse documento.", false);
+            return;
+        }
+        if (clients.size() > 1) {
+            showMessage("Escolha o cliente na lista.", false);
+            return;
+        }
+        clientBox.setValue(clients.get(0));
     }
 
     @FXML
@@ -139,16 +171,18 @@ public class ReservationController {
             showMessage(e.getMessage(), false);
         }
         Room chosen = HotelApp.chosenRoom;
-        if (chosen != null) {
-            typeBox.getItems().stream()
-                    .filter(type -> type.getName().equalsIgnoreCase(chosen.getRoomTypeName()))
-                    .findFirst()
-                    .ifPresent(typeBox::setValue);
-            startPicker.setValue(HotelApp.chosenStart);
-            endPicker.setValue(HotelApp.chosenEnd);
-            roomBox.getItems().setAll(chosen);
-            roomBox.setValue(chosen);
+        if (chosen == null) {
+            return;
         }
+        for (RoomType type : typeBox.getItems()) {
+            if (type.getName().equalsIgnoreCase(chosen.getRoomTypeName())) {
+                typeBox.setValue(type);
+            }
+        }
+        startPicker.setValue(HotelApp.chosenStart);
+        endPicker.setValue(HotelApp.chosenEnd);
+        roomBox.getItems().setAll(chosen);
+        roomBox.setValue(chosen);
     }
 
     @FXML
@@ -179,20 +213,9 @@ public class ReservationController {
             showReservations();
             showMessage("Reserva criada: quarto " + room.getNumber() + ", de "
                     + DATE_FORMAT.format(saved.getStartDate()) + " a "
-                    + DATE_FORMAT.format(saved.getEndDate()) + "." + priceSentence(room, saved), true);
+                    + DATE_FORMAT.format(saved.getEndDate()) + ".", true);
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
-        }
-    }
-
-    /** The reservation is already saved here, so a failed quote only hides the price. */
-    private String priceSentence(Room room, Reservation saved) {
-        try {
-            ReservationQuote quote = facade.quoteReservation(room, saved.getStartDate(),
-                    saved.getEndDate(), HotelApp.currentUser);
-            return " Preço base por noite: " + priceText(quote.pricePerNight()) + ".";
-        } catch (RuntimeException e) {
-            return "";
         }
     }
 
@@ -221,12 +244,23 @@ public class ReservationController {
         }
         try {
             ReservationQuote quote = facade.quoteReservation(room, start, end, HotelApp.currentUser);
-            summaryLabel.setText("Quarto " + room.getNumber() + ": " + quote.nights()
-                    + (quote.nights() == 1 ? " noite" : " noites") + ". Preço base por noite: "
-                    + priceText(quote.pricePerNight()) + ".");
+            summaryLabel.setText(summaryText(room.getNumber(), quote));
         } catch (RuntimeException e) {
             summaryLabel.setText(e.getMessage());
         }
+    }
+
+    /**
+     * Builds the price summary that the screen shows before the confirmation (AC-4).
+     *
+     * @param roomNumber the visible room number
+     * @param quote the price per night and the number of nights
+     * @return the summary text
+     */
+    static String summaryText(int roomNumber, ReservationQuote quote) {
+        String nights = quote.nights() == 1 ? " noite" : " noites";
+        return "Quarto " + roomNumber + ": " + quote.nights() + nights + ". Preço base por noite: "
+                + priceText(quote.pricePerNight()) + ".";
     }
 
     private static String statusText(ReservationStatus status) {
@@ -251,25 +285,6 @@ public class ReservationController {
         messageLabel.getStyleClass().remove("message-success");
         if (success) {
             messageLabel.getStyleClass().add("message-success");
-        }
-    }
-
-    /** Shows a value in a combo box with a fixed text. The user cannot type a value. */
-    private static final class LabelConverter<T> extends StringConverter<T> {
-        private final Function<T, String> text;
-
-        private LabelConverter(Function<T, String> text) {
-            this.text = text;
-        }
-
-        @Override
-        public String toString(T value) {
-            return value == null ? "" : text.apply(value);
-        }
-
-        @Override
-        public T fromString(String value) {
-            return null;
         }
     }
 }

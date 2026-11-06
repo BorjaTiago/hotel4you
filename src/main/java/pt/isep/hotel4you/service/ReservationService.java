@@ -51,8 +51,8 @@ public class ReservationService {
      * @param actor the logged-in user who creates the reservation
      * @return the saved reservation with the state RESERVED
      * @throws AccessDeniedException if the actor may not manage reservations
-     * @throws IllegalArgumentException if data is missing (the message names all missing fields)
-     *         or the departure is not after the arrival
+     * @throws IllegalArgumentException if data is missing (the message names all missing fields),
+     *         the departure is not after the arrival, or the arrival is before today
      * @throws RoomNotAvailableException if the room has a reservation in the nights
      * @throws IllegalStateException if the database is not available
      */
@@ -68,6 +68,9 @@ public class ReservationService {
         addMissingDates(missing, start, end);
         throwIfMissing(missing);
         Reservation.validatePeriod(start, end);
+        if (start.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("A data de entrada não pode ser antes de hoje.");
+        }
         if (!roomService.isAvailable(room, start, end)) {
             throw new RoomNotAvailableException();
         }
@@ -96,12 +99,12 @@ public class ReservationService {
         addMissingDates(missing, start, end);
         throwIfMissing(missing);
         Reservation.validatePeriod(start, end);
-        BigDecimal price = roomTypeRepository.findAll().stream()
-                .filter(type -> type.getName().equalsIgnoreCase(room.getRoomTypeName()))
-                .map(RoomType::getBasePrice)
-                .filter(value -> value != null)
-                .findFirst()
-                .orElse(null);
+        BigDecimal price = null;
+        for (RoomType type : roomTypeRepository.findAll()) {
+            if (type.getName().equalsIgnoreCase(room.getRoomTypeName())) {
+                price = type.getBasePrice();
+            }
+        }
         return new ReservationQuote(price, ChronoUnit.DAYS.between(start, end));
     }
 
@@ -118,7 +121,7 @@ public class ReservationService {
     public List<ClientReservation> listClientReservations(Client client, User actor) {
         checkPermission(actor);
         if (client == null || client.getId() == null) {
-            throwIfMissing(List.of("cliente"));
+            throw new IllegalArgumentException("Faltam dados: cliente.");
         }
         return reservationRepository.findByClient(client.getId());
     }

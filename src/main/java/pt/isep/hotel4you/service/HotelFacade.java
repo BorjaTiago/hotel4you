@@ -68,8 +68,8 @@ public class HotelFacade {
      * @param actor the logged-in user who creates the reservation
      * @return the saved reservation with the state RESERVED
      * @throws AccessDeniedException if the actor may not manage reservations
-     * @throws IllegalArgumentException if data is missing (the message names all missing fields)
-     *         or the departure is not after the arrival
+     * @throws IllegalArgumentException if data is missing (the message names all missing fields),
+     *         the departure is not after the arrival, or the arrival is before today
      * @throws RoomNotAvailableException if the room has a reservation in the nights
      * @throws IllegalStateException if the database is not available
      */
