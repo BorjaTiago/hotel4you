@@ -1,11 +1,13 @@
 package pt.isep.hotel4you.gui;
 
+import java.time.LocalDate;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.User;
 import pt.isep.hotel4you.service.HotelFacade;
 
@@ -20,6 +22,24 @@ public class HotelApp extends Application {
 
     /** The user who is logged in, or null if nobody is. Set by the login screen. */
     public static User currentUser;
+
+    /**
+     * The room chosen on the free-room screen, for the reservation screen (H4Y-76).
+     * A new search and logout set it to null. Null when nothing is chosen.
+     */
+    public static Room chosenRoom;
+
+    /**
+     * The first night chosen on the free-room screen, for the reservation screen (H4Y-76).
+     * A new search and logout set it to null. Null when nothing is chosen.
+     */
+    public static LocalDate chosenStart;
+
+    /**
+     * The check-out date chosen on the free-room screen, for the reservation screen (H4Y-76).
+     * A new search and logout set it to null. Null when nothing is chosen.
+     */
+    public static LocalDate chosenEnd;
 
     /**
      * Shows the login screen, or a popup if the start failed.

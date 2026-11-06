@@ -23,6 +23,8 @@
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="roomsButton" text="Quartos" onAction="#onRoomsClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button fx:id="freeRoomsButton" text="Quartos livres" onAction="#onFreeRoomsClicked"
+                    maxWidth="Infinity" visible="false"/>
             <Button fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="stockButton" text="Stock" onAction="#onStockClicked"
