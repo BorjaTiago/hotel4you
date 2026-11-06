@@ -23,15 +23,11 @@
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="roomsButton" text="Quartos" onAction="#onRoomsClicked"
                     maxWidth="Infinity" visible="false"/>
-            <Button fx:id="freeRoomsButton" text="Quartos livres" onAction="#onFreeRoomsClicked"
-                    maxWidth="Infinity" visible="false"/>
-            <Button fx:id="reservationsButton" text="Reservas" onAction="#onReservationsClicked"
+            <Button fx:id="reservationsButton" text="Clientes e reservas" onAction="#onReservationsClicked"
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="stockButton" text="Stock" onAction="#onStockClicked"
-                    maxWidth="Infinity" visible="false"/>
-            <Button fx:id="clientsButton" text="Clientes" onAction="#onClientsClicked"
                     maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>

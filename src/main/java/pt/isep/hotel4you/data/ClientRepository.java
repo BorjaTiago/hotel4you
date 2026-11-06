@@ -3,6 +3,7 @@ package pt.isep.hotel4you.data;
 import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 
 /** Stores and finds the hotel clients. */
@@ -36,14 +37,14 @@ public interface ClientRepository {
     List<Client> findAll();
 
     /**
-     * Finds the clients whose name or document number contains the text. The match is not case
-     * sensitive.
+     * Finds the clients whose chosen field contains the text. The match is not case sensitive.
      *
+     * @param field the client data to search in
      * @param text the text to find, not blank
      * @return the matching clients ordered by name
      * @throws IllegalStateException if the database is not available
      */
-    List<Client> search(String text);
+    List<Client> search(ClientSearchField field, String text);
 
     /**
      * Saves a new client.

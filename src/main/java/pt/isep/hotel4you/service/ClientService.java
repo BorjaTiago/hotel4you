@@ -10,6 +10,7 @@ import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.ClientInUseException;
 import pt.isep.hotel4you.data.ClientRepository;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
@@ -76,20 +77,25 @@ public class ClientService {
     }
 
     /**
-     * Finds the clients whose name or document number contains the text.
+     * Finds the clients whose chosen field contains the text.
      *
+     * @param field the client data to search in
      * @param text the text to find; a blank text lists all clients
      * @param actor the logged-in user who asks
      * @return the matching clients ordered by name
      * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws IllegalArgumentException if the field is missing
      * @throws IllegalStateException if the database is not available
      */
-    public List<Client> searchClients(String text, User actor) {
+    public List<Client> searchClients(ClientSearchField field, String text, User actor) {
         checkManage(actor);
+        if (field == null) {
+            throw new IllegalArgumentException("Escolha o campo de pesquisa.");
+        }
         if (text == null || text.isBlank()) {
             return clientRepository.findAll();
         }
-        return clientRepository.search(text.trim());
+        return clientRepository.search(field, text.trim());
     }
 
     /**

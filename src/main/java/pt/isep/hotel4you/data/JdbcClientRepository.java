@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 
 /**
@@ -80,12 +81,12 @@ public class JdbcClientRepository implements ClientRepository {
     }
 
     @Override
-    public List<Client> search(String text) {
-        String sql = "SELECT " + COLUMNS + " FROM customers"
-                + " WHERE name LIKE ? ESCAPE '\\' OR document LIKE ? ESCAPE '\\' ORDER BY name";
+    public List<Client> search(ClientSearchField field, String text) {
+        String sql = "SELECT " + COLUMNS + " FROM customers WHERE " + columnOf(field)
+                + " LIKE ? ESCAPE '\\' ORDER BY name";
         String pattern = "%" + escapeLike(text) + "%";
         try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql, pattern, pattern);
+                PreparedStatement statement = Database.prepare(connection, sql, pattern);
                 ResultSet rows = statement.executeQuery()) {
             List<Client> clients = new ArrayList<>();
             while (rows.next()) {
@@ -158,6 +159,15 @@ public class JdbcClientRepository implements ClientRepository {
             }
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
+    }
+
+    /** Maps the field to its column. The column never comes from user input. */
+    private static String columnOf(ClientSearchField field) {
+        return switch (field) {
+            case DOCUMENT -> "document";
+            case NAME -> "name";
+            case PHONE -> "phone";
+        };
     }
 
     /** Escapes the LIKE wildcards, so the text matches as plain text. */
