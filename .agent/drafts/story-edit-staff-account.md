@@ -8,7 +8,8 @@ points_suggested: 3
 status: approved
 jira_key:
 labels: [staff]
-sprint:
+sprint: 05
+assignee: lukassperandio
 ---
 
 # Título: Editar uma conta de funcionário

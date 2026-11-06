@@ -50,8 +50,8 @@ Para que o cliente receba o cartão que lhe dá acesso aos locais da reserva.
 - [ ] AC-4: O check-in de uma reserva cancelada ou inexistente é recusado e nenhum cartão é emitido.
 
 ## Notas
-Um cartão por reserva (Q-09, decisão da equipa). Entrega final (Q-06). Dependências (auditoria 2026-10-16): uma forte, story-check-in (o cartão é emitido dentro do mesmo fluxo; sprint 6 antes do sprint 9). Número do cartão: `CardNumberGenerator` (foundation T6). Testar com reservas de teste com e sem cartão (T4).
-Decisão da equipa (2026-10-16): no check-out o cartão deixa de funcionar e o registo fica guardado; o cenário está em story-check-out (AC-4). O cartão emitido aqui só vale durante a estadia.
+Um cartão por reserva (Q-09, decisão da equipa). Entrega final (Q-06). Dependências (auditoria 2026-10-16): uma forte, story-check-in-check-out (o cartão é emitido dentro do mesmo fluxo; sprint 5 antes do sprint 9). Número do cartão: `CardNumberGenerator` (foundation T6). Testar com reservas de teste com e sem cartão (T4).
+Decisão da equipa (2026-10-16): no check-out o cartão deixa de funcionar e o registo fica guardado; o cenário está em story-check-in-check-out. O cartão emitido aqui só vale durante a estadia.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -63,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Updated by: BorjaTiago. Reviewed by: pending.

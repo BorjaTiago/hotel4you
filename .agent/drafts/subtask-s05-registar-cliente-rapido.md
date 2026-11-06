@@ -5,7 +5,7 @@ parent: H4Y-59
 requirements: [RNF-03, RF-10]
 points:
 points_suggested:
-status: published
+status: removed
 jira_key: H4Y-79
 labels: [clients, reservations, usability, 1st-delivery]
 sprint: 05
@@ -13,6 +13,8 @@ branch: feat/H4Y-79-quick-client-reservation
 ---
 
 # registar-cliente-rapido: 30 segundos
+
+REMOVIDA (decisão da equipa, 2026-11-06, Q-56): a história pai H4Y-59 foi descartada. O utilizador apaga H4Y-59 e H4Y-79 no Jira. Texto antigo abaixo, só como histórico.
 
 História pai H4Y-59. Último item do sprint 5. Precisa dos ecrãs de registar-cliente (sprint 4) e de create-reservation (sprint 5) no main. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 5.
@@ -33,4 +35,4 @@ Responsável: a definir na planning do sprint 5.
 - Erro num campo: o campo fica a vermelho e os outros dados ficam escritos (AC-3).
 - Sucesso: "Reserva criada." e o ecrã fica pronto para o cliente seguinte.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.

@@ -8,11 +8,13 @@ points_suggested:
 status: published
 jira_key: H4Y-78
 labels: [reservations, security, 1st-delivery]
-sprint: 05
+sprint: 06
 branch: feat/H4Y-78-refuse-delete-reservation
 ---
 
 # refuse-delete-reservation: só o gestor apaga
+
+Nota (2026-11-06): movida para o sprint 6. Precisa de H4Y-57 (delete-reservation, sprint 5). Nenhuma história do mesmo sprint a bloqueia.
 
 História pai H4Y-58. Puxada do sprint 6 para o sprint 5 (decisão de 2026-10-23, mínimo de 13 pontos por sprint). Acrescenta uma guarda a `ReservationService.delete`. Faz-se depois de delete-reservation, no mesmo sprint, pela mesma pessoa ou a seguir. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: a definir na planning do sprint 5.
@@ -32,4 +34,4 @@ Responsável: a definir na planning do sprint 5.
 - O rececionista e o funcionário do restaurante não veem o botão "Apagar reserva" no ecrã `reservations.fxml`. O rececionista continua a ver "Cancelar reserva" (AC-2).
 - Se a ação chegar ao serviço por outro caminho, o ecrã mostra "Só o gestor pode apagar reservas." sem dados da reserva.
 
-Created by: lukassperandio. Updated by: lukassperandio. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.

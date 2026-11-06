@@ -5,7 +5,7 @@ parent: H4Y-56
 requirements: [RF-11, RF-05]
 points:
 points_suggested:
-status: published
+status: removed
 jira_key: H4Y-75
 labels: [reservations, 1st-delivery]
 sprint: 04
@@ -13,6 +13,8 @@ branch: feat/H4Y-75-reservation-service
 ---
 
 # create-reservation: regras e gravação
+
+Nota (2026-11-06): feita no sprint 4 como H4Y-75 e H4Y-76. Este rascunho s05 fica removido; o conteúdo abaixo é histórico.
 
 História pai H4Y-56. Usa `ReservationService.create` e `HotelFacade.createReservation`. Reutiliza a regra `RoomService.isAvailable` do sprint 4. Não cria uma segunda regra. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: António Martinho (antonioprmartinho).
@@ -31,4 +33,4 @@ Responsável: António Martinho (antonioprmartinho).
 
 Sem ecrã nesta subtask. O ecrã está em H4Y-76.
 
-Created by: lukassperandio. Updated by: antonioprmartinho. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-56 implementation by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-56 implementation by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.

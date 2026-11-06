@@ -5,7 +5,8 @@ parent: epic-stock-management
 requirements: [RF-28, RF-29]
 points: 2
 points_suggested: 2
-status: approved
+status: merged
+merged_into: H4Y-51
 jira_key:
 labels: [stock, final-delivery]
 sprint:
@@ -58,10 +59,12 @@ Para que o catálogo de stock esteja correto.
 ## Notas
 Decisão da equipa (2026-10-16): o gestor cria e edita os itens de stock (nome, unidade). Não há história de remover item; por isso a regra Q-36 (recusar remover item com movimentos) não tem cenário aqui. Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: itens de teste próprios (foundation T4). Antes ligada a: "Carregar um ficheiro XML de fornecedor" (gestor e rececionista), "Registar entrada de stock", "Registar uso de stock", "Registar saída de stock". Entrega final (Q-06).
 
+Fundida (2026-11-06, decisão do utilizador BorjaTiago): já feita em H4Y-68 (PR #47), com `StockService.editItem` e `StockController.onEditItemClicked`. Fundida em H4Y-51. Sem sprint futuro.
+
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
 compared: equal
 reasoning: CRUD simples de dois campos (nome, unidade) com nome único. Sem cálculos. Uma tabela e um formulário.
 split_needed: no
 
-AI use: story-writer, estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Updated by: BorjaTiago. Reviewed by: pending.

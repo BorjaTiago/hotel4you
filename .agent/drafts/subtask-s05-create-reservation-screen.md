@@ -5,7 +5,7 @@ parent: H4Y-56
 requirements: [RF-11, RNF-07]
 points:
 points_suggested:
-status: published
+status: removed
 jira_key: H4Y-76
 labels: [reservations, gui, 1st-delivery]
 sprint: 04
@@ -13,6 +13,8 @@ branch: feat/H4Y-76-reservation-screen
 ---
 
 # create-reservation: ecrã
+
+Nota (2026-11-06): feita no sprint 4 como H4Y-75 e H4Y-76. Este rascunho s05 fica removido; o conteúdo abaixo é histórico.
 
 História pai H4Y-56. Depende do serviço. Liga a pesquisa de cliente e a pesquisa de quartos livres (sprint 4). Usa `ReservationController.onCreateReservationClicked`. Previsão. Confirmar ou mudar no refinamento e na planning do sprint.
 Responsável: António Martinho (antonioprmartinho).
@@ -34,4 +36,4 @@ Responsável: António Martinho (antonioprmartinho).
 - Dados em falta: a mensagem diz o que falta (AC-3). Quarto ocupado: "O quarto já está reservado nessas datas." (AC-2).
 - Depois de confirmar: a nova reserva aparece na tabela com o estado "Reservada".
 
-Created by: lukassperandio. Updated by: antonioprmartinho. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-56 implementation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-56 implementation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
