@@ -30,7 +30,7 @@
                     <HBox spacing="12" alignment="CENTER_LEFT" styleClass="summary-footer">
                         <Label fx:id="totalLabel" styleClass="summary-total" wrapText="true" maxWidth="Infinity"
                                HBox.hgrow="ALWAYS"/>
-                        <Button text="Confirmar reserva ✓" onAction="#onCreateReservationClicked"
+                        <Button fx:id="confirmButton" text="Confirmar reserva ✓" onAction="#onCreateReservationClicked"
                                 styleClass="next-button" minWidth="-Infinity"/>
                     </HBox>
                 </VBox>

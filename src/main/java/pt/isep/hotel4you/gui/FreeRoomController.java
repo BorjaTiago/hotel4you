@@ -42,6 +42,15 @@ public class FreeRoomController {
     private LocalDate searchedEnd;
 
     @FXML
+    private Label typeLabel;
+
+    @FXML
+    private Label startLabel;
+
+    @FXML
+    private Label endLabel;
+
+    @FXML
     private ComboBox<RoomType> typeBox;
 
     @FXML
@@ -92,6 +101,9 @@ public class FreeRoomController {
 
     @FXML
     private void initialize() {
+        typeLabel.setLabelFor(typeBox);
+        startLabel.setLabelFor(startPicker);
+        endLabel.setLabelFor(endPicker);
         numberColumn.setCellValueFactory(
                 data -> new ReadOnlyObjectWrapper<>(data.getValue().getNumber()));
         floorColumn.setCellValueFactory(

@@ -8,6 +8,7 @@ import java.util.Locale;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -50,6 +51,9 @@ public class ReservationController {
 
     @FXML
     private Tab confirmTab;
+
+    @FXML
+    private Button confirmButton;
 
     @FXML
     private Label clientLabel;
@@ -110,6 +114,7 @@ public class ReservationController {
     private void onClientChosen(Client client) {
         chosenClient = client;
         clearRoomChoice();
+        confirmTab.setDisable(true);
         messageLabel.setText("");
         clientLabel.setText("Cliente: " + client.getName() + " (" + client.getDocument() + ")");
         showReservations();
@@ -131,6 +136,7 @@ public class ReservationController {
         summaryLabel.setText(summaryText(chosenRoom.getNumber(), quote));
         totalLabel.setText("Total: " + priceText(totalOf(quote)));
         confirmTab.setDisable(false);
+        confirmButton.setDisable(false);
         tabPane.getSelectionModel().select(confirmTab);
     }
 
@@ -150,7 +156,7 @@ public class ReservationController {
         showMessage("Reserva criada para o quarto " + number + ".", true);
     }
 
-    /** Forgets the room and the dates, and closes the confirm tab. */
+    /** Forgets the room and the dates, and disables the confirm button. */
     private void clearRoomChoice() {
         chosenRoom = null;
         chosenStart = null;
@@ -159,7 +165,7 @@ public class ReservationController {
         datesLabel.setText("");
         summaryLabel.setText("");
         totalLabel.setText("");
-        confirmTab.setDisable(true);
+        confirmButton.setDisable(true);
     }
 
     private void showReservations() {

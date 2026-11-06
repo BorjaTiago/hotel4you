@@ -434,7 +434,7 @@
 }
 
 .reservation-screen .scroll-bar > .thumb {
-    -fx-background-color: #b7c2cd;
+    -fx-background-color: -h4y-border-strong;
     -fx-background-insets: 2;
     -fx-background-radius: 0;
 }

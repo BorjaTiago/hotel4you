@@ -10,15 +10,15 @@
     <VBox spacing="10" VBox.vgrow="ALWAYS" styleClass="card">
         <HBox spacing="12" alignment="BOTTOM_LEFT">
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Tipo" labelFor="$typeBox"/>
+                <Label fx:id="typeLabel" text="Tipo"/>
                 <ComboBox fx:id="typeBox" maxWidth="Infinity"/>
             </VBox>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Entrada" labelFor="$startPicker"/>
+                <Label fx:id="startLabel" text="Entrada"/>
                 <DatePicker fx:id="startPicker" editable="false" maxWidth="Infinity"/>
             </VBox>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Saída" labelFor="$endPicker"/>
+                <Label fx:id="endLabel" text="Saída"/>
                 <DatePicker fx:id="endPicker" editable="false" maxWidth="Infinity"/>
             </VBox>
             <Button text="Procurar" onAction="#onSearchClicked" styleClass="primary-button" minWidth="120"/>
