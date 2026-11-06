@@ -170,17 +170,24 @@ class ReservationServiceTest {
 
     @Test
     @Tag("H4Y-56-AC-1")
-    void onCreate_throw_whenActorIsNotReceptionist() {
-        User manager = new Manager(1L, "Rui", "rui", "hash");
+    void onCreate_throw_whenActorIsNotReceptionistOrManager() {
         User staff = new RestaurantStaff(2L, "Joao", "joao", "hash");
 
-        assertThrows(AccessDeniedException.class,
-                () -> service.create(CLIENT, room, START, END, manager));
         assertThrows(AccessDeniedException.class,
                 () -> service.create(CLIENT, room, START, END, staff));
         assertThrows(AccessDeniedException.class,
                 () -> service.create(CLIENT, room, START, END, null));
         assertTrue(reservations.saved().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-1")
+    void onCreate_saveReservation_whenActorIsManager() {
+        User manager = new Manager(1L, "Rui", "rui", "hash");
+
+        Reservation saved = service.create(CLIENT, room, START, END, manager);
+
+        assertEquals(manager.getId(), saved.getCreatedByUserId());
     }
 
     @Test
@@ -213,7 +220,7 @@ class ReservationServiceTest {
 
     @Test
     @Tag("H4Y-56-AC-4")
-    void onQuote_throw_whenActorIsNotReceptionist() {
+    void onQuote_throw_whenActorIsRestaurantStaff() {
         assertThrows(AccessDeniedException.class,
                 () -> service.quote(room, START, END, new RestaurantStaff(2L, "Joao", "joao", "hash")));
     }
@@ -239,7 +246,7 @@ class ReservationServiceTest {
 
     @Test
     @Tag("H4Y-56-AC-1")
-    void onListClientReservations_throw_whenActorIsNotReceptionist() {
+    void onListClientReservations_throw_whenActorIsMissing() {
         assertThrows(AccessDeniedException.class,
                 () -> service.listClientReservations(CLIENT, null));
     }

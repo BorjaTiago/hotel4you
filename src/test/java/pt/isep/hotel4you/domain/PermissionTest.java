@@ -103,12 +103,6 @@ class PermissionTest {
         assertTrue(Permission.MANAGE_RESERVATIONS.allows(RECEPTIONIST));
     }
 
-    @Test
-    @Tag("H4Y-56-AC-1")
-    void onAllows_returnFalse_whenManagerManagesReservations() {
-        assertFalse(Permission.MANAGE_RESERVATIONS.allows(MANAGER));
-    }
-
     @ParameterizedTest
     @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")
