@@ -60,13 +60,17 @@ class HotelFacadeTest {
         LocationService locationService = new LocationService(floorRepository, locationRepository);
         roomRepository = new InMemoryRoomRepository();
         roomTypeRepository = new InMemoryRoomTypeRepository();
+        pt.isep.hotel4you.data.InMemoryReservationRepository reservationRepository =
+                new pt.isep.hotel4you.data.InMemoryReservationRepository();
         RoomService roomService = new RoomService(roomRepository, roomTypeRepository,
-                new pt.isep.hotel4you.data.InMemoryReservationRepository());
+                reservationRepository);
         itemRepository = new InMemoryItemRepository();
         StockService stockService = new StockService(itemRepository);
         ClientService clientService = new ClientService(new InMemoryClientRepository());
+        ReservationService reservationService = new ReservationService(reservationRepository,
+                roomService, roomTypeRepository);
         facade = new HotelFacade(authService, staffService, locationService, roomService,
-                stockService, clientService);
+                stockService, clientService, reservationService);
     }
 
     private User saveAna() {
@@ -512,5 +516,30 @@ class HotelFacadeTest {
         User cook = new RestaurantStaff(3L, "Joao Lima", "joao", "hash");
 
         assertThrows(AccessDeniedException.class, () -> facade.listClients(cook));
+    }
+
+    @Test
+    @Tag("H4Y-56-AC-1")
+    @Tag("H4Y-56-AC-4")
+    void onCreateReservation_saveAndQuote_whenFacadeReceivesFreeRoom() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
+        roomTypeRepository.add(new RoomType(1L, "duplo", 2, new BigDecimal("80.00")));
+        User ana = new Receptionist(4L, "Ana Silva", "ana", "hash");
+        Client client = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
+                LocalDate.of(1990, 5, 1), "912345678", "PT", null, null);
+        LocalDate start = LocalDate.of(2026, 11, 10);
+        LocalDate end = LocalDate.of(2026, 11, 12);
+
+        var quote = facade.quoteReservation(room, start, end, ana);
+        var saved = facade.createReservation(client, room, start, end, ana);
+
+        assertEquals(new BigDecimal("80.00"), quote.pricePerNight());
+        assertEquals(2, quote.nights());
+        assertEquals(1, facade.listClientReservations(client, ana).size());
+        assertEquals(saved.getId(), facade.listClientReservations(client, ana).get(0).id());
+        assertThrows(RoomNotAvailableException.class,
+                () -> facade.createReservation(client, room, start, end, ana));
     }
 }
