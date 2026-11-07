@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -24,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.service.HotelFacade;
 
@@ -41,11 +43,18 @@ public class ClientController {
     private static final long TYPING_PAUSE_MILLIS = 1000;
 
     private final HotelFacade facade;
+    private Consumer<Client> onClientChosen;
     private String typedText = "";
     private long lastKeyMillis;
 
     @FXML
     private Label searchLabel;
+
+    @FXML
+    private Label searchFieldLabel;
+
+    @FXML
+    private ComboBox<ClientSearchField> searchFieldBox;
 
     @FXML
     private TextField searchField;
@@ -137,9 +146,32 @@ public class ClientController {
         this.facade = facade;
     }
 
+    /**
+     * Sets the action that runs when the receptionist continues with the selected client.
+     *
+     * @param onClientChosen the action, or null for none
+     */
+    public void setOnClientChosen(Consumer<Client> onClientChosen) {
+        this.onClientChosen = onClientChosen;
+    }
+
     @FXML
     private void initialize() {
+        searchFieldLabel.setLabelFor(searchFieldBox);
         searchLabel.setLabelFor(searchField);
+        searchFieldBox.getItems().setAll(ClientSearchField.values());
+        searchFieldBox.setValue(ClientSearchField.DOCUMENT);
+        searchFieldBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(ClientSearchField field) {
+                return field == null ? "" : field.displayName();
+            }
+
+            @Override
+            public ClientSearchField fromString(String text) {
+                return null;
+            }
+        });
         nameLabel.setLabelFor(nameField);
         documentTypeLabel.setLabelFor(documentTypeBox);
         documentLabel.setLabelFor(documentField);
@@ -214,9 +246,11 @@ public class ClientController {
     private void onRegisterClientClicked() {
         clearErrors();
         try {
-            facade.registerClient(readClient(null), HotelApp.currentUser);
+            Client saved = facade.registerClient(readClient(null), HotelApp.currentUser);
             clearForm();
+            searchField.clear();
             loadClients();
+            selectClient(saved.getId());
             showMessage("Cliente registado.", true);
         } catch (IllegalArgumentException e) {
             showFieldError(e.getMessage());
@@ -269,6 +303,20 @@ public class ClientController {
     }
 
     @FXML
+    private void onContinueClicked() {
+        Client selected = clientTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showMessage("Escolha um cliente na tabela.", false);
+            return;
+        }
+        showMessage("", false);
+        if (onClientChosen == null) {
+            return;
+        }
+        onClientChosen.accept(selected);
+    }
+
+    @FXML
     private void onClearClicked() {
         clearErrors();
         clearForm();
@@ -277,9 +325,18 @@ public class ClientController {
 
     private void loadClients() {
         try {
-            clientTable.getItems().setAll(facade.searchClients(searchField.getText(), HotelApp.currentUser));
+            clientTable.getItems().setAll(facade.searchClients(searchFieldBox.getValue(),
+                    searchField.getText(), HotelApp.currentUser));
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
+        }
+    }
+
+    private void selectClient(Long id) {
+        for (Client client : clientTable.getItems()) {
+            if (client.getId().equals(id)) {
+                clientTable.getSelectionModel().select(client);
+            }
         }
     }
 
