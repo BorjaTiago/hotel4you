@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.data;
 
 import java.util.List;
+import java.util.Optional;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
 
@@ -42,4 +43,37 @@ public interface ReservationRepository {
      * @throws IllegalStateException if the database cannot be read
      */
     List<ClientReservation> findByClient(long clientId);
+
+    /**
+     * Reads one booking with its client, room, period, state and creator.
+     * @param id the booking identifier
+     * @return the booking, or empty if it does not exist
+     * @throws IllegalStateException if the database cannot be read
+     */
+    Optional<Reservation> findById(long id);
+
+    /**
+     * Reads the active bookings: the states RESERVED and CHECKED_IN.
+     * @return the bookings with the room number, first arrival first, or an empty list
+     * @throws IllegalStateException if the database cannot be read
+     */
+    List<ClientReservation> findActive();
+
+    /**
+     * Saves the check-in and its time. It changes the row only if the state is still RESERVED,
+     * in the same step as the update.
+     * @param id the booking identifier
+     * @return true if the row changed, false if the state was not RESERVED
+     * @throws IllegalStateException if the database cannot save the check-in
+     */
+    boolean checkIn(long id);
+
+    /**
+     * Saves the check-out and its time. It changes the row only if the state is still CHECKED_IN,
+     * in the same step as the update.
+     * @param id the booking identifier
+     * @return true if the row changed, false if the state was not CHECKED_IN
+     * @throws IllegalStateException if the database cannot save the check-out
+     */
+    boolean checkOut(long id);
 }

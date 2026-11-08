@@ -66,6 +66,43 @@ public class Reservation {
     public Long getCreatedByUserId() { return createdByUserId; }
 
     /**
+     * Gives the booking after the check-in. This booking does not change.
+     * @return a copy of the booking with the state CHECKED_IN
+     * @throws IllegalStateException if the booking is cancelled or already has a check-in
+     */
+    public Reservation checkIn() {
+        if (status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("A reserva está cancelada.");
+        }
+        if (status != ReservationStatus.RESERVED) {
+            throw new IllegalStateException("A reserva já tem check-in.");
+        }
+        return withStatus(ReservationStatus.CHECKED_IN);
+    }
+
+    /**
+     * Gives the booking after the check-out. This booking does not change.
+     * @return a copy of the booking with the state CHECKED_OUT
+     * @throws IllegalStateException if the booking is cancelled, has no check-in or already has a check-out
+     */
+    public Reservation checkOut() {
+        if (status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("A reserva está cancelada.");
+        }
+        if (status == ReservationStatus.RESERVED) {
+            throw new IllegalStateException("A reserva não tem check-in.");
+        }
+        if (status == ReservationStatus.CHECKED_OUT) {
+            throw new IllegalStateException("A reserva já tem check-out.");
+        }
+        return withStatus(ReservationStatus.CHECKED_OUT);
+    }
+
+    private Reservation withStatus(ReservationStatus newStatus) {
+        return new Reservation(id, clientId, roomId, startDate, endDate, newStatus, createdByUserId);
+    }
+
+    /**
      * Tests half-open periods. Cancelled bookings never occupy a night.
      * @param start the requested arrival
      * @param end the requested departure
