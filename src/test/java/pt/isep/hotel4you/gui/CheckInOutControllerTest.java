@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.gui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -36,5 +37,12 @@ class CheckInOutControllerTest {
     void onCanCheckOut_returnTrueAndCheckInFalse_whenRowIsCheckedIn() {
         assertTrue(CheckInOutController.canCheckOut(row(ReservationStatus.CHECKED_IN)));
         assertFalse(CheckInOutController.canCheckIn(row(ReservationStatus.CHECKED_IN)));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-12")
+    void onStatusText_showPortugueseLabel_whenStatusIsActive() {
+        assertEquals("Reservada", CheckInOutController.statusText(ReservationStatus.RESERVED));
+        assertEquals("Check-in feito", CheckInOutController.statusText(ReservationStatus.CHECKED_IN));
     }
 }

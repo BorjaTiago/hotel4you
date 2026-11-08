@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -181,16 +182,29 @@ class ReservationCheckInOutTest {
     }
 
     @Test
+    @Tag("H4Y-82-AC-6")
+    void onCheckOut_throwAndKeepState_whenReservationIsCancelled() {
+        addReservation(1L, ReservationStatus.CANCELLED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkOut(1L, RECEPTIONIST));
+        assertEquals("A reserva está cancelada.", error.getMessage());
+        assertEquals(ReservationStatus.CANCELLED, statusOf(1L));
+    }
+
+    @Test
     @Tag("H4Y-82-AC-8")
     void onSearchRooms_offerRoom_whenStayHasCheckOutAndNightsAreAfterDeparture() {
         addReservation(1L, ReservationStatus.RESERVED);
         service.checkIn(1L, RECEPTIONIST);
         service.checkOut(1L, RECEPTIONIST);
 
-        List<?> free = roomService.searchRooms(END, END.plusDays(2), DOUBLE, RECEPTIONIST);
+        List<Room> free = roomService.searchRooms(END, END.plusDays(2), DOUBLE, RECEPTIONIST);
 
+        assertEquals(ReservationStatus.CHECKED_OUT, statusOf(1L));
         assertTrue(roomService.isAvailable(room, END, END.plusDays(2)));
-        assertEquals(1, free.size());
+        assertEquals(List.of(room.getId()), free.stream().map(Room::getId).toList());
+        assertFalse(roomService.isAvailable(room, START, END));
     }
 
     @Test
