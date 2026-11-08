@@ -74,6 +74,21 @@ public class CheckInOutController {
         return row != null && row.status() == ReservationStatus.CHECKED_IN;
     }
 
+    /**
+     * Gives the Portuguese label of a reservation state.
+     *
+     * @param status the reservation state
+     * @return the label that the table shows
+     */
+    static String statusText(ReservationStatus status) {
+        return switch (status) {
+            case RESERVED -> "Reservada";
+            case CANCELLED -> "Cancelada";
+            case CHECKED_IN -> "Check-in feito";
+            case CHECKED_OUT -> "Check-out feito";
+        };
+    }
+
     @FXML
     private void initialize() {
         roomColumn.setCellValueFactory(
@@ -83,7 +98,7 @@ public class CheckInOutController {
         endColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(DATE_FORMAT.format(data.getValue().endDate())));
         statusColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(data.getValue().status().name()));
+                data -> new SimpleStringProperty(statusText(data.getValue().status())));
         reservationTable.getSelectionModel().selectedItemProperty()
                 .addListener((value, before, chosen) -> updateButtons(chosen));
         loadReservations();
@@ -97,8 +112,9 @@ public class CheckInOutController {
         }
         try {
             facade.checkIn(chosen.id(), HotelApp.currentUser);
-            loadReservations();
-            showMessage("Check-in feito: quarto " + chosen.roomNumber() + ".", true);
+            if (loadReservations()) {
+                showMessage("Check-in feito: quarto " + chosen.roomNumber() + ".", true);
+            }
         } catch (RuntimeException e) {
             loadReservations();
             showMessage(e.getMessage(), false);
@@ -113,23 +129,29 @@ public class CheckInOutController {
         }
         try {
             facade.checkOut(chosen.id(), HotelApp.currentUser);
-            loadReservations();
-            showMessage("Check-out feito: quarto " + chosen.roomNumber() + ".", true);
+            if (loadReservations()) {
+                showMessage("Check-out feito: quarto " + chosen.roomNumber() + ".", true);
+            }
         } catch (RuntimeException e) {
             loadReservations();
             showMessage(e.getMessage(), false);
         }
     }
 
-    private void loadReservations() {
+    /** Loads the list again. On an error it shows the error and returns false. */
+    private boolean loadReservations() {
+        boolean loaded;
         try {
             reservationTable.getItems().setAll(facade.listActiveReservations(HotelApp.currentUser));
             showMessage("", false);
+            loaded = true;
         } catch (RuntimeException e) {
             reservationTable.getItems().clear();
             showMessage(e.getMessage(), false);
+            loaded = false;
         }
         updateButtons(reservationTable.getSelectionModel().getSelectedItem());
+        return loaded;
     }
 
     private void updateButtons(ClientReservation chosen) {

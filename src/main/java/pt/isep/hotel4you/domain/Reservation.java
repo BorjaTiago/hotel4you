@@ -66,26 +66,27 @@ public class Reservation {
     public Long getCreatedByUserId() { return createdByUserId; }
 
     /**
-     * Gives the booking after the check-in. This booking does not change.
-     * @return a copy of the booking with the state CHECKED_IN
-     * @throws IllegalStateException if the booking is cancelled or already has a check-in
+     * Checks that the booking allows the check-in. This method does not change the booking.
+     * @throws IllegalStateException if the booking is cancelled, already has a check-in or
+     *         already has a check-out
      */
-    public Reservation checkIn() {
+    public void checkCanCheckIn() {
         if (status == ReservationStatus.CANCELLED) {
             throw new IllegalStateException("A reserva está cancelada.");
         }
-        if (status != ReservationStatus.RESERVED) {
+        if (status == ReservationStatus.CHECKED_IN) {
             throw new IllegalStateException("A reserva já tem check-in.");
         }
-        return withStatus(ReservationStatus.CHECKED_IN);
+        if (status == ReservationStatus.CHECKED_OUT) {
+            throw new IllegalStateException("A reserva já tem check-out.");
+        }
     }
 
     /**
-     * Gives the booking after the check-out. This booking does not change.
-     * @return a copy of the booking with the state CHECKED_OUT
+     * Checks that the booking allows the check-out. This method does not change the booking.
      * @throws IllegalStateException if the booking is cancelled, has no check-in or already has a check-out
      */
-    public Reservation checkOut() {
+    public void checkCanCheckOut() {
         if (status == ReservationStatus.CANCELLED) {
             throw new IllegalStateException("A reserva está cancelada.");
         }
@@ -95,11 +96,6 @@ public class Reservation {
         if (status == ReservationStatus.CHECKED_OUT) {
             throw new IllegalStateException("A reserva já tem check-out.");
         }
-        return withStatus(ReservationStatus.CHECKED_OUT);
-    }
-
-    private Reservation withStatus(ReservationStatus newStatus) {
-        return new Reservation(id, clientId, roomId, startDate, endDate, newStatus, createdByUserId);
     }
 
     /**

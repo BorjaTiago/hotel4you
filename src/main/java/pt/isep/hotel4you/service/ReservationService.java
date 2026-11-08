@@ -134,12 +134,12 @@ public class ReservationService {
      * @param actor the logged-in user who does the check-in
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws ReservationNotFoundException if the reservation does not exist
-     * @throws IllegalStateException if the reservation is cancelled, already has a check-in,
-     *         changed state at the same moment, or the database is not available
+     * @throws IllegalStateException if the reservation is cancelled, already has a check-in or a
+     *         check-out, changed state at the same moment, or the database is not available
      */
     public void checkIn(long reservationId, User actor) {
         checkPermission(actor);
-        findReservation(reservationId).checkIn();
+        findReservation(reservationId).checkCanCheckIn();
         if (!reservationRepository.checkIn(reservationId)) {
             throw new IllegalStateException(STATE_CHANGED);
         }
@@ -157,7 +157,7 @@ public class ReservationService {
      */
     public void checkOut(long reservationId, User actor) {
         checkPermission(actor);
-        findReservation(reservationId).checkOut();
+        findReservation(reservationId).checkCanCheckOut();
         if (!reservationRepository.checkOut(reservationId)) {
             throw new IllegalStateException(STATE_CHANGED);
         }
