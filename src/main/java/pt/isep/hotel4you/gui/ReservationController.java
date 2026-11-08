@@ -133,6 +133,8 @@ public class ReservationController {
         });
         clientBox.valueProperty().addListener((value, before, after) -> showReservations());
         roomBox.valueProperty().addListener((value, before, after) -> showSummary());
+        startPicker.setConverter(new DateConverter());
+        endPicker.setConverter(new DateConverter());
         startPicker.valueProperty().addListener((value, before, after) -> showSummary());
         endPicker.valueProperty().addListener((value, before, after) -> showSummary());
         newReservationBox.managedProperty().bind(newReservationBox.visibleProperty());

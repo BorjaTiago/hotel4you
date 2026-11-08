@@ -70,6 +70,8 @@ public class FreeRoomController {
 
     @FXML
     private void initialize() {
+        startPicker.setConverter(new DateConverter());
+        endPicker.setConverter(new DateConverter());
         numberColumn.setCellValueFactory(
                 data -> new ReadOnlyObjectWrapper<>(data.getValue().getNumber()));
         floorColumn.setCellValueFactory(

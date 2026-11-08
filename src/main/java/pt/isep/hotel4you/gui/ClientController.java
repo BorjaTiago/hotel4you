@@ -188,17 +188,7 @@ public class ClientController {
             }
         });
         nationalityBox.addEventFilter(KeyEvent.KEY_TYPED, this::onNationalityKeyTyped);
-        birthDatePicker.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(LocalDate date) {
-                return date == null ? "" : DATE_FORMAT.format(date);
-            }
-
-            @Override
-            public LocalDate fromString(String text) {
-                return text == null || text.isBlank() ? null : LocalDate.parse(text.trim(), DATE_FORMAT);
-            }
-        });
+        birthDatePicker.setConverter(new DateConverter());
         clientTable.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldClient, newClient) -> fillForm(newClient));
         loadClients();
