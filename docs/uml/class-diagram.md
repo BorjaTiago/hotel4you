@@ -38,7 +38,7 @@ H4Y-73 (RF-05, RNF-07) adds the screen "Quartos livres" with its own controller,
 
 H4Y-56 (RF-11, RF-05, RNF-07) adds the reservation create. `ReservationService` checks `Permission.MANAGE_RESERVATIONS` first in every method. The receptionist and the manager have it (the manager can use every function, H4Y-23 AC-1). `create` refuses missing data with one `IllegalArgumentException` that names all missing fields (client, room, check-in date, check-out date, AC-3). After the period check, it refuses an arrival date before today with "A data de entrada não pode ser antes de hoje." (Q-55, AC-5). An arrival date of today is allowed. Then it uses `Reservation.validatePeriod` and `RoomService.isAvailable`, the same overlap rule as the free-room search. A busy room throws `RoomNotAvailableException` ("O quarto já está reservado nessas datas.", AC-2). `JdbcReservationRepository.save` runs the overlap check and the insert in one SQL statement (`INSERT ... SELECT ... WHERE NOT EXISTS` with `UPDLOCK, HOLDLOCK`). The SQL repeats the rule of `Reservation.overlaps` (half-open nights, cancelled bookings do not count), because only the database can stop two saves at the same moment. When the insert adds no row, `save` throws `RoomNotAvailableException`. So two receptionists cannot reserve the same room for the same nights. `RoomNotAvailableException` is in the data package, next to `DuplicateRoomException`. The new reservation has the state `RESERVED` and keeps the client and the user who created it (`created_by_user_id`, AC-1). `quote` returns a `ReservationQuote` with the base price per night of the room type (null if not set) and the number of nights (AC-4). `listClientReservations` returns the `ClientReservation` rows of one client, with the cancelled ones (history). The actor is a parameter of `create`, `quote` and `listClientReservations`, as in the other services. `ReservationController` is the screen "Reservas" (`reservations.fxml`). It finds the client by document, shows the client reservations, and has the "Nova reserva" form. The form takes the room and dates chosen on "Quartos livres", or it searches free rooms itself. The menu button shows only when `canUse(actor, Permission.MANAGE_RESERVATIONS)` is true. The static `summaryText(roomNumber, quote)` builds the price summary that the screen shows before the confirmation (AC-4). After the save, the screen shows "Reserva criada" with the room and the dates. It does not read the price again.
 
-H4Y-81 (RF-11, RF-13, RF-14) makes the screen "Reservas" (`reservations-list.fxml`) the main screen. The menu button shows for users with `MANAGE_RESERVATIONS`. For these users, the screen opens by default after login. It replaces the H4Y-82 check-in and check-out screen. `ReservationsController` lists the `ReservationSummary` rows of `HotelFacade.listActiveReservations`. The static `filter` searches by client name or document and applies the quick filters. The static `canCheckIn` and `canCheckOut` decide which button is on. The "+ Nova reserva" button opens `reservations.fxml` in the same area. After a successful save, the list opens again and shows "Reserva criada.". `ScreenLoader.open` returns the screen and its controller as `LoadedScreen`.
+H4Y-81 (RF-11, RF-13, RF-14) makes the screen "Reservas" (`reservations-list.fxml`) the main screen. The menu button shows for users with `MANAGE_RESERVATIONS`. For these users, the screen opens by default after login. It replaces the H4Y-82 check-in and check-out screen. `ReservationsController` lists the `ReservationSummary` rows of `HotelFacade.listActiveReservations`. The static `filter` searches by client name or document and applies the quick filters. The static `canCheckIn` and `canCheckOut` decide which button is on. The "+ Nova reserva" button opens `reservations.fxml` in the same area. The return to the list after a save comes with PR #53 (H4Y-81 AC-9).
 
 ```mermaid
 classDiagram
@@ -73,12 +73,6 @@ classDiagram
     }
     class ScreenLoader {
         +load(fxmlName: String) Parent
-        +open(fxmlName: String) LoadedScreen
-    }
-    class LoadedScreen {
-        <<record>>
-        -root: Parent
-        -controller: Object
     }
     class RoomController {
         -initialize() void
@@ -103,7 +97,6 @@ classDiagram
         -onNewReservationClicked() void
         -onFindRoomsClicked() void
         -onCreateReservationClicked() void
-        -saveReservation() boolean
         ~summaryText(roomNumber: int, quote: ReservationQuote) String$
         +onCancelReservationClicked() void
         +onDeleteReservationClicked() void
@@ -111,8 +104,6 @@ classDiagram
         +onRemoveExtraClicked() void
         +onAddLocationClicked() void
         +onRemoveLocationClicked() void
-        +setOnReservationCreated(action: Runnable) void
-        -runOnReservationCreated() void
     }
     class ReservationsController {
         +ReservationsController(facade: HotelFacade)
@@ -129,7 +120,6 @@ classDiagram
         -currentFilter() QuickFilter
         -updateButtons(chosen: ReservationSummary) void
         -matchesFilter(row: ReservationSummary, filter: QuickFilter, today: LocalDate) boolean$
-        ~showCreated() void
         -showMessage(message: String, success: boolean) void
     }
     class QuickFilter {
@@ -906,7 +896,6 @@ classDiagram
     ReservationService ..> ReservationSummary : returns
     ReservationController ..> ClientReservation : displays
     ReservationsController ..> ReservationSummary : displays
-    ScreenLoader ..> LoadedScreen : returns
     ReservationController ..> ReservationQuote : displays
     Main ..> ReservationService : creates
     Main ..> Database : creates
