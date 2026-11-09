@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
 
@@ -133,15 +133,15 @@ class JdbcReservationCheckInOutTest {
     void onFindActive_readReservedAndCheckedInWithRoomNumber_whenCalled() {
         database.rows = 2;
 
-        List<ActiveReservation> rows = repository.findActive();
+        List<ReservationSummary> rows = repository.findActive();
 
         assertTrue(sql().contains("JOIN rooms rm ON rm.id = r.room_id"));
         assertTrue(sql().contains("WHERE r.status IN ('reserved', 'checked_in')"));
         assertTrue(sql().contains("ORDER BY r.start_date, r.id"));
         assertEquals(List.of(
-                new ActiveReservation(1L, "Maria Sousa", "12345678", 201, START, END,
+                new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START, END,
                         ReservationStatus.RESERVED),
-                new ActiveReservation(2L, "Maria Sousa", "12345678", 201, START, END,
+                new ReservationSummary(2L, "Maria Sousa", "12345678", 201, START, END,
                         ReservationStatus.CHECKED_IN)), rows);
         assertThrows(UnsupportedOperationException.class, rows::clear);
         assertEquals(List.of("result", "statement", "connection"), database.closed);
@@ -153,7 +153,7 @@ class JdbcReservationCheckInOutTest {
     void onFindActive_joinCustomersAndReadNameAndDocument_whenCalled() {
         database.rows = 1;
 
-        ActiveReservation row = repository.findActive().get(0);
+        ReservationSummary row = repository.findActive().get(0);
 
         assertTrue(sql().contains("JOIN customers c ON c.id = r.customer_id"));
         assertTrue(sql().contains("c.name"));

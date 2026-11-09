@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -96,11 +96,11 @@ public class InMemoryReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public List<ActiveReservation> findActive() {
+    public List<ReservationSummary> findActive() {
         return reservations.stream()
                 .filter(value -> value.getStatus() == ReservationStatus.RESERVED
                         || value.getStatus() == ReservationStatus.CHECKED_IN)
-                .map(value -> new ActiveReservation(value.getId(),
+                .map(value -> new ReservationSummary(value.getId(),
                         clients.getOrDefault(value.getClientId(), new String[] {"", ""})[0],
                         clients.getOrDefault(value.getClientId(), new String[] {"", ""})[1],
                         roomNumbers.getOrDefault(value.getRoomId(), 0), value.getStartDate(),

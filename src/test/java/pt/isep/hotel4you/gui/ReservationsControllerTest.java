@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.gui.ReservationsController.QuickFilter;
 
@@ -17,26 +17,26 @@ class ReservationsControllerTest {
     private static final LocalDate START = LocalDate.of(2026, 11, 10);
     private static final LocalDate TODAY = LocalDate.of(2026, 11, 9);
 
-    private static ActiveReservation row(ReservationStatus status) {
-        return new ActiveReservation(1L, "Maria Sousa", "12345678", 201, START,
+    private static ReservationSummary row(ReservationStatus status) {
+        return new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START,
                 START.plusDays(2), status);
     }
 
-    private static ActiveReservation row(long id, String name, String document, LocalDate start,
+    private static ReservationSummary row(long id, String name, String document, LocalDate start,
             ReservationStatus status) {
-        return new ActiveReservation(id, name, document, 200 + (int) id, start, start.plusDays(2),
+        return new ReservationSummary(id, name, document, 200 + (int) id, start, start.plusDays(2),
                 status);
     }
 
-    private static List<ActiveReservation> sample() {
+    private static List<ReservationSummary> sample() {
         return List.of(
                 row(1L, "Maria Sousa", "12345678", TODAY, ReservationStatus.RESERVED),
                 row(2L, "João Costa", "AB99887", TODAY, ReservationStatus.CHECKED_IN),
                 row(3L, "Ana Silva", "55512345", TODAY.plusDays(1), ReservationStatus.RESERVED));
     }
 
-    private static List<Long> ids(List<ActiveReservation> rows) {
-        return rows.stream().map(ActiveReservation::id).toList();
+    private static List<Long> ids(List<ReservationSummary> rows) {
+        return rows.stream().map(ReservationSummary::id).toList();
     }
 
     @Test

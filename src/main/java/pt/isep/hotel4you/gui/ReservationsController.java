@@ -19,7 +19,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.service.HotelFacade;
 
@@ -43,28 +43,28 @@ public class ReservationsController {
     }
 
     private final HotelFacade facade;
-    private List<ActiveReservation> loaded = List.of();
+    private List<ReservationSummary> loaded = List.of();
 
     @FXML
-    private TableView<ActiveReservation> reservationTable;
+    private TableView<ReservationSummary> reservationTable;
 
     @FXML
-    private TableColumn<ActiveReservation, String> clientColumn;
+    private TableColumn<ReservationSummary, String> clientColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, String> documentColumn;
+    private TableColumn<ReservationSummary, String> documentColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, Integer> roomColumn;
+    private TableColumn<ReservationSummary, Integer> roomColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, LocalDate> startColumn;
+    private TableColumn<ReservationSummary, LocalDate> startColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, LocalDate> endColumn;
+    private TableColumn<ReservationSummary, LocalDate> endColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, String> statusColumn;
+    private TableColumn<ReservationSummary, String> statusColumn;
 
     @FXML
     private VBox screenRoot;
@@ -105,7 +105,7 @@ public class ReservationsController {
      * @param row the chosen row, or null if no row is chosen
      * @return true only for a RESERVED row
      */
-    static boolean canCheckIn(ActiveReservation row) {
+    static boolean canCheckIn(ReservationSummary row) {
         return row != null && row.status() == ReservationStatus.RESERVED;
     }
 
@@ -115,7 +115,7 @@ public class ReservationsController {
      * @param row the chosen row, or null if no row is chosen
      * @return true only for a CHECKED_IN row
      */
-    static boolean canCheckOut(ActiveReservation row) {
+    static boolean canCheckOut(ReservationSummary row) {
         return row != null && row.status() == ReservationStatus.CHECKED_IN;
     }
 
@@ -144,7 +144,7 @@ public class ReservationsController {
      * @param today the date of today
      * @return the rows that match, in the same order
      */
-    static List<ActiveReservation> filter(List<ActiveReservation> rows, QuickFilter filter,
+    static List<ReservationSummary> filter(List<ReservationSummary> rows, QuickFilter filter,
             String text, LocalDate today) {
         String search = text == null ? "" : text.trim().toLowerCase(Locale.ROOT);
         return rows.stream()
@@ -154,7 +154,7 @@ public class ReservationsController {
                 .toList();
     }
 
-    private static boolean matchesFilter(ActiveReservation row, QuickFilter filter, LocalDate today) {
+    private static boolean matchesFilter(ReservationSummary row, QuickFilter filter, LocalDate today) {
         return switch (filter) {
             case ALL_ACTIVE -> true;
             case ARRIVING_TODAY -> row.status() == ReservationStatus.RESERVED
@@ -201,7 +201,7 @@ public class ReservationsController {
 
     @FXML
     private void onCheckInClicked() {
-        ActiveReservation chosen = reservationTable.getSelectionModel().getSelectedItem();
+        ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
         if (!canCheckIn(chosen)) {
             return;
         }
@@ -219,7 +219,7 @@ public class ReservationsController {
 
     @FXML
     private void onCheckOutClicked() {
-        ActiveReservation chosen = reservationTable.getSelectionModel().getSelectedItem();
+        ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
         if (!canCheckOut(chosen)) {
             return;
         }
@@ -269,7 +269,7 @@ public class ReservationsController {
         return QuickFilter.ALL_ACTIVE;
     }
 
-    private void updateButtons(ActiveReservation chosen) {
+    private void updateButtons(ReservationSummary chosen) {
         checkInButton.setDisable(!canCheckIn(chosen));
         checkOutButton.setDisable(!canCheckOut(chosen));
     }
@@ -280,7 +280,7 @@ public class ReservationsController {
     }
 
     /** A table cell that shows a date as dd/MM/yyyy. */
-    private static class DateCell extends TableCell<ActiveReservation, LocalDate> {
+    private static class DateCell extends TableCell<ReservationSummary, LocalDate> {
         @Override
         protected void updateItem(LocalDate date, boolean empty) {
             super.updateItem(date, empty);

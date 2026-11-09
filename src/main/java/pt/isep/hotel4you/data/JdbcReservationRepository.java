@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -132,17 +132,17 @@ public class JdbcReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public List<ActiveReservation> findActive() {
+    public List<ReservationSummary> findActive() {
         String sql = "SELECT r.id, c.name, c.document, rm.number, r.start_date, r.end_date, r.status "
                 + "FROM reservations r JOIN rooms rm ON rm.id = r.room_id "
                 + "JOIN customers c ON c.id = r.customer_id "
                 + "WHERE r.status IN ('reserved', 'checked_in') ORDER BY r.start_date, r.id";
-        List<ActiveReservation> reservations = new ArrayList<>();
+        List<ReservationSummary> reservations = new ArrayList<>();
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql);
                 ResultSet result = statement.executeQuery()) {
             while (result.next()) {
-                reservations.add(new ActiveReservation(result.getLong("id"),
+                reservations.add(new ReservationSummary(result.getLong("id"),
                         result.getString("name"), result.getString("document"),
                         result.getInt("number"),
                         result.getDate("start_date").toLocalDate(),

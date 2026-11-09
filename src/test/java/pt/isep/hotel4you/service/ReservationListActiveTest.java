@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.Reservation;
@@ -57,9 +57,9 @@ class ReservationListActiveTest {
     void onListActive_showClientRoomDatesAndStatus_whenReservationIsReserved() {
         addReservation(1L, ReservationStatus.RESERVED);
 
-        List<ActiveReservation> rows = service.listActive(RECEPTIONIST);
+        List<ReservationSummary> rows = service.listActive(RECEPTIONIST);
 
-        assertEquals(List.of(new ActiveReservation(1L, "Maria Sousa", "12345678", 201, START, END,
+        assertEquals(List.of(new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START, END,
                 ReservationStatus.RESERVED)), rows);
     }
 
@@ -69,10 +69,10 @@ class ReservationListActiveTest {
         addReservation(1L, ReservationStatus.RESERVED);
         addReservation(2L, ReservationStatus.CHECKED_IN);
 
-        List<ActiveReservation> rows = service.listActive(RECEPTIONIST);
+        List<ReservationSummary> rows = service.listActive(RECEPTIONIST);
 
         assertEquals(List.of(ReservationStatus.RESERVED, ReservationStatus.CHECKED_IN),
-                rows.stream().map(ActiveReservation::status).toList());
+                rows.stream().map(ReservationSummary::status).toList());
     }
 
     @Test
@@ -82,9 +82,9 @@ class ReservationListActiveTest {
         addReservation(2L, ReservationStatus.CHECKED_OUT);
         addReservation(3L, ReservationStatus.RESERVED);
 
-        List<ActiveReservation> rows = service.listActive(RECEPTIONIST);
+        List<ReservationSummary> rows = service.listActive(RECEPTIONIST);
 
-        assertEquals(List.of(3L), rows.stream().map(ActiveReservation::id).toList());
+        assertEquals(List.of(3L), rows.stream().map(ReservationSummary::id).toList());
     }
 
     @Test

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -227,11 +227,11 @@ class ReservationCheckInOutTest {
         addReservation(3L, ReservationStatus.CANCELLED);
         addReservation(4L, ReservationStatus.CHECKED_OUT);
 
-        List<ActiveReservation> active = service.listActive(RECEPTIONIST);
+        List<ReservationSummary> active = service.listActive(RECEPTIONIST);
 
-        assertEquals(List.of(1L, 2L), active.stream().map(ActiveReservation::id).toList());
+        assertEquals(List.of(1L, 2L), active.stream().map(ReservationSummary::id).toList());
         assertEquals(List.of(ReservationStatus.RESERVED, ReservationStatus.CHECKED_IN),
-                active.stream().map(ActiveReservation::status).toList());
+                active.stream().map(ReservationSummary::status).toList());
     }
 
     @Test

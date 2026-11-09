@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * One line of the active reservation list of the hotel, with the client and the visible room number.
+ * One row of the reservation list of the hotel. The list shows the active reservations today, with the client and the visible room number.
  *
  * @param id the reservation identifier
  * @param clientName the name of the client
@@ -14,7 +14,7 @@ import java.util.Objects;
  * @param endDate the departure date
  * @param status the reservation state
  */
-public record ActiveReservation(long id, String clientName, String document, int roomNumber,
+public record ReservationSummary(long id, String clientName, String document, int roomNumber,
         LocalDate startDate, LocalDate endDate, ReservationStatus status) {
     /**
      * Checks that the text, the dates and the state are present.
@@ -27,7 +27,7 @@ public record ActiveReservation(long id, String clientName, String document, int
      * @param endDate the departure date
      * @param status the reservation state
      */
-    public ActiveReservation {
+    public ReservationSummary {
         Objects.requireNonNull(clientName);
         Objects.requireNonNull(document);
         Objects.requireNonNull(startDate);

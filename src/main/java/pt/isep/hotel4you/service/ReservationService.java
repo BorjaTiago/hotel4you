@@ -9,7 +9,7 @@ import pt.isep.hotel4you.data.ReservationRepository;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.data.RoomTypeRepository;
 import pt.isep.hotel4you.domain.Client;
-import pt.isep.hotel4you.domain.ActiveReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
@@ -172,7 +172,7 @@ public class ReservationService {
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws IllegalStateException if the database is not available
      */
-    public List<ActiveReservation> listActive(User actor) {
+    public List<ReservationSummary> listActive(User actor) {
         checkPermission(actor);
         return reservationRepository.findActive();
     }
