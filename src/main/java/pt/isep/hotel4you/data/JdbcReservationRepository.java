@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -106,6 +107,70 @@ public class JdbcReservationRepository implements ReservationRepository {
             return List.copyOf(reservations);
         } catch (SQLException error) {
             throw new IllegalStateException("Não foi possível consultar as reservas.", error);
+        }
+    }
+
+    @Override
+    public Optional<Reservation> findById(long id) {
+        String sql = "SELECT id, customer_id, room_id, start_date, end_date, status, created_by_user_id "
+                + "FROM reservations WHERE id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, id);
+                ResultSet result = statement.executeQuery()) {
+            if (!result.next()) {
+                return Optional.empty();
+            }
+            return Optional.of(new Reservation(result.getLong("id"), result.getLong("customer_id"),
+                    result.getLong("room_id"), result.getDate("start_date").toLocalDate(),
+                    result.getDate("end_date").toLocalDate(),
+                    ReservationStatus.fromDatabase(result.getString("status")),
+                    result.getLong("created_by_user_id")));
+        } catch (SQLException error) {
+            throw new IllegalStateException("Não foi possível consultar as reservas.", error);
+        }
+    }
+
+    @Override
+    public List<ClientReservation> findActive() {
+        String sql = "SELECT r.id, rm.number, r.start_date, r.end_date, r.status "
+                + "FROM reservations r JOIN rooms rm ON rm.id = r.room_id "
+                + "WHERE r.status IN ('reserved', 'checked_in') ORDER BY r.start_date, r.id";
+        List<ClientReservation> reservations = new ArrayList<>();
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql);
+                ResultSet result = statement.executeQuery()) {
+            while (result.next()) {
+                reservations.add(new ClientReservation(result.getLong("id"), result.getInt("number"),
+                        result.getDate("start_date").toLocalDate(),
+                        result.getDate("end_date").toLocalDate(),
+                        ReservationStatus.fromDatabase(result.getString("status"))));
+            }
+            return List.copyOf(reservations);
+        } catch (SQLException error) {
+            throw new IllegalStateException("Não foi possível consultar as reservas.", error);
+        }
+    }
+
+    @Override
+    public boolean checkIn(long id) {
+        String sql = "UPDATE reservations SET status = 'checked_in', checked_in_at = SYSDATETIME() "
+                + "WHERE id = ? AND status = 'reserved'";
+        return update(sql, id, "Não foi possível guardar o check-in.");
+    }
+
+    @Override
+    public boolean checkOut(long id) {
+        String sql = "UPDATE reservations SET status = 'checked_out', checked_out_at = SYSDATETIME() "
+                + "WHERE id = ? AND status = 'checked_in'";
+        return update(sql, id, "Não foi possível guardar o check-out.");
+    }
+
+    private boolean update(String sql, long id, String errorMessage) {
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, id)) {
+            return statement.executeUpdate() == 1;
+        } catch (SQLException error) {
+            throw new IllegalStateException(errorMessage, error);
         }
     }
 }

@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.domain;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -74,5 +75,83 @@ class ReservationTest {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> Reservation.validatePeriod(END, START));
         assertEquals("A data de saída tem de ser depois da data de entrada.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-1")
+    void onCheckCanCheckIn_notThrow_whenReservationIsReserved() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        assertDoesNotThrow(reservation::checkCanCheckIn);
+        assertEquals(ReservationStatus.RESERVED, reservation.getStatus());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-2")
+    void onCheckCanCheckIn_throw_whenReservationIsCheckedIn() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CHECKED_IN);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                reservation::checkCanCheckIn);
+        assertEquals("A reserva já tem check-in.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-2")
+    void onCheckCanCheckIn_throw_whenReservationIsCheckedOut() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CHECKED_OUT);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                reservation::checkCanCheckIn);
+        assertEquals("A reserva já tem check-out.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-3")
+    void onCheckCanCheckIn_throw_whenReservationIsCancelled() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CANCELLED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                reservation::checkCanCheckIn);
+        assertEquals("A reserva está cancelada.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-5")
+    void onCheckCanCheckOut_notThrow_whenReservationIsCheckedIn() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CHECKED_IN);
+
+        assertDoesNotThrow(reservation::checkCanCheckOut);
+        assertEquals(ReservationStatus.CHECKED_IN, reservation.getStatus());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-6")
+    void onCheckCanCheckOut_throw_whenReservationHasNoCheckIn() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                reservation::checkCanCheckOut);
+        assertEquals("A reserva não tem check-in.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-6")
+    void onCheckCanCheckOut_throw_whenReservationIsCancelled() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CANCELLED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                reservation::checkCanCheckOut);
+        assertEquals("A reserva está cancelada.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-7")
+    void onCheckCanCheckOut_throw_whenReservationHasCheckOut() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CHECKED_OUT);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                reservation::checkCanCheckOut);
+        assertEquals("A reserva já tem check-out.", error.getMessage());
     }
 }

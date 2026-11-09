@@ -40,6 +40,9 @@ public class MainController {
     private Button reservationsButton;
 
     @FXML
+    private Button checkInOutButton;
+
+    @FXML
     private Button pricesButton;
 
     @FXML
@@ -78,6 +81,8 @@ public class MainController {
         freeRoomsButton.setVisible(facade.canUse(user, Permission.SEARCH_ROOMS));
         reservationsButton.managedProperty().bind(reservationsButton.visibleProperty());
         reservationsButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
+        checkInOutButton.managedProperty().bind(checkInOutButton.visibleProperty());
+        checkInOutButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
@@ -116,6 +121,12 @@ public class MainController {
     private void onReservationsClicked() {
         Parent reservationsScreen = new ScreenLoader(facade).load("reservations.fxml");
         contentPane.getChildren().setAll(reservationsScreen);
+    }
+
+    @FXML
+    private void onCheckInOutClicked() {
+        Parent checkInOutScreen = new ScreenLoader(facade).load("check-in-out.fxml");
+        contentPane.getChildren().setAll(checkInOutScreen);
     }
 
     @FXML

@@ -66,6 +66,39 @@ public class Reservation {
     public Long getCreatedByUserId() { return createdByUserId; }
 
     /**
+     * Checks that the booking allows the check-in. This method does not change the booking.
+     * @throws IllegalStateException if the booking is cancelled, already has a check-in or
+     *         already has a check-out
+     */
+    public void checkCanCheckIn() {
+        if (status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("A reserva está cancelada.");
+        }
+        if (status == ReservationStatus.CHECKED_IN) {
+            throw new IllegalStateException("A reserva já tem check-in.");
+        }
+        if (status == ReservationStatus.CHECKED_OUT) {
+            throw new IllegalStateException("A reserva já tem check-out.");
+        }
+    }
+
+    /**
+     * Checks that the booking allows the check-out. This method does not change the booking.
+     * @throws IllegalStateException if the booking is cancelled, has no check-in or already has a check-out
+     */
+    public void checkCanCheckOut() {
+        if (status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("A reserva está cancelada.");
+        }
+        if (status == ReservationStatus.RESERVED) {
+            throw new IllegalStateException("A reserva não tem check-in.");
+        }
+        if (status == ReservationStatus.CHECKED_OUT) {
+            throw new IllegalStateException("A reserva já tem check-out.");
+        }
+    }
+
+    /**
      * Tests half-open periods. Cancelled bookings never occupy a night.
      * @param start the requested arrival
      * @param end the requested departure

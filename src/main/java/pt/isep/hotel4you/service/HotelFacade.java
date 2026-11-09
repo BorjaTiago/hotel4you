@@ -109,6 +109,44 @@ public class HotelFacade {
     }
 
     /**
+     * Does the check-in of a reservation.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who does the check-in
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the state does not allow the check-in or the database fails
+     */
+    public void checkIn(long reservationId, User actor) {
+        reservationService.checkIn(reservationId, actor);
+    }
+
+    /**
+     * Does the check-out of a reservation.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who does the check-out
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the state does not allow the check-out or the database fails
+     */
+    public void checkOut(long reservationId, User actor) {
+        reservationService.checkOut(reservationId, actor);
+    }
+
+    /**
+     * Lists the active reservations of the hotel: the states RESERVED and CHECKED_IN.
+     *
+     * @param actor the logged-in user who asks
+     * @return the reservations with the room number, first arrival first
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<ClientReservation> listActiveReservations(User actor) {
+        return reservationService.listActive(actor);
+    }
+
+    /**
      * Registers a new client.
      *
      * @param client the new client data
