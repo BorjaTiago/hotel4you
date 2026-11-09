@@ -31,6 +31,7 @@ import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
+import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
@@ -555,5 +556,27 @@ class HotelFacadeTest {
         assertEquals(saved.getId(), facade.listClientReservations(client, ana).get(0).id());
         assertThrows(RoomNotAvailableException.class,
                 () -> facade.createReservation(client, room, start, end, ana));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-12")
+    @Tag("H4Y-82-AC-13")
+    void onCheckInAndCheckOut_updateActiveList_whenFacadeReceivesReservation() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
+        User ana = new Receptionist(4L, "Ana Silva", "ana", "hash");
+        Client client = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
+                LocalDate.of(1990, 5, 1), "912345678", "PT", null, null);
+        LocalDate start = LocalDate.now();
+        var saved = facade.createReservation(client, room, start, start.plusDays(2), ana);
+
+        facade.checkIn(saved.getId(), ana);
+        var afterCheckIn = facade.listActiveReservations(ana);
+        facade.checkOut(saved.getId(), ana);
+
+        assertEquals(1, afterCheckIn.size());
+        assertEquals(ReservationStatus.CHECKED_IN, afterCheckIn.get(0).status());
+        assertTrue(facade.listActiveReservations(ana).isEmpty());
     }
 }

@@ -22,6 +22,7 @@ import pt.isep.hotel4you.domain.User;
 public class ReservationService {
 
     private static final String NO_PERMISSION = "Não tem permissão para gerir reservas.";
+    private static final String STATE_CHANGED = "A reserva mudou de estado. Atualize a lista.";
 
     private final ReservationRepository reservationRepository;
     private final RoomService roomService;
@@ -124,6 +125,60 @@ public class ReservationService {
             throw new IllegalArgumentException("Faltam dados: cliente.");
         }
         return reservationRepository.findByClient(client.getId());
+    }
+
+    /**
+     * Does the check-in of a reservation. The state changes from RESERVED to CHECKED_IN.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who does the check-in
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the reservation is cancelled, already has a check-in or a
+     *         check-out, changed state at the same moment, or the database is not available
+     */
+    public void checkIn(long reservationId, User actor) {
+        checkPermission(actor);
+        findReservation(reservationId).checkCanCheckIn();
+        if (!reservationRepository.checkIn(reservationId)) {
+            throw new IllegalStateException(STATE_CHANGED);
+        }
+    }
+
+    /**
+     * Does the check-out of a reservation. The state changes from CHECKED_IN to CHECKED_OUT.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who does the check-out
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the reservation is cancelled, has no check-in, already has
+     *         a check-out, changed state at the same moment, or the database is not available
+     */
+    public void checkOut(long reservationId, User actor) {
+        checkPermission(actor);
+        findReservation(reservationId).checkCanCheckOut();
+        if (!reservationRepository.checkOut(reservationId)) {
+            throw new IllegalStateException(STATE_CHANGED);
+        }
+    }
+
+    /**
+     * Lists the active reservations of the hotel: the states RESERVED and CHECKED_IN.
+     *
+     * @param actor the logged-in user who asks
+     * @return the reservations with the room number, first arrival first
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<ClientReservation> listActive(User actor) {
+        checkPermission(actor);
+        return reservationRepository.findActive();
+    }
+
+    private Reservation findReservation(long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(ReservationNotFoundException::new);
     }
 
     private static void checkPermission(User actor) {

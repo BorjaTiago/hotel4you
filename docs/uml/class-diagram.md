@@ -99,8 +99,13 @@ classDiagram
         +onRemoveLocationClicked() void
     }
     class CheckInOutController {
-        +onCheckInClicked() void
-        +onCheckOutClicked() void
+        +CheckInOutController(facade: HotelFacade)
+        ~canCheckIn(row: ClientReservation) boolean$
+        ~canCheckOut(row: ClientReservation) boolean$
+        ~statusText(status: ReservationStatus) String$
+        -initialize() void
+        -onCheckInClicked() void
+        -onCheckOutClicked() void
     }
     class StaffController {
         -initialize() void
@@ -174,8 +179,9 @@ classDiagram
         +searchClients(field: ClientSearchField, text: String, actor: User) List~Client~
         +editClient(client: Client, actor: User) void
         +removeClient(id: long, actor: User) void
-        +checkIn(reservation: Reservation) void
-        +checkOut(reservation: Reservation) void
+        +checkIn(reservationId: long, actor: User) void
+        +checkOut(reservationId: long, actor: User) void
+        +listActiveReservations(actor: User) List~ClientReservation~
         +issueCard(reservation: Reservation) MagneticCard
         +issueMasterCard(manager: Manager) MagneticCard
         +blockMasterCard(card: MagneticCard) void
@@ -273,8 +279,9 @@ classDiagram
         +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +addLocation(reservation: Reservation, location: Location) void
         +removeLocation(reservation: Reservation, location: Location) void
-        +checkIn(reservation: Reservation) void
-        +checkOut(reservation: Reservation) void
+        +checkIn(reservationId: long, actor: User) void
+        +checkOut(reservationId: long, actor: User) void
+        +listActive(actor: User) List~ClientReservation~
     }
     class StaffService {
         +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
@@ -330,6 +337,9 @@ classDiagram
         <<exception>>
     }
     class ClientNotFoundException {
+        <<exception>>
+    }
+    class ReservationNotFoundException {
         <<exception>>
     }
     class StockItemNameTakenException {
@@ -405,12 +415,20 @@ classDiagram
         +findByRooms(roomIds: List~Long~) List~Reservation~
         +save(reservation: Reservation) Reservation
         +findByClient(clientId: long) List~ClientReservation~
+        +findById(id: long) Optional~Reservation~
+        +findActive() List~ClientReservation~
+        +checkIn(id: long) boolean
+        +checkOut(id: long) boolean
     }
     class JdbcReservationRepository {
         +findByRoom(roomId: long) List~Reservation~
         +findByRooms(roomIds: List~Long~) List~Reservation~
         +save(reservation: Reservation) Reservation
         +findByClient(clientId: long) List~ClientReservation~
+        +findById(id: long) Optional~Reservation~
+        +findActive() List~ClientReservation~
+        +checkIn(id: long) boolean
+        +checkOut(id: long) boolean
     }
     class Database {
         +NOT_AVAILABLE String$
@@ -566,8 +584,8 @@ classDiagram
         -status: ReservationStatus
         -checkedInAt: LocalDateTime
         -checkedOutAt: LocalDateTime
-        +checkIn() void
-        +checkOut() void
+        +checkCanCheckIn() void
+        +checkCanCheckOut() void
         +cancel() void
         +overlaps(start: LocalDate, end: LocalDate) boolean
         +calculateTotal() BigDecimal
@@ -855,10 +873,12 @@ classDiagram
     ReservationService ..> RoomTypeRepository : reads base price
     ReservationService ..> Permission : uses
     ReservationService ..> AccessDeniedException : throws
+    ReservationService ..> ReservationNotFoundException : throws
     ReservationService ..> RoomNotAvailableException : throws
     ReservationService ..> ReservationQuote : returns
     ReservationService ..> ClientReservation : returns
     ReservationController ..> ClientReservation : displays
+    CheckInOutController ..> ClientReservation : displays
     ReservationController ..> ReservationQuote : displays
     Main ..> ReservationService : creates
     Main ..> Database : creates
@@ -895,4 +915,4 @@ classDiagram
     note for RoomService "MANAGE_ROOMS allows a manager to save a room.<br/>Constants enforce floors 2 and 3 with 10 rooms each, as stated in the course statement.<br/>Only the repository checks the room count, inside its save transaction.<br/>Q-01 targets 7/10/3 appear in the summary but are not enforced."
 ```
 
-Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-82 check-in and check-out by Claude Code (claude-opus-5-5), 2026-11-08; H4Y-82 PR #55 review fixes by Claude Code (claude-opus-5-5), 2026-11-08; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06; merge with main after H4Y-82 by Claude Code (claude-opus-5-5), 2026-11-09. Reviewed by: pending.

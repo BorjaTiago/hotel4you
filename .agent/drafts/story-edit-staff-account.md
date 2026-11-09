@@ -1,14 +1,15 @@
 ---
 type: story
 summary: Editar uma conta de funcionário
-parent: epic-staff-management-access
+parent: H4Y-12
 requirements: [RF-26]
 points: 3
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-85
 labels: [staff]
-sprint:
+sprint: 05
+assignee: lukassperandio
 ---
 
 # Título: Editar uma conta de funcionário

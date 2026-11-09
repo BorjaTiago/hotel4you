@@ -1,0 +1,58 @@
+@startuml component-diagram
+' H4Y-9 component diagram. Source of component-diagram.svg.
+' Render from docs/uml: docker run --rm -v "$PWD":/data plantuml/plantuml:1.2024.7 -tsvg /data/component-diagram.puml
+skinparam componentStyle uml2
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam monochrome true
+left to right direction
+
+interface "HotelUI" as IUI
+artifact "Supplier XML stock file" <<external>> as XML
+
+component "Hotel4You" <<subsystem>> as H4Y {
+  portin "xml" as pXML
+  portin "ui" as pUI
+  portout "db" as pDB
+
+  component ":gui" as GUI
+  component ":service" as SVC
+  component ":data" as DATA
+  component ":config" as CFG
+  component ":domain" as DOM
+
+  interface "HotelFacade" as IFAC
+  interface "Repositories" as IREPO
+  interface "AppConfig" as ICFG
+}
+
+component "SQL Server" <<external>> as SQL
+interface "SQL" as ISQL
+
+' Input: the supplier XML file comes in through the xml port
+XML --> pXML
+pXML --> SVC : <<delegate>>
+
+' Input: actors use HotelUI through the ui port, delegated to gui
+IUI -- pUI
+pUI --> GUI : <<delegate>>
+
+' Assembly connectors (ball and socket), in call order
+GUI --( IFAC
+IFAC -- SVC
+SVC --( IREPO
+IREPO -- DATA
+DATA --( ICFG
+ICFG -- CFG
+
+' Output: data reaches SQL Server through the db port
+DATA --> pDB : <<delegate>>
+pDB --( ISQL
+ISQL -- SQL
+
+' Use of the domain types
+GUI ..> DOM
+SVC ..> DOM
+DATA ..> DOM
+' Created by: jmbcruz. Updated by: jmbcruz. AI use: PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06; review fixes by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+@enduml

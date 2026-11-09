@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
+import pt.isep.hotel4you.domain.ReservationStatus;
 
 /** Own reservation fixtures for availability and reservation tests. */
 public class InMemoryReservationRepository implements ReservationRepository {
@@ -18,6 +20,8 @@ public class InMemoryReservationRepository implements ReservationRepository {
     public int findByRoomsCalls;
     /** When true, the next save acts as if another user saved the same nights first. */
     public boolean loseNextSave;
+    /** When true, the next check-in or check-out acts as if another user changed the state first. */
+    public boolean loseNextUpdate;
 
     /** @param reservation the test reservation to add */
     public void add(Reservation reservation) {
@@ -72,5 +76,48 @@ public class InMemoryReservationRepository implements ReservationRepository {
                         roomNumbers.getOrDefault(value.getRoomId(), 0), value.getStartDate(),
                         value.getEndDate(), value.getStatus()))
                 .toList();
+    }
+
+    @Override
+    public Optional<Reservation> findById(long id) {
+        return reservations.stream().filter(value -> Objects.equals(value.getId(), id)).findFirst();
+    }
+
+    @Override
+    public List<ClientReservation> findActive() {
+        return reservations.stream()
+                .filter(value -> value.getStatus() == ReservationStatus.RESERVED
+                        || value.getStatus() == ReservationStatus.CHECKED_IN)
+                .map(value -> new ClientReservation(value.getId(),
+                        roomNumbers.getOrDefault(value.getRoomId(), 0), value.getStartDate(),
+                        value.getEndDate(), value.getStatus()))
+                .toList();
+    }
+
+    @Override
+    public boolean checkIn(long id) {
+        return changeStatus(id, ReservationStatus.RESERVED, ReservationStatus.CHECKED_IN);
+    }
+
+    @Override
+    public boolean checkOut(long id) {
+        return changeStatus(id, ReservationStatus.CHECKED_IN, ReservationStatus.CHECKED_OUT);
+    }
+
+    private boolean changeStatus(long id, ReservationStatus from, ReservationStatus to) {
+        if (loseNextUpdate) {
+            loseNextUpdate = false;
+            return false;
+        }
+        for (int i = 0; i < reservations.size(); i++) {
+            Reservation value = reservations.get(i);
+            if (Objects.equals(value.getId(), id) && value.getStatus() == from) {
+                reservations.set(i, new Reservation(value.getId(), value.getClientId(),
+                        value.getRoomId(), value.getStartDate(), value.getEndDate(), to,
+                        value.getCreatedByUserId()));
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -73,14 +73,14 @@ Every external library also goes in [docs/libraries.md](../libraries.md) with it
 | Where is the database in the class diagram? | `Database` opens the connection. `JdbcUserRepository` implements `UserRepository` with SQL (G-01, C-01 closed). |
 | Why are JavaFX, the JDBC driver and JUnit not in the diagram? | A library is not a component. Only components, interfaces and external elements go in the diagram. |
 | Why is SQL Server outside the subsystem? | We do not write it. It is an external component that provides `SQL`. `data` reaches it through a port. |
-| Why is the socket a `(` character? | Mermaid has no socket shape. The `(` and `(○` text nodes draw the socket and the ball-and-socket of the slide. |
-| Why are the subsystem ports next to the border? | Mermaid cannot put a box on a border. This is the only layout difference from the slide. |
+| Why is this diagram in PlantUML and not Mermaid? | Mermaid cannot put a port on a border and has no socket shape. The diagram looked wrong (teacher feedback, Sprint 3). PlantUML has `portin`, `portout`, ball and socket. The other diagrams stay in Mermaid. |
+| Where is the output port? | `db` is a `portout` on the border of the subsystem. `data` delegates to it. It requires `SQL` from SQL Server. |
 | Why `config` uses all packages? | It only creates and connects objects at start-up. No business call goes through it. |
 
-## Validation results (2026-10-21)
+## Validation results (2026-11-06)
 
-Mermaid CLI rendered the diagram to a temporary PNG file. The preview was inspected: the subsystem box holds the parts, the ports sit on its border, and SQL Server and the XML file are outside. No rendered file was added to the repository.
+PlantUML 1.2024.7 (Docker image `plantuml/plantuml:1.2024.7`) rendered `component-diagram.puml` to `component-diagram.svg`. The image was inspected: the subsystem box holds the parts, the `ui` and `xml` input ports and the `db` output port sit on its border, the parts connect with ball and socket, and SQL Server and the XML file are outside.
 
 The five packages now exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17, C-04). Human review is still required.
 
-Created by: jmbcruz. Updated by: pedrocostaisep. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
+Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.

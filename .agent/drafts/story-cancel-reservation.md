@@ -3,12 +3,13 @@ type: story
 summary: Cancelar uma reserva mantendo o histórico
 parent: epic-reservations
 requirements: [RF-12]
-points:
+points: 3
 points_suggested: 3
 status: published
 jira_key: H4Y-55
 labels: [reservations, 1st-delivery]
-sprint: 04
+sprint: 05
+assignee: jmbcruz
 ---
 
 # Título: Cancelar uma reserva mantendo o histórico
@@ -42,14 +43,23 @@ Para que o quarto fique livre e o registo da reserva se mantenha no histórico.
   Então o sistema recusa a ação
   E o estado da reserva não muda
 
+### Cenário AC-5: Botão Cancelar no ecrã principal
+  Dado que o rececionista está no ecrã principal "Reservas"
+  Quando o rececionista escolhe uma linha
+  Então o botão "Cancelar" da barra de ações está ativo só se a linha tem o estado RESERVED
+  E ao carregar em "Cancelar" a reserva é cancelada
+
 ## Critérios de aceite (checklist)
 
 - [ ] AC-1: Uma reserva ativa pode ser cancelada.
 - [ ] AC-2: Depois de cancelar a reserva, o quarto volta a ficar livre.
 - [ ] AC-3: Cancelar uma reserva já cancelada é recusado.
 - [ ] AC-4: Cancelar uma reserva com check-in efetuado é recusado.
+- [ ] AC-5: A ação é o botão "Cancelar" na barra de ações do ecrã principal "Reservas", ativo só numa linha RESERVED.
 
 ## Notas
+Precisa do esqueleto do ecrã principal (dia 1) de story-ver-reservas-ativas.md. Decisão da equipa (BorjaTiago, 2026-11-06).
+
 Decisão da equipa (2026-10-16): cancelar não é possível depois do check-in (AC-4).
 Q-05 (decisão da equipa, não confirmada): cancelar é mudança de estado, fica no histórico. Apagar é só do gestor (RF-22). Cancelar uma reserva com check-in efetuado não está definido no enunciado e fica fora desta história (cenário removido pelo refinador). Libertar o quarto ao cancelar é o efeito normal do cancelamento (RF-12). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste próprias (ativa, cancelada, com check-in) (foundation T4). O AC-2 verifica com a consulta de quartos livres (sprint 4, já feita).
 
@@ -63,4 +73,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.

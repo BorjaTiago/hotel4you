@@ -26,6 +26,7 @@ Docs and chore work use `chore/H4Y-N-...`. The statement (`enunciado.md`) allows
 
 - Start with the Jira key: `H4Y-4 create room table`.
 - Use short, imperative text. One change per commit.
+- In each code PR, the first commit holds the failing tests. The code commit comes after it.
 
 ### Commit and PR rule
 
@@ -130,4 +131,4 @@ Check real names with getTransitionsForJiraIssue before a transition.
 - Statuses seen: To Do, In Progress. Confirm "In Review" and "Done" with getTransitionsForJiraIssue before the first transition.
 - Existing issues H4Y-5 to H4Y-10 are Tasks for diagram work. Do not duplicate or change them.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06. Reviewed by: pending.

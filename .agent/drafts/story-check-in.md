@@ -5,7 +5,8 @@ parent: epic-check-in-out
 requirements: [RF-13]
 points: 3
 points_suggested: 3
-status: approved
+status: merged
+merged_into: story-check-in-check-out
 jira_key:
 labels: [check-in, 1st-delivery]
 sprint:
@@ -50,6 +51,8 @@ Para que o cliente fique instalado no quarto reservado.
 - [ ] AC-4: O check-in de uma reserva inexistente devolve uma resposta de não encontrado.
 
 ## Notas
+JUNTA em story-check-in-check-out.md (decisão do utilizador, 2026-11-06). Não implementar aqui.
+
 Entrega 1 (Q-06). A entrega do cartão magnético (RF-13, RF-16) fica na entrega final (epic-magnetic-card-access). Depois do check-in o gestor deixa de poder apagar a reserva (RF-22). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: reservas de teste próprias (ativa, cancelada, com check-in) (foundation T4).
 
 points_suggested: 3
@@ -62,4 +65,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.
