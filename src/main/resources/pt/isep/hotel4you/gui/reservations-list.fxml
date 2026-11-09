@@ -12,7 +12,7 @@
 
     <HBox spacing="12" alignment="CENTER_LEFT">
         <Label text="Reservas" styleClass="subtitle" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="+ Nova reserva" onAction="#onNewReservationClicked"
+        <Button text="+ Reservar quarto" onAction="#onNewReservationClicked"
                 styleClass="action-button, save-button"/>
     </HBox>
     <TextField fx:id="searchField" promptText="Pesquisar por nome ou documento"

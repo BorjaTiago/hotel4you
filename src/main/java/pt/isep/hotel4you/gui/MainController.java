@@ -34,9 +34,6 @@ public class MainController {
     private Button roomsButton;
 
     @FXML
-    private Button reservationsButton;
-
-    @FXML
     private Button reservationsListButton;
 
     @FXML
@@ -71,8 +68,6 @@ public class MainController {
         floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
         roomsButton.managedProperty().bind(roomsButton.visibleProperty());
         roomsButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
-        reservationsButton.managedProperty().bind(reservationsButton.visibleProperty());
-        reservationsButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
         reservationsListButton.managedProperty().bind(reservationsListButton.visibleProperty());
         reservationsListButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
@@ -102,12 +97,6 @@ public class MainController {
     private void onRoomsClicked() {
         Parent roomScreen = new ScreenLoader(facade).load("rooms.fxml");
         contentPane.getChildren().setAll(roomScreen);
-    }
-
-    @FXML
-    private void onReservationsClicked() {
-        Parent reservationsScreen = new ScreenLoader(facade).load("reservations.fxml");
-        contentPane.getChildren().setAll(reservationsScreen);
     }
 
     @FXML
