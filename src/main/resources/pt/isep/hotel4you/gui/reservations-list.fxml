@@ -12,18 +12,15 @@
 
     <HBox spacing="12" alignment="CENTER_LEFT">
         <Label text="Reservas" styleClass="subtitle" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="+ Nova reserva" onAction="#onNewReservationClicked" accessibleText="Criar uma nova reserva"
+        <Button text="+ Nova reserva" onAction="#onNewReservationClicked"
                 styleClass="action-button, save-button"/>
     </HBox>
     <TextField fx:id="searchField" promptText="Pesquisar por nome ou documento"
                accessibleText="Pesquisar reservas por nome ou documento"/>
     <HBox spacing="8">
-        <RadioButton text="Todas ativas" toggleGroup="$filterGroup" selected="true"
-                      accessibleText="Mostrar todas as reservas ativas"/>
-        <RadioButton fx:id="arrivingTodayToggle" text="Chegam hoje" toggleGroup="$filterGroup"
-                      accessibleText="Mostrar as reservas que chegam hoje"/>
-        <RadioButton fx:id="checkedInToggle" text="Hospedados" toggleGroup="$filterGroup"
-                      accessibleText="Mostrar os hóspedes com check-in feito"/>
+        <RadioButton text="Todas ativas" toggleGroup="$filterGroup" selected="true"/>
+        <RadioButton fx:id="arrivingTodayToggle" text="Chegam hoje" toggleGroup="$filterGroup"/>
+        <RadioButton fx:id="checkedInToggle" text="Hospedados" toggleGroup="$filterGroup"/>
     </HBox>
     <TableView fx:id="reservationTable" accessibleText="Reservas ativas" VBox.vgrow="ALWAYS" prefWidth="500">
         <columns>

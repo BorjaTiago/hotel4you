@@ -209,6 +209,7 @@ public class ReservationsController {
             facade.checkIn(chosen.id(), HotelApp.currentUser);
             if (loadReservations()) {
                 showMessage("Check-in feito: quarto " + chosen.roomNumber() + ".", true);
+                reservationTable.requestFocus();
             }
         } catch (RuntimeException e) {
             loadReservations();
@@ -226,6 +227,7 @@ public class ReservationsController {
             facade.checkOut(chosen.id(), HotelApp.currentUser);
             if (loadReservations()) {
                 showMessage("Check-out feito: quarto " + chosen.roomNumber() + ".", true);
+                reservationTable.requestFocus();
             }
         } catch (RuntimeException e) {
             loadReservations();
