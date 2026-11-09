@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
-import pt.isep.hotel4you.domain.ClientReservation;
+import pt.isep.hotel4you.domain.ActiveReservation;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -98,6 +98,17 @@ class ReservationCheckInOutTest {
                 () -> service.checkIn(1L, RECEPTIONIST));
         assertEquals("A reserva mudou de estado. Atualize a lista.", error.getMessage());
         assertEquals(ReservationStatus.RESERVED, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-2")
+    void onCheckIn_throwAndKeepState_whenReservationHasCheckOut() {
+        addReservation(1L, ReservationStatus.CHECKED_OUT);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkIn(1L, RECEPTIONIST));
+        assertEquals("A reserva já tem check-out.", error.getMessage());
+        assertEquals(ReservationStatus.CHECKED_OUT, statusOf(1L));
     }
 
     @Test
@@ -216,11 +227,11 @@ class ReservationCheckInOutTest {
         addReservation(3L, ReservationStatus.CANCELLED);
         addReservation(4L, ReservationStatus.CHECKED_OUT);
 
-        List<ClientReservation> active = service.listActive(RECEPTIONIST);
+        List<ActiveReservation> active = service.listActive(RECEPTIONIST);
 
-        assertEquals(List.of(1L, 2L), active.stream().map(ClientReservation::id).toList());
+        assertEquals(List.of(1L, 2L), active.stream().map(ActiveReservation::id).toList());
         assertEquals(List.of(ReservationStatus.RESERVED, ReservationStatus.CHECKED_IN),
-                active.stream().map(ClientReservation::status).toList());
+                active.stream().map(ActiveReservation::status).toList());
     }
 
     @Test

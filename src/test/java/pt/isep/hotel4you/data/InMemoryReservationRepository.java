@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import pt.isep.hotel4you.domain.ActiveReservation;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -15,6 +16,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
     private final List<Reservation> reservations = new ArrayList<>();
     private final List<Reservation> saved = new ArrayList<>();
     private final Map<Long, Integer> roomNumbers = new HashMap<>();
+    private final Map<Long, String[]> clients = new HashMap<>();
     private long nextId = 100;
     public int findByRoomCalls;
     public int findByRoomsCalls;
@@ -35,6 +37,16 @@ public class InMemoryReservationRepository implements ReservationRepository {
      */
     public void addRoomNumber(long roomId, int number) {
         roomNumbers.put(roomId, number);
+    }
+
+    /**
+     * Sets the name and the document of a client, as the customers table does in SQL.
+     * @param clientId the client identifier
+     * @param name the client name
+     * @param document the client document number
+     */
+    public void addClient(long clientId, String name, String document) {
+        clients.put(clientId, new String[] {name, document});
     }
 
     /** @return the reservations saved through save, in save order */
@@ -84,11 +96,13 @@ public class InMemoryReservationRepository implements ReservationRepository {
     }
 
     @Override
-    public List<ClientReservation> findActive() {
+    public List<ActiveReservation> findActive() {
         return reservations.stream()
                 .filter(value -> value.getStatus() == ReservationStatus.RESERVED
                         || value.getStatus() == ReservationStatus.CHECKED_IN)
-                .map(value -> new ClientReservation(value.getId(),
+                .map(value -> new ActiveReservation(value.getId(),
+                        clients.getOrDefault(value.getClientId(), new String[] {"", ""})[0],
+                        clients.getOrDefault(value.getClientId(), new String[] {"", ""})[1],
                         roomNumbers.getOrDefault(value.getRoomId(), 0), value.getStartDate(),
                         value.getEndDate(), value.getStatus()))
                 .toList();
