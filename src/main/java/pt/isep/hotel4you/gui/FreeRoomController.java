@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.function.Consumer;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
@@ -18,16 +19,36 @@ import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.service.HotelFacade;
 
-/** Controller for the free-room screen: search by type and period, and choose a room. */
+/** Controller for the room step of the reservation screen: search by type and period, and choose a room. */
 public class FreeRoomController {
 
     private static final NumberFormat PRICE_FORMAT =
             NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-PT"));
 
+    /**
+     * The room that the receptionist chose and the searched period.
+     *
+     * @param room the chosen room
+     * @param start the first night
+     * @param end the check-out date
+     */
+    public record Choice(Room room, LocalDate start, LocalDate end) {
+    }
+
     private final HotelFacade facade;
+    private Consumer<Choice> onRoomChosen;
     private RoomType searchedType;
     private LocalDate searchedStart;
     private LocalDate searchedEnd;
+
+    @FXML
+    private Label typeLabel;
+
+    @FXML
+    private Label startLabel;
+
+    @FXML
+    private Label endLabel;
 
     @FXML
     private ComboBox<RoomType> typeBox;
@@ -68,8 +89,21 @@ public class FreeRoomController {
         this.facade = facade;
     }
 
+    /**
+     * Sets the action that runs when the receptionist chooses a room.
+     * If the callback throws, this screen shows the error message.
+     *
+     * @param onRoomChosen the action, or null for none
+     */
+    public void setOnRoomChosen(Consumer<Choice> onRoomChosen) {
+        this.onRoomChosen = onRoomChosen;
+    }
+
     @FXML
     private void initialize() {
+        typeLabel.setLabelFor(typeBox);
+        startLabel.setLabelFor(startPicker);
+        endLabel.setLabelFor(endPicker);
         numberColumn.setCellValueFactory(
                 data -> new ReadOnlyObjectWrapper<>(data.getValue().getNumber()));
         floorColumn.setCellValueFactory(
@@ -101,9 +135,6 @@ public class FreeRoomController {
     @FXML
     private void onSearchClicked() {
         messageLabel.setText("");
-        HotelApp.chosenRoom = null;
-        HotelApp.chosenStart = null;
-        HotelApp.chosenEnd = null;
         try {
             RoomSearchResult result = facade.searchRoomsWithMessage(startPicker.getValue(),
                     endPicker.getValue(), typeBox.getValue(), HotelApp.currentUser);
@@ -125,9 +156,16 @@ public class FreeRoomController {
             showMessage("Escolha um quarto na tabela.", false);
             return;
         }
-        HotelApp.chosenRoom = selected;
-        HotelApp.chosenStart = searchedStart;
-        HotelApp.chosenEnd = searchedEnd;
+        if (onRoomChosen == null) {
+            showMessage("Quarto " + selected.getNumber() + " escolhido para a reserva.", true);
+            return;
+        }
+        try {
+            onRoomChosen.accept(new Choice(selected, searchedStart, searchedEnd));
+        } catch (RuntimeException e) {
+            showMessage(e.getMessage(), false);
+            return;
+        }
         showMessage("Quarto " + selected.getNumber() + " escolhido para a reserva.", true);
     }
 

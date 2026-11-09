@@ -125,7 +125,7 @@ docker compose down -v     # stop and delete the data
 
 ## Room availability service (H4Y-72)
 
-The service searches a room type and a date period. The H4Y-73 screen "Quartos livres" in the main menu uses this search and lists the free rooms. The search does not hold a room.
+The service searches a room type and a date period. The free-room search is tab "2. Quarto" of the "Nova reserva" screen (H4Y-73). It lists the free rooms. The search does not hold a room.
 
 Run the scripts in order, v1 to v10. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
 
