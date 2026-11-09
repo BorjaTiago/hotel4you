@@ -26,7 +26,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Check the password in the controller. Not done: the GUI would hold security code.
 
 ### MainController
-- **What:** Main window after login. Top: "Olá, <name> (<role>)" and Logout. The role name comes from `Role.displayName()`. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen (`openLogin()`). Without a logged-in user, no button shows and the window opens the login screen (H4Y-23 AC-3, H4Y-61). The stock button shows only when `canUse(actor, MANAGE_STOCK)` allows it (H4Y-51).
+- **What:** Main window after login. Top: "Olá, <name> (<role>)" and Logout. The role name comes from `Role.displayName()`. Left: menu with the functions of the user. Centre: the open function. Logout clears `HotelApp.currentUser` and opens the login screen (`openLogin()`). The menu has only the "Reservas" list button for reservations. The "Reservar quarto" screen opens only from "+ Reservar quarto" in that list. Without a logged-in user, no button shows and the window opens the login screen (H4Y-23 AC-3, H4Y-61). The stock button shows only when `canUse(actor, MANAGE_STOCK)` allows it (H4Y-51).
 - **Why:** RNF-06, RNF-07. Each user finds the functions of the role in one place.
 - **Why this way:** The menu asks `HotelFacade.canUse(actor, permission)` which buttons to show. The screen has no role check of its own.
 - **Other option:** A `Session` or `PermissionPolicy` class for the menu. Not done: the facade already holds the rules, and the extra class adds no value now.
@@ -474,8 +474,8 @@ Enums have fixed values. They stop typing errors.
 | MANAGE_PRICES | View and set the base price of the room types (H4Y-26) | yes | no | no |
 | LIST_ROOMS | See the rooms table with type, floor and base price, on the "Quartos" screen (H4Y-50) | yes | yes | no |
 | MANAGE_STOCK | Create, edit and list stock items on the stock screen (H4Y-51) | yes | no | no |
-| MANAGE_CLIENTS | Register, list, search, edit and remove clients in tab "1. Cliente" of the "Reservar quarto" screen (H4Y-52, Q-54) | yes | yes | no |
-| MANAGE_RESERVATIONS | Create reservations and list the reservations of a client (H4Y-56). On the "Reservas" list screen, list the active reservations and run check-in and check-out (H4Y-81, H4Y-82) | yes | yes | no |
+| MANAGE_CLIENTS | Register, list, search, edit and remove clients in tab "1. Cliente" of the "Reservar quarto" screen, which opens from "+ Reservar quarto" in the "Reservas" list (H4Y-52, Q-54) | yes | yes | no |
+| MANAGE_RESERVATIONS | Create reservations and list the reservations of a client (H4Y-56). On the "Reservas" list screen, list the active reservations and run check-in and check-out (H4Y-81, H4Y-82). The create screen opens from "+ Reservar quarto" in that list | yes | yes | no |
 
 Without a logged-in user, no function is allowed. The restaurant staff has no function in the application yet.
 
