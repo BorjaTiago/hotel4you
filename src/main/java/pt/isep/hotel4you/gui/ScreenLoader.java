@@ -34,35 +34,15 @@ public class ScreenLoader {
      * @throws IllegalStateException if the screen cannot be opened
      */
     public Parent load(String fxmlName) {
-        return open(fxmlName).root();
-    }
-
-    /**
-     * Opens a screen from an FXML file and also gives its controller.
-     *
-     * @param fxmlName the file name, for example {@code "reservations.fxml"}
-     * @return the screen and its controller
-     * @throws IllegalStateException if the screen cannot be opened
-     */
-    public LoadedScreen open(String fxmlName) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlName));
         loader.setControllerFactory(type -> createController(type));
         try {
             Parent root = loader.load();
             root.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
-            return new LoadedScreen(root, loader.getController());
+            return root;
         } catch (IOException e) {
             throw new IllegalStateException("Não foi possível abrir o ecrã.");
         }
-    }
-
-    /**
-     * A screen and its controller.
-     *
-     * @param root the screen
-     * @param controller the controller of the screen
-     */
-    public record LoadedScreen(Parent root, Object controller) {
     }
 
     private Object createController(Class<?> type) {

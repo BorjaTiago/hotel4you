@@ -35,7 +35,6 @@ public class ReservationController {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final HotelFacade facade;
-    private Runnable onReservationCreated;
 
     @FXML
     private TextField documentField;
@@ -203,14 +202,6 @@ public class ReservationController {
     @FXML
     private void onCreateReservationClicked() {
         messageLabel.setText("");
-        if (!saveReservation()) {
-            return;
-        }
-        runOnReservationCreated();
-    }
-
-    /** Saves the reservation. On an error it shows the error and returns false. */
-    private boolean saveReservation() {
         try {
             Room room = roomBox.getValue();
             Reservation saved = facade.createReservation(clientBox.getValue(), room,
@@ -223,25 +214,8 @@ public class ReservationController {
             showMessage("Reserva criada: quarto " + room.getNumber() + ", de "
                     + DATE_FORMAT.format(saved.getStartDate()) + " a "
                     + DATE_FORMAT.format(saved.getEndDate()) + ".", true);
-            return true;
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
-            return false;
-        }
-    }
-
-    /**
-     * Sets the action to run after a reservation is saved. A failed save does not run it.
-     *
-     * @param action the action, or null for none
-     */
-    public void setOnReservationCreated(Runnable action) {
-        this.onReservationCreated = action;
-    }
-
-    private void runOnReservationCreated() {
-        if (onReservationCreated != null) {
-            onReservationCreated.run();
         }
     }
 

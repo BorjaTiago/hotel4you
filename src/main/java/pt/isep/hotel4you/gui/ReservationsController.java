@@ -188,15 +188,10 @@ public class ReservationsController {
 
     @FXML
     private void onNewReservationClicked() {
-        Pane parent = (Pane) screenRoot.getParent();
-        ScreenLoader.LoadedScreen screen = new ScreenLoader(facade).open("reservations.fxml");
-        ReservationController controller = (ReservationController) screen.controller();
-        controller.setOnReservationCreated(() -> {
-            ScreenLoader.LoadedScreen list = new ScreenLoader(facade).open("reservations-list.fxml");
-            parent.getChildren().setAll(list.root());
-            ((ReservationsController) list.controller()).showCreated();
-        });
-        parent.getChildren().setAll(screen.root());
+        if (!(screenRoot.getParent() instanceof Pane parent)) {
+            return;
+        }
+        parent.getChildren().setAll(new ScreenLoader(facade).load("reservations.fxml"));
     }
 
     @FXML
@@ -272,11 +267,6 @@ public class ReservationsController {
     private void updateButtons(ReservationSummary chosen) {
         checkInButton.setDisable(!canCheckIn(chosen));
         checkOutButton.setDisable(!canCheckOut(chosen));
-    }
-
-    /** Shows that a reservation was created. */
-    void showCreated() {
-        showMessage("Reserva criada.", true);
     }
 
     /** A table cell that shows a date as dd/MM/yyyy. */
