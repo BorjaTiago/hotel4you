@@ -6,7 +6,7 @@
 <VBox styleClass="screen, reservation-screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.ReservationController">
 
-    <Label text="Clientes e reservas" styleClass="page-title"/>
+    <Label text="Nova reserva" styleClass="page-title"/>
 
     <TabPane fx:id="tabPane" styleClass="steps" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <!-- Step 1: choose the client -->

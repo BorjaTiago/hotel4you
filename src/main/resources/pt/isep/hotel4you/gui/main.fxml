@@ -23,7 +23,7 @@
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="roomsButton" text="Quartos" onAction="#onRoomsClicked"
                     maxWidth="Infinity" visible="false"/>
-            <Button fx:id="reservationsButton" text="Clientes e reservas" onAction="#onReservationsClicked"
+            <Button fx:id="reservationsButton" text="Nova reserva" onAction="#onReservationsClicked"
                     maxWidth="Infinity" visible="false"/>
             <Button fx:id="checkInOutButton" text="Check-in e check-out" onAction="#onCheckInOutClicked"
                     maxWidth="Infinity" visible="false"/>
