@@ -42,14 +42,14 @@ class ReservationsControllerTest {
     @Test
     @Tag("H4Y-82-AC-9")
     void onCanCheckInOrOut_returnFalse_whenNoRowIsChosen() {
-        assertFalse(ReservationsController.canCheckIn(null));
+        assertFalse(ReservationsController.canCheckIn(null, START));
         assertFalse(ReservationsController.canCheckOut(null));
     }
 
     @Test
     @Tag("H4Y-82-AC-10")
     void onCanCheckIn_returnTrueAndCheckOutFalse_whenRowIsReserved() {
-        assertTrue(ReservationsController.canCheckIn(row(ReservationStatus.RESERVED)));
+        assertTrue(ReservationsController.canCheckIn(row(ReservationStatus.RESERVED), START));
         assertFalse(ReservationsController.canCheckOut(row(ReservationStatus.RESERVED)));
     }
 
@@ -57,7 +57,33 @@ class ReservationsControllerTest {
     @Tag("H4Y-82-AC-11")
     void onCanCheckOut_returnTrueAndCheckInFalse_whenRowIsCheckedIn() {
         assertTrue(ReservationsController.canCheckOut(row(ReservationStatus.CHECKED_IN)));
-        assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.CHECKED_IN)));
+        assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.CHECKED_IN), START));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCanCheckIn_returnFalse_whenTodayIsBeforeStartDate() {
+        assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.RESERVED), TODAY));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCanCheckIn_returnTrue_whenTodayIsStartDate() {
+        assertTrue(ReservationsController.canCheckIn(row(ReservationStatus.RESERVED), START));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-15")
+    void onCanCheckIn_returnFalse_whenTodayIsEndDate() {
+        assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.RESERVED),
+                START.plusDays(2)));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-10")
+    void onCanCheckIn_returnFalse_whenRowIsNotReserved() {
+        assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.CANCELLED), START));
+        assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.CHECKED_OUT), START));
     }
 
     @Test

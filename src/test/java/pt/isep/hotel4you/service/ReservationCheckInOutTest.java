@@ -53,6 +53,10 @@ class ReservationCheckInOutTest {
         reservations.add(new Reservation(id, 7L, room.getId(), START, END, status, 4L));
     }
 
+    private void addReservation(long id, LocalDate start, LocalDate end, ReservationStatus status) {
+        reservations.add(new Reservation(id, 7L, room.getId(), start, end, status, 4L));
+    }
+
     private ReservationStatus statusOf(long id) {
         return reservations.findById(id).orElseThrow().getStatus();
     }
@@ -120,6 +124,38 @@ class ReservationCheckInOutTest {
                 () -> service.checkIn(1L, RECEPTIONIST));
         assertEquals("A reserva está cancelada.", error.getMessage());
         assertEquals(ReservationStatus.CANCELLED, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckIn_throwAndKeepState_whenStartDateIsInTheFuture() {
+        addReservation(1L, START.plusDays(1), START.plusDays(3), ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkIn(1L, RECEPTIONIST));
+        assertEquals("O check-in só é possível a partir do dia de entrada.", error.getMessage());
+        assertEquals(ReservationStatus.RESERVED, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckIn_saveCheckedIn_whenStartDateIsToday() {
+        addReservation(1L, START, START.plusDays(1), ReservationStatus.RESERVED);
+
+        service.checkIn(1L, RECEPTIONIST);
+
+        assertEquals(ReservationStatus.CHECKED_IN, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-15")
+    void onCheckIn_throwAndKeepState_whenEndDateIsToday() {
+        addReservation(1L, START.minusDays(2), START, ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkIn(1L, RECEPTIONIST));
+        assertEquals("A data de saída da reserva já passou.", error.getMessage());
+        assertEquals(ReservationStatus.RESERVED, statusOf(1L));
     }
 
     @Test
