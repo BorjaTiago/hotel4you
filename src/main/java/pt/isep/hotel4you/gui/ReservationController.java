@@ -203,6 +203,14 @@ public class ReservationController {
     @FXML
     private void onCreateReservationClicked() {
         messageLabel.setText("");
+        if (!saveReservation()) {
+            return;
+        }
+        runOnReservationCreated();
+    }
+
+    /** Saves the reservation. On an error it shows the error and returns false. */
+    private boolean saveReservation() {
         try {
             Room room = roomBox.getValue();
             Reservation saved = facade.createReservation(clientBox.getValue(), room,
@@ -215,9 +223,10 @@ public class ReservationController {
             showMessage("Reserva criada: quarto " + room.getNumber() + ", de "
                     + DATE_FORMAT.format(saved.getStartDate()) + " a "
                     + DATE_FORMAT.format(saved.getEndDate()) + ".", true);
-            runOnReservationCreated();
+            return true;
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
+            return false;
         }
     }
 

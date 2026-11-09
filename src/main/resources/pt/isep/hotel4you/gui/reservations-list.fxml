@@ -18,11 +18,11 @@
     <TextField fx:id="searchField" promptText="Pesquisar por nome ou documento"
                accessibleText="Pesquisar reservas por nome ou documento"/>
     <HBox spacing="8">
-        <ToggleButton fx:id="allActiveToggle" text="Todas ativas" toggleGroup="$filterGroup" selected="true"
+        <RadioButton text="Todas ativas" toggleGroup="$filterGroup" selected="true"
                       accessibleText="Mostrar todas as reservas ativas"/>
-        <ToggleButton fx:id="arrivingTodayToggle" text="Chegam hoje" toggleGroup="$filterGroup"
+        <RadioButton fx:id="arrivingTodayToggle" text="Chegam hoje" toggleGroup="$filterGroup"
                       accessibleText="Mostrar as reservas que chegam hoje"/>
-        <ToggleButton fx:id="checkedInToggle" text="Hospedados" toggleGroup="$filterGroup"
+        <RadioButton fx:id="checkedInToggle" text="Hospedados" toggleGroup="$filterGroup"
                       accessibleText="Mostrar os hóspedes com check-in feito"/>
     </HBox>
     <TableView fx:id="reservationTable" accessibleText="Reservas ativas" VBox.vgrow="ALWAYS" prefWidth="500">

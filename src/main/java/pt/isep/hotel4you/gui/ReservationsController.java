@@ -5,10 +5,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import javafx.collections.FXCollections;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -52,13 +55,13 @@ public class ReservationsController {
     private TableColumn<ActiveReservation, String> documentColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, String> roomColumn;
+    private TableColumn<ActiveReservation, Integer> roomColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, String> startColumn;
+    private TableColumn<ActiveReservation, LocalDate> startColumn;
 
     @FXML
-    private TableColumn<ActiveReservation, String> endColumn;
+    private TableColumn<ActiveReservation, LocalDate> endColumn;
 
     @FXML
     private TableColumn<ActiveReservation, String> statusColumn;
@@ -73,13 +76,10 @@ public class ReservationsController {
     private ToggleGroup filterGroup;
 
     @FXML
-    private Toggle allActiveToggle;
+    private RadioButton arrivingTodayToggle;
 
     @FXML
-    private Toggle arrivingTodayToggle;
-
-    @FXML
-    private Toggle checkedInToggle;
+    private RadioButton checkedInToggle;
 
     @FXML
     private Button checkInButton;
@@ -170,17 +170,19 @@ public class ReservationsController {
         documentColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().document()));
         roomColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(String.valueOf(data.getValue().roomNumber())));
+                data -> new SimpleObjectProperty<>(data.getValue().roomNumber()));
         startColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(DATE_FORMAT.format(data.getValue().startDate())));
+                data -> new SimpleObjectProperty<>(data.getValue().startDate()));
         endColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(DATE_FORMAT.format(data.getValue().endDate())));
+                data -> new SimpleObjectProperty<>(data.getValue().endDate()));
+        startColumn.setCellFactory(column -> new DateCell());
+        endColumn.setCellFactory(column -> new DateCell());
         statusColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(statusText(data.getValue().status())));
         reservationTable.getSelectionModel().selectedItemProperty()
                 .addListener((value, before, chosen) -> updateButtons(chosen));
         searchField.textProperty().addListener((value, before, text) -> applyFilter());
-        filterGroup.selectedToggleProperty().addListener((value, before, chosen) -> keepOneToggle(before));
+        filterGroup.selectedToggleProperty().addListener((value, before, chosen) -> applyFilter());
         loadReservations();
     }
 
@@ -189,8 +191,11 @@ public class ReservationsController {
         Pane parent = (Pane) screenRoot.getParent();
         ScreenLoader.LoadedScreen screen = new ScreenLoader(facade).open("reservations.fxml");
         ReservationController controller = (ReservationController) screen.controller();
-        controller.setOnReservationCreated(() -> parent.getChildren()
-                .setAll(new ScreenLoader(facade).load("reservations-list.fxml")));
+        controller.setOnReservationCreated(() -> {
+            ScreenLoader.LoadedScreen list = new ScreenLoader(facade).open("reservations-list.fxml");
+            parent.getChildren().setAll(list.root());
+            ((ReservationsController) list.controller()).showCreated();
+        });
         parent.getChildren().setAll(screen.root());
     }
 
@@ -262,18 +267,23 @@ public class ReservationsController {
         return QuickFilter.ALL_ACTIVE;
     }
 
-    /** Puts the old toggle back when the user clicks the chosen one, so one filter is always on. */
-    private void keepOneToggle(Toggle before) {
-        if (filterGroup.getSelectedToggle() == null) {
-            filterGroup.selectToggle(before == null ? allActiveToggle : before);
-            return;
-        }
-        applyFilter();
-    }
-
     private void updateButtons(ActiveReservation chosen) {
         checkInButton.setDisable(!canCheckIn(chosen));
         checkOutButton.setDisable(!canCheckOut(chosen));
+    }
+
+    /** Shows that a reservation was created. */
+    void showCreated() {
+        showMessage("Reserva criada.", true);
+    }
+
+    /** A table cell that shows a date as dd/MM/yyyy. */
+    private static class DateCell extends TableCell<ActiveReservation, LocalDate> {
+        @Override
+        protected void updateItem(LocalDate date, boolean empty) {
+            super.updateItem(date, empty);
+            setText(empty || date == null ? null : DATE_FORMAT.format(date));
+        }
     }
 
     private void showMessage(String message, boolean success) {
