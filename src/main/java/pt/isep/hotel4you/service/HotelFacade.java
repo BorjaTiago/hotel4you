@@ -10,6 +10,7 @@ import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ActiveReservation;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
@@ -142,7 +143,7 @@ public class HotelFacade {
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws IllegalStateException if the database is not available
      */
-    public List<ClientReservation> listActiveReservations(User actor) {
+    public List<ActiveReservation> listActiveReservations(User actor) {
         return reservationService.listActive(actor);
     }
 

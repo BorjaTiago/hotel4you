@@ -40,7 +40,7 @@ public class MainController {
     private Button reservationsButton;
 
     @FXML
-    private Button checkInOutButton;
+    private Button reservationsListButton;
 
     @FXML
     private Button pricesButton;
@@ -81,8 +81,8 @@ public class MainController {
         freeRoomsButton.setVisible(facade.canUse(user, Permission.SEARCH_ROOMS));
         reservationsButton.managedProperty().bind(reservationsButton.visibleProperty());
         reservationsButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
-        checkInOutButton.managedProperty().bind(checkInOutButton.visibleProperty());
-        checkInOutButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
+        reservationsListButton.managedProperty().bind(reservationsListButton.visibleProperty());
+        reservationsListButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
@@ -91,6 +91,9 @@ public class MainController {
         clientsButton.setVisible(facade.canUse(user, Permission.MANAGE_CLIENTS));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
+        if (facade.canUse(user, Permission.MANAGE_RESERVATIONS)) {
+            onReservationsListClicked();
+        }
     }
 
     @FXML
@@ -124,9 +127,9 @@ public class MainController {
     }
 
     @FXML
-    private void onCheckInOutClicked() {
-        Parent checkInOutScreen = new ScreenLoader(facade).load("check-in-out.fxml");
-        contentPane.getChildren().setAll(checkInOutScreen);
+    private void onReservationsListClicked() {
+        Parent reservationsListScreen = new ScreenLoader(facade).load("reservations-list.fxml");
+        contentPane.getChildren().setAll(reservationsListScreen);
     }
 
     @FXML
