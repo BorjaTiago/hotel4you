@@ -103,10 +103,14 @@ public class ReservationsController {
      * Tells if the check-in button is on for the chosen row.
      *
      * @param row the chosen row, or null if no row is chosen
-     * @return true only for a RESERVED row
+     * @param today the current date
+     * @return true only for a RESERVED row whose start date is today or before and whose end date is after today
      */
-    static boolean canCheckIn(ReservationSummary row) {
-        return row != null && row.status() == ReservationStatus.RESERVED;
+    static boolean canCheckIn(ReservationSummary row, LocalDate today) {
+        if (row == null || row.status() != ReservationStatus.RESERVED) {
+            return false;
+        }
+        return !today.isBefore(row.startDate()) && today.isBefore(row.endDate());
     }
 
     /**
@@ -197,7 +201,7 @@ public class ReservationsController {
     @FXML
     private void onCheckInClicked() {
         ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
-        if (!canCheckIn(chosen)) {
+        if (!canCheckIn(chosen, LocalDate.now())) {
             return;
         }
         try {
@@ -265,7 +269,7 @@ public class ReservationsController {
     }
 
     private void updateButtons(ReservationSummary chosen) {
-        checkInButton.setDisable(!canCheckIn(chosen));
+        checkInButton.setDisable(!canCheckIn(chosen, LocalDate.now()));
         checkOutButton.setDisable(!canCheckOut(chosen));
     }
 
