@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.layout.*?>
 
 <VBox styleClass="screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.ClientController">
 
-    <!-- Title and search -->
+    <!-- Title and next step -->
     <HBox spacing="8" alignment="CENTER_LEFT">
-        <Label text="Clientes" styleClass="section-title" minWidth="-Infinity">
-            <HBox.margin>
-                <Insets right="8"/>
-            </HBox.margin>
-        </Label>
+        <Label text="Clientes" styleClass="section-title" minWidth="-Infinity"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Continuar com este cliente →" onAction="#onContinueClicked" styleClass="next-button"
+                minWidth="-Infinity"/>
+    </HBox>
+
+    <!-- Search -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
         <Label fx:id="searchFieldLabel" text="Procurar por" minWidth="-Infinity"/>
         <ComboBox fx:id="searchFieldBox" minWidth="140"/>
         <Label fx:id="searchLabel" text="Texto" minWidth="-Infinity"/>
@@ -93,11 +95,9 @@
         </GridPane>
     </HBox>
 
-    <!-- Footer: message on the left, next step on the right -->
+    <!-- Footer: message only -->
     <HBox spacing="12" alignment="CENTER_RIGHT">
         <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                visible="${messageLabel.text != ''}"/>
-        <Button text="Continuar com este cliente →" onAction="#onContinueClicked" styleClass="next-button"
-                minWidth="-Infinity"/>
     </HBox>
 </VBox>
