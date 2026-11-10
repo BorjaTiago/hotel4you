@@ -22,7 +22,7 @@ import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
-/** Tests the creation of staff accounts. */
+/** Tests the creation, list and edit of staff accounts. */
 class StaffServiceTest {
 
     private static final String HASH =
@@ -253,5 +253,162 @@ class StaffServiceTest {
     @Tag("H4Y-27-AC-1")
     void onListUsers_returnEmptyList_whenNoAccountExists() {
         assertTrue(staffService.listUsers().isEmpty());
+    }
+
+    private long saveAna() {
+        staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
+        return repository.findByUsername("ana").orElseThrow().getId();
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_saveNewRole_whenActorIsManager() {
+        long id = saveAna();
+
+        staffService.editStaff(id, "Ana Silva", "ana", Role.RESTAURANT, manager());
+
+        User ana = repository.findById(id).orElseThrow();
+        assertTrue(ana instanceof RestaurantStaff);
+        assertEquals(Role.RESTAURANT, ana.getRole());
+        assertEquals(1, repository.count());
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_loginWithNewRoleAndSamePassword_whenRoleChanged() {
+        long id = saveAna();
+
+        staffService.editStaff(id, "Ana Silva", "ana", Role.RESTAURANT, manager());
+
+        assertEquals(Role.RESTAURANT, authService.login("ana", PASSWORD).getRole());
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_saveTrimmedNameAndUsername_whenTheyChange() {
+        long id = saveAna();
+
+        staffService.editStaff(id, "  Ana Costa  ", "  anac  ", Role.RECEPTIONIST, manager());
+
+        User ana = repository.findById(id).orElseThrow();
+        assertEquals("Ana Costa", ana.getName());
+        assertEquals("anac", ana.getUsername());
+        assertTrue(repository.findByUsername("ana").isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_saveAccount_whenUsernameOnlyChangesCase() {
+        long id = saveAna();
+
+        staffService.editStaff(id, "Ana Silva", "Ana", Role.RECEPTIONIST, manager());
+
+        assertEquals("Ana", repository.findById(id).orElseThrow().getUsername());
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_throw_whenNameBlank() {
+        long id = saveAna();
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> staffService.editStaff(id, "  ", "ana", Role.RESTAURANT, manager()));
+
+        assertEquals("Preencha todos os campos.", error.getMessage());
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_throw_whenUsernameLongerThan50() {
+        long id = saveAna();
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> staffService.editStaff(
+                        id, "Ana Silva", "a".repeat(51), Role.RESTAURANT, manager()));
+
+        assertEquals("O nome de utilizador tem no máximo 50 caracteres.", error.getMessage());
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onEditStaff_throw_whenRoleIsClient() {
+        long id = saveAna();
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> staffService.editStaff(id, "Ana Silva", "ana", Role.CLIENT, manager()));
+
+        assertEquals("Este tipo de conta não é permitido.", error.getMessage());
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-2")
+    void onEditStaff_throwUsernameTaken_whenUsernameOfOtherAccount() {
+        long id = saveAna();
+        staffService.createStaff("Rui Lima", "rui", PASSWORD, Role.MANAGER, manager());
+
+        assertThrows(UsernameTakenException.class,
+                () -> staffService.editStaff(id, "Ana Silva", "rui", Role.RESTAURANT, manager()));
+
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-2")
+    void onEditStaff_throwUsernameTaken_whenUsernameOfOtherAccountDiffersOnlyInCase() {
+        long id = saveAna();
+        staffService.createStaff("Rui Lima", "rui", PASSWORD, Role.MANAGER, manager());
+
+        assertThrows(UsernameTakenException.class,
+                () -> staffService.editStaff(id, "Ana Silva", "RUI", Role.RESTAURANT, manager()));
+
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-3")
+    void onEditStaff_throwStaffNotFound_whenAccountMissing() {
+        StaffNotFoundException error = assertThrows(StaffNotFoundException.class,
+                () -> staffService.editStaff(99L, "Zé Lopes", "ze", Role.RECEPTIONIST, manager()));
+
+        assertEquals("A conta não existe.", error.getMessage());
+        assertEquals(0, repository.count());
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-4")
+    void onEditStaff_throwAccessDenied_whenActorIsReceptionist() {
+        assertEditDenied(new Receptionist(2L, "Bia Neves", "bia", HASH));
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-4")
+    void onEditStaff_throwAccessDenied_whenActorIsRestaurantStaff() {
+        assertEditDenied(new RestaurantStaff(3L, "Joao Lima", "joao", HASH));
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-4")
+    void onEditStaff_throwAccessDenied_whenActorIsNull() {
+        assertEditDenied(null);
+    }
+
+    private void assertEditDenied(User actor) {
+        long id = saveAna();
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> staffService.editStaff(id, "Ana Silva", "ana", Role.RESTAURANT, actor));
+
+        assertEquals("Só o gestor pode editar contas.", error.getMessage());
+        assertAnaUnchanged(id);
+    }
+
+    private void assertAnaUnchanged(long id) {
+        User ana = repository.findById(id).orElseThrow();
+        assertEquals("Ana Silva", ana.getName());
+        assertEquals("ana", ana.getUsername());
+        assertEquals(Role.RECEPTIONIST, ana.getRole());
     }
 }

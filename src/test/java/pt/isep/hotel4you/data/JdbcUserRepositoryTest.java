@@ -78,4 +78,26 @@ class JdbcUserRepositoryTest {
         assertEquals(Database.NOT_AVAILABLE, error.getMessage());
         assertInstanceOf(SQLException.class, error.getCause());
     }
+
+    @Test
+    @Tag("H4Y-85-AC-3")
+    void onFindById_keepSqlCause_whenSqlFails() {
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> repository.findById(1L));
+
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
+        assertInstanceOf(SQLException.class, error.getCause());
+    }
+
+    @Test
+    @Tag("H4Y-85-AC-1")
+    void onUpdate_keepSqlCause_whenSqlFails() {
+        Manager manager = new Manager(1L, "Ana Silva", "ana", "hash");
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> repository.update(manager));
+
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
+        assertInstanceOf(SQLException.class, error.getCause());
+    }
 }
