@@ -255,11 +255,6 @@ class StaffServiceTest {
         assertTrue(staffService.listUsers().isEmpty());
     }
 
-    private long saveAna() {
-        staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
-        return repository.findByUsername("ana").orElseThrow().getId();
-    }
-
     @Test
     @Tag("H4Y-85-AC-1")
     void onEditStaff_saveNewRole_whenActorIsManager() {
@@ -410,5 +405,10 @@ class StaffServiceTest {
         assertEquals("Ana Silva", ana.getName());
         assertEquals("ana", ana.getUsername());
         assertEquals(Role.RECEPTIONIST, ana.getRole());
+    }
+
+    private long saveAna() {
+        staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
+        return repository.findByUsername("ana").orElseThrow().getId();
     }
 }
