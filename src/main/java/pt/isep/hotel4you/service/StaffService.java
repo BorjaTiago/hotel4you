@@ -59,7 +59,8 @@ public class StaffService {
         if (password == null || password.isBlank()) {
             throw new IllegalArgumentException("Preencha todos os campos.");
         }
-        String trimmedName = checkFields(name, username, role);
+        checkFields(name, username, role);
+        String trimmedName = name.trim();
         String trimmedUsername = username.trim();
         if (userRepository.existsByUsername(trimmedUsername)) {
             throw new UsernameTakenException();
@@ -88,31 +89,29 @@ public class StaffService {
         if (!Permission.MANAGE_STAFF.allows(actor)) {
             throw new AccessDeniedException("Só o gestor pode editar contas.");
         }
-        String trimmedName = checkFields(name, username, role);
+        checkFields(name, username, role);
+        String trimmedName = name.trim();
         String trimmedUsername = username.trim();
         User current = userRepository.findById(id).orElseThrow(StaffNotFoundException::new);
-        Optional<User> same = userRepository.findByUsername(trimmedUsername);
-        if (same.isPresent() && same.get().getId() != id) {
+        Optional<User> owner = userRepository.findByUsername(trimmedUsername);
+        boolean takenByOther = owner.isPresent() && owner.get().getId() != id;
+        if (takenByOther) {
             throw new UsernameTakenException();
         }
+        // The account can be removed between findById and update.
         if (!userRepository.update(newUser(id, trimmedName, trimmedUsername,
                 current.getPasswordHash(), role))) {
             throw new StaffNotFoundException();
         }
     }
 
-    /**
-     * Checks the name, the username and the role of an account.
-     *
-     * @return the trimmed name
-     */
-    private static String checkFields(String name, String username, Role role) {
+    /** Checks the name, the username and the role of an account. */
+    private static void checkFields(String name, String username, Role role) {
         if (name == null || name.isBlank() || username == null || username.isBlank()
                 || role == null) {
             throw new IllegalArgumentException("Preencha todos os campos.");
         }
-        String trimmedName = name.trim();
-        if (trimmedName.length() > MAX_NAME_LENGTH) {
+        if (name.trim().length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException("O nome tem no máximo 100 caracteres.");
         }
         if (username.trim().length() > MAX_USERNAME_LENGTH) {
@@ -121,7 +120,6 @@ public class StaffService {
         if (role != Role.RECEPTIONIST && role != Role.RESTAURANT && role != Role.MANAGER) {
             throw new IllegalArgumentException("Este tipo de conta não é permitido.");
         }
-        return trimmedName;
     }
 
     private static User newUser(Long id, String name, String username, String passwordHash,

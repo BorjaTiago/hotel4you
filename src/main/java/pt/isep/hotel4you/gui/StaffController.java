@@ -109,7 +109,7 @@ public class StaffController {
     }
 
     private void fillForm(User user) {
-        // The password does not change on edit, so the field is hidden while a row is selected.
+        // Clear the password. Edit does not change it.
         passwordField.clear();
         if (user != null) {
             nameField.setText(user.getName());
