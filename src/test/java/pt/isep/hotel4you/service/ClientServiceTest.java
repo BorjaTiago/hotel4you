@@ -19,6 +19,7 @@ import pt.isep.hotel4you.data.ClientExistsException;
 import pt.isep.hotel4you.data.ClientInUseException;
 import pt.isep.hotel4you.data.InMemoryClientRepository;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
@@ -369,7 +370,7 @@ class ClientServiceTest {
         service.register(valid(), receptionist());
         service.register(client("João Pereira", DocumentType.PASSPORT, "X998877"), receptionist());
 
-        List<Client> clients = service.searchClients("  santos ", receptionist());
+        List<Client> clients = service.searchClients(ClientSearchField.NAME, "  santos ", receptionist());
 
         assertEquals(1, clients.size());
         assertEquals(NAME, clients.get(0).getName());
@@ -381,7 +382,7 @@ class ClientServiceTest {
         service.register(valid(), receptionist());
         service.register(client("João Pereira", DocumentType.PASSPORT, "X998877"), receptionist());
 
-        List<Client> clients = service.searchClients("9988", manager());
+        List<Client> clients = service.searchClients(ClientSearchField.DOCUMENT, "9988", manager());
 
         assertEquals(1, clients.size());
         assertEquals("João Pereira", clients.get(0).getName());
@@ -392,7 +393,7 @@ class ClientServiceTest {
     void onSearchClients_returnEmpty_whenNoClientMatches() {
         service.register(valid(), receptionist());
 
-        assertTrue(service.searchClients("Inexistente", receptionist()).isEmpty());
+        assertTrue(service.searchClients(ClientSearchField.NAME, "Inexistente", receptionist()).isEmpty());
     }
 
     @ParameterizedTest
@@ -403,7 +404,7 @@ class ClientServiceTest {
         service.register(valid(), receptionist());
         service.register(client("João Pereira", DocumentType.PASSPORT, "X998877"), receptionist());
 
-        assertEquals(2, service.searchClients(text, receptionist()).size());
+        assertEquals(2, service.searchClients(ClientSearchField.NAME, text, receptionist()).size());
     }
 
     @Test
@@ -418,7 +419,53 @@ class ClientServiceTest {
     @Test
     @Tag("H4Y-52-AC-8")
     void onSearchClients_throw_whenNoActor() {
-        assertThrows(AccessDeniedException.class, () -> service.searchClients("Maria", null));
+        assertThrows(AccessDeniedException.class, () -> service.searchClients(ClientSearchField.NAME, "Maria", null));
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearchClients_returnEmpty_whenDocumentFieldAndTextIsName() {
+        service.register(valid(), receptionist());
+
+        assertTrue(service.searchClients(ClientSearchField.DOCUMENT, "Santos", receptionist()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearchClients_returnMatch_whenFieldIsPhone() {
+        service.register(valid(), receptionist());
+
+        List<Client> clients = service.searchClients(ClientSearchField.PHONE, "912 345", receptionist());
+
+        assertEquals(1, clients.size());
+        assertEquals(NAME, clients.get(0).getName());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearchClients_throw_whenFieldIsNull() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.searchClients(null, "Maria", receptionist()));
+
+        assertEquals("Escolha o campo de pesquisa.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-4")
+    void onSearchClients_returnAllClients_whenFieldIsPhoneAndTextBlank() {
+        service.register(valid(), receptionist());
+        service.register(client("João Pereira", DocumentType.PASSPORT, "X998877"), receptionist());
+
+        assertEquals(2, service.searchClients(ClientSearchField.PHONE, "  ", receptionist()).size());
+    }
+
+    @Test
+    @Tag("H4Y-52-AC-8")
+    void onSearchClients_throw_whenActorIsRestaurantStaff() {
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> service.searchClients(ClientSearchField.NAME, "Maria", cook()));
+
+        assertEquals(DENIED_MESSAGE, error.getMessage());
     }
 
     // ---------- Edit ----------

@@ -15,14 +15,14 @@ assignee: BorjaTiago
 # Título: Criar uma reserva em três passos: cliente, quarto e confirmação
 
 Como rececionista,
-Eu quero atender o cliente num só ecrã "Clientes e reservas",
+Eu quero atender o cliente num só ecrã "Nova reserva",
 Para que o atendimento ao balcão seja simples, sem mudar de ecrã.
 
 ## Critérios de aceite
 
 ### Cenário AC-1: Ecrã único com três separadores
   Dado que o rececionista tem sessão iniciada
-  Quando o rececionista abre o ecrã "Clientes e reservas"
+  Quando o rececionista abre o ecrã "Nova reserva"
   Então o ecrã mostra os separadores Cliente, Quarto e Confirmar
   E o menu não tem os botões separados "Clientes" e "Quartos livres"
 
@@ -57,7 +57,7 @@ Para que o atendimento ao balcão seja simples, sem mudar de ecrã.
 
 ## Critérios de aceite (checklist)
 
-- [ ] AC-1: O ecrã "Clientes e reservas" tem os separadores Cliente, Quarto e Confirmar, sem botões separados no menu.
+- [ ] AC-1: O ecrã "Nova reserva" tem os separadores Cliente, Quarto e Confirmar, sem botões separados no menu.
 - [ ] AC-2: O separador Cliente pesquisa por documento, nome ou telefone e permite registar, editar e remover.
 - [ ] AC-3: O separador Quarto só abre depois de escolher um cliente.
 - [ ] AC-4: O separador Quarto lista os quartos livres por tipo e datas.
@@ -79,4 +79,4 @@ compared: equal
 reasoning: O código e os testes já existem no PR #53 (24 ficheiros, cerca de 980 linhas). O trabalho que resta é rever e fazer merge, sem CSS. Se a equipa contar o tamanho total do ecrã (lógica, dados e GUI), seria 5 (Realizar check-in com cartão magnético).
 split_needed: no
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06; estimator, Claude Code (claude-sonnet-5-5), 2026-11-06; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06; estimator, Claude Code (claude-sonnet-5-5), 2026-11-06; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06; screen rename to "Nova reserva" by Claude Code (claude-opus-5-5), 2026-11-09. Reviewed by: pending.

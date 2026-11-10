@@ -3,25 +3,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.ClientController">
 
-    <Label text="Clientes" styleClass="subtitle"/>
-    <HBox spacing="16" VBox.vgrow="ALWAYS">
+    <!-- Next step: the screen title is in reservations.fxml -->
+    <HBox alignment="CENTER_RIGHT">
+        <Button text="Continuar com este cliente →" onAction="#onContinueClicked" styleClass="next-button"
+                minWidth="-Infinity"/>
+    </HBox>
 
-        <!-- Search and client table -->
-        <VBox spacing="12" HBox.hgrow="ALWAYS">
-            <HBox spacing="12" alignment="CENTER_LEFT">
-                <Label fx:id="searchLabel" text="Procurar"/>
-                <TextField fx:id="searchField" promptText="Nome ou documento"
-                           onAction="#onSearchClientClicked" HBox.hgrow="ALWAYS"/>
-                <Button text="Procurar" onAction="#onSearchClientClicked" styleClass="primary-button"/>
-            </HBox>
-            <TableView fx:id="clientTable" accessibleText="Clientes" VBox.vgrow="ALWAYS" prefWidth="520">
+    <!-- Search -->
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <Label fx:id="searchFieldLabel" text="Procurar por" minWidth="-Infinity"/>
+        <ComboBox fx:id="searchFieldBox" minWidth="140"/>
+        <Label fx:id="searchLabel" text="Texto" minWidth="-Infinity"/>
+        <TextField fx:id="searchField" promptText="Texto a procurar"
+                   onAction="#onSearchClientClicked" HBox.hgrow="ALWAYS"/>
+        <Button text="Procurar" onAction="#onSearchClientClicked" styleClass="primary-button"
+                minWidth="-Infinity"/>
+    </HBox>
+
+    <HBox spacing="12" VBox.vgrow="ALWAYS">
+
+        <!-- Client table -->
+        <VBox HBox.hgrow="ALWAYS" styleClass="card">
+            <TableView fx:id="clientTable" accessibleText="Clientes" VBox.vgrow="ALWAYS" prefWidth="300">
                 <columns>
-                    <TableColumn fx:id="nameColumn" text="Nome" prefWidth="180"/>
-                    <TableColumn fx:id="documentTypeColumn" text="Tipo de documento" prefWidth="140"/>
-                    <TableColumn fx:id="documentColumn" text="Documento" prefWidth="120"/>
+                    <TableColumn fx:id="nameColumn" text="Nome" prefWidth="160"/>
+                    <TableColumn fx:id="documentTypeColumn" text="Tipo de documento" prefWidth="150"/>
+                    <TableColumn fx:id="documentColumn" text="Documento" prefWidth="110"/>
                     <TableColumn fx:id="birthDateColumn" text="Data de nascimento" prefWidth="140"/>
                     <TableColumn fx:id="phoneColumn" text="Telefone" prefWidth="110"/>
                     <TableColumn fx:id="nationalityColumn" text="Nacionalidade" prefWidth="120"/>
@@ -34,32 +44,58 @@
             </TableView>
         </VBox>
 
-        <!-- Client form -->
-        <VBox spacing="6" prefWidth="320" minWidth="280">
-            <Label fx:id="nameLabel" text="Nome"/>
-            <TextField fx:id="nameField" maxWidth="Infinity"/>
-            <Label fx:id="documentTypeLabel" text="Tipo de documento"/>
-            <ComboBox fx:id="documentTypeBox" maxWidth="Infinity"/>
-            <Label fx:id="documentLabel" text="Documento"/>
-            <TextField fx:id="documentField" maxWidth="Infinity"/>
-            <Label fx:id="birthDateLabel" text="Data de nascimento"/>
-            <DatePicker fx:id="birthDatePicker" promptText="dd/mm/aaaa" maxWidth="Infinity"/>
-            <Label fx:id="phoneLabel" text="Telefone"/>
-            <TextField fx:id="phoneField" maxWidth="Infinity"/>
-            <Label fx:id="nationalityLabel" text="Nacionalidade"/>
-            <ComboBox fx:id="nationalityBox" maxWidth="Infinity"/>
-            <Label fx:id="emailLabel" text="Email (opcional)"/>
-            <TextField fx:id="emailField" maxWidth="Infinity"/>
-            <Label fx:id="taxNumberLabel" text="NIF (opcional)"/>
-            <TextField fx:id="taxNumberField" maxWidth="Infinity"/>
-        </VBox>
+        <!-- Client form: two columns, then the actions -->
+        <GridPane hgap="10" vgap="6" prefWidth="350" minWidth="350" styleClass="card">
+            <columnConstraints>
+                <ColumnConstraints percentWidth="50"/>
+                <ColumnConstraints percentWidth="50"/>
+            </columnConstraints>
+            <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                <Label fx:id="nameLabel" text="Nome"/>
+                <TextField fx:id="nameField" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                <Label fx:id="documentTypeLabel" text="Tipo de documento"/>
+                <ComboBox fx:id="documentTypeBox" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                <Label fx:id="documentLabel" text="Documento"/>
+                <TextField fx:id="documentField" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                <Label fx:id="birthDateLabel" text="Data de nascimento"/>
+                <DatePicker fx:id="birthDatePicker" promptText="dd/mm/aaaa" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                <Label fx:id="phoneLabel" text="Telefone"/>
+                <TextField fx:id="phoneField" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                <Label fx:id="nationalityLabel" text="Nacionalidade"/>
+                <ComboBox fx:id="nationalityBox" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                <Label fx:id="emailLabel" text="Email (opcional)"/>
+                <TextField fx:id="emailField" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="2" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <Label fx:id="taxNumberLabel" text="NIF (opcional)"/>
+                <TextField fx:id="taxNumberField" maxWidth="Infinity"/>
+            </VBox>
+            <Button text="Registar" onAction="#onRegisterClientClicked" styleClass="action-button, save-button"
+                    maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+            <Button text="Guardar alterações" onAction="#onSaveClientChangesClicked" styleClass="action-button, edit-button"
+                    maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            <Button text="Remover" onAction="#onRemoveClientClicked" styleClass="action-button, danger-button"
+                    maxWidth="Infinity" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+            <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button"
+                    maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        </GridPane>
     </HBox>
 
-    <HBox spacing="12">
-        <Button text="Registar" onAction="#onRegisterClientClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="Guardar alterações" onAction="#onSaveClientChangesClicked" styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="Remover" onAction="#onRemoveClientClicked" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-        <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+    <!-- Footer: message only -->
+    <HBox spacing="12" alignment="CENTER_RIGHT">
+        <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+               visible="${messageLabel.text != ''}"/>
     </HBox>
-    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>
