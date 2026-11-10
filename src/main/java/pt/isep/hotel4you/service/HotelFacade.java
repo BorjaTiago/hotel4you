@@ -295,6 +295,24 @@ public class HotelFacade {
     }
 
     /**
+     * Changes the name, login name and role of a staff account. The password stays the same.
+     *
+     * @param id the identifier of the account
+     * @param name the new full name
+     * @param username the new login name
+     * @param role the new role
+     * @param actor the logged-in user who asks for the change
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if a field is blank, too long, or the role has no account
+     * @throws StaffNotFoundException if the account does not exist
+     * @throws UsernameTakenException if another account uses the username
+     * @throws IllegalStateException if the database is not available
+     */
+    public void editStaff(long id, String name, String username, Role role, User actor) {
+        staffService.editStaff(id, name, username, role, actor);
+    }
+
+    /**
      * Lists all staff accounts.
      *
      * @return the accounts, or an empty list if none exists
