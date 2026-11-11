@@ -10,7 +10,9 @@ import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
@@ -142,7 +144,7 @@ public class HotelFacade {
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws IllegalStateException if the database is not available
      */
-    public List<ClientReservation> listActiveReservations(User actor) {
+    public List<ReservationSummary> listActiveReservations(User actor) {
         return reservationService.listActive(actor);
     }
 
@@ -174,16 +176,18 @@ public class HotelFacade {
     }
 
     /**
-     * Finds the clients whose name or document number contains the text.
+     * Finds the clients whose chosen field contains the text.
      *
+     * @param field the client data to search in
      * @param text the text to find; a blank text lists all clients
      * @param actor the logged-in user who asks
      * @return the matching clients ordered by name
      * @throws AccessDeniedException if the actor is not a receptionist or a manager
+     * @throws IllegalArgumentException if the field is missing
      * @throws IllegalStateException if the database is not available
      */
-    public List<Client> searchClients(String text, User actor) {
-        return clientService.searchClients(text, actor);
+    public List<Client> searchClients(ClientSearchField field, String text, User actor) {
+        return clientService.searchClients(field, text, actor);
     }
 
     /**

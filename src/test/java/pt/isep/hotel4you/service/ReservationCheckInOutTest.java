@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
-import pt.isep.hotel4you.domain.ClientReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -51,6 +51,10 @@ class ReservationCheckInOutTest {
 
     private void addReservation(long id, ReservationStatus status) {
         reservations.add(new Reservation(id, 7L, room.getId(), START, END, status, 4L));
+    }
+
+    private void addReservation(long id, LocalDate start, LocalDate end, ReservationStatus status) {
+        reservations.add(new Reservation(id, 7L, room.getId(), start, end, status, 4L));
     }
 
     private ReservationStatus statusOf(long id) {
@@ -101,6 +105,17 @@ class ReservationCheckInOutTest {
     }
 
     @Test
+    @Tag("H4Y-82-AC-2")
+    void onCheckIn_throwAndKeepState_whenReservationHasCheckOut() {
+        addReservation(1L, ReservationStatus.CHECKED_OUT);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkIn(1L, RECEPTIONIST));
+        assertEquals("A reserva já tem check-out.", error.getMessage());
+        assertEquals(ReservationStatus.CHECKED_OUT, statusOf(1L));
+    }
+
+    @Test
     @Tag("H4Y-82-AC-3")
     void onCheckIn_throwAndKeepState_whenReservationIsCancelled() {
         addReservation(1L, ReservationStatus.CANCELLED);
@@ -109,6 +124,38 @@ class ReservationCheckInOutTest {
                 () -> service.checkIn(1L, RECEPTIONIST));
         assertEquals("A reserva está cancelada.", error.getMessage());
         assertEquals(ReservationStatus.CANCELLED, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckIn_throwAndKeepState_whenStartDateIsInTheFuture() {
+        addReservation(1L, START.plusDays(1), START.plusDays(3), ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkIn(1L, RECEPTIONIST));
+        assertEquals("O check-in só é possível a partir do dia de entrada.", error.getMessage());
+        assertEquals(ReservationStatus.RESERVED, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckIn_saveCheckedIn_whenStartDateIsToday() {
+        addReservation(1L, START, START.plusDays(1), ReservationStatus.RESERVED);
+
+        service.checkIn(1L, RECEPTIONIST);
+
+        assertEquals(ReservationStatus.CHECKED_IN, statusOf(1L));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-15")
+    void onCheckIn_throwAndKeepState_whenEndDateIsToday() {
+        addReservation(1L, START.minusDays(2), START, ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.checkIn(1L, RECEPTIONIST));
+        assertEquals("A data de saída da reserva já passou.", error.getMessage());
+        assertEquals(ReservationStatus.RESERVED, statusOf(1L));
     }
 
     @Test
@@ -216,11 +263,11 @@ class ReservationCheckInOutTest {
         addReservation(3L, ReservationStatus.CANCELLED);
         addReservation(4L, ReservationStatus.CHECKED_OUT);
 
-        List<ClientReservation> active = service.listActive(RECEPTIONIST);
+        List<ReservationSummary> active = service.listActive(RECEPTIONIST);
 
-        assertEquals(List.of(1L, 2L), active.stream().map(ClientReservation::id).toList());
+        assertEquals(List.of(1L, 2L), active.stream().map(ReservationSummary::id).toList());
         assertEquals(List.of(ReservationStatus.RESERVED, ReservationStatus.CHECKED_IN),
-                active.stream().map(ClientReservation::status).toList());
+                active.stream().map(ReservationSummary::status).toList());
     }
 
     @Test

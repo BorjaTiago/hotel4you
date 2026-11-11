@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
 
 /** Keeps clients in memory. Unit tests use it instead of the database. */
@@ -37,12 +38,21 @@ public class InMemoryClientRepository implements ClientRepository {
     }
 
     @Override
-    public List<Client> search(String text) {
+    public List<Client> search(ClientSearchField field, String text) {
         String part = text.toLowerCase(Locale.ROOT);
         return findAll().stream()
-                .filter(client -> client.getName().toLowerCase(Locale.ROOT).contains(part)
-                        || client.getDocument().toLowerCase(Locale.ROOT).contains(part))
+                .filter(client -> valueOf(field, client).toLowerCase(Locale.ROOT).contains(part))
                 .toList();
+    }
+
+    private static String valueOf(ClientSearchField field, Client client) {
+        if (field == ClientSearchField.NAME) {
+            return client.getName();
+        }
+        if (field == ClientSearchField.PHONE) {
+            return client.getPhone();
+        }
+        return client.getDocument();
     }
 
     @Override

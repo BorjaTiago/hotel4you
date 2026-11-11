@@ -70,10 +70,10 @@ Para que o cliente fique instalado no quarto e a estadia termine quando sai.
   Quando o rececionista olha para os botões
   Então "Fazer check-in" e "Fazer check-out" estão desativados
 
-### Cenário AC-10: Check-in só para reserva RESERVED
+### Cenário AC-10: Check-in só para reserva RESERVED dentro do período
   Dado que o rececionista escolhe uma linha
   Quando a linha tem o estado RESERVED
-  Então "Fazer check-in" está ativo
+  Então "Fazer check-in" está ativo só se hoje estiver entre a data de entrada (incluída) e a data de saída (excluída)
   E "Fazer check-out" está desativado
 
 ### Cenário AC-11: Check-out só para reserva CHECKED_IN
@@ -94,6 +94,20 @@ Para que o cliente fique instalado no quarto e a estadia termine quando sai.
   Então a tabela atualiza
   E a reserva deixa de aparecer na lista
 
+### Cenário AC-14: Check-in antes do dia de entrada
+  Dado que a reserva está RESERVED
+  E a data de entrada ainda não chegou
+  Quando o rececionista tenta fazer o check-in
+  Então o sistema recusa o check-in
+  E informa "O check-in só é possível a partir do dia de entrada."
+
+### Cenário AC-15: Check-in depois do período
+  Dado que a reserva está RESERVED
+  E a data de saída já passou ou é hoje
+  Quando o rececionista tenta fazer o check-in
+  Então o sistema recusa o check-in
+  E informa "A data de saída da reserva já passou."
+
 ## Critérios de aceite (checklist)
 
 - [ ] AC-1: O check-in de uma reserva ativa é registado.
@@ -105,16 +119,19 @@ Para que o cliente fique instalado no quarto e a estadia termine quando sai.
 - [ ] AC-7: Um check-out duplicado é recusado.
 - [ ] AC-8: Depois do período da reserva, o quarto volta a ficar livre.
 - [ ] AC-9: Sem linha escolhida, os dois botões estão desativados.
-- [ ] AC-10: "Fazer check-in" só está ativo numa linha RESERVED.
+- [ ] AC-10: "Fazer check-in" só está ativo numa linha RESERVED dentro do período.
 - [ ] AC-11: "Fazer check-out" só está ativo numa linha CHECKED_IN.
 - [ ] AC-12: Depois do check-in, a tabela atualiza e mostra CHECKED_IN.
 - [ ] AC-13: Depois do check-out, a tabela atualiza e a reserva sai da lista.
+- [ ] AC-14: Antes do dia de entrada, o check-in é recusado com a mensagem própria.
+- [ ] AC-15: Na data de saída ou depois, o check-in é recusado com a mensagem própria.
 
 ## Notas
 - Junta as histórias story-check-in e story-check-out (decisão do utilizador, 2026-11-06). Entrega 1 (Q-06).
 - Os botões Check-in e Check-out ficam na barra de ações do ecrã principal "Reservas" (story-ver-reservas-ativas.md). Mesmo dono dessa história. Nenhuma outra história do sprint espera por esta.
 - A entrega do cartão magnético (RF-13, RF-16) fica na entrega final (epic-magnetic-card-access): as histórias do cartão acrescentam depois a emissão do cartão no checkIn e o cartão deixa de funcionar no checkOut (story-desativar-cartao-check-out). No check-out o registo de passagens fica guardado (decisão da equipa, 2026-10-16).
 - Depois do check-in o gestor deixa de poder apagar a reserva (RF-22).
+- Regra de datas do check-in (Q-61, decisão da equipa, 2026-11-09, não confirmada pelo professor): o check-in só é possível quando a data de entrada <= hoje < a data de saída. Antes da entrada o sistema recusa com "O check-in só é possível a partir do dia de entrada." Na data de saída ou depois recusa com "A data de saída da reserva já passou." O check-out não tem regra de data.
 - Dependências: nenhuma forte. Testar sozinha com reservas de teste próprias (ativa, cancelada, com check-in, com check-out) (foundation T4). O AC-8 verifica com a consulta de quartos livres (sprint 4).
 
 points_suggested: 5
@@ -123,4 +140,4 @@ compared: equal
 reasoning: Um só serviço (checkIn e checkOut) com regras de estado e erros (duplicado, cancelada, inexistente, sem check-in). Os estados já existem em ReservationStatus. Há também dois botões que ativam conforme o estado da linha e atualizam a tabela. Não há cartão, o que baixa o esforço, mas há 13 critérios e dois fluxos.
 split_needed: no
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06; estimator, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06; estimator, Claude Code (claude-sonnet-5-5), 2026-11-06; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09. Reviewed by: pending.

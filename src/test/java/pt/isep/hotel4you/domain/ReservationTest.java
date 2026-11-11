@@ -82,7 +82,7 @@ class ReservationTest {
     void onCheckCanCheckIn_notThrow_whenReservationIsReserved() {
         Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
 
-        assertDoesNotThrow(reservation::checkCanCheckIn);
+        assertDoesNotThrow(() -> reservation.checkCanCheckIn(START));
         assertEquals(ReservationStatus.RESERVED, reservation.getStatus());
     }
 
@@ -92,7 +92,7 @@ class ReservationTest {
         Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CHECKED_IN);
 
         IllegalStateException error = assertThrows(IllegalStateException.class,
-                reservation::checkCanCheckIn);
+                () -> reservation.checkCanCheckIn(START));
         assertEquals("A reserva já tem check-in.", error.getMessage());
     }
 
@@ -102,7 +102,7 @@ class ReservationTest {
         Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CHECKED_OUT);
 
         IllegalStateException error = assertThrows(IllegalStateException.class,
-                reservation::checkCanCheckIn);
+                () -> reservation.checkCanCheckIn(START));
         assertEquals("A reserva já tem check-out.", error.getMessage());
     }
 
@@ -112,7 +112,63 @@ class ReservationTest {
         Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CANCELLED);
 
         IllegalStateException error = assertThrows(IllegalStateException.class,
-                reservation::checkCanCheckIn);
+                () -> reservation.checkCanCheckIn(START));
+        assertEquals("A reserva está cancelada.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckCanCheckIn_throw_whenTodayIsBeforeStartDate() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservation.checkCanCheckIn(START.minusDays(1)));
+        assertEquals("O check-in só é possível a partir do dia de entrada.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckCanCheckIn_notThrow_whenTodayIsStartDate() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        assertDoesNotThrow(() -> reservation.checkCanCheckIn(START));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-14")
+    void onCheckCanCheckIn_notThrow_whenTodayIsBetweenStartAndEndDate() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        assertDoesNotThrow(() -> reservation.checkCanCheckIn(START.plusDays(1)));
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-15")
+    void onCheckCanCheckIn_throw_whenTodayIsEndDate() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservation.checkCanCheckIn(END));
+        assertEquals("A data de saída da reserva já passou.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-15")
+    void onCheckCanCheckIn_throw_whenTodayIsAfterEndDate() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.RESERVED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservation.checkCanCheckIn(END.plusDays(5)));
+        assertEquals("A data de saída da reserva já passou.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-82-AC-2")
+    void onCheckCanCheckIn_throwStateMessage_whenStateIsWrongAndDateIsOutOfPeriod() {
+        Reservation reservation = new Reservation(1L, 2L, START, END, ReservationStatus.CANCELLED);
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> reservation.checkCanCheckIn(END.plusDays(5)));
         assertEquals("A reserva está cancelada.", error.getMessage());
     }
 

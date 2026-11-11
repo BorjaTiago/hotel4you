@@ -2,6 +2,7 @@ package pt.isep.hotel4you.data;
 
 import java.util.List;
 import java.util.Optional;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
 
@@ -54,10 +55,10 @@ public interface ReservationRepository {
 
     /**
      * Reads the active bookings: the states RESERVED and CHECKED_IN.
-     * @return the bookings with the room number, first arrival first, or an empty list
+     * @return the bookings with the client and the room number, first arrival first, or an empty list
      * @throws IllegalStateException if the database cannot be read
      */
-    List<ClientReservation> findActive();
+    List<ReservationSummary> findActive();
 
     /**
      * Saves the check-in and its time. It changes the row only if the state is still RESERVED,

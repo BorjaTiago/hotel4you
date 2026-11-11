@@ -9,6 +9,7 @@ import pt.isep.hotel4you.data.ReservationRepository;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.data.RoomTypeRepository;
 import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
@@ -135,11 +136,12 @@ public class ReservationService {
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws ReservationNotFoundException if the reservation does not exist
      * @throws IllegalStateException if the reservation is cancelled, already has a check-in or a
-     *         check-out, changed state at the same moment, or the database is not available
+     *         check-out, today is outside the stay dates, changed state at the same moment, or the
+     *         database is not available
      */
     public void checkIn(long reservationId, User actor) {
         checkPermission(actor);
-        findReservation(reservationId).checkCanCheckIn();
+        findReservation(reservationId).checkCanCheckIn(LocalDate.now());
         if (!reservationRepository.checkIn(reservationId)) {
             throw new IllegalStateException(STATE_CHANGED);
         }
@@ -171,7 +173,7 @@ public class ReservationService {
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws IllegalStateException if the database is not available
      */
-    public List<ClientReservation> listActive(User actor) {
+    public List<ReservationSummary> listActive(User actor) {
         checkPermission(actor);
         return reservationRepository.findActive();
     }

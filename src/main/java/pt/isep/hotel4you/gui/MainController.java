@@ -34,22 +34,13 @@ public class MainController {
     private Button roomsButton;
 
     @FXML
-    private Button freeRoomsButton;
-
-    @FXML
-    private Button reservationsButton;
-
-    @FXML
-    private Button checkInOutButton;
+    private Button reservationsListButton;
 
     @FXML
     private Button pricesButton;
 
     @FXML
     private Button stockButton;
-
-    @FXML
-    private Button clientsButton;
 
     @FXML
     private StackPane contentPane;
@@ -77,20 +68,17 @@ public class MainController {
         floorsButton.setVisible(facade.canUse(user, Permission.MANAGE_FLOORS));
         roomsButton.managedProperty().bind(roomsButton.visibleProperty());
         roomsButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
-        freeRoomsButton.managedProperty().bind(freeRoomsButton.visibleProperty());
-        freeRoomsButton.setVisible(facade.canUse(user, Permission.SEARCH_ROOMS));
-        reservationsButton.managedProperty().bind(reservationsButton.visibleProperty());
-        reservationsButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
-        checkInOutButton.managedProperty().bind(checkInOutButton.visibleProperty());
-        checkInOutButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
+        reservationsListButton.managedProperty().bind(reservationsListButton.visibleProperty());
+        reservationsListButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
         stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
-        clientsButton.managedProperty().bind(clientsButton.visibleProperty());
-        clientsButton.setVisible(facade.canUse(user, Permission.MANAGE_CLIENTS));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
+        if (facade.canUse(user, Permission.MANAGE_RESERVATIONS)) {
+            onReservationsListClicked();
+        }
     }
 
     @FXML
@@ -112,21 +100,9 @@ public class MainController {
     }
 
     @FXML
-    private void onFreeRoomsClicked() {
-        Parent freeRoomsScreen = new ScreenLoader(facade).load("free-rooms.fxml");
-        contentPane.getChildren().setAll(freeRoomsScreen);
-    }
-
-    @FXML
-    private void onReservationsClicked() {
-        Parent reservationsScreen = new ScreenLoader(facade).load("reservations.fxml");
-        contentPane.getChildren().setAll(reservationsScreen);
-    }
-
-    @FXML
-    private void onCheckInOutClicked() {
-        Parent checkInOutScreen = new ScreenLoader(facade).load("check-in-out.fxml");
-        contentPane.getChildren().setAll(checkInOutScreen);
+    private void onReservationsListClicked() {
+        Parent reservationsListScreen = new ScreenLoader(facade).load("reservations-list.fxml");
+        contentPane.getChildren().setAll(reservationsListScreen);
     }
 
     @FXML
@@ -142,17 +118,8 @@ public class MainController {
     }
 
     @FXML
-    private void onClientsClicked() {
-        Parent clientScreen = new ScreenLoader(facade).load("client.fxml");
-        contentPane.getChildren().setAll(clientScreen);
-    }
-
-    @FXML
     private void onLogoutClicked() {
         HotelApp.currentUser = null;
-        HotelApp.chosenRoom = null;
-        HotelApp.chosenStart = null;
-        HotelApp.chosenEnd = null;
         openLogin();
     }
 

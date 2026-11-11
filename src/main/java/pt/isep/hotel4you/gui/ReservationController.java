@@ -4,30 +4,27 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ClientReservation;
-import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationQuote;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.domain.Room;
-import pt.isep.hotel4you.domain.RoomSearchResult;
-import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.service.HotelFacade;
 
-/** Controller for the reservation screen: find a client, see the reservations, create one. */
+/**
+ * Controller for the reservation screen. It has three tabs: choose the client, choose the room
+ * and the dates, and confirm the reservation.
+ */
 public class ReservationController {
 
     static final NumberFormat PRICE_FORMAT =
@@ -35,12 +32,46 @@ public class ReservationController {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final HotelFacade facade;
+    private Client chosenClient;
+    private Room chosenRoom;
+    private LocalDate chosenStart;
+    private LocalDate chosenEnd;
 
     @FXML
-    private TextField documentField;
+    private ClientController clientStepController;
 
     @FXML
-    private ComboBox<Client> clientBox;
+    private FreeRoomController roomStepController;
+
+    @FXML
+    private TabPane tabPane;
+
+    @FXML
+    private Tab roomTab;
+
+    @FXML
+    private Tab confirmTab;
+
+    @FXML
+    private Button confirmButton;
+
+    @FXML
+    private Label clientLabel;
+
+    @FXML
+    private Label roomLabel;
+
+    @FXML
+    private Label datesLabel;
+
+    @FXML
+    private Label summaryLabel;
+
+    @FXML
+    private Label totalLabel;
+
+    @FXML
+    private Label messageLabel;
 
     @FXML
     private TableView<ClientReservation> reservationTable;
@@ -56,27 +87,6 @@ public class ReservationController {
 
     @FXML
     private TableColumn<ClientReservation, String> statusColumn;
-
-    @FXML
-    private VBox newReservationBox;
-
-    @FXML
-    private ComboBox<RoomType> typeBox;
-
-    @FXML
-    private DatePicker startPicker;
-
-    @FXML
-    private DatePicker endPicker;
-
-    @FXML
-    private ComboBox<Room> roomBox;
-
-    @FXML
-    private Label summaryLabel;
-
-    @FXML
-    private Label messageLabel;
 
     /**
      * Creates the controller.
@@ -97,157 +107,82 @@ public class ReservationController {
                 data -> new SimpleStringProperty(DATE_FORMAT.format(data.getValue().endDate())));
         statusColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(statusText(data.getValue().status())));
-        clientBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Client client) {
-                return client == null ? "" : client.getName() + " (" + client.getDocument() + ")";
-            }
-
-            @Override
-            public Client fromString(String text) {
-                return null;
-            }
-        });
-        typeBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(RoomType type) {
-                return type == null ? "" : typeText(type.getName());
-            }
-
-            @Override
-            public RoomType fromString(String text) {
-                return null;
-            }
-        });
-        roomBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Room room) {
-                return room == null ? "" : "Quarto " + room.getNumber()
-                        + " (piso " + room.getFloorNumber() + ", " + typeText(room.getRoomTypeName()) + ")";
-            }
-
-            @Override
-            public Room fromString(String text) {
-                return null;
-            }
-        });
-        clientBox.valueProperty().addListener((value, before, after) -> showReservations());
-        roomBox.valueProperty().addListener((value, before, after) -> showSummary());
-        startPicker.valueProperty().addListener((value, before, after) -> showSummary());
-        endPicker.valueProperty().addListener((value, before, after) -> showSummary());
-        newReservationBox.managedProperty().bind(newReservationBox.visibleProperty());
-        newReservationBox.setVisible(false);
+        clientStepController.setOnClientChosen(this::onClientChosen);
+        roomStepController.setOnRoomChosen(this::onRoomChosen);
     }
 
-    @FXML
-    private void onFindClientClicked() {
+    private void onClientChosen(Client client) {
+        chosenClient = client;
+        clearRoomChoice();
+        confirmTab.setDisable(true);
         messageLabel.setText("");
-        List<Client> clients;
-        try {
-            clients = facade.searchClients(documentField.getText(), HotelApp.currentUser);
-        } catch (RuntimeException e) {
-            showMessage(e.getMessage(), false);
-            return;
-        }
-        clientBox.getItems().setAll(clients);
-        if (clients.isEmpty()) {
-            showMessage("Não há clientes com esse documento.", false);
-            return;
-        }
-        if (clients.size() > 1) {
-            showMessage("Escolha o cliente na lista.", false);
-            return;
-        }
-        clientBox.setValue(clients.get(0));
+        clientLabel.setText("Cliente: " + client.getName() + " (" + client.getDocument() + ")");
+        showReservations();
+        roomTab.setDisable(false);
+        tabPane.getSelectionModel().select(roomTab);
     }
 
-    @FXML
-    private void onNewReservationClicked() {
+    private void onRoomChosen(FreeRoomController.Choice choice) {
         messageLabel.setText("");
-        newReservationBox.setVisible(true);
-        try {
-            typeBox.getItems().setAll(facade.listSearchRoomTypes(HotelApp.currentUser));
-        } catch (RuntimeException e) {
-            showMessage(e.getMessage(), false);
-        }
-        Room chosen = HotelApp.chosenRoom;
-        if (chosen == null) {
-            return;
-        }
-        for (RoomType type : typeBox.getItems()) {
-            if (type.getName().equalsIgnoreCase(chosen.getRoomTypeName())) {
-                typeBox.setValue(type);
-            }
-        }
-        startPicker.setValue(HotelApp.chosenStart);
-        endPicker.setValue(HotelApp.chosenEnd);
-        roomBox.getItems().setAll(chosen);
-        roomBox.setValue(chosen);
-    }
-
-    @FXML
-    private void onFindRoomsClicked() {
-        messageLabel.setText("");
-        roomBox.getItems().clear();
-        try {
-            RoomSearchResult result = facade.searchRoomsWithMessage(startPicker.getValue(),
-                    endPicker.getValue(), typeBox.getValue(), HotelApp.currentUser);
-            roomBox.getItems().setAll(result.rooms());
-            showMessage(result.message(), false);
-        } catch (RuntimeException e) {
-            showMessage(e.getMessage(), false);
-        }
+        ReservationQuote quote = facade.quoteReservation(choice.room(), choice.start(), choice.end(),
+                HotelApp.currentUser);
+        chosenRoom = choice.room();
+        chosenStart = choice.start();
+        chosenEnd = choice.end();
+        roomLabel.setText("Quarto " + chosenRoom.getNumber() + " ("
+                + typeText(chosenRoom.getRoomTypeName()) + ")");
+        datesLabel.setText("Entrada: " + DATE_FORMAT.format(chosenStart) + ". Saída: "
+                + DATE_FORMAT.format(chosenEnd) + ".");
+        summaryLabel.setText(summaryText(chosenRoom.getNumber(), quote));
+        totalLabel.setText("Total: " + priceText(totalOf(quote)));
+        confirmTab.setDisable(false);
+        confirmButton.setDisable(false);
+        tabPane.getSelectionModel().select(confirmTab);
     }
 
     @FXML
     private void onCreateReservationClicked() {
         messageLabel.setText("");
         try {
-            Room room = roomBox.getValue();
-            Reservation saved = facade.createReservation(clientBox.getValue(), room,
-                    startPicker.getValue(), endPicker.getValue(), HotelApp.currentUser);
-            HotelApp.chosenRoom = null;
-            HotelApp.chosenStart = null;
-            HotelApp.chosenEnd = null;
-            roomBox.getItems().clear();
-            showReservations();
-            showMessage("Reserva criada: quarto " + room.getNumber() + ", de "
-                    + DATE_FORMAT.format(saved.getStartDate()) + " a "
-                    + DATE_FORMAT.format(saved.getEndDate()) + ".", true);
+            facade.createReservation(chosenClient, chosenRoom, chosenStart, chosenEnd,
+                    HotelApp.currentUser);
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
+            return;
         }
+        int number = chosenRoom.getNumber();
+        clearRoomChoice();
+        showReservations();
+        showMessage("Reserva criada para o quarto " + number + ".", true);
+    }
+
+    /** Forgets the room and the dates, and disables the confirm button. */
+    private void clearRoomChoice() {
+        chosenRoom = null;
+        chosenStart = null;
+        chosenEnd = null;
+        roomLabel.setText("");
+        datesLabel.setText("");
+        summaryLabel.setText("");
+        totalLabel.setText("");
+        confirmButton.setDisable(true);
     }
 
     private void showReservations() {
-        Client client = clientBox.getValue();
-        if (client == null) {
-            reservationTable.getItems().clear();
-            return;
-        }
         try {
             reservationTable.getItems().setAll(
-                    facade.listClientReservations(client, HotelApp.currentUser));
+                    facade.listClientReservations(chosenClient, HotelApp.currentUser));
         } catch (RuntimeException e) {
             reservationTable.getItems().clear();
             showMessage(e.getMessage(), false);
         }
     }
 
-    private void showSummary() {
-        Room room = roomBox.getValue();
-        LocalDate start = startPicker.getValue();
-        LocalDate end = endPicker.getValue();
-        if (room == null || start == null || end == null) {
-            summaryLabel.setText("");
-            return;
+    private static BigDecimal totalOf(ReservationQuote quote) {
+        if (quote.pricePerNight() == null) {
+            return null;
         }
-        try {
-            ReservationQuote quote = facade.quoteReservation(room, start, end, HotelApp.currentUser);
-            summaryLabel.setText(summaryText(room.getNumber(), quote));
-        } catch (RuntimeException e) {
-            summaryLabel.setText(e.getMessage());
-        }
+        return quote.pricePerNight().multiply(BigDecimal.valueOf(quote.nights()));
     }
 
     /**

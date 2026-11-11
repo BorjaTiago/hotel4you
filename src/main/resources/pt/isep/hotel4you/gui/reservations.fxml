@@ -3,64 +3,59 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="screen, reservation-screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.ReservationController">
 
-    <Label text="Reservas" styleClass="subtitle"/>
+    <Label text="Reservar quarto" styleClass="page-title"/>
 
-    <!-- Client search -->
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <Label text="Documento do cliente" labelFor="$documentField"/>
-        <TextField fx:id="documentField" onAction="#onFindClientClicked" HBox.hgrow="ALWAYS"/>
-        <Button text="Procurar" onAction="#onFindClientClicked" styleClass="primary-button"/>
-    </HBox>
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <Label text="Cliente" labelFor="$clientBox"/>
-        <ComboBox fx:id="clientBox" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-    </HBox>
+    <TabPane fx:id="tabPane" styleClass="steps" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <!-- Step 1: choose the client -->
+        <Tab text="1. Cliente">
+            <fx:include fx:id="clientStep" source="client.fxml"/>
+        </Tab>
 
-    <!-- Reservations of the client, with the cancelled ones -->
-    <TableView fx:id="reservationTable" accessibleText="Reservas do cliente" VBox.vgrow="ALWAYS"
-               prefHeight="160">
-        <columns>
-            <TableColumn fx:id="roomColumn" text="Quarto" prefWidth="100"/>
-            <TableColumn fx:id="startColumn" text="Entrada" prefWidth="140"/>
-            <TableColumn fx:id="endColumn" text="Saída" prefWidth="140"/>
-            <TableColumn fx:id="statusColumn" text="Estado" prefWidth="160"/>
-        </columns>
-        <placeholder>
-            <Label text="Procure o cliente para ver as reservas."/>
-        </placeholder>
-    </TableView>
-    <Button text="Nova reserva" onAction="#onNewReservationClicked" styleClass="action-button, edit-button"/>
+        <!-- Step 2: choose the room and the dates -->
+        <Tab fx:id="roomTab" text="2. Quarto" disable="true">
+            <fx:include fx:id="roomStep" source="free-rooms.fxml"/>
+        </Tab>
 
-    <!-- New reservation form -->
-    <VBox fx:id="newReservationBox" spacing="8">
-        <HBox spacing="12">
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Tipo" labelFor="$typeBox"/>
-                <ComboBox fx:id="typeBox" maxWidth="Infinity"/>
-            </VBox>
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Entrada" labelFor="$startPicker"/>
-                <DatePicker fx:id="startPicker" editable="false" maxWidth="Infinity"/>
-            </VBox>
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Saída" labelFor="$endPicker"/>
-                <DatePicker fx:id="endPicker" editable="false" maxWidth="Infinity"/>
-            </VBox>
-        </HBox>
-        <HBox spacing="12" alignment="BOTTOM_LEFT">
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label text="Quarto livre" labelFor="$roomBox"/>
-                <ComboBox fx:id="roomBox" maxWidth="Infinity"/>
-            </VBox>
-            <Button text="Procurar quartos livres" onAction="#onFindRoomsClicked" styleClass="primary-button"/>
-        </HBox>
-        <Label fx:id="summaryLabel" wrapText="true" maxWidth="Infinity"/>
-        <Button text="Confirmar reserva" onAction="#onCreateReservationClicked"
-                styleClass="action-button, save-button" maxWidth="Infinity"/>
-    </VBox>
+        <!-- Step 3: check the data and confirm -->
+        <Tab fx:id="confirmTab" text="3. Confirmar" disable="true">
+            <VBox styleClass="screen" spacing="12">
+                <VBox styleClass="summary-card" spacing="6">
+                    <Label fx:id="clientLabel" wrapText="true" maxWidth="Infinity"/>
+                    <Label fx:id="roomLabel" wrapText="true" maxWidth="Infinity"/>
+                    <Label fx:id="datesLabel" wrapText="true" maxWidth="Infinity"/>
+                    <Label fx:id="summaryLabel" wrapText="true" maxWidth="Infinity"/>
+                    <HBox spacing="12" alignment="CENTER_LEFT" styleClass="summary-footer">
+                        <Label fx:id="totalLabel" styleClass="summary-total" wrapText="true" maxWidth="Infinity"
+                               HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="confirmButton" text="Confirmar reserva ✓" onAction="#onCreateReservationClicked"
+                                styleClass="next-button" minWidth="-Infinity"/>
+                    </HBox>
+                </VBox>
+                <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"
+                       visible="${messageLabel.text != ''}" managed="${messageLabel.text != ''}"/>
 
-    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+                <!-- Reservations of the client, with the cancelled ones -->
+                <VBox VBox.vgrow="ALWAYS" styleClass="card">
+                    <TableView fx:id="reservationTable" accessibleText="Reservas do cliente"
+                               VBox.vgrow="ALWAYS" prefHeight="160">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                        </columnResizePolicy>
+                        <columns>
+                            <TableColumn fx:id="roomColumn" text="Quarto" prefWidth="110"/>
+                            <TableColumn fx:id="startColumn" text="Entrada" prefWidth="150"/>
+                            <TableColumn fx:id="endColumn" text="Saída" prefWidth="150"/>
+                            <TableColumn fx:id="statusColumn" text="Estado" prefWidth="180"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="O cliente não tem reservas."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+            </VBox>
+        </Tab>
+    </TabPane>
 </VBox>
