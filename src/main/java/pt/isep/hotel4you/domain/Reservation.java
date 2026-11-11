@@ -67,10 +67,11 @@ public class Reservation {
 
     /**
      * Checks that the booking allows the check-in. This method does not change the booking.
+     * @param today the current date; the check-in is allowed from the start date until the day before the end date
      * @throws IllegalStateException if the booking is cancelled, already has a check-in or
-     *         already has a check-out
+     *         already has a check-out, or if today is before the start date or on or after the end date
      */
-    public void checkCanCheckIn() {
+    public void checkCanCheckIn(LocalDate today) {
         if (status == ReservationStatus.CANCELLED) {
             throw new IllegalStateException("A reserva está cancelada.");
         }
@@ -79,6 +80,12 @@ public class Reservation {
         }
         if (status == ReservationStatus.CHECKED_OUT) {
             throw new IllegalStateException("A reserva já tem check-out.");
+        }
+        if (today.isBefore(startDate)) {
+            throw new IllegalStateException("O check-in só é possível a partir do dia de entrada.");
+        }
+        if (!today.isBefore(endDate)) {
+            throw new IllegalStateException("A data de saída da reserva já passou.");
         }
     }
 

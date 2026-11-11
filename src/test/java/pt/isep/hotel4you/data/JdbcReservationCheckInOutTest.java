@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import pt.isep.hotel4you.domain.ClientReservation;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
 
@@ -133,16 +133,34 @@ class JdbcReservationCheckInOutTest {
     void onFindActive_readReservedAndCheckedInWithRoomNumber_whenCalled() {
         database.rows = 2;
 
-        List<ClientReservation> rows = repository.findActive();
+        List<ReservationSummary> rows = repository.findActive();
 
         assertTrue(sql().contains("JOIN rooms rm ON rm.id = r.room_id"));
         assertTrue(sql().contains("WHERE r.status IN ('reserved', 'checked_in')"));
         assertTrue(sql().contains("ORDER BY r.start_date, r.id"));
         assertEquals(List.of(
-                new ClientReservation(1L, 201, START, END, ReservationStatus.RESERVED),
-                new ClientReservation(2L, 201, START, END, ReservationStatus.CHECKED_IN)), rows);
+                new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START, END,
+                        ReservationStatus.RESERVED),
+                new ReservationSummary(2L, "Maria Sousa", "12345678", 201, START, END,
+                        ReservationStatus.CHECKED_IN)), rows);
         assertThrows(UnsupportedOperationException.class, rows::clear);
         assertEquals(List.of("result", "statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-81-AC-1")
+    @Tag("H4Y-81-AC-2")
+    void onFindActive_joinCustomersAndReadNameAndDocument_whenCalled() {
+        database.rows = 1;
+
+        ReservationSummary row = repository.findActive().get(0);
+
+        assertTrue(sql().contains("JOIN customers c ON c.id = r.customer_id"));
+        assertTrue(sql().contains("c.name"));
+        assertTrue(sql().contains("c.document"));
+        assertTrue(sql().contains("WHERE r.status IN ('reserved', 'checked_in')"));
+        assertEquals("Maria Sousa", row.clientName());
+        assertEquals("12345678", row.document());
     }
 
     @Test
@@ -226,7 +244,11 @@ class JdbcReservationCheckInOutTest {
                         };
                         case "getInt" -> 201;
                         case "getDate" -> Date.valueOf("start_date".equals(args[0]) ? START : END);
-                        case "getString" -> row[0] == 1 ? "reserved" : "checked_in";
+                        case "getString" -> switch ((String) args[0]) {
+                            case "name" -> "Maria Sousa";
+                            case "document" -> "12345678";
+                            default -> row[0] == 1 ? "reserved" : "checked_in";
+                        };
                         case "close" -> {
                             closed.add("result");
                             yield null;

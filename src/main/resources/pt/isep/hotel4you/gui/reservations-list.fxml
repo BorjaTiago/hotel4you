@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="screenRoot" styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.ReservationsController">
+
+    <fx:define>
+        <ToggleGroup fx:id="filterGroup"/>
+    </fx:define>
+
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <Label text="Reservas" styleClass="subtitle" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="+ Reservar quarto" onAction="#onNewReservationClicked"
+                styleClass="action-button, save-button"/>
+    </HBox>
+    <TextField fx:id="searchField" promptText="Pesquisar por nome ou documento"
+               accessibleText="Pesquisar reservas por nome ou documento"/>
+    <HBox spacing="8">
+        <RadioButton text="Todas ativas" toggleGroup="$filterGroup" selected="true"/>
+        <RadioButton fx:id="arrivingTodayToggle" text="Chegam hoje" toggleGroup="$filterGroup"/>
+        <RadioButton fx:id="checkedInToggle" text="Hospedados" toggleGroup="$filterGroup"/>
+    </HBox>
+    <TableView fx:id="reservationTable" accessibleText="Reservas ativas" VBox.vgrow="ALWAYS" prefWidth="500">
+        <columns>
+            <TableColumn fx:id="clientColumn" text="Cliente" prefWidth="160"/>
+            <TableColumn fx:id="documentColumn" text="Documento" prefWidth="110"/>
+            <TableColumn fx:id="roomColumn" text="Quarto" prefWidth="70"/>
+            <TableColumn fx:id="startColumn" text="Entrada" prefWidth="100"/>
+            <TableColumn fx:id="endColumn" text="Saída" prefWidth="100"/>
+            <TableColumn fx:id="statusColumn" text="Estado" prefWidth="120"/>
+        </columns>
+        <placeholder>
+            <Label text="Não há reservas ativas."/>
+        </placeholder>
+    </TableView>
+    <HBox spacing="12">
+        <Button fx:id="checkInButton" text="Fazer check-in" onAction="#onCheckInClicked" disable="true"
+                styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="checkOutButton" text="Fazer check-out" onAction="#onCheckOutClicked" disable="true"
+                styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
