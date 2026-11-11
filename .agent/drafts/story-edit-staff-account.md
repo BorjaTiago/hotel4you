@@ -51,6 +51,7 @@ Para que a conta fique correta quando o funcionário muda.
 
 ## Notas
 Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: contas de teste próprias "ana" e "rui" (foundation T4), sessões simuladas de gestor e rececionista (T0). Só contas, sem horários (Q-18). RF-26. Fase: Q-25.
+Aberto: Q-62 (o gestor pode mudar o próprio tipo ou o do último gestor, e o sistema fica sem gestor). Fora destes AC até a resposta do professor.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -60,6 +61,6 @@ split_needed: no
 
 ready: true
 dor_failed: []
-questions: []
+questions: [Q-62]
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Q-62 note by Claude Code (claude-opus-5-5), 2026-11-10. Reviewed by: pending.

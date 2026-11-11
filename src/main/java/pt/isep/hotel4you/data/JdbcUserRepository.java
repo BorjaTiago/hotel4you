@@ -77,6 +77,25 @@ public class JdbcUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findById(long id) {
+        String sql = """
+                SELECT u.id, u.name, u.username, u.password_hash, r.name AS role
+                FROM users u JOIN roles r ON r.id = u.role_id
+                WHERE u.id = ?
+                """;
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, id);
+                ResultSet row = statement.executeQuery()) {
+            if (!row.next()) {
+                return Optional.empty();
+            }
+            return Optional.ofNullable(toUser(row));
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
     public boolean existsByUsername(String username) {
         String sql = "SELECT 1 FROM users WHERE username = ?";
         try (Connection connection = database.connect();
@@ -104,6 +123,22 @@ public class JdbcUserRepository implements UserRepository {
             }
             return createUser(row.getLong("id"), user.getName(), user.getUsername(),
                     user.getPasswordHash(), user.getRole());
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
+    public boolean update(User user) {
+        String sql = """
+                UPDATE users
+                SET name = ?, username = ?, role_id = (SELECT id FROM roles WHERE name = ?)
+                WHERE id = ?
+                """;
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, user.getName(),
+                        user.getUsername(), user.getRole().name(), user.getId())) {
+            return statement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }

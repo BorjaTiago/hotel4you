@@ -23,6 +23,14 @@ public interface UserRepository {
     Optional<User> findByUsername(String username);
 
     /**
+     * Finds a user by identifier.
+     *
+     * @param id the identifier
+     * @return the user, or empty if none matches
+     */
+    Optional<User> findById(long id);
+
+    /**
      * Checks if a user with this login name exists. The check ignores case.
      *
      * @param username the login name
@@ -37,4 +45,12 @@ public interface UserRepository {
      * @return the saved user, with its identifier
      */
     User save(User user);
+
+    /**
+     * Changes the name, login name and role of a saved user. The password stays the same.
+     *
+     * @param user the user with its identifier and the new data
+     * @return true if the user was changed, false if no user has this identifier
+     */
+    boolean update(User user);
 }
