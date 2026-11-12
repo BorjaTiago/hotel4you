@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox fx:id="screenRoot" styleClass="screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+<VBox fx:id="screenRoot" styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.ReservationsController">
 
     <fx:define>
@@ -22,7 +22,7 @@
         <RadioButton fx:id="arrivingTodayToggle" text="Chegam hoje" toggleGroup="$filterGroup"/>
         <RadioButton fx:id="checkedInToggle" text="Hospedados" toggleGroup="$filterGroup"/>
     </HBox>
-    <TableView fx:id="reservationTable" accessibleText="Reservas ativas" VBox.vgrow="ALWAYS" prefWidth="500">
+    <TableView styleClass="data-table" fx:id="reservationTable" accessibleText="Reservas ativas" VBox.vgrow="ALWAYS" prefWidth="500">
         <columns>
             <TableColumn fx:id="clientColumn" text="Cliente" prefWidth="160"/>
             <TableColumn fx:id="documentColumn" text="Documento" prefWidth="110"/>

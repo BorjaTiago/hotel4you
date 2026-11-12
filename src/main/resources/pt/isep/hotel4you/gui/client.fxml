@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox styleClass="screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="app-view, screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.ClientController">
 
     <!-- Next step: the screen title is in reservations.fxml -->
@@ -27,7 +27,7 @@
 
         <!-- Client table -->
         <VBox HBox.hgrow="ALWAYS" styleClass="card">
-            <TableView fx:id="clientTable" accessibleText="Clientes" VBox.vgrow="ALWAYS" prefWidth="300">
+            <TableView styleClass="data-table" fx:id="clientTable" accessibleText="Clientes" VBox.vgrow="ALWAYS" prefWidth="300">
                 <columns>
                     <TableColumn fx:id="nameColumn" text="Nome" prefWidth="160"/>
                     <TableColumn fx:id="documentTypeColumn" text="Tipo de documento" prefWidth="150"/>

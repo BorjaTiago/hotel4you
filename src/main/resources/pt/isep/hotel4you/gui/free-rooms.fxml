@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox styleClass="screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
+<VBox styleClass="app-view, screen" spacing="10" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.FreeRoomController">
 
     <Label text="Quartos livres" styleClass="section-title"/>
@@ -23,7 +23,7 @@
             </VBox>
             <Button text="Procurar" onAction="#onSearchClicked" styleClass="primary-button" minWidth="120"/>
         </HBox>
-        <TableView fx:id="roomTable" VBox.vgrow="ALWAYS" prefWidth="500">
+        <TableView styleClass="data-table" fx:id="roomTable" VBox.vgrow="ALWAYS" prefWidth="500">
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
             </columnResizePolicy>

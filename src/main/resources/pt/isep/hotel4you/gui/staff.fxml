@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox styleClass="screen" spacing="30" xmlns:fx="http://javafx.com/fxml"
+<HBox styleClass="app-view, screen" spacing="30" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.StaffController">
 
     <!-- Create and edit staff form -->
@@ -15,9 +15,9 @@
         <ComboBox fx:id="roleBox" promptText="Tipo de conta" maxWidth="Infinity"/>
         <Button fx:id="createButton" text="Criar conta" onAction="#onCreateStaffClicked" maxWidth="Infinity"
                 styleClass="primary-button"/>
-        <Button fx:id="saveButton" text="Guardar alterações" onAction="#onSaveStaffChangesClicked"
+        <Button styleClass="action-button, edit-button" fx:id="saveButton" text="Guardar alterações" onAction="#onSaveStaffChangesClicked"
                 maxWidth="Infinity"/>
-        <Button text="Limpar" onAction="#onClearClicked" maxWidth="Infinity"/>
+        <Button styleClass="action-button, clear-button" text="Limpar" onAction="#onClearClicked" maxWidth="Infinity"/>
         <Label fx:id="editHintLabel" text="Selecione uma conta na tabela para a editar."
                wrapText="true"/>
         <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
@@ -28,7 +28,7 @@
     <!-- Staff list -->
     <VBox spacing="12" HBox.hgrow="ALWAYS">
         <Label text="Funcionários" styleClass="subtitle"/>
-        <TableView fx:id="staffTable" VBox.vgrow="ALWAYS" prefWidth="500">
+        <TableView styleClass="data-table" fx:id="staffTable" VBox.vgrow="ALWAYS" prefWidth="500">
             <columns>
                 <TableColumn fx:id="nameColumn" text="Nome" prefWidth="160"/>
                 <TableColumn fx:id="usernameColumn" text="Nome de utilizador" prefWidth="160"/>
