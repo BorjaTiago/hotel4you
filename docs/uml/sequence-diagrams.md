@@ -20,13 +20,13 @@ Sources: `origin/main` at `ddd8757`; [class diagram](class-diagram.md), [class m
 - **Actor:** Manager; another signed-in User takes the unauthorized branch.
 - **Goal:** Delete a reservation only before check-in, using the permanent deletion required by RF-22 and Q-05.
 - **Requirements:** RF-02, RF-22; RNF-07, RNF-12.
-- **Status:** The controller, facade and service call names exist in the class model. The helpers, repository and transaction context are proposed (G-01, G-02).
+- **Status:** The controller, facade and service calls are implemented (H4Y-57). The H4Y-57 code checks `Permission.DELETE_RESERVATIONS`, reads the row with `findById` (no row gives `ReservationNotFoundException`), then runs one `DELETE FROM reservations WHERE id = ? AND checked_in_at IS NULL`. No child tables exist yet, so one guarded DELETE is enough. The helpers, the explicit transaction and the child-row batch below stay proposed for when `reservation_services` and `reservation_locations` exist (G-01, G-02).
 
 ```mermaid
 %%{init: {"theme":"neutral","fontFamily":"Arial","sequence":{"width":170,"wrap":false}}}%%
 sequenceDiagram
     actor User
-    participant RC as ReservationController
+    participant RC as ReservationsController
     participant F as HotelFacade
     participant RS as ReservationService
     participant RR as ReservationRepository<br/>(proposed G-01)
@@ -34,13 +34,13 @@ sequenceDiagram
     participant SQL as SQLServer<br/>(external database)
     Note over RS,SQL: Proposed persistence design. No reservation transaction is implemented.<br/>tx identifies one operation-scoped connection, owned by the repository.
     User->>RC: 1. onDeleteReservationClicked()
-    RC->>F: 1.1. deleteReservation(reservation, user)
-    F->>RS: 1.1.1. delete(reservation, user)
-    RS->>RS: 1.1.1.1. authorizeDelete(user) [proposed G-02]
+    RC->>F: 1.1. deleteReservation(reservationId, actor)
+    F->>RS: 1.1.1. delete(reservationId, actor)
+    RS->>RS: 1.1.1.1. authorizeDelete(actor) [proposed G-02]
     alt User is not a Manager
         Note over RS: Refuse access. No repository or SQL call.
     else User is a Manager
-        RS->>RR: 1.1.1.2. beginDelete(reservation.id) [proposed G-01]
+        RS->>RR: 1.1.1.2. beginDelete(reservationId) [proposed G-01]
         RR->>D: 1.1.1.2.1. connect()
         D-->>RR: 1.1.1.2.2. Connection or connection error
         opt Connection opened
@@ -62,7 +62,7 @@ sequenceDiagram
                 RR-->>RS: 1.1.1.6. Completion or rollback error
             end
         else Current reservation exists and has no check-in
-            RS->>RR: 1.1.1.7. delete(tx, reservation.id) [proposed G-01]
+            RS->>RR: 1.1.1.7. delete(tx, reservationId) [proposed G-01]
             RR->>SQL: 1.1.1.7.1. DELETE FROM reservation_services WHERE reservation_id = ?<br/>DELETE FROM reservation_locations WHERE reservation_id = ?<br/>DELETE FROM reservations WHERE id = ? [SQL G-01]
             SQL-->>RR: 1.1.1.7.2. Delete batch completed or SQL error
             alt SQL operation fails
@@ -201,4 +201,4 @@ All proposed participants and methods are named here. They are not claims about 
 
 Only SD-04 and SD-06 are shown. The arrows distinguish existing modeled calls, the implemented connection factory, missing proposed APIs and external SQL operations. Preview and transactions are documentation proposals. No association-cardinality diagram or SD-05 is added. Rendering and static checks cannot establish runtime transaction safety or full Definition of Done approval.
 
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: antonioprmartinho. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-57 delete reservation by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
