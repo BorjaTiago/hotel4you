@@ -23,6 +23,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
   - `items.unit` (Q-38).
   - `stock_movements.exit_reason`: discard, return, loss (Q-34).
   - `stock_imports` and `stock_movements.import_id`. `supplier_name` moves to `stock_imports` (RF-28, Q-10).
+  - `stock_imports.file_format`: `xml` or `json` (statement update 2026-11-06, H4Y-84, Q-59).
 - **Changed:**
   - `roles` has 5 rows, the actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER (upper case, the same as the Java `Role` enum).
   - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
@@ -159,7 +160,7 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 ### stock_movements
 **What:** The history of every stock change.
 **Why:** The manager must see who changed the stock, when, and why.
-**Why this way:** `quantity` is always positive. `type` says the effect: `in` adds, `use` and `out` subtract. This avoids sign errors. `exit_reason` (discard, return, loss) only exists for `out` (CHECK, Q-34). `import_id` links a movement to the XML load that created it. It is NULL for a movement entered by hand.
+**Why this way:** `quantity` is always positive. `type` says the effect: `in` adds, `use` and `out` subtract. This avoids sign errors. `exit_reason` (discard, return, loss) only exists for `out` (CHECK, Q-34). `import_id` links a movement to the supplier file load (XML or JSON) that created it. It is NULL for a movement entered by hand.
 **Other option:** Negative numbers for `use` and `out`. We did not, because a wrong sign gives wrong stock and the type is already clear.
 
 | id | item_id | type | exit_reason | quantity | moved_at | user_id | import_id |
@@ -169,14 +170,15 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 | 3 | 2 | out | discard | 10 | 2026-10-13 08:00 | 2 | NULL |
 
 ### stock_imports
-**What:** One row for each XML file that hotel staff or the manager loads.
+**What:** One row for each supplier file (XML or JSON) that hotel staff or the manager loads.
 **Why:** The hotel must know who loaded a delivery, when and from which supplier (RF-28, Q-10).
-**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. Every item from a valid XML file enters stock. The import creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Linked movements give the imported items and quantities. Save new items, the import, movements and balances together. A failed save undoes them all. No rejection list is stored.
+**Why this way:** The supplier is the same for all lines of one file, so it is stored once here, not in each movement. Every item from a valid XML or JSON file enters stock. The import creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Linked movements give the imported items and quantities. Save new items, the import, movements and balances together. A failed save undoes them all. No rejection list is stored.
 **Other option:** `supplier_name` in each movement. We did not, because it repeats and it does not record the load itself.
+**File format (H4Y-84):** `file_format` is `xml` or `json` (CHECK). The JSON file follows the same rules as the XML file, so the other columns stay the same. The column shows which reader read the file. Other option: no column. We did not, because then the report and a support check cannot tell the format (Q-59).
 
-| id | loaded_at | user_id | supplier_name |
-|---|---|---|---|
-| 1 | 2026-10-01 09:00 | 2 | TextilPT |
+| id | loaded_at | user_id | supplier_name | file_format |
+|---|---|---|---|---|
+| 1 | 2026-10-01 09:00 | 2 | TextilPT | xml |
 
 ---
 
@@ -356,4 +358,4 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
