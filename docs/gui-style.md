@@ -17,10 +17,11 @@ On 2026-11-12, Pedro also approved a small Java window change outside the origin
 
 ## Checks run on 2026-11-12
 
-1. Wrote `ScreenStyleTest` before changing the resources. `mvnw.cmd -B -Dtest=ScreenStyleTest test` failed on an unstyled table and the missing `next-button` CSS rule.
-2. Ran `mvnw.cmd -B verify javadoc:javadoc`: 647 tests passed, with no failures or errors. Javadoc built. The build used the installed JDK 26 with the existing Java 21 release target. Existing compiler and Javadoc warnings remain.
-3. Compared every FXML file with the branch base after removing `styleClass` attributes from both XML documents: all 11 structures matched.
-4. Rendered all 11 FXML screens and the three reservation tabs with JavaFX. A temporary preview in `target/` removed controllers and event handlers from an in-memory copy, so it did not connect to the database or run business actions. Checked the resulting images and error labels. The computed error colour was `#c0392b`, with a 12 px font. JavaFX reported no CSS parse errors.
+1. Ran `mvnw.cmd -B verify javadoc:javadoc`: 644 tests passed, with no failures or errors. The Javadoc goal passed; the existing output was up to date. The build used the installed JDK 26 with the existing Java 21 release target. Earlier compiler and Javadoc warnings remain outside this change.
+2. Compared every FXML file with the branch base after removing `styleClass` attributes from both XML documents: all 11 structures matched.
+3. Rendered all 11 FXML screens and the three reservation tabs with JavaFX. A temporary preview in `target/` removed controllers and event handlers from an in-memory copy, so it did not connect to the database or run business actions. Checked the resulting images and error labels. The computed error colour was `#c0392b`, with a 12 px font. JavaFX reported no CSS parse errors.
+
+The dedicated CSS unit tests were removed at the reviewer's request in PR #59. No existing application tests changed. Visual checks and the application test suite validate this style change.
 
 The isolated previews check appearance only. On 2026-11-12, Pedro tested the running application and reported that it looked correct. Peer review is still required.
 
