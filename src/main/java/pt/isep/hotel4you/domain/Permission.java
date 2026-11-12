@@ -33,7 +33,10 @@ public enum Permission {
     SEARCH_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
 
     /** Create reservations and list the reservations of a client. */
-    MANAGE_RESERVATIONS(Role.RECEPTIONIST, Role.MANAGER);
+    MANAGE_RESERVATIONS(Role.RECEPTIONIST, Role.MANAGER),
+
+    /** Delete a reservation for good before the check-in (RF-22, Q-05). */
+    DELETE_RESERVATIONS(Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 

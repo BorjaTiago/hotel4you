@@ -22,7 +22,7 @@ import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
 
-/** Checks the check-in, check-out and active list SQL with JDBC doubles (H4Y-82). */
+/** Checks the check-in, check-out, delete and active list SQL with JDBC doubles (H4Y-82, H4Y-57). */
 class JdbcReservationCheckInOutTest {
     private static final LocalDate START = LocalDate.of(2026, 11, 10);
     private static final LocalDate END = LocalDate.of(2026, 11, 12);
@@ -94,6 +94,36 @@ class JdbcReservationCheckInOutTest {
         IllegalStateException error = assertThrows(IllegalStateException.class,
                 () -> repository.checkOut(5L));
         assertEquals("Não foi possível guardar o check-out.", error.getMessage());
+        assertSame(database.failure, error.getCause());
+        assertEquals(List.of("statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-1")
+    void onDelete_deleteOnlyRowWithoutCheckIn_whenCalled() {
+        assertTrue(repository.delete(5L));
+
+        assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND checked_in_at IS NULL"));
+        assertEquals(List.of(5L), database.bound);
+        assertEquals(List.of("statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-1")
+    void onDelete_returnFalse_whenNoRowIsDeleted() {
+        database.updated = 0;
+
+        assertFalse(repository.delete(5L));
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-1")
+    void onDelete_throwAndClose_whenDeleteFails() {
+        database.failure = new SQLException("Delete failed");
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> repository.delete(5L));
+        assertEquals("Não foi possível apagar a reserva.", error.getMessage());
         assertSame(database.failure, error.getCause());
         assertEquals(List.of("statement", "connection"), database.closed);
     }

@@ -45,10 +45,10 @@ Para que reservas indevidas desapareçam do sistema.
 
 ## Critérios de aceite (checklist)
 
-- [ ] AC-1: Uma reserva sem check-in pode ser apagada.
-- [ ] AC-2: Depois de apagar a reserva, o quarto volta a ficar livre.
-- [ ] AC-3: Apagar uma reserva inexistente devolve uma resposta de não encontrado.
-- [ ] AC-4: A ação é o botão "Apagar" na barra de ações do ecrã principal "Reservas", só para o gestor e ativo só numa linha RESERVED.
+- [x] AC-1: Uma reserva sem check-in pode ser apagada.
+- [x] AC-2: Depois de apagar a reserva, o quarto volta a ficar livre.
+- [x] AC-3: Apagar uma reserva inexistente devolve uma resposta de não encontrado.
+- [x] AC-4: A ação é o botão "Apagar" na barra de ações do ecrã principal "Reservas", só para o gestor e ativo só numa linha RESERVED.
 
 ## Notas
 Precisa do esqueleto do ecrã principal (dia 1) de story-ver-reservas-ativas.md. A recusa a outros papéis fica em H4Y-58 (sprint 6). Decisão da equipa (BorjaTiago, 2026-11-06).
@@ -66,4 +66,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; story-writer, Claude Code (claude-sonnet-5-5), 2026-11-06; checklist for H4Y-57 by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

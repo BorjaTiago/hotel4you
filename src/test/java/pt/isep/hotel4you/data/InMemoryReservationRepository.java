@@ -22,7 +22,10 @@ public class InMemoryReservationRepository implements ReservationRepository {
     public int findByRoomsCalls;
     /** When true, the next save acts as if another user saved the same nights first. */
     public boolean loseNextSave;
-    /** When true, the next check-in or check-out acts as if another user changed the state first. */
+    /**
+     * When true, the next check-in, check-out or delete acts as if another user changed the
+     * state first.
+     */
     public boolean loseNextUpdate;
 
     /** @param reservation the test reservation to add */
@@ -116,6 +119,17 @@ public class InMemoryReservationRepository implements ReservationRepository {
     @Override
     public boolean checkOut(long id) {
         return changeStatus(id, ReservationStatus.CHECKED_IN, ReservationStatus.CHECKED_OUT);
+    }
+
+    @Override
+    public boolean delete(long id) {
+        if (loseNextUpdate) {
+            loseNextUpdate = false;
+            return false;
+        }
+        return reservations.removeIf(value -> Objects.equals(value.getId(), id)
+                && (value.getStatus() == ReservationStatus.RESERVED
+                        || value.getStatus() == ReservationStatus.CANCELLED));
     }
 
     private boolean changeStatus(long id, ReservationStatus from, ReservationStatus to) {
