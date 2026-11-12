@@ -77,4 +77,13 @@ public interface ReservationRepository {
      * @throws IllegalStateException if the database cannot save the check-out
      */
     boolean checkOut(long id);
+
+    /**
+     * Deletes a booking for good. It deletes the row only if it has no check-in, in the same step
+     * as the delete.
+     * @param id the booking identifier
+     * @return true if the row was deleted, false if it has a check-in or does not exist
+     * @throws IllegalStateException if the database cannot delete the booking
+     */
+    boolean delete(long id);
 }

@@ -8,7 +8,9 @@ import javafx.collections.FXCollections;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
@@ -19,14 +21,16 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.service.HotelFacade;
 
 /**
  * Controller of the Reservas screen. It lists the active reservations, searches them by name or
- * document, filters them, and turns on only the check-in or check-out button that the chosen row
- * allows. It also opens the screen to create a reservation.
+ * document, filters them, and turns on only the check-in, check-out or delete button that the
+ * chosen row allows. Only the manager sees the delete button. It also opens the screen to create a
+ * reservation.
  */
 public class ReservationsController {
 
@@ -88,6 +92,9 @@ public class ReservationsController {
     private Button checkOutButton;
 
     @FXML
+    private Button deleteButton;
+
+    @FXML
     private Label messageLabel;
 
     /**
@@ -121,6 +128,27 @@ public class ReservationsController {
      */
     static boolean canCheckOut(ReservationSummary row) {
         return row != null && row.status() == ReservationStatus.CHECKED_IN;
+    }
+
+    /**
+     * Tells if the delete button is on for the chosen row.
+     *
+     * @param row the chosen row, or null if no row is chosen
+     * @return true only for a RESERVED row
+     */
+    static boolean canDelete(ReservationSummary row) {
+        return row != null && row.status() == ReservationStatus.RESERVED;
+    }
+
+    /**
+     * Gives the question that the screen asks before it deletes a reservation.
+     *
+     * @param row the chosen row
+     * @return the question with the room number
+     */
+    static String deleteQuestion(ReservationSummary row) {
+        return "Apagar de vez a reserva do quarto " + row.roomNumber()
+                + "? Esta ação não pode ser desfeita.";
     }
 
     /**
@@ -187,6 +215,8 @@ public class ReservationsController {
                 .addListener((value, before, chosen) -> updateButtons(chosen));
         searchField.textProperty().addListener((value, before, text) -> applyFilter());
         filterGroup.selectedToggleProperty().addListener((value, before, chosen) -> applyFilter());
+        deleteButton.managedProperty().bind(deleteButton.visibleProperty());
+        deleteButton.setVisible(facade.canUse(HotelApp.currentUser, Permission.DELETE_RESERVATIONS));
         loadReservations();
     }
 
@@ -234,6 +264,29 @@ public class ReservationsController {
         }
     }
 
+    @FXML
+    private void onDeleteReservationClicked() {
+        ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
+        if (!canDelete(chosen)) {
+            return;
+        }
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, deleteQuestion(chosen),
+                ButtonType.YES, ButtonType.NO);
+        if (confirmation.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+        try {
+            facade.deleteReservation(chosen.id(), HotelApp.currentUser);
+            if (loadReservations()) {
+                showMessage("Reserva apagada: quarto " + chosen.roomNumber() + ".", true);
+                reservationTable.requestFocus();
+            }
+        } catch (RuntimeException e) {
+            loadReservations();
+            showMessage(e.getMessage(), false);
+        }
+    }
+
     /** Loads the list again. On an error it shows the error and returns false. */
     private boolean loadReservations() {
         boolean loadedOk;
@@ -271,6 +324,7 @@ public class ReservationsController {
     private void updateButtons(ReservationSummary chosen) {
         checkInButton.setDisable(!canCheckIn(chosen, LocalDate.now()));
         checkOutButton.setDisable(!canCheckOut(chosen));
+        deleteButton.setDisable(!canDelete(chosen));
     }
 
     /** A table cell that shows a date as dd/MM/yyyy. */

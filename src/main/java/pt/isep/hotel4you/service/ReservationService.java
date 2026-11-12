@@ -178,6 +178,27 @@ public class ReservationService {
         return reservationRepository.findActive();
     }
 
+    /**
+     * Deletes a reservation for good before the check-in (RF-22, Q-05). The room is free again
+     * for the nights of the reservation.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who deletes the reservation
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the reservation got a check-in at the same moment, or the
+     *         database is not available
+     */
+    public void delete(long reservationId, User actor) {
+        if (!Permission.DELETE_RESERVATIONS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode apagar reservas.");
+        }
+        findReservation(reservationId);
+        if (!reservationRepository.delete(reservationId)) {
+            throw new IllegalStateException(STATE_CHANGED);
+        }
+    }
+
     private Reservation findReservation(long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(ReservationNotFoundException::new);
