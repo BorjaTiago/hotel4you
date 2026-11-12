@@ -38,8 +38,9 @@ public class HotelApp extends Application {
         }
         Parent root = new ScreenLoader(facade).load("login.fxml");
         stage.setTitle("Hotel4You");
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.setScene(new Scene(root));
         stage.show();
+        stage.setMaximized(true);
     }
 }
