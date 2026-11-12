@@ -40,8 +40,7 @@ public class LoginController {
             Parent root = new ScreenLoader(facade).load("main.fxml");
             Stage stage = (Stage) messageLabel.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.sizeToScene();
-            stage.centerOnScreen();
+            stage.setMaximized(true);
         } catch (IllegalArgumentException | LoginFailedException | IllegalStateException e) {
             messageLabel.setText(e.getMessage());
             passwordField.clear();

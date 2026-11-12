@@ -3,13 +3,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<HBox styleClass="screen" spacing="30" xmlns:fx="http://javafx.com/fxml"
+<HBox styleClass="app-view, screen" spacing="30" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.FloorController">
 
     <!-- Floors and search -->
     <VBox spacing="12" prefWidth="280" minWidth="240">
         <Label text="Pisos" styleClass="subtitle" labelFor="$floorList"/>
-        <ListView fx:id="floorList" VBox.vgrow="ALWAYS"/>
+        <ListView styleClass="data-list" fx:id="floorList" VBox.vgrow="ALWAYS"/>
         <Label text="Número do piso" labelFor="$numberField"/>
         <TextField fx:id="numberField" maxWidth="Infinity"/>
         <Button text="Procurar" onAction="#onSearchClicked" maxWidth="Infinity"
@@ -22,7 +22,7 @@
     <!-- Zones of the selected floor -->
     <VBox spacing="12" HBox.hgrow="ALWAYS">
         <Label text="Zonas do piso" styleClass="subtitle" labelFor="$locationTable"/>
-        <TableView fx:id="locationTable" VBox.vgrow="ALWAYS" prefWidth="500">
+        <TableView styleClass="data-table" fx:id="locationTable" VBox.vgrow="ALWAYS" prefWidth="500">
             <columns>
                 <TableColumn fx:id="nameColumn" text="Zona" prefWidth="180"/>
                 <TableColumn fx:id="guestCardColumn" text="Acesso com cartão do cliente" prefWidth="180"/>
