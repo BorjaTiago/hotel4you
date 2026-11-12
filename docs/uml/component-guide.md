@@ -4,12 +4,12 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 
 ## Main ideas
 
-1. The layout follows the teacher's slide: one `«subsystem» Hotel4You` box with its internal structure. Each part inside is one Java package: `gui`, `service`, `domain`, `data`, `config`. The diagram reads from left to right, from input to output (class 1 slides): the actors and the supplier XML file on the left, SQL Server on the right.
+1. The layout follows the teacher's slide: one `«subsystem» Hotel4You` box with its internal structure. Each part inside is one Java package: `gui`, `service`, `domain`, `data`, `config`. The diagram reads from left to right, from input to output (class 1 slides): the actors and the supplier stock file (XML or JSON) on the left, SQL Server on the right.
 2. Parts connect with assembly connectors (ball and socket). Ports on the border connect to parts with delegation connectors.
 3. The GUI talks only to the business logic. `gui` calls `HotelFacade` and reads `domain` objects. It never uses `data` or SQL Server (RNF-07).
 4. Services do not know SQL. They use the repository interfaces in `data` (T0, H4Y-32). `data` implements them with JDBC (`JdbcUserRepository`, `JdbcRoomRepository`). Unit tests use in-memory repositories in `src/test`, not in the application (RNF-08, RNF-10, RNF-12).
 5. Only `config` knows all packages. It creates and connects the objects at start-up. It holds no business rule.
-6. Only external components and artifacts are in the diagram: SQL Server and the supplier XML file. Libraries and the JDBC driver are not components (teacher feedback, 2026-10-17). Each library has a reason from the statement (RNF-11).
+6. Only external components and artifacts are in the diagram: SQL Server and the supplier stock file (XML or JSON). Libraries and the JDBC driver are not components (teacher feedback, 2026-10-17). Each library has a reason from the statement (RNF-11).
 
 ## Done criteria of H4Y-9
 
@@ -17,7 +17,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 |-----------|--------------------------|
 | The interface communicates only with the business logic. | `gui` requires only `HotelFacade` and reads `domain`. `gui` has no connector to `data` or SQL Server. |
 | Each component matches a package in the code. | The five components are the five packages planned in H4Y-32. `HotelFacade` lives in `service`, the repository interfaces in `data`, `AppConfig` in `config`. The check against the Java files is done (C-04). |
-| External systems and libraries appear and are justified. | SQL Server and the supplier XML file are in the diagram as external elements. Libraries are not components, so they are only in the table below and in `libraries.md`. |
+| External systems and libraries appear and are justified. | SQL Server and the supplier stock file (XML or JSON) are in the diagram as external elements. Libraries are not components, so they are only in the table below and in `libraries.md`. |
 
 ## Components
 
@@ -59,7 +59,7 @@ Use this guide to defend the [component diagram](component-diagram.md). Classes 
 | Microsoft JDBC Driver for SQL Server (mssql-jdbc) | No, library | Official Microsoft driver. Java needs a driver to connect to SQL Server (RNF-12). | jTDS: not maintained. |
 | JavaFX | No, library | GUI library recommended by the statement (RNF-06, Q-22). | Swing: older and less flexible. |
 | BCrypt (`at.favre.lib:bcrypt`) | No, library | Passwords must be saved encrypted (RNF-02). BCrypt makes a salted one-way hash. Cost 12. | jBCrypt: not maintained. Spring Security Crypto: adds the Spring libraries. PBKDF2 in the JDK: more own code. Argon2: needs a native library. |
-| Supplier XML stock file | Yes, external artifact | The supplier sends one XML file with each delivery (RF-28). | None: the statement sets the format. |
+| Supplier stock file (XML or JSON) | Yes, external artifact | The supplier sends one XML or JSON file with each delivery (RF-28; JSON: statement update 2026-11-06, Q-59). One artifact, because both formats follow the same rules and enter through the same port. | None: the statement sets the formats. |
 | JUnit | No, library | The statement requires JUnit tests (RNF-10). | None: the statement names JUnit. |
 
 Every external library also goes in [docs/libraries.md](../libraries.md) with its version (RNF-11, H4Y-36). The versions are in `pom.xml` and `docs/libraries.md`.
@@ -79,8 +79,8 @@ Every external library also goes in [docs/libraries.md](../libraries.md) with it
 
 ## Validation results (2026-11-06)
 
-PlantUML 1.2024.7 (Docker image `plantuml/plantuml:1.2024.7`) rendered `component-diagram.puml` to `component-diagram.svg`. The image was inspected: the subsystem box holds the parts, the `ui` and `xml` input ports and the `db` output port sit on its border, the parts connect with ball and socket, and SQL Server and the XML file are outside.
+PlantUML 1.2024.7 (Docker image `plantuml/plantuml:1.2024.7`) rendered `component-diagram.puml` to `component-diagram.svg`. The image was inspected: the subsystem box holds the parts, the `ui` and `file` input ports and the `db` output port sit on its border, the parts connect with ball and socket, and SQL Server and the supplier file (XML or JSON) are outside.
 
 The five packages now exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17, C-04). Human review is still required.
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+Created by: jmbcruz. Updated by: antonioprmartinho. AI use: Cursor agent, Claude Opus 5.5, 2026-10-16; review fixes by Cursor agent, Claude Opus 5.5, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz with Claude Code (claude-opus-5-5), 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

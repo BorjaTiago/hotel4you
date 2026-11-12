@@ -10,16 +10,16 @@ Sources: [statement](../../.agent/context/enunciado.md) sections 2 and 3, [requi
 
 The diagram reads from left to right, from input to output, as in the class 1 slides (Moodle).
 
-- Left side, inputs: the actors use `HotelUI` through the `ui` port, and the supplier XML stock file comes in through the `xml` port.
+- Left side, inputs: the actors use `HotelUI` through the `ui` port, and the supplier stock file (XML or JSON, statement update 2026-11-06) comes in through the `file` port.
 - Middle: the parts of the subsystem, in call order (`gui`, `service`, `data`).
 - Right side, output: `data` reaches SQL Server through the `db` output port.
 - The big box `«subsystem» Hotel4You` is the structured classifier. Its inside is the internal structure.
 - A box `:name` inside the subsystem is a part. Each part is one Java package of our code.
-- A small square on the border of the subsystem is a port. `ui` and `xml` are input ports (`portin`). `db` is an output port (`portout`).
+- A small square on the border of the subsystem is a port. `ui` and `file` are input ports (`portin`). `db` is an output port (`portout`).
 - A circle is a provided interface (ball). A half circle is a required interface (socket). A ball in a socket is an assembly connector between two parts.
 - A `«delegate»` arrow from a port to a part, or from a part to a port, is a delegation connector.
 - The `db` port requires `SQL`. SQL Server provides it.
-- A box with `«external»` is outside our code. SQL Server is an external component. The supplier XML file is an external artifact.
+- A box with `«external»` is outside our code. SQL Server is an external component. The supplier stock file (XML or JSON) is an external artifact.
 - Libraries (JavaFX, JUnit) and the JDBC driver are not components. They are not in the diagram. See [libraries.md](../libraries.md).
 - A dashed arrow to `:domain` is a dependency. `gui`, `service` and `data` use the `domain` types.
 - `config` creates all parts at start-up. These links are wiring, not dependencies, so they are not drawn.
@@ -33,7 +33,7 @@ The diagram is drawn in PlantUML, not Mermaid, because Mermaid cannot put ports 
 | Component (package) | Content | Provides | Uses | Requirement IDs |
 |---------------------|---------|----------|------|-----------------|
 | `gui` | JavaFX controllers from the class diagram (`LoginController`, `RoomController`, `ReservationController` and the others) and their views. | `HotelUI` (screens for the actors), through the subsystem port. | `HotelFacade`, `domain` (read only). | RNF-06, RNF-07 |
-| `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, the supplier XML file (through a port). | RNF-07, RNF-08 |
+| `service` | `HotelFacade` and the services (`AuthService`, `RoomService`, `ReservationService`, `CardAccessService`, `StockService` and the others). All business rules. | `HotelFacade`. | `domain`, the repository interfaces in `data`, the supplier XML or JSON file (through a port). | RNF-07, RNF-08 |
 | `domain` | Domain classes and enums (`User`, `Room`, `Reservation`, `MagneticCard`, `StockItem`, `Role` and the others). No SQL and no JavaFX. | Data types for the other packages. | None. | RNF-07, RNF-08 |
 | `data` | Repository interfaces, including `UserRepository` and `RoomRepository`, and the JDBC versions for SQL Server (`JdbcUserRepository`, `JdbcRoomRepository`, `Database`). `Database` gets `AppConfig` and opens the connections. The JDBC versions map table rows to domain objects. Unit tests use in-memory repositories in `src/test`. | The repository interfaces. | `domain`, `AppConfig`, `SQL` of SQL Server (through a port). | RF-04, RNF-01, RNF-10, RNF-12 |
 | `config` | Reads the settings from the `application.properties` file (`AppConfig`). Starts the application: creates the repositories and services and gives `HotelFacade` to `gui`. The start-up links are not drawn. | `AppConfig`. | `gui`, `service`, `data` (start-up only). | RNF-08, RNF-12 |
@@ -53,7 +53,7 @@ The diagram is drawn in PlantUML, not Mermaid, because Mermaid cannot put ports 
 | Name | Type | Used by | Requirement IDs |
 |------|------|---------|-----------------|
 | SQL Server | External component. Provides `SQL`. | `data`, through a port | RNF-12 |
-| Supplier XML stock file | External artifact (file) | `service` (`StockService`), through a port | RF-28 |
+| Supplier stock file (XML or JSON) | External artifact (file) | `service` (`StockService`), through a port | RF-28 (Q-59) |
 
 JavaFX, the Microsoft JDBC Driver for SQL Server, BCrypt (`at.favre.lib:bcrypt`) and JUnit are libraries. A library is not a component (teacher feedback, H4Y-9, 2026-10-17). They are listed with their reasons in [libraries.md](../libraries.md) and [component-guide.md](component-guide.md).
 
@@ -68,4 +68,4 @@ These gaps need team review. They are not approved requirements.
 | C-04 | There was no Java code (H4Y-32). | Closed for the classes that exist now. The five packages exist in the Java code. The class-to-diagram check is done (architecture review, 2026-10-17). |
 | C-03 | The package of `HotelFacade` was not named in H4Y-32. | Closed. `HotelFacade` is in `service`, as in the Java code. |
 
-Created by: jmbcruz. Updated by: jmbcruz. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06. Reviewed by: pending.
+Created by: jmbcruz. Updated by: antonioprmartinho. AI use: Cursor agent, Claude 2026-10-16; review fixes by Cursor agent, Claude, 2026-10-16; docs-updater, Claude Code (claude-haiku-5-5), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; teacher feedback fixes by jmbcruz with Claude Code, 2026-10-21; left-to-right layout fix by jmbcruz, 2026-10-23; merge with main by Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 room registration, OpenAI Codex (GPT-6), 2026-10-27; slide match by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 merge attribution review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; PlantUML ports by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
