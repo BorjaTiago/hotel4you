@@ -89,12 +89,12 @@ The schema documents permanent deletion, not a reservation soft-delete flag. Onl
 
 A transaction protects the group of writes; a protected current-state read also prevents a concurrent check-in from invalidating the decision. These are explicit proposed database interactions, not the old combined note "check state and delete in one transaction". Connection, commit and rollback failures still need an implemented policy (G-01).
 
-## SD-06 - General: import supplier XML
+## SD-06 - General: import supplier XML or JSON file
 
 - **Use case:** UC-15 Enter supplier delivery in stock, with the preview revision requested on 2026-10-30.
 - **Actor:** Signed-in hotel staff or Manager. The supplier sends the file and does not log in (Q-17).
-- **Goal:** Review the validated XML, confirm it, then save the import and stock changes together.
-- **Requirements:** RF-28, RF-29; RNF-07, RNF-08; new preview instruction from the professor, supplied by the user.
+- **Goal:** Review the validated XML or JSON file, confirm it, then save the import and stock changes together.
+- **Requirements:** RF-28, RF-29; RNF-07, RNF-08; new preview instruction from the professor, supplied by the user; JSON files from the statement update of 2026-11-06 (Q-59).
 - **Status:** The current class model has only `importStock(file, user)`. The two-phase API, preview data, view and repository below are proposed (G-01, G-03, G-04). UC-15 still says no preview; this discrepancy is explicit in G-05.
 
 Phase A is read-only parsing and validation. It prepares an immutable snapshot of supplier, item names, units and quantities. Phase B displays that snapshot and offers Confirm and Cancel. Phase C saves only the confirmed snapshot after final checks; it does not read the file again. Catalogue lookup is done during save, so no preview database read is needed in this design.
@@ -111,13 +111,14 @@ sequenceDiagram
     participant D as Database
     participant SQL as SQLServer<br/>(external database)
     Note over SC,SQL: Proposed preview and persistence design, not implemented Java behavior.<br/>No connection or write transaction is held while the user reviews the preview.
-    User->>SC: 1. onImportXmlClicked()
+    User->>SC: 1. onImportStockFileClicked()
     SC->>F: 1.1. prepareImport(file, user) [proposed G-03]
     F->>SS: 1.1.1. prepareImport(file, user) [proposed G-03]
     SS->>SS: 1.1.1.1. parseAndValidate(file, user) [proposed G-03]
-    SS-->>F: 1.1.2. Immutable preview or permission/XML/data error
+    Note over SS: StockFileFormat.fromFileName(file) picks XmlStockFileReader or JsonStockFileReader.<br/>Both give the same StockFileLine rows (H4Y-84, Q-59).
+    SS-->>F: 1.1.2. Immutable preview or permission/file format/data error
     F-->>SC: 1.2. Preview or validation error
-    alt No permission or invalid XML or imported data
+    alt No permission or invalid XML or JSON file or imported data
         SC-->>User: 1.3. Validation error. No data saved
     else Preview is valid
         SC->>PV: 1.4. showPreview(preview) [proposed G-04]
@@ -140,7 +141,7 @@ sequenceDiagram
                     SR->>SQL: 2.2.1.2.3. BEGIN TRANSACTION [SQL G-01]
                     SQL-->>SR: 2.2.1.2.4. Transaction opened or SQL error
                     opt Transaction opened
-                        SR->>SQL: 2.2.1.2.5. INSERT stock_imports(supplier_name, loaded_at, user_id)<br/>and return INSERTED.id [SQL G-01]
+                        SR->>SQL: 2.2.1.2.5. INSERT stock_imports(supplier_name, file_format, loaded_at, user_id)<br/>and return INSERTED.id [SQL G-01]
                         SQL-->>SR: 2.2.1.2.6. importId or SQL error
                         loop Each confirmed item while previous SQL succeeded
                             SR->>SQL: 2.2.1.2.7. SELECT item by name. INSERT it if missing<br/>UPDATE items SET stock_quantity = stock_quantity + ? WHERE id = ?<br/>INSERT stock_movements(item_id, type='in', quantity, moved_at, user_id, import_id) [SQL G-01]
@@ -168,9 +169,9 @@ sequenceDiagram
     end
 ```
 
-**Required error cases:** No permission, invalid XML or imported data, failed final validation and database failure. Cancel never calls `confirmImport` or `saveImport`. All import writes and the proposed BEGIN occur inside the Confirm branch. A connection failure does not start a transaction. A failed write must not leave partial stock, new items or an import row; that guarantee still needs code (G-01).
+**Required error cases:** No permission, an unknown file format, invalid XML or JSON or imported data, failed final validation and database failure. Cancel never calls `confirmImport` or `saveImport`. All import writes and the proposed BEGIN occur inside the Confirm branch. A connection failure does not start a transaction. A failed write must not leave partial stock, new items or an import row; that guarantee still needs code (G-01).
 
-Unknown items are created, not rejected, under RF-28 and the retained PR #20 item rule. A new item starts with the schema's default stock quantity before the delivered quantity is added. The `stock_imports` row is created before movements use its ID. Catalogue changes, stock increments, the import and ENTRY movements share one transaction. SQL type `in` represents the model's ENTRY movement. Item lookup uses the unique `items.name`; XML name/unit matching details still need a contract (G-01, G-03).
+Unknown items are created, not rejected, under RF-28 and the retained PR #20 item rule. A new item starts with the schema's default stock quantity before the delivered quantity is added. The `stock_imports` row is created before movements use its ID. Catalogue changes, stock increments, the import and ENTRY movements share one transaction. SQL type `in` represents the model's ENTRY movement. Item lookup uses the unique `items.name`; XML and JSON name/unit matching details still need a contract (G-01, G-03, Q-59).
 
 **Contract change:** The latest preview instruction replaces the earlier no-preview workflow for this proposed sequence. It does not mean that the current UC-15 text, class diagram, JavaFX screen or two-phase API have already been updated. See G-03 to G-05.
 
@@ -183,7 +184,7 @@ Every request, SQL command and significant response has an explicit number on it
 | Use case | Existing modeled or implemented calls used | Proposed calls | Sources |
 |----------|--------------------------------------------|----------------|---------|
 | UC-05 Delete reservation | ReservationController.onDeleteReservationClicked; HotelFacade.deleteReservation; ReservationService.delete; Database.connect | ReservationService authorization/state helpers; ReservationRepository transaction and deletion methods | RF-22, Q-05; G-01, G-02 |
-| UC-15 Supplier XML import, proposed preview revision | StockController.onImportXmlClicked; Database.connect | HotelFacade/StockService prepareImport and confirmImport; StockService validation helpers; StockController.onPreviewDecision; StockImportPreviewView; StockRepository.saveImport | RF-28, RF-29; professor feedback 2026-10-30; G-01, G-03 to G-05 |
+| UC-15 Supplier XML or JSON import, proposed preview revision | StockController.onImportStockFileClicked; Database.connect | HotelFacade/StockService prepareImport and confirmImport; StockFileFormat and the StockFileReader of each format; StockService validation helpers; StockController.onPreviewDecision; StockImportPreviewView; StockRepository.saveImport | RF-28, RF-29; professor feedback 2026-10-30; G-01, G-03 to G-05 |
 
 ## Gaps
 
@@ -193,7 +194,7 @@ All proposed participants and methods are named here. They are not claims about 
 |----|----------------------------------|-----------------------------------------|
 | G-01 | No ReservationRepository or StockRepository, transaction context or database implementation for these flows | Proposed ReservationRepository.beginDelete(id), delete(tx, id), rollback(tx); StockRepository.saveImport(preview, user). Repositories use the existing Database.connect and own one operation-scoped connection. Define the context, parameterized statements, locking, connection closure and commit/rollback error handling before implementation. BEGIN/COMMIT/ROLLBACK are proposed database boundaries, not Database methods. |
 | G-02 | Reservation runtime flow and validation helpers are missing | The three deletion call names exist only in the class model. Proposed ReservationService.authorizeDelete(user) and validateDeleteResult(result) implement RF-22 checks before writes. The protected read and deletion share tx; check-in must honor the same row protection. |
-| G-03 | No two-phase XML API, immutable preview object or parser contract | Proposed HotelFacade.prepareImport(file, user), confirmImport(preview, user); StockService.prepareImport(file, user), parseAndValidate(file, user), confirmImport(preview, user), validateConfirmation(preview, user); new StockImportPreview snapshot. It must contain the reviewed data and cannot trigger a later file re-read. Confirm must recheck permission and data. Split or revise the current one-step importStock API explicitly in the class model before coding. |
+| G-03 | No two-phase import API, immutable preview object or parser contract for XML and JSON | Proposed HotelFacade.prepareImport(file, user), confirmImport(preview, user); StockService.prepareImport(file, user), parseAndValidate(file, user), confirmImport(preview, user), validateConfirmation(preview, user); new StockImportPreview snapshot. It must contain the reviewed data and cannot trigger a later file re-read. Confirm must recheck permission and data. Split or revise the current one-step importStock API explicitly in the class model before coding. |
 | G-04 | No preview screen or decision handler | Proposed StockImportPreviewView.showPreview(preview), closePreview(), showImportResult(result), and StockController.onPreviewDecision(decision). Define the JavaFX screen with Confirm/Cancel buttons. Cancel discards the preview and never reaches persistence. No screen or Java class is created by this documentation task. |
 | G-05 | Current UC-15 and class documentation still describe no preview | The 2026-10-30 instruction supplied by the user requires preview and confirmation. Current UC-15 explicitly forbids these stages and the model exposes only importStock(file, user). The proposed sequence follows the new feedback while retaining unknown-item creation. The use-case and class-model owners must align these contracts; no unrelated requirements are silently rewritten here. |
 
@@ -201,4 +202,4 @@ All proposed participants and methods are named here. They are not claims about 
 
 Only SD-04 and SD-06 are shown. The arrows distinguish existing modeled calls, the implemented connection factory, missing proposed APIs and external SQL operations. Preview and transactions are documentation proposals. No association-cardinality diagram or SD-05 is added. Rendering and static checks cannot establish runtime transaction safety or full Definition of Done approval.
 
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: antonioprmartinho. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16. teacher feedback corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; PR-20 stock import review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-19; sequence-only scope correction by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-21; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

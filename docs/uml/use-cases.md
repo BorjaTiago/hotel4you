@@ -22,7 +22,7 @@ Reading rules:
 - Primary actors (they start the use case) are on the left. Secondary actors (they take part, but do not use the application) are on the right.
 - An included use case is linked to its actors through its base use case.
 - Some diagrams have an invisible link (`~~~`). It only keeps a primary actor on the left or a secondary actor on the right. It has no UML meaning.
-- The client does not log in (Q-13). The client uses the magnetic card, and asks reception for services. The supplier does not log in (Q-17). The supplier only sends the XML file.
+- The client does not log in (Q-13). The client uses the magnetic card, and asks reception for services. The supplier does not log in (Q-17). The supplier only sends the stock file (XML or JSON, statement update 2026-11-06).
 
 ## Overview
 
@@ -283,7 +283,7 @@ flowchart LR
     UC15(["UC-15 Enter supplier delivery in stock"]):::uc
     UC47(["UC-47 Show import report"]):::uc
     UC50(["UC-50 Record stock entry"]):::uc
-    UC53(["UC-53 Read supplier XML stock file"]):::uc
+    UC53(["UC-53 Read supplier stock file (XML or JSON)"]):::uc
     UC16(["UC-16 Record stock use"]):::uc
     UC49(["UC-49 Record stock exit"]):::uc
   end
@@ -313,9 +313,9 @@ flowchart LR
   style Hotel4You fill:none,stroke:#555555,stroke-width:2px
 ```
 
-The supplier is a secondary actor in UC-15. The supplier sends the XML file. The receptionist or the manager loads it (Q-17).
+The supplier is a secondary actor in UC-15. The supplier sends the XML or JSON file. The receptionist or the manager loads it (Q-17).
 
-UC-15 always includes UC-53 and UC-50. The system reads the supplier XML stock file (RF-28) and records one stock entry for each item with UC-50. UC-50 alone is a manual entry of one existing item (RF-29). The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (Q-53, team decision, 2026-10-30).
+UC-15 always includes UC-53 and UC-50. The system reads the supplier stock file, XML or JSON (RF-28, Q-59), and records one stock entry for each item with UC-50. UC-50 alone is a manual entry of one existing item (RF-29). The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (Q-53, team decision, 2026-10-30).
 
 ## Changes from the first version
 
@@ -338,4 +338,4 @@ UC-15 always includes UC-53 and UC-50. The system reads the supplier XML stock f
 
 UC-02, UC-04, UC-05, UC-10, UC-11 and UC-12 keep their name. The IDs UC-01 to UC-19 do not change, because the sequence diagrams and the requirements use them.
 
-Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29; UC-50 XML-only entry and UC-15 include by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-50 manual entry back, UC-15 includes UC-50 and UC-53 after PR-36 review by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: OpenAI Codex, GPT-6, 2026-10-16; edited by OpenAI Codex, GPT-6, 2026-10-16; ellipse use-case and actor-symbol notation update by OpenAI Codex, GPT-6, 2026-10-16; H4Y-7 review (split and new use cases, include and extend relations, overview diagram) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-29; UC-50 XML-only entry and UC-15 include by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-50 manual entry back, UC-15 includes UC-50 and UC-53 after PR-36 review by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
