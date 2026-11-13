@@ -5,11 +5,14 @@ parent: epic-staff-management-access
 requirements: [RF-25, RF-01]
 points: 3
 points_suggested: 3
-status: approved
+status: merged
+merged_into: regra-acesso-por-local
 jira_key:
 labels: [access-control]
 sprint:
 ---
+
+Junta-se a `story-regra-acesso-por-local` (decisão do utilizador, 2026-11-13). Esta história não entra em nenhum sprint. O AC-3 (o restaurante não cria nem apaga reservas) já está feito: `ReservationService.create` exige `Permission.MANAGE_RESERVATIONS` e `ReservationService.delete` exige `Permission.DELETE_RESERVATIONS`. Testes: `onCreate_throw_whenActorIsNotReceptionistOrManager`, `onDelete_throwAccessDenied_whenUserIsNotManager`, `onAllows_returnFalse_whenReceptionistDeletesReservations`.
 
 # Título: Limitar o restaurante à cozinha e ao restaurante
 
@@ -55,4 +58,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13. Created by: BorjaTiago. Updated by: BorjaTiago. Reviewed by: pending.

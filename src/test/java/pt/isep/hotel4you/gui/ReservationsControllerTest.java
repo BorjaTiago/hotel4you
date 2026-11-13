@@ -81,6 +81,31 @@ class ReservationsControllerTest {
     }
 
     @Test
+    @Tag("H4Y-57-AC-4")
+    void onCanDelete_returnTrue_whenRowIsReserved() {
+        assertTrue(ReservationsController.canDelete(row(ReservationStatus.RESERVED)));
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-4")
+    void onCanDelete_returnFalse_whenRowIsCheckedIn() {
+        assertFalse(ReservationsController.canDelete(row(ReservationStatus.CHECKED_IN)));
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-4")
+    void onCanDelete_returnFalse_whenNoRowIsChosen() {
+        assertFalse(ReservationsController.canDelete(null));
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-4")
+    void onDeleteQuestion_nameRoomAndWarn_whenRowIsChosen() {
+        assertEquals("Apagar de vez a reserva do quarto 201? Esta ação não pode ser desfeita.",
+                ReservationsController.deleteQuestion(row(ReservationStatus.RESERVED)));
+    }
+
+    @Test
     @Tag("H4Y-82-AC-14")
     void onCanCheckIn_returnFalse_whenTodayIsBeforeStartDate() {
         assertFalse(ReservationsController.canCheckIn(row(ReservationStatus.RESERVED), TODAY));

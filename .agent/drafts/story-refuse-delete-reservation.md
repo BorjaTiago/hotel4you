@@ -5,11 +5,13 @@ parent: epic-reservations
 requirements: [RF-22]
 points:
 points_suggested: 2
-status: published
+status: removed
 jira_key: H4Y-58
 labels: [reservations, security, 1st-delivery]
-sprint: 05
+sprint:
 ---
+
+Removida (2026-11-13, decisão do utilizador): already delivered by H4Y-57 (ReservationService.delete: Permission.DELETE_RESERVATIONS and status RESERVED only). H4Y-58 e a subtask H4Y-78 ficam abertas no Jira até o utilizador autorizar o fecho. Não se edita o Jira aqui.
 
 # Título: Recusar o apagar de reservas a quem não é gestor
 
@@ -62,4 +64,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint field by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13. Reviewed by: pending.

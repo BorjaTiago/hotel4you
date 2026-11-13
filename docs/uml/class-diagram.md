@@ -14,7 +14,7 @@
 - `RoomRepository` stores rooms and reads the floor and room type catalogues. `JdbcRoomRepository` uses SQL Server. Tests use an in-memory implementation.
 - `InMemoryLocationRepository` (in `src/test`) is a test helper, so it is not in this diagram. Its `delete` returns false when other rows use the zone.
 - The stock catalogue (H4Y-51) uses `Permission.MANAGE_STOCK`, for a manager only. `StockService.createItem`, `editItem` and `listItems` throw `AccessDeniedException` for other users. A new item starts with `stockQuantity` 0. `editItem` changes only the name and the unit, so the stock stays. Two items cannot have the same name: `createItem` and `editItem` throw `StockItemNameTakenException`. `editItem` throws `StockItemNotFoundException` for an unknown item. No item is removed (Q-38).
-- `StockController` is one screen for the stock catalogue (H4Y-51). The manager selects a row, and the form fills. `onClearClicked` clears the form, the table selection and the message. `onImportXmlClicked` and `onRegisterMovementClicked` are future methods. They are not in the code yet.
+- `StockController` is one screen for the stock catalogue (H4Y-51). The manager selects a row, and the form fills. `onClearClicked` clears the form, the table selection and the message. `onImportStockFileClicked` (XML or JSON file, H4Y-84) and `onRegisterMovementClicked` are future methods. They are not in the code yet.
 - `ItemRepository` is in the data layer. `JdbcItemRepository` is the SQL Server version. `InMemoryItemRepository` (in `src/test`) is a test helper, so it is not in this diagram.
 - `$` marks a static member.
 - `ClientService` checks `Permission.MANAGE_CLIENTS` first in every method (receptionist and manager; clients do not log in, Q-13, Q-54). `register` and `editClient` trim the texts and check each field: a missing or wrong field throws `IllegalArgumentException` and the message names the field. Required: name (at most 100), `documentType`, document (at most 20), `birthDate` (not in the future), phone (digits, spaces and one leading '+', at most 20) and nationality (ISO code from `Locale.getISOCountries()`). Optional: email (at most 100) and tax number (9 digits). A client with the same document type and number (not case sensitive) throws `ClientExistsException`. `JdbcClientRepository.save` and `update` also throw it when the database finds the same document (error 2601 or 2627). `editClient` and `removeClient` throw `ClientNotFoundException` for an unknown client. `JdbcClientRepository.delete` throws `ClientInUseException` on SQL error 547, so a client with reservations is not removed (Q-36). `searchClients` takes a `ClientSearchField` (`DOCUMENT`, `NAME` or `PHONE`) and the text. A null field throws `IllegalArgumentException` ("Escolha o campo de pesquisa."). A blank text lists all clients (H4Y-52).
@@ -41,6 +41,8 @@ H4Y-56 (RF-11, RF-05, RNF-07) adds the reservation create. `ReservationService` 
 H4Y-81 (RF-11, RF-13, RF-14) makes the screen "Reservas" (`reservations-list.fxml`) the main screen. The list button "Reservas" in the menu shows for users with `MANAGE_RESERVATIONS`. For these users, the screen opens by default after login. It replaces the H4Y-82 check-in and check-out screen. `ReservationsController` lists the `ReservationSummary` rows of `HotelFacade.listActiveReservations`. The static `filter` searches by client name or document and applies the quick filters. The static `canCheckIn` and `canCheckOut` decide which button is on. `canCheckIn` also checks the stay period (Q-61). The "+ Reservar quarto" button opens `reservations.fxml` in the same area. It is the only way to open that screen. The return to the list after a save comes with PR #53 (H4Y-81 AC-9).
 
 H4Y-55 (RF-12, Q-05) adds the cancel. The receptionist and the manager cancel a RESERVED reservation with the "Cancelar" button on the screen "Reservas". The static `canCancel` turns the button on only for a RESERVED row. The screen asks first with `cancelQuestion` (room and dates). `ReservationService.cancel(reservationId, actor)` checks `MANAGE_RESERVATIONS`, reads the reservation and calls `Reservation.checkCanCancel()`. It refuses a cancelled reservation ("A reserva já está cancelada."), a reservation with a check-in ("A reserva já tem check-in.") and a reservation with a check-out ("A reserva já tem check-out."). `ReservationRepository.cancel(id)` runs `UPDATE ... SET status = 'cancelled' WHERE id = ? AND status = 'reserved'`. The row stays in the database, so the client history shows it. A cancelled reservation does not block the room (`Reservation.overlaps`). An update that changes no row gives "A reserva mudou de estado. Atualize a lista.". The planned `Reservation.cancel()` is replaced by `checkCanCancel()`, as for the check-in and the check-out. The cancel button is on the screen "Reservas", so `onCancelReservationClicked` moves from `ReservationController` to `ReservationsController`.
+
+H4Y-57 (RF-22, Q-05, Q-36) adds the permanent delete of a reservation before the check-in. `Permission.DELETE_RESERVATIONS` allows only the manager. `ReservationService.delete(reservationId, actor)` checks it first and throws `AccessDeniedException` ("Só o gestor pode apagar reservas.") for other users. An unknown id throws `ReservationNotFoundException` ("A reserva não existe.", AC-3). `JdbcReservationRepository.delete` runs `DELETE FROM reservations WHERE id = ? AND status = 'reserved'`, so a check-in or a cancel at the same moment stops the delete. Only a RESERVED reservation is deleted (Q-05). The service reads the state first. For a cancelled, checked-in or checked-out reservation it throws the same message and does not call the repository, so a cancelled reservation stays in the history. When no row is deleted, the service throws "A reserva mudou de estado. Atualize a lista.". The deleted row is gone from the active list and the client history (AC-1), and the room is free again for the same nights (AC-2). On the "Reservas" screen, `ReservationsController` shows the "Apagar" button (`action-button, danger-button`) only when `canUse(actor, Permission.DELETE_RESERVATIONS)` is true. The static `canDelete` turns it on only for a `RESERVED` row (AC-4). The static `deleteQuestion` gives the confirmation text. The refusal for other roles (H4Y-58) and the refusal after the check-in with its own message (story block-delete-after-check-in) add guards to the same method. The ids replace the old planned `delete(reservation, user)` signature, as in `checkIn` and `checkOut`.
 
 ```mermaid
 classDiagram
@@ -96,6 +98,7 @@ classDiagram
         -onCreateReservationClicked() void
         ~summaryText(roomNumber: int, quote: ReservationQuote) String$
         +onDeleteReservationClicked() void
+        +onCancelReservationClicked() void
         +onAddExtraClicked() void
         +onRemoveExtraClicked() void
         +onAddLocationClicked() void
@@ -107,6 +110,8 @@ classDiagram
         ~canCheckOut(row: ReservationSummary) boolean$
         ~canCancel(row: ReservationSummary) boolean$
         ~cancelQuestion(row: ReservationSummary) String$
+        ~canDelete(row: ReservationSummary) boolean$
+        ~deleteQuestion(row: ReservationSummary) String$
         ~statusText(status: ReservationStatus) String$
         ~filter(rows: List~ReservationSummary~, filter: QuickFilter, text: String, today: LocalDate) List~ReservationSummary~$
         -initialize() void
@@ -114,6 +119,7 @@ classDiagram
         -onCheckInClicked() void
         -onCheckOutClicked() void
         -onCancelReservationClicked() void
+        -onDeleteReservationClicked() void
         -loadReservations() boolean
         -applyFilter() void
         -currentFilter() QuickFilter
@@ -147,8 +153,8 @@ classDiagram
     }
     class StockController {
         -initialize() void
-        %% future: not in StockController yet (RF-28)
-        -onImportXmlClicked() void
+        %% future: not in StockController yet (RF-28, XML or JSON)
+        -onImportStockFileClicked() void
         -onSaveItemClicked() void
         -onEditItemClicked() void
         -onClearClicked() void
@@ -193,7 +199,7 @@ classDiagram
         +quoteReservation(room: Room, start: LocalDate, end: LocalDate, actor: User) ReservationQuote
         +listClientReservations(client: Client, actor: User) List~ClientReservation~
         +cancelReservation(reservationId: long, actor: User) void
-        +deleteReservation(reservation: Reservation, user: User) void
+        +deleteReservation(reservationId: long, actor: User) void
         +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
         +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +addLocation(reservation: Reservation, location: Location) void
@@ -298,7 +304,7 @@ classDiagram
         +quote(room: Room, start: LocalDate, end: LocalDate, actor: User) ReservationQuote
         +listClientReservations(client: Client, actor: User) List~ClientReservation~
         +cancel(reservationId: long, actor: User) void
-        +delete(reservation: Reservation, user: User) void
+        +delete(reservationId: long, actor: User) void
         +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
         +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +addLocation(reservation: Reservation, location: Location) void
@@ -449,6 +455,7 @@ classDiagram
         +checkIn(id: long) boolean
         +checkOut(id: long) boolean
         +cancel(id: long) boolean
+        +delete(id: long) boolean
     }
     class JdbcReservationRepository {
         +findByRoom(roomId: long) List~Reservation~
@@ -460,6 +467,7 @@ classDiagram
         +checkIn(id: long) boolean
         +checkOut(id: long) boolean
         +cancel(id: long) boolean
+        +delete(id: long) boolean
     }
     class Database {
         +NOT_AVAILABLE String$
@@ -674,6 +682,13 @@ classDiagram
     class StockImport {
         -supplierName: String
         -importedAt: LocalDateTime
+        -fileFormat: StockFileFormat
+    }
+    class StockFileFormat {
+        <<enumeration>>
+        XML
+        JSON
+        +fromFileName(fileName: String) StockFileFormat$
     }
 
     %% ==========================================
@@ -709,6 +724,7 @@ classDiagram
         MANAGE_CLIENTS
         SEARCH_ROOMS
         MANAGE_RESERVATIONS
+        DELETE_RESERVATIONS
         -allowedRoles: Set~Role~
         +allows(actor: User) boolean
     }
@@ -758,6 +774,27 @@ classDiagram
         RETURN
         LOSS
     }
+    %% future: supplier file readers (RF-28, H4Y-84, Q-59)
+    class StockFileReader {
+        <<interface>>
+        +format() StockFileFormat
+        +read(content: String) List~StockFileLine~
+    }
+    class XmlStockFileReader {
+        +format() StockFileFormat
+        +read(content: String) List~StockFileLine~
+    }
+    class JsonStockFileReader {
+        +format() StockFileFormat
+        +read(content: String) List~StockFileLine~
+    }
+    class StockFileLine {
+        <<record>>
+        +supplierName: String
+        +itemName: String
+        +unit: String
+        +quantity: int
+    }
 
     %% ==========================================
     %% INHERITANCES
@@ -791,6 +828,11 @@ classDiagram
     User "1" --> "*" StockMovement : records
     StockMovement "*" --> "0..1" StockImport : from
     StockImport "*" --> "1" User : imported by
+    StockImport "*" --> "1" StockFileFormat : read from
+    XmlStockFileReader ..|> StockFileReader : implements
+    JsonStockFileReader ..|> StockFileReader : implements
+    StockFileReader ..> StockFileLine : reads
+    StockService ..> StockFileReader : picks by format
 
     %% ==========================================
     %% DEPENDENCIES (Controllers -> Facade)
@@ -958,8 +1000,8 @@ classDiagram
     note for ReservationService "addLocation and removeLocation accept only locations with guestCardAccess = true and requiresReservation = true. Allowed only before check-in."
     note for CardAccessService "Master card opens every room and every zone.<br/>Client card opens only its own room and zones with guestCardAccess = true. If requiresReservation = true, only zones included in its reservation.<br/>A blocked or inactive card opens nothing.<br/>Receptionist card opens only zones on floors 0 and 1 and no guest room.<br/>Restaurant staff card opens only the kitchen and the restaurant and no guest room.<br/>A staff card never opens a guest room. Only the master card does."
     note for MagneticCard "A card belongs to a Reservation OR a staff User, never both."
-    note for StockService "importStock accepts all items from a valid XML file.<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38).<br/>createItem, editItem and listItems need MANAGE_STOCK (manager only). A new item starts with stock 0. editItem keeps the stock (RF-28, RF-29, Q-38)."
+    note for StockService "importStock accepts all items from a valid XML or JSON file.<br/>The file name gives StockFileFormat. The reader of that format gives the same StockFileLine rows (H4Y-84, Q-59).<br/>Create missing catalogue items, add stock and ENTRY movements.<br/>Save or undo items, import, movements and balances together (RF-28, Q-10, Q-38).<br/>createItem, editItem and listItems need MANAGE_STOCK (manager only). A new item starts with stock 0. editItem keeps the stock (RF-28, RF-29, Q-38)."
     note for RoomService "MANAGE_ROOMS allows a manager to save a room.<br/>Constants enforce floors 2 and 3 with 10 rooms each, as stated in the course statement.<br/>Only the repository checks the room count, inside its save transaction.<br/>Q-01 targets 7/10/3 appear in the summary but are not enforced."
 ```
 
-Created by: antonioprmartinho. Updated by: jmbcruz. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-82 check-in and check-out by Claude Code (claude-opus-5-5), 2026-11-08; H4Y-82 PR #55 review fixes by Claude Code (claude-opus-5-5), 2026-11-08; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09 (sync with 6faf8f8); rename by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09.; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06; merge with main after H4Y-82 by Claude Code (claude-opus-5-5), 2026-11-09; screen rename to "Reservar quarto" by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 edit staff account by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 rebase on main after H4Y-82 and review fixes by Claude Code (claude-opus-5-5), 2026-11-10; H4Y-85 rebase on main after H4Y-80 and H4Y-81 by Claude Code (claude-opus-5-5), 2026-11-11; H4Y-55 cancel reservation by Claude Code (claude-opus-5-5), 2026-11-13. Reviewed by: pending.
+Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-82 check-in and check-out by Claude Code (claude-opus-5-5), 2026-11-08; H4Y-82 PR #55 review fixes by Claude Code (claude-opus-5-5), 2026-11-08; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09 (sync with 6faf8f8); rename by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09.; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06; merge with main after H4Y-82 by Claude Code (claude-opus-5-5), 2026-11-09; screen rename to "Reservar quarto" by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 edit staff account by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 rebase on main after H4Y-82 and review fixes by Claude Code (claude-opus-5-5), 2026-11-10; H4Y-85 rebase on main after H4Y-80 and H4Y-81 by Claude Code (claude-opus-5-5), 2026-11-11; H4Y-57 delete reservation by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13. Reviewed by: pending.

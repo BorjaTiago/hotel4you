@@ -22,7 +22,7 @@ import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationStatus;
 
-/** Checks the check-in, check-out and active list SQL with JDBC doubles (H4Y-82). */
+/** Checks the check-in, check-out, delete and active list SQL with JDBC doubles (H4Y-82, H4Y-57). */
 class JdbcReservationCheckInOutTest {
     private static final LocalDate START = LocalDate.of(2026, 11, 10);
     private static final LocalDate END = LocalDate.of(2026, 11, 12);
@@ -99,32 +99,31 @@ class JdbcReservationCheckInOutTest {
     }
 
     @Test
-    @Tag("H4Y-55-AC-1")
-    void onCancel_updateOnlyReservedRow_whenCalled() {
-        assertTrue(repository.cancel(5L));
+    @Tag("H4Y-57-AC-1")
+    void onDelete_deleteOnlyReservedRow_whenCalled() {
+        assertTrue(repository.delete(5L));
 
-        assertTrue(sql().contains("UPDATE reservations SET status = 'cancelled'"));
-        assertTrue(sql().contains("WHERE id = ? AND status = 'reserved'"));
+        assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND status = 'reserved'"));
         assertEquals(List.of(5L), database.bound);
         assertEquals(List.of("statement", "connection"), database.closed);
     }
 
     @Test
-    @Tag("H4Y-55-AC-3")
-    void onCancel_returnFalse_whenNoRowChanges() {
+    @Tag("H4Y-57-AC-1")
+    void onDelete_returnFalse_whenNoRowIsDeleted() {
         database.updated = 0;
 
-        assertFalse(repository.cancel(5L));
+        assertFalse(repository.delete(5L));
     }
 
     @Test
-    @Tag("H4Y-55-AC-1")
-    void onCancel_throwAndClose_whenUpdateFails() {
-        database.failure = new SQLException("Update failed");
+    @Tag("H4Y-57-AC-1")
+    void onDelete_throwAndClose_whenDeleteFails() {
+        database.failure = new SQLException("Delete failed");
 
         IllegalStateException error = assertThrows(IllegalStateException.class,
-                () -> repository.cancel(5L));
-        assertEquals("Não foi possível cancelar a reserva.", error.getMessage());
+                () -> repository.delete(5L));
+        assertEquals("Não foi possível apagar a reserva.", error.getMessage());
         assertSame(database.failure, error.getCause());
         assertEquals(List.of("statement", "connection"), database.closed);
     }

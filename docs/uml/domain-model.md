@@ -89,6 +89,12 @@ classDiagram
     class StockImport {
         supplierName: String
         importedAt: LocalDateTime
+        fileFormat: StockFileFormat
+    }
+    class StockFileFormat {
+        <<enumeration>>
+        XML
+        JSON
     }
     class Feedback {
         type: FeedbackType
@@ -158,6 +164,7 @@ classDiagram
     User "1" --> "*" StockMovement : records
     StockMovement "*" --> "0..1" StockImport : from
     StockImport "*" --> "1" User : imported by
+    StockImport "*" --> "1" StockFileFormat : read from
 ```
 
 ## Concepts
@@ -181,7 +188,7 @@ classDiagram
 | CardAccessRecord | Saved record of a card entry (Card access record). | entryDateTime |
 | StockItem | Material stored in the hotel (Stock). | name, unit, stockQuantity |
 | StockMovement | Entry, use or exit of a stock item. | type, quantity, dateTime, exitReason |
-| StockImport | Import of a supplier XML file. | supplierName, importedAt |
+| StockImport | Import of one supplier stock file (XML or JSON). | supplierName, importedAt, fileFormat |
 | Feedback | Suggestion or complaint of a client. | type, description, createdAt |
 | Role | Enum: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER. | - |
 | ReservationStatus | Enum: RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT. | - |
@@ -189,6 +196,7 @@ classDiagram
 | FeedbackType | Enum: SUGGESTION, COMPLAINT. | - |
 | MovementType | Enum: ENTRY, USE, EXIT. | - |
 | ExitReason | Enum: DISCARD, RETURN, LOSS. | - |
+| StockFileFormat | Enum: XML, JSON. The format of the supplier stock file (statement update 2026-11-06, Q-59). | - |
 
 ## Business rules
 
@@ -201,8 +209,8 @@ classDiagram
 - A room has one room type. The base price comes from the room type. Extras add to it.
 - A card access record points to a room or a location (each 0..1).
 - A stock movement of type EXIT has an exit reason (DISCARD, RETURN or LOSS).
-- Every item from a valid supplier XML file enters stock. The import creates missing catalogue items (RF-28, Q-10, Q-38; PR #20 decision, 2026-10-21).
-- A stock movement from an XML import points to its stock import. The import keeps supplier and time. Linked movements keep items and quantities. A save failure undoes all changes for that import, including new catalogue items.
+- Every item from a valid supplier XML or JSON file enters stock. Both formats follow the same rules (statement update 2026-11-06, Q-59). The import creates missing catalogue items (RF-28, Q-10, Q-38; PR #20 decision, 2026-10-21).
+- A stock movement from a file import points to its stock import. The import keeps supplier, time and file format. Linked movements keep items and quantities. A save failure undoes all changes for that import, including new catalogue items.
 - A client may leave many feedbacks. The client link is 0..1.
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

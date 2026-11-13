@@ -1,14 +1,14 @@
 ---
 type: story
 summary: Guardar e consultar todos os utilizadores
-parent: epic-authentication-users
+parent: H4Y-12
 requirements: [RNF-01]
-points: 3
-points_suggested: 3
-status: approved
-jira_key:
+points: 2
+points_suggested: 2
+status: published
+jira_key: H4Y-89
 labels: [security, 1st-delivery]
-sprint:
+sprint: 06
 ---
 
 # Título: Guardar e consultar todos os utilizadores
@@ -52,14 +52,16 @@ Para que saiba quem tem acesso à aplicação.
 RNF-01 (todos os utilizadores guardados e acessíveis). Decisão da equipa (2026-10-16): só o gestor consulta os utilizadores. Criar, editar e remover contas: epic-staff-management-access (RF-26).
 Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: utilizadores de teste próprios (foundation T4), sessão de gestor simulada (T0); na demo, o gestor inicial (auth T2).
 
-points_suggested: 3
+Decisão do utilizador (2026-11-13): puxada do sprint 7 para o sprint 6, 2 pontos (eram 3). A lista já existe (`StaffService.listUsers`, `StaffController`). Falta: `StaffService.findUser(username, actor)` com a verificação `Permission.MANAGE_STAFF` e a exceção de não encontrado (`StaffNotFoundException`), o método da fachada, uma pesquisa pequena no ecrã de contas, a verificação do `actor` em `listUsers` e os testes.
+
+points_suggested: 2
 reference: Registar um cliente (validação de dados e gravação) (3)
-compared: equal
-reasoning: List and view users from the database with a manager screen. Persistence check after restart. Simple rules.
+compared: smaller
+reasoning: The list already exists. Only a lookup by username, an actor check and a small screen field remain.
 split_needed: no
 
 ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13; jira-publisher, Claude Code (claude-sonnet-5-5), 2026-11-13. Created by: BorjaTiago. Updated by: BorjaTiago. Reviewed by: pending.

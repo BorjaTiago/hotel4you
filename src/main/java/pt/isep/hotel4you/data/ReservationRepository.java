@@ -86,4 +86,14 @@ public interface ReservationRepository {
      * @throws IllegalStateException if the database cannot save the cancel
      */
     boolean cancel(long id);
+
+    /**
+     * Deletes a booking for good. It deletes the row only if the state is RESERVED, in the same
+     * step as the delete. A cancelled booking stays in the history.
+     * @param id the booking identifier
+     * @return true if the row was deleted, false if the state is not RESERVED or the row does not
+     *         exist
+     * @throws IllegalStateException if the database cannot delete the booking
+     */
+    boolean delete(long id);
 }

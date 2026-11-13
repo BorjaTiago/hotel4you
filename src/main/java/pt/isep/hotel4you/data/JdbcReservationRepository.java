@@ -175,6 +175,12 @@ public class JdbcReservationRepository implements ReservationRepository {
         return update(sql, id, "Não foi possível cancelar a reserva.");
     }
 
+    @Override
+    public boolean delete(long id) {
+        String sql = "DELETE FROM reservations WHERE id = ? AND status = 'reserved'";
+        return update(sql, id, "Não foi possível apagar a reserva.");
+    }
+
     private boolean update(String sql, long id, String errorMessage) {
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, id)) {

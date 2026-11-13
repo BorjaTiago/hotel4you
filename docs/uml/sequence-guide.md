@@ -6,10 +6,10 @@ Use this guide to explain [SD-04 and SD-06](sequence-diagrams.md). The sources a
 
 1. Read from top to bottom. Every arrow has a hierarchical number. A child interaction adds a level. The next interaction at that level uses the next number. Returns also have numbers. Alternatives skip the other branch; a loop repeats the same labeled interaction.
 2. A controller calls `HotelFacade`. The facade calls a service. Services check permissions and business rules. Proposed repositories own database connections and transactions. Controllers never call the database.
-3. `Database.connect()` is implemented. The reservation and XML runtime flows are not implemented at this baseline. A modeled method is not proof of runtime behavior.
+3. `Database.connect()` is implemented. The supplier file (XML or JSON) runtime flow is not implemented at this baseline. A modeled method is not proof of runtime behavior.
 4. `[proposed G-xx]` marks a missing class-model method. `[SQL G-01]` marks an abbreviated database operation, not a Java method. `SQLServer` is an external database participant. All proposed contracts are listed under Gaps in the diagram file.
 5. SD-04 expands reservation deletion. SD-06 presents the three import phases: prepare, review, save. Its SQL messages summarize each item batch. SD-05 stays removed.
-6. No connection or transaction stays open while a person reviews the XML. Confirm saves the exact reviewed snapshot. Cancel discards it without calling persistence.
+6. No connection or transaction stays open while a person reviews the file data. Confirm saves the exact reviewed snapshot. Cancel discards it without calling persistence.
 
 ## SD-04 - Detailed: delete a reservation
 
@@ -17,7 +17,7 @@ Use this guide to explain [SD-04 and SD-06](sequence-diagrams.md). The sources a
 
 **Why:** Permission and current reservation state must be checked before deletion. A failure must not leave only part of the reservation deleted.
 
-**Why this way:** The existing modeled calls are `ReservationController.onDeleteReservationClicked()`, `HotelFacade.deleteReservation(reservation, user)` and `ReservationService.delete(reservation, user)`. The proposed service first checks the role. An unauthorized user reaches no repository or SQL call. The repository then opens one connection and starts a proposed transaction. A protected SELECT retrieves the current row. The service checks that the row exists and `checked_in_at` is null. These are separate numbered messages, so the reader can see the check before the deletion.
+**Why this way:** The implemented calls (H4Y-57) are `ReservationsController.onDeleteReservationClicked()`, `HotelFacade.deleteReservation(reservationId, actor)` and `ReservationService.delete(reservationId, actor)`. Today the repository runs one `DELETE ... WHERE id = ? AND status = 'reserved'` (only a RESERVED reservation is deleted; a cancelled one stays in the history, Q-05), because no child table exists yet. The proposed service first checks the role. An unauthorized user reaches no repository or SQL call. The repository then opens one connection and starts a proposed transaction. A protected SELECT retrieves the current row. The service checks that the row exists and `checked_in_at` is null. These are separate numbered messages, so the reader can see the check before the deletion.
 
 If the read fails, the reservation is missing or check-in has happened, the flow stops before DELETE. An active transaction is rolled back. On the valid path, the repository removes this reservation's `reservation_services` and `reservation_locations` rows, then the reservation. These child tables have foreign keys that prevent deleting the parent first. The database commits only after the whole batch succeeds. A write failure follows the rollback branch. The result reaches the Manager through the service, facade and controller.
 
@@ -31,13 +31,13 @@ If the read fails, the reservation is missing or check-in has happened, the flow
 
 **How to explain it:** "First, the service checks the Manager role. Then it reads the current reservation under the proposed transaction. It refuses a missing or checked-in reservation. It deletes the child rows and booking together. Commit completes success; failure takes the rollback path. This is a design proposal. The persistence contract and check-in protection still need implementation."
 
-## SD-06 - General: import supplier XML
+## SD-06 - General: import supplier XML or JSON file
 
 **What:** UC-15 imports a supplier delivery. The corrected sequence adds a required preview with Confirm and Cancel before any import write. The supplier supplies the file; an authorized hotel user performs the import (Q-17).
 
 **Why:** The professor feedback of 2026-10-30 requires the user to see and confirm the data before saving. This replaces the earlier no-preview decision for the proposed flow. It retains RF-28's rule that a new item enters the catalogue automatically.
 
-**Why this way:** Phase A checks permission, parses the complete XML and validates the imported data. The proposed API returns an immutable `StockImportPreview` containing the supplier, item names, units and quantities. Invalid XML, invalid data or missing permission returns an error before preview or persistence.
+**Why this way:** Phase A checks permission, finds the file format from the file name (`StockFileFormat`), parses the complete XML or JSON file with the reader of that format and validates the imported data. Both readers give the same rows, because the JSON file follows the same rules as the XML file (statement update 2026-11-06, Q-59). The proposed API returns an immutable `StockImportPreview` containing the supplier, item names, units and quantities. An unknown format, invalid XML or JSON, invalid data or missing permission returns an error before preview or persistence.
 
 Phase B calls the proposed `StockImportPreviewView.showPreview(preview)`. The user reviews the data and selects Confirm or Cancel. Cancel closes the preview and never calls `confirmImport`, the repository or SQL Server. There is no open database transaction during this review.
 
@@ -65,7 +65,7 @@ In SD-06, `1` starts preparation and its child messages reach the preview. `2` i
 
 - **G-01:** Both repositories, transaction context, SQL contracts, resource cleanup and connection/commit/rollback failure policies are missing. `Database.connect()` exists; there are no invented `Database.commit()` or `Database.rollback()` calls.
 - **G-02:** The reservation runtime flow and the proposed authorization/state helpers are missing. Check-in must share the reservation protection contract.
-- **G-03:** The two-phase XML methods, parser contract and immutable preview class are missing. The existing one-step `importStock(file, user)` contract needs an explicit class-model revision before coding.
+- **G-03:** The two-phase import methods, the XML and JSON parser contract and the immutable preview class are missing. The existing one-step `importStock(file, user)` contract needs an explicit class-model revision before coding.
 - **G-04:** The preview view and decision handler are proposed. No JavaFX screen was implemented by this task.
 - **G-05:** Current UC-15 still says no preview or confirmation. The proposed sequence follows the latest professor feedback supplied by the user. The use-case and class-model owners must align their documents. The unknown-item creation rule stays valid.
 
@@ -82,4 +82,4 @@ Validate both Mermaid blocks, their visible numbering, database boundaries and p
 - The check matched six existing call occurrences to their class-model receiver, method name and argument count. Sixteen proposed calls match the explicit Gaps contracts. Eleven external SQL messages are marked separately from Java methods. The stock movement summary includes its required item and time fields.
 - The check verified preview before writes, no persistence calls on Cancel, BEGIN and writes inside Confirm, and the import row before its linked movements. Source review checked the manager/state rules, permanent deletion, schema names and unknown-item creation. Local links and documentation footers passed checks.
 - `git diff --check` passed. Only `sequence-diagrams.md` and this guide changed. No application, full build, JUnit, Javadoc, SQL script or migration was run. Rendered files remain outside the repository. These checks validate the documents; they do not test runtime transactions or close G-01 to G-05.
-Created by: pedrocostaisep. Updated by: pedrocostaisep. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30. Reviewed by: pending.
+Created by: pedrocostaisep. Updated by: BorjaTiago. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; PR review corrections by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; carryover review by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; clarified professor feedback by sequence-diagram-editor, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-57 delete reservation by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: pedrocostaisep. Updated by: BorjaTiago. AI use: sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13. Reviewed by: pending.

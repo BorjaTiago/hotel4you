@@ -43,6 +43,9 @@
         <Button fx:id="cancelButton" text="Cancelar" onAction="#onCancelReservationClicked" disable="true"
                 styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                 accessibleText="Cancelar a reserva escolhida"/>
+        <Button fx:id="deleteButton" text="Apagar" onAction="#onDeleteReservationClicked" disable="true"
+                visible="false" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                accessibleText="Apagar de vez a reserva escolhida"/>
     </HBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>

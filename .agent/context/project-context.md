@@ -7,7 +7,7 @@ Short facts sheet. Full source: `enunciado.md`. Never add a requirement that is 
 - Receptionist (staff): registers clients, makes and cancels reservations, does check-in and check-out, helps with room services. Access only to floors 0 and 1 services.
 - Manager: runs the hotel, manages staff, receives suggestions and complaints, configures room items, deletes reservations (only before check-in), uses the master card (all rooms, all zones), sees card and room logs.
 - Restaurant staff: works for an external company. Access only to the kitchen and restaurant.
-- Supplier: delivers goods (food, hygiene material, beds, sofas, sheets, room material). Sends an XML stock file with each delivery.
+- Supplier: delivers goods (food, hygiene material, beds, sofas, sheets, room material). Sends an XML or JSON stock file with each delivery (JSON: statement update 2026-11-06, Q-59).
 
 ## Key business rules
 - Building: floor -1 garage and storeroom; 0 reception, bar, conference rooms; 1 restaurant and pool; 2 and 3 rooms.
@@ -18,7 +18,7 @@ Short facts sheet. Full source: `enunciado.md`. Never add a requirement that is 
 - The system saves each card entry: place and time.
 - The manager sees: places of one card; card passes of one room (master card included).
 - Only managers delete reservations, and only before check-in.
-- Stock: staff or managers record entry, use and exit. Supplier XML file gives the entry.
+- Stock: staff or managers record entry, use and exit. Supplier XML or JSON file gives the entry.
 - All users log in with user name and password.
 
 ## Non-functional requirements
@@ -55,7 +55,7 @@ Short facts sheet. Full source: `enunciado.md`. Never add a requirement that is 
 - Agents must tell the team to reference every AI use (tool, prompt, where used) in the doc footer.
 
 ## Tech
-Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
+Java, JavaFX, SQL Server, JUnit, Javadoc, XML or JSON stock file.
 
 ## Team decisions
 - Jira key: H4Y. Hierarchy: Epic > Story > Subtask (Jira issue type name).
@@ -75,4 +75,4 @@ Java, JavaFX, SQL Server, JUnit, Javadoc, XML stock file.
 - Drafts: `.agent/drafts/<type>-<slug>.md`. Examples: `.agent/examples/`.
 - Acceptance scenarios are numbered AC-1, AC-2 inside the story. Each test has `@Tag("H4Y-NN-AC-n")`.
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04); branch rule (2026-10-16); doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; UI language rule, Claude Code (claude-opus-5-5), 2026-10-23. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: docs-updater, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint weeks note (Q-04); branch rule (2026-10-16); doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; UI language rule, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

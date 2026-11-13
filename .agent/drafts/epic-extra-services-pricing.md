@@ -5,8 +5,8 @@ parent:
 requirements: [RF-07, RF-09]
 points:
 points_suggested:
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-86
 labels: [pricing, services]
 sprint:
 ---
@@ -45,4 +45,4 @@ Secção 2. RF-07, RF-09. Q-11, Q-20.
 ## Questões em aberto
 - Nenhuma nova.
 
-AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: epic-writer, general-purpose (tradução para PT-PT), Claude Code (claude-sonnet-5-5), 2026-10-16; jira-publisher, Claude Code (claude-sonnet-5-5), 2026-11-13. Updated by: BorjaTiago. Reviewed by: pending.

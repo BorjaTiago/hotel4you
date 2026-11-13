@@ -7,14 +7,14 @@ points: 3
 points_suggested: 3
 status: approved
 jira_key:
-labels: [stock, xml, final-delivery]
+labels: [stock, xml, json, final-delivery]
 sprint:
 ---
 
 # Título: Ver o relatório de importação com itens rejeitados
 
 Como gestor,
-Eu quero ver o relatório de uma importação XML,
+Eu quero ver o relatório de uma importação de um ficheiro XML ou JSON,
 Para que eu saiba que itens entraram e que itens foram rejeitados.
 
 ## Critérios de aceite
@@ -43,7 +43,7 @@ Para que eu saiba que itens entraram e que itens foram rejeitados.
 - [ ] AC-3: Para uma importação inexistente, o sistema indica que a importação não existe.
 
 ## Notas
-Q-10 (decisão da equipa). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: importações de teste próprias, com e sem rejeitados (foundation T4, tabela `stock_imports` do esquema H4Y-10). Entrega final (Q-06).
+Q-10 (decisão da equipa). O relatório é o mesmo para um ficheiro XML e para um ficheiro JSON (atualização do enunciado de 2026-11-06, H4Y-84, Q-59); os critérios não mudam. Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: importações de teste próprias, com e sem rejeitados (foundation T4, tabela `stock_imports` do esquema H4Y-10). Entrega final (Q-06).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -55,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

@@ -181,19 +181,19 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - RF links: RF-28, RF-29.
 - Phase: final delivery (Q-06).
 - Main flow:
-  1. The supplier delivers goods and sends the XML file.
-  2. Staff or the manager loads the XML file into the system (Q-17, team decision).
-  3. The system checks permission and reads and validates the XML (UC-53, included).
+  1. The supplier delivers goods and sends the stock file: an XML file or a JSON file (statement update 2026-11-06).
+  2. Staff or the manager loads the file into the system (Q-17, team decision).
+  3. The system checks permission, finds the format and reads and validates the file (UC-53, included).
   4. The system shows a preview of the items and quantities in the file. The user confirms or cancels (teacher feedback, 2026-10-30, Jira H4Y-8).
   5. The user confirms. The system checks permission and the data again. For every item in the file, it finds or creates the catalogue item and records a stock entry for the delivered quantity (UC-50, included; Q-10, Q-38; PR #20 decision, 2026-10-21).
   6. The system saves the import, catalogue changes, ENTRY movements and balances together. It shows the import report (UC-47, included).
 - Alternative flows:
-  - 3a. The file is not valid XML. The system refuses it and records nothing.
+  - 3a. The file is not valid XML or valid JSON. The system refuses it and records nothing.
   - 3b. The caller has no permission. The system refuses the import and changes no data.
   - 4a. The user cancels. The system closes the preview and changes no data.
   - 6a. A save fails. The system undoes the whole import, including new catalogue items, and keeps the original stock.
   - A missing catalogue item is created, not rejected (PR #20 decision, 2026-10-21, confirmed by the user on 2026-10-22). The preview with confirm and cancel replaces the "no preview" part of that decision (teacher feedback, 2026-10-30, Jira H4Y-8).
-  - Difference from UC-50: UC-15 handles the full supplier delivery. It reads the XML file (UC-53), creates missing catalogue items, records one entry for each item with UC-50 and shows the report (UC-47). UC-50 alone is one manual entry of an existing item.
+  - Difference from UC-50: UC-15 handles the full supplier delivery. It reads the XML or JSON file (UC-53), creates missing catalogue items, records one entry for each item with UC-50 and shows the report (UC-47). UC-50 alone is one manual entry of an existing item.
 
 ## UC-16 Record stock use
 - Actors: receptionist, manager.
@@ -238,7 +238,7 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
   3. The system saves the item in the catalogue.
 - Alternative flows:
   - 2a. Data is not valid. The system shows the error and does not save.
-  - XML import (UC-15) accepts all items from a valid file and creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Manual catalogue management remains a manager action.
+  - The supplier file import (UC-15, XML or JSON) accepts all items from a valid file and creates missing catalogue items (Q-10, Q-38; PR #20 decision, 2026-10-21). Manual catalogue management remains a manager action.
   - Stock use and exit (UC-16) use catalogue items (Q-38, team decision).
   - Removal of a catalogue item is not in the team decision (Q-38). If it is added, Q-36 applies.
 
@@ -574,14 +574,14 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Actors: receptionist, manager.
 - RF links: RF-28, RF-29.
 - Phase: final delivery (Q-06).
-- Included in: UC-15 (one entry for each item of the supplier XML file).
+- Included in: UC-15 (one entry for each item of the supplier XML or JSON file).
 - Main flow:
   1. Staff or the manager selects a stock item.
   2. The user records an entry with the quantity and the date (Q-21, team decision).
   3. The system saves the record and raises the balance.
 - Alternative flows:
   - 2a. The quantity is not valid. The system shows the error and does not save.
-  - Supplier deliveries use UC-15. UC-15 reads the XML file (UC-53) and records each item with this use case. Then the item and the quantity come from the file, not from the user.
+  - Supplier deliveries use UC-15. UC-15 reads the XML or JSON file (UC-53) and records each item with this use case. Then the item and the quantity come from the file, not from the user.
   - The sprint 2 retrospective (Jira H4Y-7, 2026-10-23) asks to link UC-50 with the supplier XML stock file. The link goes through UC-15, so UC-50 stays a manual entry, as in the approved story "Registar entrada de stock" (Q-53, team decision, 2026-10-30).
 
 ## UC-51 Check reservation has check-in
@@ -606,15 +606,15 @@ Source: `enunciado.md`, section 2. Flows only use steps the statement supports, 
 - Alternative flows:
   - 1a. The client has no reservation. The system refuses the check-in.
 
-## UC-53 Read supplier XML stock file
+## UC-53 Read supplier stock file (XML or JSON)
 - Actors: via UC-15 (receptionist, manager).
 - RF links: RF-28.
 - Phase: final delivery (Q-06).
 - Included in: UC-15.
 - Main flow:
-  1. The system opens the supplier XML stock file.
-  2. The system reads each item and its quantity.
+  1. The system opens the supplier stock file and finds its format: XML or JSON (statement update 2026-11-06).
+  2. The system reads each item and its quantity. Both formats give the same data and follow the same rules. The JSON fields are not known yet (Q-59).
 - Alternative flows:
-  - 1a. The file is not valid XML. The system refuses it and changes no data (Q-10).
+  - 1a. The file is not valid XML or valid JSON, or the format is not known. The system refuses it and changes no data (Q-10, Q-59).
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-7 review (renamed UC-08, UC-09, UC-13, UC-14, UC-16 to UC-19, include and extend steps, new UC-20 to UC-50) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53, UC-50 XML-only entry) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-50 manual entry back, UC-15 includes UC-50 and UC-53 after PR-36 review by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-15 XML preview with confirm and cancel by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; update of answers Q-01 to Q-23 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-15; update of answers Q-03 to Q-26 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-03, UC-18 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-02, UC-07, UC-08, UC-09, UC-16, UC-18 for Q-29 to Q-34 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; notes of UC-03, UC-04, UC-13, UC-15 and new UC-19 for Q-37 to Q-40 by requirements-analyst, Claude Code (claude-haiku-5-5), 2026-10-16; edit of UC-16 actor by OpenAI Codex, GPT-6, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-7 review (renamed UC-08, UC-09, UC-13, UC-14, UC-16 to UC-19, include and extend steps, new UC-20 to UC-50) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-7 retrospective fixes (UC-51, UC-52, UC-53, UC-50 XML-only entry) by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-50 manual entry back, UC-15 includes UC-50 and UC-53 after PR-36 review by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; UC-15 XML preview with confirm and cancel by use-case-diagram-editor, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
