@@ -32,6 +32,7 @@ Responsável: a definir na planning do sprint 5.
 
 - No ecrã `reservations-list.fxml` ("Reservas", H4Y-81): botão "Apagar" na barra de ações, para a linha selecionada, visível só para o gestor (regra de H4Y-23).
 - Pergunta de confirmação: "Apagar de vez a reserva do quarto 201? Esta ação não pode ser desfeita."
+- Só se apaga uma reserva RESERVED (Q-05). O serviço e o SQL recusam uma reserva cancelada, com check-in ou com check-out: mensagem "A reserva mudou de estado. Atualize a lista."; a reserva cancelada fica no histórico.
 - Depois de apagar: a reserva sai da tabela (AC-1). Reserva inexistente: "A reserva não existe." (AC-3).
 
-Created by: lukassperandio. Updated by: antonioprmartinho. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; checklist and screen update for H4Y-57 by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
+Created by: lukassperandio. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; UI section by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; checklist and screen update for H4Y-57 by Claude Code (claude-opus-5-5), 2026-11-12; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13. Reviewed by: pending.
