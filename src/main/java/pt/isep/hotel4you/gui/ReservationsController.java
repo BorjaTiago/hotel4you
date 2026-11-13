@@ -296,6 +296,8 @@ public class ReservationsController {
         }
         Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, cancelQuestion(chosen),
                 ButtonType.YES, ButtonType.NO);
+        ((Button) confirmation.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
+        ((Button) confirmation.getDialogPane().lookupButton(ButtonType.NO)).setDefaultButton(true);
         if (confirmation.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
             return;
         }
