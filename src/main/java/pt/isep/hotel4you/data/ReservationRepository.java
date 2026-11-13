@@ -79,6 +79,15 @@ public interface ReservationRepository {
     boolean checkOut(long id);
 
     /**
+     * Cancels a booking. The row stays in the database (history). It changes the row only if the
+     * state is still RESERVED, in the same step as the update.
+     * @param id the booking identifier
+     * @return true if the row changed, false if the state changed before or the row does not exist
+     * @throws IllegalStateException if the database cannot save the cancel
+     */
+    boolean cancel(long id);
+
+    /**
      * Deletes a booking for good. It deletes the row only if the state is RESERVED, in the same
      * step as the delete. A cancelled booking stays in the history.
      * @param id the booking identifier

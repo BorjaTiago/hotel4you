@@ -124,6 +124,11 @@ public class InMemoryReservationRepository implements ReservationRepository {
     }
 
     @Override
+    public boolean cancel(long id) {
+        return changeStatus(id, ReservationStatus.RESERVED, ReservationStatus.CANCELLED);
+    }
+
+    @Override
     public boolean delete(long id) {
         deleteCalls++;
         if (loseNextUpdate) {

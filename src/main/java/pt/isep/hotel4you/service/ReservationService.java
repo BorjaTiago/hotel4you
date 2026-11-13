@@ -166,6 +166,25 @@ public class ReservationService {
     }
 
     /**
+     * Cancels a reservation (RF-12, Q-05). The state changes from RESERVED to CANCELLED. The
+     * reservation stays in the client history and the room is free again for its nights.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who cancels the reservation
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the reservation is already cancelled, has a check-in or a
+     *         check-out, changed state at the same moment, or the database is not available
+     */
+    public void cancel(long reservationId, User actor) {
+        checkPermission(actor);
+        findReservation(reservationId).checkCanCancel();
+        if (!reservationRepository.cancel(reservationId)) {
+            throw new IllegalStateException(STATE_CHANGED);
+        }
+    }
+
+    /**
      * Lists the active reservations of the hotel: the states RESERVED and CHECKED_IN.
      *
      * @param actor the logged-in user who asks

@@ -106,6 +106,22 @@ public class Reservation {
     }
 
     /**
+     * Checks that the booking allows the cancel (RF-12, Q-05). This method does not change the booking.
+     * @throws IllegalStateException if the booking is already cancelled, has a check-in or has a check-out
+     */
+    public void checkCanCancel() {
+        if (status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("A reserva já está cancelada.");
+        }
+        if (status == ReservationStatus.CHECKED_IN) {
+            throw new IllegalStateException("A reserva já tem check-in.");
+        }
+        if (status == ReservationStatus.CHECKED_OUT) {
+            throw new IllegalStateException("A reserva já tem check-out.");
+        }
+    }
+
+    /**
      * Tests half-open periods. Cancelled bookings never occupy a night.
      * @param start the requested arrival
      * @param end the requested departure

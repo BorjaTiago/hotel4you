@@ -92,6 +92,9 @@ public class ReservationsController {
     private Button checkOutButton;
 
     @FXML
+    private Button cancelButton;
+
+    @FXML
     private Button deleteButton;
 
     @FXML
@@ -131,6 +134,16 @@ public class ReservationsController {
     }
 
     /**
+     * Tells if the cancel button is on for the chosen row.
+     *
+     * @param row the chosen row, or null if no row is chosen
+     * @return true only for a RESERVED row
+     */
+    static boolean canCancel(ReservationSummary row) {
+        return row != null && row.status() == ReservationStatus.RESERVED;
+    }
+
+    /**
      * Tells if the delete button is on for the chosen row.
      *
      * @param row the chosen row, or null if no row is chosen
@@ -138,6 +151,17 @@ public class ReservationsController {
      */
     static boolean canDelete(ReservationSummary row) {
         return row != null && row.status() == ReservationStatus.RESERVED;
+    }
+
+    /**
+     * Gives the question that the screen asks before it cancels a reservation.
+     *
+     * @param row the chosen row
+     * @return the question with the room number and the dates
+     */
+    static String cancelQuestion(ReservationSummary row) {
+        return "Cancelar a reserva do quarto " + row.roomNumber() + ", de "
+                + DATE_FORMAT.format(row.startDate()) + " a " + DATE_FORMAT.format(row.endDate()) + "?";
     }
 
     /**
@@ -265,6 +289,31 @@ public class ReservationsController {
     }
 
     @FXML
+    private void onCancelReservationClicked() {
+        ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
+        if (!canCancel(chosen)) {
+            return;
+        }
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, cancelQuestion(chosen),
+                ButtonType.YES, ButtonType.NO);
+        ((Button) confirmation.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
+        ((Button) confirmation.getDialogPane().lookupButton(ButtonType.NO)).setDefaultButton(true);
+        if (confirmation.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+        try {
+            facade.cancelReservation(chosen.id(), HotelApp.currentUser);
+            if (loadReservations()) {
+                showMessage("Reserva cancelada: quarto " + chosen.roomNumber() + ".", true);
+                reservationTable.requestFocus();
+            }
+        } catch (RuntimeException e) {
+            loadReservations();
+            showMessage(e.getMessage(), false);
+        }
+    }
+
+    @FXML
     private void onDeleteReservationClicked() {
         ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
         if (!canDelete(chosen)) {
@@ -324,6 +373,7 @@ public class ReservationsController {
     private void updateButtons(ReservationSummary chosen) {
         checkInButton.setDisable(!canCheckIn(chosen, LocalDate.now()));
         checkOutButton.setDisable(!canCheckOut(chosen));
+        cancelButton.setDisable(!canCancel(chosen));
         deleteButton.setDisable(!canDelete(chosen));
     }
 
