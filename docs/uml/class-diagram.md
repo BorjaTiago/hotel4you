@@ -97,7 +97,6 @@ classDiagram
         -onRoomChosen(choice: Choice) void
         -onCreateReservationClicked() void
         ~summaryText(roomNumber: int, quote: ReservationQuote) String$
-        +onDeleteReservationClicked() void
         +onAddExtraClicked() void
         +onRemoveExtraClicked() void
         +onAddLocationClicked() void
