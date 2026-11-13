@@ -137,6 +137,20 @@ public class HotelFacade {
     }
 
     /**
+     * Deletes a RESERVED reservation for good before the check-in.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who deletes the reservation
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the reservation is not RESERVED (cancelled, checked in or
+     *         checked out), changed state at the same moment, or the database is not available
+     */
+    public void deleteReservation(long reservationId, User actor) {
+        reservationService.delete(reservationId, actor);
+    }
+
+    /**
      * Lists the active reservations of the hotel: the states RESERVED and CHECKED_IN.
      *
      * @param actor the logged-in user who asks
