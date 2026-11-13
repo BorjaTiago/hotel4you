@@ -171,7 +171,7 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public boolean delete(long id) {
-        String sql = "DELETE FROM reservations WHERE id = ? AND checked_in_at IS NULL";
+        String sql = "DELETE FROM reservations WHERE id = ? AND status = 'reserved'";
         return update(sql, id, "Não foi possível apagar a reserva.");
     }
 
