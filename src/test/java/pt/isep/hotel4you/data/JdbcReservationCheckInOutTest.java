@@ -99,6 +99,37 @@ class JdbcReservationCheckInOutTest {
     }
 
     @Test
+    @Tag("H4Y-55-AC-1")
+    void onCancel_updateOnlyReservedRow_whenCalled() {
+        assertTrue(repository.cancel(5L));
+
+        assertTrue(sql().contains("UPDATE reservations SET status = 'cancelled'"));
+        assertTrue(sql().contains("WHERE id = ? AND status = 'reserved'"));
+        assertEquals(List.of(5L), database.bound);
+        assertEquals(List.of("statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-55-AC-3")
+    void onCancel_returnFalse_whenNoRowChanges() {
+        database.updated = 0;
+
+        assertFalse(repository.cancel(5L));
+    }
+
+    @Test
+    @Tag("H4Y-55-AC-1")
+    void onCancel_throwAndClose_whenUpdateFails() {
+        database.failure = new SQLException("Update failed");
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> repository.cancel(5L));
+        assertEquals("Não foi possível cancelar a reserva.", error.getMessage());
+        assertSame(database.failure, error.getCause());
+        assertEquals(List.of("statement", "connection"), database.closed);
+    }
+
+    @Test
     @Tag("H4Y-82-AC-4")
     void onFindById_mapRow_whenReservationExists() {
         database.rows = 1;

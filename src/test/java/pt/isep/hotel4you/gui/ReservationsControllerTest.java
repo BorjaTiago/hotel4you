@@ -40,6 +40,26 @@ class ReservationsControllerTest {
     }
 
     @Test
+    @Tag("H4Y-55-AC-5")
+    void onCanCancel_returnTrue_whenRowIsReserved() {
+        assertTrue(ReservationsController.canCancel(row(ReservationStatus.RESERVED)));
+    }
+
+    @Test
+    @Tag("H4Y-55-AC-5")
+    void onCanCancel_returnFalse_whenRowIsCheckedInOrNotChosen() {
+        assertFalse(ReservationsController.canCancel(row(ReservationStatus.CHECKED_IN)));
+        assertFalse(ReservationsController.canCancel(null));
+    }
+
+    @Test
+    @Tag("H4Y-55-AC-5")
+    void onCancelQuestion_nameRoomAndDates_whenRowIsChosen() {
+        assertEquals("Cancelar a reserva do quarto 201, de 10/11/2026 a 12/11/2026?",
+                ReservationsController.cancelQuestion(row(ReservationStatus.RESERVED)));
+    }
+
+    @Test
     @Tag("H4Y-82-AC-9")
     void onCanCheckInOrOut_returnFalse_whenNoRowIsChosen() {
         assertFalse(ReservationsController.canCheckIn(null, START));
