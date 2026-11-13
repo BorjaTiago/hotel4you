@@ -1,14 +1,14 @@
 ---
 type: story
 summary: Configurar os itens de um quarto
-parent: epic-rooms-pricing
+parent: H4Y-14
 requirements: [RF-08]
-points: 
+points: 5
 points_suggested: 5
-status: draft
-jira_key:
+status: published
+jira_key: H4Y-91
 labels: [rooms, 1st-delivery]
-sprint:
+sprint: 06
 ---
 
 # Título: Configurar os itens de um quarto
@@ -92,7 +92,7 @@ Quantidade (2026-11-06): o esquema `room_items` guarda a quantidade de cada item
 
 Q-58 (answered: No): a quantidade de um item no quarto não mexe no stock. Sem dependência de registar-entrada-stock. Sem critério novo.
 
-Reestimar: o âmbito cresceu (quantidade). A equipa reestima e define `points`; `points_suggested` mantém-se. Estado `draft` porque um humano deve aprovar os critérios alterados.
+Decisão do utilizador (2026-11-13): 5 pontos, estado `approved`, sprint 06. Duas subtasks: serviço (com o script SQL v11 da tabela `room_items`) e ecrã. Reutiliza a permissão `Permission.MANAGE_ROOMS` (só gestor). Sem permissão nova.
 points_suggested: 5
 reference: Realizar check-in com cartão magnético (5)
 compared: equal
@@ -103,4 +103,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-11-06; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Updated by: BorjaTiago. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-11-06; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13; jira-publisher, Claude Code (claude-sonnet-5-5), 2026-11-13. Created by: BorjaTiago. Updated by: BorjaTiago. Reviewed by: pending.

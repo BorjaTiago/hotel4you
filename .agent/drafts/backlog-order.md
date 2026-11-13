@@ -9,6 +9,8 @@ Proposal for the PO. The PO decides. No Jira write. Source: 15 epics, 53 active 
 
 Revision 2026-10-16: full dependency audit. The status goes back to `draft` because the order changed. The PO approves it again.
 
+Revision 2026-11-13: final sprint 6 (21 points), user decisions task by task. See the block "Revision 2026-11-13" below. The status stays `draft`. The PO approves it again.
+
 ## Planning assumptions
 
 - Sprint 1 (2026-10-12): requirements only. No story.
@@ -88,7 +90,7 @@ Reasons:
 - Items 4 to 6 do not block each other. Each story uses its own test reservations or accounts. `ReservationStatus` already has RESERVED, CANCELLED, CHECKED_IN and CHECKED_OUT.
 - Removed: registar-cliente-rapido H4Y-59 (Q-56). editar-item-stock is `status: merged` into H4Y-51 (already built in H4Y-68, PR #47: `StockService.editItem` and `StockController.onEditItemClicked`). registar-entrada-stock moves to sprint 6.
 
-### Sprint 6 (Team Leader Antonio Martinho, 14/11 to 20/11): 23 points, all parallel
+### Sprint 6 (Team Leader Antonio Martinho, 14/11 to 20/11): 23 points, all parallel (history, replaced by Revision 2026-11-13 below)
 
 Goal: "Garantir que cada funcionário só faz o que o seu papel permite."
 
@@ -111,7 +113,7 @@ Cut order if the sprint is full: 8, then 7, then 6. Items 1 to 3 close the 1st d
 
 H4Y-58 and block-delete-after-check-in touch the same delete action. This is a merge conflict risk only. Neither story waits for the other.
 
-### Sprint 7 and later
+### Sprint 7 and later (history, replaced by Revision 2026-11-13 below)
 
 - consultar-utilizadores (3) moves to sprint 7. Sprint 7 also has the 1st delivery freeze and zip (due 2026-12-01). Sprint 7 holds only 3 story points, so the freeze has room.
 - criar-zona, editar-zona and remover-zona are `status: merged` into model-hotel-floors (H4Y-28). They are done in H4Y-28 (sprint 3). They are not in a future sprint. Sprint 8 has no story left.
@@ -122,6 +124,42 @@ H4Y-58 and block-delete-after-check-in touch the same delete action. This is a m
 ### Refinement before the sprint 5 planning
 
 - `StaffService.listUsers` already exists in code. Refine consultar-utilizadores against the code before the team confirms points. Points may go down. editar-item-stock is already built (H4Y-68) and merged into H4Y-51.
+
+## Revision 2026-11-13: final sprint 6 and the plan for sprint 7 and later
+
+The status stays `draft`. The PO approves the order again. The user decided this set task by task on 2026-11-13. This block replaces the "Sprint 6" section and the "Sprint 7 and later" note of the 2026-11-06 revision. The old text stays above as history. Plan: `docs/scrum/sprint-06/planning.md`.
+
+### Sprint 6 (Team Leader Antonio Martinho, 14/11 to 20/11): 21 points, all parallel
+
+Goal: "Garantir que cada funcionário só faz o que o seu papel permite." This goal now covers only the access rule, remove-staff-account and consultar-utilizadores. The team rewords it to customer value in the planning meeting.
+
+| Priority | Story | Points | Needs (earlier sprint) | SQL |
+|----------|-------|--------|------------------------|-----|
+| 1 | configure-room-items | 5 | none (Q-58 answered: No). Reuses `MANAGE_ROOMS`. | v11 `room_items` |
+| 2 | registar-entrada-stock | 3 | none. Manager only (`MANAGE_STOCK`, no new Permission). Only movement type `in`. | v12 `stock_movements` |
+| 3 | regra-acesso-por-local (new, merges limit-reception-floors and limit-restaurant-staff-zones) | 3 | none. One rule `canAccess(location, actor)`, table tests, no screen. | none |
+| 4 | remove-staff-account | 3 | none. New AC-5 (no self removal). Only reservations count as associated records. | none |
+| 5 | definir-precos-extra (pulled from sprint 12) | 3 | none. New Permission `MANAGE_EXTRA_PRICES` (manager only). | v14 `extra_prices` |
+| 6 | reservation-restaurant-pool | 2 | H4Y-56 (sprint 4) | v13 `reservation_locations` |
+| 7 | consultar-utilizadores (pulled from sprint 7) | 2 (was 3) | none. Listing exists. Remaining: `findUser(username, actor)`, lookup in the staff screen, actor check on `listUsers`. | none |
+
+Total: 5 + 3 + 3 + 3 + 3 + 2 + 2 = 21 points. Cut order if the sprint is full: 5, then 4, then 6.
+
+- The SQL numbers are fixed: the code stops at v10. Each story uses its own number, so there is no clash.
+- Cut: refuse-delete-reservation (H4Y-58, `status: removed`, points empty) and block-delete-after-check-in (`status: removed`). Reason: already delivered by H4Y-57 (`ReservationService.delete`: `Permission.DELETE_RESERVATIONS` and status RESERVED only). H4Y-58 and H4Y-78 stay open in Jira until the user OKs closing them.
+- Merged: limit-reception-floors and limit-restaurant-staff-zones (`status: merged`, `merged_into: regra-acesso-por-local`). The restaurant AC-3 (no create or delete of reservations) is already built: `ReservationService.create` needs `MANAGE_RESERVATIONS`, `delete` needs `DELETE_RESERVATIONS`.
+- Moved: T3 usability test goes to sprint 7 (`subtask-s07-t3-usability-test`).
+- Not in sprint 6: cancel-reservation H4Y-55 (PR #62, conflicts). It is a carry-over from sprint 5. Owner: José.
+- Removed sub-tasks: `subtask-s06-configure-room-items-tests-docs` (merged into service and screen), the four `subtask-s06-limit-*`, `subtask-s05-refuse-delete-reservation`, `subtask-s06-block-delete-after-check-in`.
+
+### Sprint 7 and later
+
+- Sprint 7 (21/11 to 27/11): 1st delivery freeze and zip (due 2026-12-01), T3 usability test (task), and registar-saida-stock plus registar-uso-stock as ONE block with one owner (5 points). They need `stock_movements` from registar-entrada-stock (sprint 6, earlier sprint). consultar-utilizadores leaves sprint 7.
+- Sprint 8: foundation T6 (card reader simulator, card numbers, first master card: 5 points). Nothing for the cards exists yet: no card tables or classes. The card stories (sprints 9 and 10) are NOT startable before T6.
+- Extras chain: adicionar-extras-quarto-reserva (5), adicionar-servicos-extra-reserva (3 to 5; the draft says 5) and calcular-preco-total-reserva (3 to 5; the draft says 5) follow definir-precos-extra. They are in sprint 7 or later, never in sprint 6. The table keeps sprints 12 and 13. The PO may pull them earlier in the sprint 7 planning. The team re-estimates them then.
+- carregar-xml-fornecedor-gestor stays in sprint 11. Blockers: Q-59 (JSON field names, still open), the Gson dependency is missing, and AC-2 contradicts `docs/uml/traceability.md` (reject unknown items versus create missing items). No new Q-NN is added here.
+- Sprint 12 has 8 points now (carregar-xml-fornecedor-rececionista 3, adicionar-extras-quarto-reserva 5). Sprint 7 has 5 points.
+- Sums, new: 13 + 15 + 20 + 11 + 21 + 5 + 0 + 17 + 18 + 11 + 8 + 17 = 156 known points (was 165: refuse and block -4, limit stories 6 to 3 -3, consultar-utilizadores 3 to 2 -1, saida and uso 6 to 5 as one block -1). 1st delivery scope (sprints 2 to 7) = 85 known points plus the pending ones (was 86 before the H4Y-87 re-estimate to 3 points). From sprint 5 on: 117 - 9 = 108 known points plus the pending ones.
 
 ## Dependency audit result
 
@@ -148,16 +186,18 @@ H4Y-58 and block-delete-after-check-in touch the same delete action. This is a m
 | 3 | 10-26 | 13 + 2 stretch | funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price, list-rooms; stretch: cadastrar-item-stock | The hotel has its 20 rooms and nightly prices in the system. Reception can tell clients which rooms exist and their price. Each employee uses only the functions of their role. Stretch: item catalogue. |
 | 4 | 11-02 | 20 (done, Jira) | H4Y-9, H4Y-51, H4Y-52, H4Y-53, H4Y-54, H4Y-56 (create-reservation) | Done. Reception registers and finds clients, sees free rooms and creates a reservation. Items can be created (stock 0). Team Leader José Cruz (Q-57). |
 | 5 | 11-07 | 11 + pending | Criar uma reserva em três passos (story-ecra-unico-clientes-reservas) 2, Ver e gerir as reservas ativas no ecrã principal (story-ver-reservas-ativas) pending, story-check-in-check-out (pending), delete-reservation (H4Y-57) 3, cancel-reservation (H4Y-55) 3, edit-staff-account 3; tasks: task-estilo-comum-ui, task-json-stock-import | Permitir que o cliente faça o check-in e o check-out no hotel. Reception sees the active reservations, checks clients in and out, cancels and deletes reservations. |
-| 6 | 11-14 | 23 | refuse-delete-reservation (H4Y-58) 2, block-delete-after-check-in 2, configure-room-items 5*, registar-entrada-stock 3, limit-reception-floors 3, limit-restaurant-staff-zones 3, reservation-restaurant-pool 2, remove-staff-account 3 | Garantir que cada funcionário só faz o que o seu papel permite: only the manager deletes reservations and never after check-in, reception enters only its floors, restaurant staff only their zones. The reservation includes restaurant and pool. The manager sets the items of each room and records stock entries. |
-| 7 | 11-21 | 3 | consultar-utilizadores | 1st delivery freeze and zip (due 2026-12-01). The manager lists users. |
-| 8 | 11-28 | 0 | none (criar-zona, editar-zona, remover-zona are merged into H4Y-28, done) | Technical task T6 (card reader simulator, card numbers, first master card) for the card stories. |
+| 6 | 11-14 | 21 (revision 2026-11-13; was 23) | configure-room-items 5, registar-entrada-stock 3, regra-acesso-por-local 3 (merges limit-reception-floors and limit-restaurant-staff-zones), remove-staff-account 3, definir-precos-extra 3 (pulled from sprint 12), reservation-restaurant-pool 2, consultar-utilizadores 2 (pulled from sprint 7). Cut: refuse-delete-reservation (H4Y-58) and block-delete-after-check-in (done by H4Y-57). | Garantir que cada funcionário só faz o que o seu papel permite (the team rewords it to customer value): one access rule for reception and restaurant staff, accounts removed and looked up by the manager, extra prices per night, room items, stock entries, restaurant and pool in the reservation. |
+| 7 | 11-21 | 5 (revision 2026-11-13; was 3) | registar-saida-stock and registar-uso-stock as one block with one owner (5); task T3 usability test | 1st delivery freeze and zip (due 2026-12-01). The manager records stock exits and use. consultar-utilizadores moved to sprint 6. |
+| 8 | 11-28 | 0 | none (criar-zona, editar-zona, remover-zona are merged into H4Y-28, done) | Technical task T6 (card reader simulator, card numbers, first master card) for the card stories. The card stories are not startable before T6. |
 | 9 | 12-07 | 17 | emitir-cartao-check-in, registar-passagens-cartao, abrir-quarto-com-cartao, abrir-restaurante-piscina-reservados, recusar-cartao-locais-nao-permitidos | The client card is issued, opens the room and the reserved places, and every pass is logged. |
 | 10 | 12-14 | 18 | desativar-cartao-check-out, abrir-tudo-cartao-mestre, bloquear-cartao-mestre, emitir-novo-cartao-mestre, consultar-locais-cartao, consultar-passagens-quarto | Card off at check-out, master card, block and new card, card and room logs. |
 | 11 | 2027-01-11 | 11 | carregar-xml-fornecedor-gestor, ver-relatorio-importacao | The manager loads the supplier XML with an import report. |
-| 12 | 2027-01-18 | 17 | registar-uso-stock, registar-saida-stock, carregar-xml-fornecedor-rececionista, definir-precos-extra, adicionar-extras-quarto-reserva | Stock use and exit. Reception loads XML. Extra prices. Extras on the reservation. |
+| 12 | 2027-01-18 | 8 (revision 2026-11-13; was 17) | carregar-xml-fornecedor-rececionista, adicionar-extras-quarto-reserva (registar-uso-stock and registar-saida-stock moved to sprint 7, definir-precos-extra moved to sprint 6) | Reception loads XML. Extras on the reservation. The PO may pull the extras chain earlier (sprint 7 or later). |
 | 13 | 2027-01-25 | 17 | adicionar-servicos-extra-reserva, calcular-preco-total-reserva, register-room-service-request, record-suggestion-complaint, list-suggestions-complaints | Paid services, total price, room service, suggestions and complaints. Final zip. |
 
 Check (2026-11-06): 13+15+20+11+23+3+0+17+18+11+17+17 = 165 known points, plus the pending points of ver-reservas-ativas and check-in-check-out (sprint 5). 1st delivery scope (sprints 2 to 7) = 85 known points plus the pending ones. Older check (2026-10-16, history): 178 = 180 minus login-restaurante (2, deleted). The difference comes from H4Y-59 (3, discarded, Q-56), the zone stories (9, merged into H4Y-28) and the sprint 4 count taken from Jira.
+
+Check (2026-11-13): 13+15+20+11+21+5+0+17+18+11+8+17 = 156 known points, plus the pending points of ver-reservas-ativas and check-in-check-out (sprint 5). 1st delivery scope (sprints 2 to 7) = 85 known points plus the pending ones. The difference from 165 is in the Sprint 7 and later block of Revision 2026-11-13.
 
 Changes from the approved order: `create-staff-account` 7 -> 2; `login-restaurante` 2 -> 3; `list-rooms` 3 -> 4; `cadastrar-item-stock` 11 -> 4 (accepted, Q-43); `registar-cliente-rapido` 4 -> 5; `refuse-delete-reservation` 5 -> 6. Inside sprint 2, `janela-principal` no longer waits for login (stub session).
 
@@ -171,20 +211,20 @@ Stories in one lane group have no link between them and run in parallel. "Then" 
 | 3 | login-restaurante, funcoes-por-papel, model-hotel-floors, register-rooms, set-base-price, list-rooms, cadastrar-item-stock | none |
 | 4 | H4Y-9, H4Y-51, H4Y-52, H4Y-53, H4Y-54, H4Y-56 (done; H4Y-76 waited on H4Y-75, the reason for the same-sprint rule) | done |
 | 5 | ecra-unico-clientes-reservas, ver-reservas-ativas + check-in-check-out (one owner), delete-reservation, cancel-reservation, edit-staff-account; tasks estilo-comum-ui, json-stock-import | Accepted exception (BorjaTiago, 2026-11-06): day 1 skeleton of the main screen (item 2 owner) then buttons of check-in-check-out, delete-reservation, cancel-reservation; at most one day |
-| 6 | refuse-delete-reservation, block-delete-after-check-in, configure-room-items, registar-entrada-stock, limit-reception-floors, limit-restaurant-staff-zones, reservation-restaurant-pool, remove-staff-account; task T3 usability test | none (refuse and block touch the same delete action: merge risk only) |
-| 7 | consultar-utilizadores | none |
+| 6 | configure-room-items, registar-entrada-stock, regra-acesso-por-local, remove-staff-account, definir-precos-extra, reservation-restaurant-pool, consultar-utilizadores (revision 2026-11-13; refuse and block are cut) | none (shared files `Permission` and `HotelFacade`: merge risk only; SQL v11 to v14 have fixed numbers) |
+| 7 | registar-saida-stock + registar-uso-stock (one block, one owner); task T3 usability test | none |
 | 8 | no story | none |
 | 9 | emitir-cartao-check-in, registar-passagens-cartao, abrir-quarto-com-cartao, abrir-restaurante-piscina-reservados, recusar-cartao-locais-nao-permitidos | none (each access rule is its own class, T0) |
 | 10 | all 6 stories | none |
 | 11 | carregar-xml-fornecedor-gestor, ver-relatorio-importacao | none |
-| 12 | registar-uso-stock, registar-saida-stock, carregar-xml-fornecedor-rececionista, definir-precos-extra, adicionar-extras-quarto-reserva | none |
+| 12 | carregar-xml-fornecedor-rececionista, adicionar-extras-quarto-reserva | none |
 | 13 | all 5 stories | none |
 
 ## Technical tasks (no points) by sprint
 
 | Epic | Tasks | Sprint |
 |------|-------|--------|
-| foundation-architecture | T0 skeleton and core classes: first task of sprint 2, before every story and before the seed. Then T2 SQL Server with the PR #4 schema, T4 test data mechanism, T1 layer check. T5 reference data: start of sprint 3. T3 usability test: sprint 6, on the new main screen "Reservas" (RNF-04); repeat in sprint 10. T6 card reader simulator, card number generator, master card for the first manager: sprint 8. | 2, 3, 6, 8, 10 |
+| foundation-architecture (T3 in sprint 7 since 2026-11-13) | T0 skeleton and core classes: first task of sprint 2, before every story and before the seed. Then T2 SQL Server with the PR #4 schema, T4 test data mechanism, T1 layer check. T5 reference data: start of sprint 3. T3 usability test: sprint 7 (moved from sprint 6, 2026-11-13), on the new main screen "Reservas" (RNF-04); repeat in sprint 10. T6 card reader simulator, card number generator, master card for the first manager: sprint 8. | 2, 3, 7, 8, 10 |
 | authentication-users | T1 encrypted passwords, then T2 seed (5 roles + first manager from config): sprint 2, after foundation T0 and T2, before the login stories. | 2 |
 | engineering-quality | Setup JUnit, Javadoc, `docs/libraries.md`, branch and commit rule, AI-use reference (RNF-09, 10, 11, 20, 21, 25): sprint 2. Code-of-conduct check (RNF-26): each sprint review. Final audit: sprints 12 to 13. | 2 to 13 |
 | scrum-process | Planning, daily notes, review, retrospective, refinement, leader rotation, validation, diagram update (RNF-13 to 19, 27): every sprint 2 to 13. | 2 to 13 |
@@ -228,22 +268,22 @@ Value: H/M/L. Risk: H/M/L. Dependency: "none (hard)" means it builds and tests a
 | 26 | Criar uma reserva em três passos (story-ecra-unico-clientes-reservas) | Story | see draft | 2 | Value H: the 3-step create flow, built in PR #53. Risk L: already built. Dependency: none; its owner (item 27) merges it on day 1. Date: 1st delivery; sprint 5, priority 1. | 5 |
 | 27 | Ver e gerir as reservas ativas no ecrã principal (story-ver-reservas-ativas) | Story | see draft | pending (re-estimate) | Value H: "Reservas" is the ONE main screen of reception (search, quick filters, "+ Nova reserva", action bar). Risk M: shared screen; 3 stories add buttons. Dependency: none hard; accepted day-1 wait for items 28, 30, 31 (see Dependencies). Date: 1st delivery; sprint 5, priority 2. Day 1: merge PR #53 and the skeleton (table + empty action bar). | 5 |
 | 28 | story-check-in-check-out (merges check-in and check-out) | Story | RF-13, 14 | pending (estimator) | Value H: the sprint 5 goal. Risk M. Dependency: adds Check-in and Check-out buttons to the main screen of item 27 after the day-1 skeleton (accepted exception). Date: 1st delivery; sprint 5, priority 3, same owner as item 27. | 5 |
-| 29 | block-delete-after-check-in | Story | RF-13, 22 | 2 | Value H. Risk L. Dependency: hard on item 25 and item 28 story-check-in-check-out (earlier sprint 5; guard on the same delete action). Date: 1st delivery; sprint 6, priority 2. | 6 |
-| 30 | refuse-delete-reservation | Story | RF-22 | 2 | Value H. Risk L. Dependency: hard on item 25 (sprint 5; role guard on the same delete action). Date: 1st delivery; sprint 6, H4Y-58, 2 points (team confirms). | 6 |
-| 31 | configure-room-items | Story | RF-08 | 5 | Value M (should), in the 1st delivery (Q-06). Risk L. Dependency: none (Q-58 answered: No, room quantity does not touch stock). Date: sprint 6, priority 3; the team re-estimates the 5 points. | 6 |
+| 29 | block-delete-after-check-in | Story | RF-13, 22 | 2 | Removed (2026-11-13): already delivered by H4Y-57 (`ReservationService.delete`: `Permission.DELETE_RESERVATIONS` and status RESERVED only). `status: removed`, no sprint. | removed (H4Y-57) |
+| 30 | refuse-delete-reservation | Story | RF-22 | 2 | Removed (2026-11-13): already delivered by H4Y-57 (same reason). `status: removed`, `sprint:` and `points:` empty. H4Y-58 and H4Y-78 stay open in Jira until the user OKs closing them. | removed (H4Y-57) |
+| 31 | configure-room-items | Story | RF-08 | 5 | Value M (should), in the 1st delivery (Q-06). Risk L. Dependency: none (Q-58 answered: No, room quantity does not touch stock). Date: sprint 6, priority 1, 5 points approved (2026-11-13). Reuses `MANAGE_ROOMS`. SQL v11 `room_items`. Two sub-tasks: service and screen. | 6 |
 | 32 | Delivery T: class, sequence, executables, Javadoc | Task | RNF-24 | - | Value H. Risk M. Dependency: code of sprints 2 to 6. Date: sprints 5 and 6. | 5 to 6 |
-| 33 | Foundation T3 usability test | Task | RNF-04 | - | Value H: the team says the app is not intuitive. Risk M: findings may grow the work. Dependency: the new main screen "Reservas" (items 26 to 28, sprint 5, earlier sprint). Date: 1st delivery; sprint 6. The findings become new stories. | 6 |
+| 33 | Foundation T3 usability test | Task | RNF-04 | - | Value H: the team says the app is not intuitive. Risk M: findings may grow the work. Dependency: the new main screen "Reservas" (items 26 to 28, sprint 5, earlier sprint). Date: 1st delivery; moved from sprint 6 to sprint 7 (2026-11-13). The findings become new stories. | 7 |
 | 34 | Delivery T: 1st zip and validation | Task | RNF-22, 23, 24 | - | Value H: 35% of grade. Risk H: deadline. Dependency: items 1 to 33. Date: 12-01 23:55. | 7 |
-| 35 | consultar-utilizadores | Story | RNF-01 | 3 | Value M. Risk L. Dependency: none hard (test users). Date: final delivery; moved to sprint 7 (2026-11-06; code exists, refine points first). | 7 |
+| 35 | consultar-utilizadores | Story | RNF-01 | 2 | Value M. Risk L. Dependency: none hard (test users). Date: pulled from sprint 7 to sprint 6 (2026-11-13), 2 points (was 3). Listing exists (`StaffService.listUsers`). Remaining: `findUser(username, actor)`, facade method, lookup in the staff screen, actor check on `listUsers`, tests. One sub-task. | 6 |
 | 36 | edit-staff-account | Story | RF-26 | 3 | Value H. Risk L. Dependency: none hard (test accounts). Date: moved to sprint 5 (2026-11-06). | 5 |
-| 37 | remove-staff-account | Story | RF-26 | 3 | Value H. Risk M: Q-36 refusal. Dependency: none hard (test accounts with links). Date: moved to sprint 6 (2026-11-06). | 6 |
+| 37 | remove-staff-account | Story | RF-26 | 3 | Value H. Risk M: Q-36 refusal. Dependency: none hard (test accounts with links). Date: moved to sprint 6 (2026-11-06). 2026-11-13: new AC-5 (the manager cannot remove his own account); only reservations (`reservations.created_by_user_id`) count as associated records. | 6 |
 | 38 | criar-zona (merged into H4Y-28) | Story | RF-03 | 3 | Merged into model-hotel-floors (H4Y-28): done there (sprint 3). No future sprint. | done in H4Y-28 |
 | 39 | editar-zona (merged into H4Y-28) | Story | RF-03 | 3 | Merged into model-hotel-floors (H4Y-28): done there (sprint 3). No future sprint. | done in H4Y-28 |
 | 40 | remover-zona (merged into H4Y-28) | Story | RF-03 | 3 | Merged into model-hotel-floors (H4Y-28): done there (sprint 3). No future sprint. | done in H4Y-28 |
-| 41 | reservation-restaurant-pool | Story | RF-11, 18 | 2 | Value H: the card rule needs it. Risk M. Dependency: hard on item 23 (H4Y-56, sprint 4, done); places from T5. Date: moved to sprint 6 (2026-11-06; was sprint 8, Q-42). | 6 |
-| 42 | limit-reception-floors | Story | RF-24 | 3 | Value H (must). Risk M. Dependency: none hard (T5 places; AC-3 tests refusal only; removes hidden blocker 5). Date: moved to sprint 6 (2026-11-06). | 6 |
-| 43 | limit-restaurant-staff-zones | Story | RF-25, 01 | 3 | Value H (must). Risk M. Dependency: none hard (test account and zones). Date: moved to sprint 6 (2026-11-06). | 6 |
-| 44 | Foundation T6 card reader simulator, card numbers, first master card | Task | RF-16, 17, 23 | - | Value H: shared core for 11 card stories (removes hidden blockers 7 and 10). Risk M. Dependency: item 1. Date: before sprint 9. | 8 |
+| 41 | reservation-restaurant-pool | Story | RF-11, 18 | 2 | Value H: the card rule needs it. Risk M. Dependency: hard on item 23 (H4Y-56, sprint 4, done); places from T5. Date: moved to sprint 6 (2026-11-06; was sprint 8, Q-42). 2026-11-13: one sub-task (SQL v13 `reservation_locations`, two checkboxes, one list column). | 6 |
+| 42 | limit-reception-floors | Story | RF-24 | 3 | Merged (2026-11-13) into regra-acesso-por-local (item 72). `status: merged`, `merged_into: regra-acesso-por-local`, no sprint. | merged (item 72) |
+| 43 | limit-restaurant-staff-zones | Story | RF-25, 01 | 3 | Merged (2026-11-13) into regra-acesso-por-local (item 72). `status: merged`. The AC-3 (no create or delete of reservations) is already built (`MANAGE_RESERVATIONS`, `DELETE_RESERVATIONS`). | merged (item 72) |
+| 44 | Foundation T6 card reader simulator, card numbers, first master card | Task | RF-16, 17, 23 | - | Value H: shared core for 11 card stories (removes hidden blockers 7 and 10). Risk M. Dependency: item 1. Date: before sprint 9. Effort 5 points; nothing exists yet (no card tables or classes). The card stories (items 45 to 55) are not startable before T6 (2026-11-13). | 8 |
 | 45 | emitir-cartao-check-in | Story | RF-13, 16 | 3 | Value H. Risk H: number rule. Dependency: hard on item 28 (inside the check-in flow); generator from item 44. Date: final delivery. | 9 |
 | 46 | registar-passagens-cartao | Story | RF-19 | 3 | Value H: base of all logs. Risk H. Dependency: none hard (implements the T0 logger). Date: final delivery. | 9 |
 | 47 | abrir-quarto-com-cartao | Story | RF-17 | 3 | Value H. Risk M. Dependency: none hard (test cards). Date: final delivery. | 9 |
@@ -257,12 +297,12 @@ Value: H/M/L. Risk: H/M/L. Dependency: "none (hard)" means it builds and tests a
 | 55 | consultar-passagens-quarto | Story | RF-21, 19 | 3 | Value H. Risk L. Dependency: none hard (test passes). Date: final delivery. | 10 |
 | 56 | editar-item-stock (merged into H4Y-51) | Story | RF-28, 29 | 2 | Already built in H4Y-68 (PR #47): `StockService.editItem`, `StockController.onEditItemClicked`. `status: merged`, `merged_into: H4Y-51`. No sprint. | merged (H4Y-51) |
 | 57 | carregar-xml-fornecedor-gestor | Story | RF-28 | 8 | Value H. Risk H: biggest story, team XML format. Dependency: none hard (test items and files). Date: early in the stock block. | 11 |
-| 58 | registar-entrada-stock | Story | RF-29 | 3 | Value H: H4Y-51 creates items with stock 0; only a stock movement changes `items.stock_quantity`; the manager needs units before room items. Risk L. Dependency: none hard. Date: moved from sprint 11 to sprint 6 (2026-11-06), priority 4. | 6 |
+| 58 | registar-entrada-stock | Story | RF-29 | 3 | Value H: H4Y-51 creates items with stock 0; only a stock movement changes `items.stock_quantity`; the manager needs units before room items. Risk L. Dependency: none hard. Date: moved from sprint 11 to sprint 6 (2026-11-06). 2026-11-13: manager only (`MANAGE_STOCK`, no new Permission), only movement type `in`, creates `stock_movements` (SQL v12). | 6 |
 | 59 | ver-relatorio-importacao | Story | RF-28 | 3 | Value H. Risk M. Dependency: none hard (test imports). Date: final delivery. | 11 |
-| 60 | registar-uso-stock | Story | RF-29 | 3 | Value H. Risk L. Dependency: none hard. Date: final delivery. | 12 |
-| 61 | registar-saida-stock | Story | RF-29 | 3 | Value H. Risk L. Dependency: none hard. Date: final delivery. | 12 |
+| 60 | registar-uso-stock | Story | RF-29 | 3 | Value H. Risk L. Dependency: hard on item 58 (`stock_movements`, sprint 6, earlier sprint). Date: moved to sprint 7 (2026-11-13) as ONE block with item 61, one owner, 5 points for the block (team re-estimates). | 7 |
+| 61 | registar-saida-stock | Story | RF-29 | 3 | Value H. Risk L. Dependency: hard on item 58 (`stock_movements`). Date: moved to sprint 7 (2026-11-13), one block with item 60, one owner. | 7 |
 | 62 | carregar-xml-fornecedor-rececionista | Story | RF-28 | 3 | Value M. Risk L. Dependency: hard on item 57 (reuses the XML reader; 3 points assume reuse). Date: final delivery. | 12 |
-| 63 | definir-precos-extra | Story | RF-07, 09 | 3 | Value H (RF-07 must). Risk L. Dependency: none hard (extras list from T5). Date: Q-25. | 12 |
+| 63 | definir-precos-extra | Story | RF-07, 09 | 3 | Value H (RF-07 must). Risk L. Dependency: none hard (extras list from T5). Date: Q-25; pulled from sprint 12 to sprint 6 (2026-11-13), 3 points. Needs table `extra_prices` with the 9 items (SQL v14), domain class, repositories, service, new Permission `MANAGE_EXTRA_PRICES` (manager only), controller and FXML, tests. Two sub-tasks: service and screen. | 6 |
 | 64 | adicionar-extras-quarto-reserva | Story | RF-07 | 5 | Value H. Risk M: one view (Q-37), until check-in (Q-40). Dependency: none hard (test reservations and prices). Date: final delivery. | 12 |
 | 65 | adicionar-servicos-extra-reserva | Story | RF-09 | 5 | Value M (should). Risk M. Dependency: none hard. Date: final delivery. | 13 |
 | 66 | calcular-preco-total-reserva | Story | RF-06, 07, 09 | 5 | Value H. Risk H: sums. Dependency: none hard (test reservations with extras). Date: final delivery. | 13 |
@@ -271,6 +311,7 @@ Value: H/M/L. Risk: H/M/L. Dependency: "none (hard)" means it builds and tests a
 | 69 | list-suggestions-complaints | Story | RF-27 | 2 | Value L (should). Risk L. Dependency: none hard (test records). Date: cut-first candidate. | 13 |
 | 70 | Delivery T: final diagrams, Javadoc, zip, submit | Task | RNF-22, 23, 24 | - | Value H: 65% of grade. Risk H: deadline. Dependency: all items. Date: 2027-01-31. | 12 to 13 |
 | 71 | Scrum-process and engineering-quality tasks | Task | RNF-13 to 19, 26, 27 | - | Value H. Risk L. Dependency: none. Date: each sprint. | 2 to 13 |
+| 72 | regra-acesso-por-local (new, merges items 42 and 43) | Story | RF-24, 25, 01 | 3 | Value H (must). Risk M. Dependency: none hard (test locations and users). One rule `canAccess(location, actor)`: reception only floors 0 and 1, restaurant staff only Cozinha and Restaurante, manager not limited. Rule and table-driven tests only, NO screen (the screen is left for the card stories). Parent epic-staff-management-access. Date: sprint 6 (2026-11-13). One sub-task. | 6 |
 
 Removed (no number): registar-cliente-rapido (RNF-03, RF-10, 3 points). Discarded by team decision (Q-56, 2026-11-06). The user deletes H4Y-59 and H4Y-79 in Jira.
 
@@ -282,7 +323,7 @@ Every RF and RNF of `requirements.md`. One `MISSING` since 2026-11-06: RNF-03 (Q
 
 | Requirement ID | Epic | Stories |
 |----------------|------|---------|
-| RF-01 | authentication-users, staff-management-access | login-rececionista, login-gestor, login-restaurante, create-staff-account, limit-restaurant-staff-zones; task auth T2 |
+| RF-01 | authentication-users, staff-management-access | login-rececionista, login-gestor, login-restaurante, create-staff-account, regra-acesso-por-local (limit-restaurant-staff-zones merged); task auth T2 |
 | RF-02 | authentication-users | login-rececionista, login-gestor, login-restaurante, funcoes-por-papel; task auth T2 (5 roles) |
 | RF-03 | rooms-pricing, magnetic-card-access | model-hotel-floors, criar-zona, editar-zona, remover-zona, abrir-restaurante-piscina-reservados, recusar-cartao-locais-nao-permitidos; task foundation T5 |
 | RF-04 | rooms-pricing | register-rooms, list-rooms |
@@ -294,7 +335,7 @@ Every RF and RNF of `requirements.md`. One `MISSING` since 2026-11-06: RNF-03 (Q
 | RF-10 | client-registration | registar-cliente, procurar-cliente |
 | RF-11 | reservations | create-reservation, reservation-restaurant-pool |
 | RF-12 | reservations | cancel-reservation |
-| RF-13 | check-in-out, magnetic-card-access | story-check-in-check-out, block-delete-after-check-in, emitir-cartao-check-in |
+| RF-13 | check-in-out, magnetic-card-access | story-check-in-check-out (block-delete-after-check-in removed: done by H4Y-57), emitir-cartao-check-in |
 | RF-14 | check-in-out | story-check-in-check-out, desativar-cartao-check-out |
 | RF-15 | guest-support | register-room-service-request |
 | RF-16 | magnetic-card-access | emitir-cartao-check-in, desativar-cartao-check-out; task foundation T6 |
@@ -303,10 +344,10 @@ Every RF and RNF of `requirements.md`. One `MISSING` since 2026-11-06: RNF-03 (Q
 | RF-19 | magnetic-card-access, master-card-audit | registar-passagens-cartao, abrir-tudo-cartao-mestre, consultar-locais-cartao, consultar-passagens-quarto |
 | RF-20 | master-card-audit | consultar-locais-cartao |
 | RF-21 | master-card-audit | consultar-passagens-quarto |
-| RF-22 | reservations, check-in-out | delete-reservation, refuse-delete-reservation, block-delete-after-check-in |
+| RF-22 | reservations, check-in-out | delete-reservation (H4Y-57; refuse-delete-reservation and block-delete-after-check-in removed: done by H4Y-57) |
 | RF-23 | master-card-audit | abrir-tudo-cartao-mestre, emitir-novo-cartao-mestre |
-| RF-24 | staff-management-access | limit-reception-floors |
-| RF-25 | staff-management-access | limit-restaurant-staff-zones |
+| RF-24 | staff-management-access | regra-acesso-por-local (limit-reception-floors merged) |
+| RF-25 | staff-management-access | regra-acesso-por-local (limit-restaurant-staff-zones merged) |
 | RF-26 | staff-management-access | create-staff-account, edit-staff-account, remove-staff-account |
 | RF-27 | guest-support | record-suggestion-complaint, list-suggestions-complaints |
 | RF-28 | stock-management | cadastrar-item-stock, editar-item-stock (merged into H4Y-51), carregar-xml-fornecedor-gestor, carregar-xml-fornecedor-rececionista, ver-relatorio-importacao |
@@ -361,6 +402,15 @@ Every link points to an earlier sprint. No link stays inside one sprint (same-sp
 | 11 | ver-reservas-ativas, check-in-check-out (main screen "Reservas") -> Foundation T3 usability test | 5 -> 6 | The test runs on the new main screen. |
 
 Removed: registar-cliente-rapido links (story discarded, Q-56). cancel and story-check-in-check-out do not link to each other (own test reservations). refuse and block touch the same delete action: merge risk, no wait.
+
+### Revision 2026-11-13: dependency changes
+
+- Rows 2, 3 and 4 of the 2026-11-06 table are void: refuse-delete-reservation and block-delete-after-check-in are removed (done by H4Y-57).
+- Row 11 now reads: ver-reservas-ativas, check-in-check-out (main screen "Reservas") -> Foundation T3 usability test, 5 -> 7.
+- New: registar-entrada-stock (`stock_movements`, sprint 6) -> registar-saida-stock and registar-uso-stock (one block, sprint 7). 6 -> 7.
+- New: definir-precos-extra (sprint 6) -> adicionar-extras-quarto-reserva, adicionar-servicos-extra-reserva, calcular-preco-total-reserva (sprint 7 or later, now in 12 and 13).
+- New: foundation T6 (sprint 8) -> all card stories (sprints 9 and 10). The card stories are not startable before T6.
+- Sprint 6 has no link inside the sprint. SQL numbers v11 to v14 are fixed per story.
 
 ### History: dependencies of 2026-10-16 (superseded where the sprint changed)
 
@@ -436,6 +486,6 @@ None by the Definition of Ready. Notes for the PO:
   - Zone flags: Q-45. `guest_card_access` (0 = client card never opens the place, Q-20) and `requires_reservation` (1 = card opens only if the reservation lists the place). See docs/database.
 - Accepted (user, 2026-10-16, Q-43): cadastrar-item-stock in sprint 4 (1st delivery). Seeding room items is not needed.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06 (sprint 5 and 6 revision); backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06 (user decisions on sprints 5 and 6); backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint 3 planning, forecast for sprints 4 and 5 and refinement agenda by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; task-json-stock-import by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-06. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06 (sprint 5 and 6 revision); backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06 (user decisions on sprints 5 and 6); backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-10-16; status set to approved by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; dependency audit and reorder by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Q-43 to Q-45 answers, PR #4 notes and cadastrar-item-stock acceptance by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16. Week column, planning assumptions, sprint 13 risk and Q-04 and Q-28 closure by doc-editor, Claude Code (claude-haiku-5-5), 2026-10-16; sprint 3 planning, forecast for sprints 4 and 5 and refinement agenda by sprint-planner, Claude Code (claude-opus-5-5), 2026-10-23; task-json-stock-import by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-06; revision 2026-11-13 (sprint 6 final, sprint 7 and later) by sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-13. Reviewed by: pending.
 
 Note (2026-10-26): criar-zona, editar-zona and remover-zona are merged into model-hotel-floors (H4Y-28). Order not changed.

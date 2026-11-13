@@ -5,11 +5,13 @@ parent: epic-check-in-out
 requirements: [RF-13, RF-22]
 points: 2
 points_suggested: 2
-status: approved
+status: removed
 jira_key:
 labels: [check-in, reservations, 1st-delivery]
 sprint:
 ---
+
+Removida (2026-11-13, decisão do utilizador): already delivered by H4Y-57 (ReservationService.delete: Permission.DELETE_RESERVATIONS and status RESERVED only). Testes existentes: `onDelete_throwAndKeepReservation_whenReservationIsCheckedIn` e `onDelete_throwAndKeepReservation_whenReservationIsCheckedOut` (`ReservationDeleteTest`).
 
 # Título: Impedir apagar reservas após check-in
 
@@ -55,4 +57,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Updated by: BorjaTiago. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13. Created by: BorjaTiago. Updated by: BorjaTiago. Reviewed by: pending.
