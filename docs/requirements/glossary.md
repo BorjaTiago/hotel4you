@@ -35,6 +35,8 @@ sprint: 1
 | Floor 1 | Restaurant and swimming pool. | 2 |
 | Floors 2 and 3 | Sleeping rooms. | 2 |
 | Stock | Material stored in the hotel. Entry, use and exit are recorded. | 2 |
+| JSON file | File from the supplier with the material that enters the stock. Suppliers that cannot export XML send it. It follows the same assumptions and rules as the XML file. Fields: Q-59. | 2 (update 2026-11-06) |
+| Supplier stock file | The XML file or the JSON file of one supplier delivery (RF-28). | 2 |
 | XML file | File from the supplier with the material that enters the stock. | 2 |
 | Login | Access with user name and password. All users use it. | 2 |
 | Scrum | Agile method used in the project. | 1 |
@@ -65,4 +67,4 @@ sprint: 1
 | Final delivery | Due 2027-01-31 at 23:55. 65% of the final grade. | 5, 6 |
 | Code of conduct | Rules: no claim of others' work, no use of code (AI included) or diagrams without reference, no code sharing between groups. | 7 |
 
-AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: requirements-analyst, Claude Code (claude-sonnet-5-5), 2026-10-15; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
