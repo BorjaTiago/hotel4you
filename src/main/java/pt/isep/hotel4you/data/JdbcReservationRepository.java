@@ -169,6 +169,12 @@ public class JdbcReservationRepository implements ReservationRepository {
         return update(sql, id, "Não foi possível guardar o check-out.");
     }
 
+    @Override
+    public boolean cancel(long id) {
+        String sql = "UPDATE reservations SET status = 'cancelled' WHERE id = ? AND status = 'reserved'";
+        return update(sql, id, "Não foi possível cancelar a reserva.");
+    }
+
     private boolean update(String sql, long id, String errorMessage) {
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, id)) {

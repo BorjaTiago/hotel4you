@@ -118,6 +118,11 @@ public class InMemoryReservationRepository implements ReservationRepository {
         return changeStatus(id, ReservationStatus.CHECKED_IN, ReservationStatus.CHECKED_OUT);
     }
 
+    @Override
+    public boolean cancel(long id) {
+        return changeStatus(id, ReservationStatus.RESERVED, ReservationStatus.CANCELLED);
+    }
+
     private boolean changeStatus(long id, ReservationStatus from, ReservationStatus to) {
         if (loseNextUpdate) {
             loseNextUpdate = false;

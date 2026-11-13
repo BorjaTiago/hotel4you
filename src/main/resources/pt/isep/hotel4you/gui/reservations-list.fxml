@@ -40,6 +40,9 @@
                 styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
         <Button fx:id="checkOutButton" text="Fazer check-out" onAction="#onCheckOutClicked" disable="true"
                 styleClass="action-button, edit-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="cancelButton" text="Cancelar" onAction="#onCancelReservationClicked" disable="true"
+                styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"
+                accessibleText="Cancelar a reserva escolhida"/>
     </HBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>

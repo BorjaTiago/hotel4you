@@ -137,6 +137,20 @@ public class HotelFacade {
     }
 
     /**
+     * Cancels a reservation and keeps it in the history.
+     *
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user who cancels the reservation
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws ReservationNotFoundException if the reservation does not exist
+     * @throws IllegalStateException if the reservation is already cancelled, has a check-in or a
+     *         check-out, changed state at the same moment, or the database is not available
+     */
+    public void cancelReservation(long reservationId, User actor) {
+        reservationService.cancel(reservationId, actor);
+    }
+
+    /**
      * Lists the active reservations of the hotel: the states RESERVED and CHECKED_IN.
      *
      * @param actor the logged-in user who asks

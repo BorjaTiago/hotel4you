@@ -8,7 +8,9 @@ import javafx.collections.FXCollections;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableCell;
@@ -88,6 +90,9 @@ public class ReservationsController {
     private Button checkOutButton;
 
     @FXML
+    private Button cancelButton;
+
+    @FXML
     private Label messageLabel;
 
     /**
@@ -121,6 +126,27 @@ public class ReservationsController {
      */
     static boolean canCheckOut(ReservationSummary row) {
         return row != null && row.status() == ReservationStatus.CHECKED_IN;
+    }
+
+    /**
+     * Tells if the cancel button is on for the chosen row.
+     *
+     * @param row the chosen row, or null if no row is chosen
+     * @return true only for a RESERVED row
+     */
+    static boolean canCancel(ReservationSummary row) {
+        return row != null && row.status() == ReservationStatus.RESERVED;
+    }
+
+    /**
+     * Gives the question that the screen asks before it cancels a reservation.
+     *
+     * @param row the chosen row
+     * @return the question with the room number and the dates
+     */
+    static String cancelQuestion(ReservationSummary row) {
+        return "Cancelar a reserva do quarto " + row.roomNumber() + ", de "
+                + DATE_FORMAT.format(row.startDate()) + " a " + DATE_FORMAT.format(row.endDate()) + "?";
     }
 
     /**
@@ -234,6 +260,29 @@ public class ReservationsController {
         }
     }
 
+    @FXML
+    private void onCancelReservationClicked() {
+        ReservationSummary chosen = reservationTable.getSelectionModel().getSelectedItem();
+        if (!canCancel(chosen)) {
+            return;
+        }
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, cancelQuestion(chosen),
+                ButtonType.YES, ButtonType.NO);
+        if (confirmation.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+        try {
+            facade.cancelReservation(chosen.id(), HotelApp.currentUser);
+            if (loadReservations()) {
+                showMessage("Reserva cancelada: quarto " + chosen.roomNumber() + ".", true);
+                reservationTable.requestFocus();
+            }
+        } catch (RuntimeException e) {
+            loadReservations();
+            showMessage(e.getMessage(), false);
+        }
+    }
+
     /** Loads the list again. On an error it shows the error and returns false. */
     private boolean loadReservations() {
         boolean loadedOk;
@@ -271,6 +320,7 @@ public class ReservationsController {
     private void updateButtons(ReservationSummary chosen) {
         checkInButton.setDisable(!canCheckIn(chosen, LocalDate.now()));
         checkOutButton.setDisable(!canCheckOut(chosen));
+        cancelButton.setDisable(!canCancel(chosen));
     }
 
     /** A table cell that shows a date as dd/MM/yyyy. */
