@@ -100,10 +100,10 @@ class JdbcReservationCheckInOutTest {
 
     @Test
     @Tag("H4Y-57-AC-1")
-    void onDelete_deleteOnlyRowWithoutCheckIn_whenCalled() {
+    void onDelete_deleteOnlyReservedRow_whenCalled() {
         assertTrue(repository.delete(5L));
 
-        assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND checked_in_at IS NULL"));
+        assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND status = 'reserved'"));
         assertEquals(List.of(5L), database.bound);
         assertEquals(List.of("statement", "connection"), database.closed);
     }

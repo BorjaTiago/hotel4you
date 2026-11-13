@@ -68,7 +68,7 @@ class ReservationDeleteTest {
     }
 
     @Test
-    @Tag("H4Y-57-AC-1")
+    @Tag("H4Y-57-AC-4")
     void onDelete_throwAccessDenied_whenUserIsNotManager() {
         assertThrows(AccessDeniedException.class, () -> service.delete(1L, RECEPTIONIST));
         assertFalse(reservations.findById(1L).isEmpty());
@@ -83,6 +83,34 @@ class ReservationDeleteTest {
                 () -> service.delete(1L, MANAGER));
         assertEquals("A reserva mudou de estado. Atualize a lista.", error.getMessage());
         assertFalse(reservations.findById(1L).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-1")
+    void onDelete_throwAndKeepReservation_whenReservationIsCancelled() {
+        assertKeptWithoutDelete(ReservationStatus.CANCELLED);
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-1")
+    void onDelete_throwAndKeepReservation_whenReservationIsCheckedIn() {
+        assertKeptWithoutDelete(ReservationStatus.CHECKED_IN);
+    }
+
+    @Test
+    @Tag("H4Y-57-AC-1")
+    void onDelete_throwAndKeepReservation_whenReservationIsCheckedOut() {
+        assertKeptWithoutDelete(ReservationStatus.CHECKED_OUT);
+    }
+
+    private void assertKeptWithoutDelete(ReservationStatus status) {
+        reservations.add(new Reservation(2L, 7L, 1L, START, END, status, 4L));
+
+        IllegalStateException error = assertThrows(IllegalStateException.class,
+                () -> service.delete(2L, MANAGER));
+        assertEquals("A reserva mudou de estado. Atualize a lista.", error.getMessage());
+        assertFalse(reservations.findById(2L).isEmpty());
+        assertEquals(0, reservations.deleteCalls);
     }
 
     @Test

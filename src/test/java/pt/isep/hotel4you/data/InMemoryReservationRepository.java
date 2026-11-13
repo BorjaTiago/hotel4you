@@ -27,6 +27,8 @@ public class InMemoryReservationRepository implements ReservationRepository {
      * state first.
      */
     public boolean loseNextUpdate;
+    /** How many times the service called delete. */
+    public int deleteCalls;
 
     /** @param reservation the test reservation to add */
     public void add(Reservation reservation) {
@@ -123,13 +125,13 @@ public class InMemoryReservationRepository implements ReservationRepository {
 
     @Override
     public boolean delete(long id) {
+        deleteCalls++;
         if (loseNextUpdate) {
             loseNextUpdate = false;
             return false;
         }
         return reservations.removeIf(value -> Objects.equals(value.getId(), id)
-                && (value.getStatus() == ReservationStatus.RESERVED
-                        || value.getStatus() == ReservationStatus.CANCELLED));
+                && value.getStatus() == ReservationStatus.RESERVED);
     }
 
     private boolean changeStatus(long id, ReservationStatus from, ReservationStatus to) {
