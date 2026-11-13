@@ -1,14 +1,14 @@
 ---
 type: story
 summary: Definir os preços extra por noite
-parent: epic-extra-services-pricing
+parent: H4Y-86
 requirements: [RF-07, RF-09]
 points: 3
 points_suggested: 3
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-93
 labels: [pricing, services]
-sprint:
+sprint: 06
 ---
 
 # Título: Definir os preços extra por noite
@@ -57,6 +57,8 @@ Para que o preço da reserva use valores corretos.
 Preços fixos por noite definidos pelo gestor (Q-11, decisão da equipa). Piscinas privadas, spa e salas são extras pagos sem acesso por cartão (Q-20). Fase pelo priorizador (Q-25).
 Dependências (auditoria 2026-10-16): nenhuma forte (antes ligada a story-set-base-price sem razão de código). A lista de extras e serviços pagos, sem preço, vem dos dados de referência (foundation T5). Construir e testar sozinha: essa lista e sessões simuladas (T0, T4).
 
+Decisão do utilizador (2026-11-13): puxada do sprint 12 para o sprint 6, 3 pontos. Faltam: tabela `extra_prices` com a lista dos 9 itens (script SQL v14), a classe de domínio, o repositório (JDBC e em memória), o serviço, a permissão nova `Permission.MANAGE_EXTRA_PRICES` (só gestor), o controlador com FXML e os testes. As histórias que usam estes preços (adicionar-extras-quarto-reserva, adicionar-servicos-extra-reserva, calcular-preco-total-reserva) ficam no sprint 7 ou depois.
+
 points_suggested: 3
 reference: Registar um cliente (3)
 compared: equal
@@ -67,4 +69,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13; jira-publisher, Claude Code (claude-sonnet-5-5), 2026-11-13. Created by: BorjaTiago. Updated by: BorjaTiago. Reviewed by: pending.

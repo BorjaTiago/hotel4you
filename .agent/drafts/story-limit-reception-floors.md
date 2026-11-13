@@ -5,11 +5,14 @@ parent: epic-staff-management-access
 requirements: [RF-24]
 points: 3
 points_suggested: 3
-status: approved
+status: merged
+merged_into: regra-acesso-por-local
 jira_key:
 labels: [access-control]
 sprint:
 ---
+
+Junta-se a `story-regra-acesso-por-local` (decisão do utilizador, 2026-11-13). Esta história não entra em nenhum sprint. As subtasks `subtask-s06-limit-reception-floors-*` estão `removed`.
 
 # Título: Limitar a receção aos serviços dos pisos 0 e 1
 
@@ -60,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13. Reviewed by: pending.

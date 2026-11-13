@@ -1,14 +1,14 @@
 ---
 type: story
 summary: Incluir restaurante e piscina na reserva
-parent: epic-reservations
+parent: H4Y-15
 requirements: [RF-11, RF-18]
 points: 2
 points_suggested: 2
-status: approved
-jira_key:
+status: published
+jira_key: H4Y-92
 labels: [reservations, 1st-delivery]
-sprint:
+sprint: 06
 ---
 
 # Título: Incluir restaurante e piscina na reserva
@@ -43,6 +43,7 @@ Para que o hotel saiba os locais a que o cliente tem direito.
 
 ## Notas
 O acesso efetivo com cartão fica na entrega final (RF-18, Q-06, Q-09). Piscinas privadas, spa e salas de conferência são extras pagos (Q-20) e ficam fora desta história. Alterar os locais depois de criada a reserva não está no enunciado e ficou fora desta história (os cenários de alteração foram removidos pelo refinador). Dependências (auditoria 2026-10-16): uma forte, story-create-reservation (acrescenta a escolha de locais ao mesmo formulário; sprint 5 antes do sprint 8). Restaurante e piscina vêm dos dados de referência (foundation T5), sem depender de story-criar-zona. Testar com reservas de teste (T4).
+Decisão do utilizador (2026-11-13): sprint 6, 2 pontos, uma subtask só (script SQL v13 `reservation_locations`, duas caixas "Restaurante" e "Piscina" no ecrã de reserva, uma coluna "Locais" na lista de reservas).
 
 points_suggested: 2
 reference: Listar os quartos por tipo (2)
@@ -54,4 +55,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; sprint-planner, Claude Code (claude-sonnet-5-5), 2026-11-13; jira-publisher, Claude Code (claude-sonnet-5-5), 2026-11-13. Created by: BorjaTiago. Updated by: BorjaTiago. Reviewed by: pending.
