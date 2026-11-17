@@ -6,11 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 
 /** Keeps stock items in memory. Unit tests use it instead of the database. */
 public class InMemoryItemRepository implements ItemRepository {
 
     private final Map<Long, StockItem> items = new HashMap<>();
+    private final List<StockMovement> movements = new ArrayList<>();
     private long nextId = 1;
 
     @Override
@@ -45,6 +47,27 @@ public class InMemoryItemRepository implements ItemRepository {
         }
         items.put(item.getId(), item);
         return true;
+    }
+
+    @Override
+    public boolean addMovement(StockMovement movement) {
+        StockItem item = items.get(movement.getItem().getId());
+        if (item == null) {
+            return false;
+        }
+        items.put(item.getId(), new StockItem(item.getId(), item.getName(), item.getUnit(),
+                item.getStockQuantity() + movement.getQuantity()));
+        movements.add(movement);
+        return true;
+    }
+
+    /**
+     * Returns the saved movements, in the order of saving.
+     *
+     * @return the movements
+     */
+    public List<StockMovement> movements() {
+        return movements;
     }
 
     /**
