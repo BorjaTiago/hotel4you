@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 
-/** Stores and finds stock items in the SQL Server table {@code items}. */
+/** Stores and finds stock items in the SQL Server tables {@code items} and {@code stock_movements}. */
 public class JdbcItemRepository implements ItemRepository {
 
     private final Database database;
@@ -85,6 +87,59 @@ public class JdbcItemRepository implements ItemRepository {
                 throw new DuplicateItemException();
             }
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
+    public boolean addMovement(StockMovement movement) {
+        try (Connection connection = database.connect()) {
+            return addMovementInTransaction(connection, movement);
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    private static boolean addMovementInTransaction(Connection connection, StockMovement movement)
+            throws SQLException {
+        String updateStock = "UPDATE items SET stock_quantity = stock_quantity + ? WHERE id = ?";
+        String insertMovement = """
+                INSERT INTO stock_movements (item_id, type, quantity, moved_at, user_id)
+                VALUES (?, ?, ?, ?, ?)
+                """;
+        connection.setAutoCommit(false);
+        try {
+            try (PreparedStatement statement = Database.prepare(connection, updateStock,
+                    movement.getQuantity(), movement.getItem().getId())) {
+                if (statement.executeUpdate() == 0) {
+                    connection.rollback();
+                    return false;
+                }
+            }
+            try (PreparedStatement statement = Database.prepare(connection, insertMovement,
+                    movement.getItem().getId(), typeCode(movement.getType()), movement.getQuantity(),
+                    movement.getDateTime(), movement.getUser().getId())) {
+                statement.executeUpdate();
+            }
+            connection.commit();
+            return true;
+        } catch (SQLException | RuntimeException e) {
+            rollback(connection, e);
+            throw e;
+        }
+    }
+
+    /** Gives the code of the type in the {@code stock_movements.type} column. */
+    private static String typeCode(MovementType type) {
+        return switch (type) {
+            case ENTRY -> "in";
+        };
+    }
+
+    private static void rollback(Connection connection, Exception cause) {
+        try {
+            connection.rollback();
+        } catch (SQLException rollbackError) {
+            cause.addSuppressed(rollbackError);
         }
     }
 

@@ -3,6 +3,7 @@ package pt.isep.hotel4you.data;
 import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 
 /** Stores and finds the stock items of the hotel. */
 public interface ItemRepository {
@@ -53,4 +54,14 @@ public interface ItemRepository {
      * @throws IllegalStateException if the database is not available
      */
     boolean update(StockItem item);
+
+    /**
+     * Saves a stock movement and adds its quantity to the stock of the item.
+     * Both changes are saved together, or none is saved.
+     *
+     * @param movement the movement, with the saved item, the type, the quantity, the date and the user
+     * @return true if the movement was saved, false if no item has the id of the movement item
+     * @throws IllegalStateException if the database is not available
+     */
+    boolean addMovement(StockMovement movement);
 }
