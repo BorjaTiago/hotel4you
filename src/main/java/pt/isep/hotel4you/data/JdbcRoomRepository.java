@@ -7,7 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.StockItem;
 
 /** Stores rooms in SQL Server. */
 public class JdbcRoomRepository implements RoomRepository {
@@ -234,6 +236,88 @@ public class JdbcRoomRepository implements RoomRepository {
             if (statement.executeUpdate() == 0) {
                 throw new IllegalArgumentException("O quarto indicado não existe.");
             }
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == FOREIGN_KEY_ERROR) {
+                return false;
+            }
+            throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public List<RoomItem> findItems(long roomId) {
+        String sql = "SELECT i.id, i.name, i.unit, i.stock_quantity, ri.quantity "
+                + "FROM room_items ri JOIN items i ON i.id = ri.item_id "
+                + "WHERE ri.room_id = ? ORDER BY i.name";
+        List<RoomItem> roomItems = new ArrayList<>();
+        try (Connection connection = database.connect();
+                PreparedStatement statement = prepareLong(connection, sql, roomId);
+                ResultSet result = statement.executeQuery()) {
+            while (result.next()) {
+                StockItem item = new StockItem(result.getLong("id"), result.getString("name"),
+                        result.getString("unit"), result.getInt("stock_quantity"));
+                roomItems.add(new RoomItem(item, result.getInt("quantity")));
+            }
+            return List.copyOf(roomItems);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public void saveItem(long roomId, long itemId, int quantity) {
+        try (Connection connection = database.connect()) {
+            saveItemInTransaction(connection, roomId, itemId, quantity);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    private static void saveItemInTransaction(
+            Connection connection, long roomId, long itemId, int quantity) throws SQLException {
+        connection.setAutoCommit(false);
+        try {
+            if (updateItem(connection, roomId, itemId, quantity) == 0) {
+                insertItem(connection, roomId, itemId, quantity);
+            }
+            connection.commit();
+        } catch (SQLException | RuntimeException e) {
+            rollback(connection, e);
+            throw e;
+        }
+    }
+
+    private static int updateItem(Connection connection, long roomId, long itemId, int quantity)
+            throws SQLException {
+        String sql = "UPDATE room_items SET quantity = ? WHERE room_id = ? AND item_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, quantity);
+            statement.setLong(2, roomId);
+            statement.setLong(3, itemId);
+            return statement.executeUpdate();
+        }
+    }
+
+    private static void insertItem(Connection connection, long roomId, long itemId, int quantity)
+            throws SQLException {
+        String sql = "INSERT INTO room_items (room_id, item_id, quantity) VALUES (?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, roomId);
+            statement.setLong(2, itemId);
+            statement.setInt(3, quantity);
+            statement.executeUpdate();
+        }
+    }
+
+    @Override
+    public boolean deleteItem(long roomId, long itemId) {
+        String sql = "DELETE FROM room_items WHERE room_id = ? AND item_id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, roomId);
+            statement.setLong(2, itemId);
+            statement.executeUpdate();
             return true;
         } catch (SQLException e) {
             if (e.getErrorCode() == FOREIGN_KEY_ERROR) {

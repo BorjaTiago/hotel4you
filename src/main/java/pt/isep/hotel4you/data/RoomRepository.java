@@ -2,6 +2,7 @@ package pt.isep.hotel4you.data;
 
 import java.util.List;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
 
 /** Stores and reads rooms. */
@@ -55,4 +56,34 @@ public interface RoomRepository {
      * @throws IllegalStateException if the database is not available
      */
     boolean delete(long id);
+
+    /**
+     * Returns the items of a room with their quantities.
+     *
+     * @param roomId the room id
+     * @return an immutable list of room items, empty if the room has none
+     * @throws IllegalStateException if the database is not available
+     */
+    List<RoomItem> findItems(long roomId);
+
+    /**
+     * Sets the quantity of an item in a room. It changes the row if it exists and adds it if not.
+     * The change and the add must be one transaction.
+     *
+     * @param roomId the room id
+     * @param itemId the item id
+     * @param quantity the quantity in the room
+     * @throws IllegalStateException if the database is not available
+     */
+    void saveItem(long roomId, long itemId, int quantity);
+
+    /**
+     * Removes an item from a room.
+     *
+     * @param roomId the room id
+     * @param itemId the item id
+     * @return true if the item was removed, false if other data still uses it
+     * @throws IllegalStateException if the database is not available
+     */
+    boolean deleteItem(long roomId, long itemId);
 }
