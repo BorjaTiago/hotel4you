@@ -11,7 +11,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -166,7 +165,10 @@ public class RoomController {
         });
         loadRoomTypes();
         roomTable.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldRoom, selected) -> fillForm(selected));
+                (observable, oldRoom, selected) -> {
+                    fillForm(selected);
+                    loadRoomItems();
+                });
         initRoomItems();
     }
 
@@ -191,8 +193,6 @@ public class RoomController {
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
         }
-        roomTable.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldRoom, selected) -> loadRoomItems());
     }
 
     private void fillForm(RoomSummary selected) {
@@ -301,10 +301,9 @@ public class RoomController {
             showMessage("Escolha um item.", false);
             return;
         }
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "Remover o item do quarto?",
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
+                "Remover o item do quarto?",
                 ButtonType.YES, ButtonType.NO);
-        ((Button) confirmation.getDialogPane().lookupButton(ButtonType.YES)).setDefaultButton(false);
-        ((Button) confirmation.getDialogPane().lookupButton(ButtonType.NO)).setDefaultButton(true);
         if (confirmation.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
             return;
         }
