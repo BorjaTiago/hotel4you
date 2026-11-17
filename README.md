@@ -82,6 +82,7 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v8-create-customers.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v9-create-reservations.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v10-alter-customers.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -I -i /database/v11-create-room-items.sql
 ```
 
 Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
@@ -97,6 +98,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v7-creat
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v8-create-customers.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v9-create-reservations.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v10-alter-customers.sql
+sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -I -i database/v11-create-room-items.sql
 ```
 
 `v10-alter-customers.sql` from H4Y-52 adds the full client data (document type, birth date, phone, nationality, email, NIF; Q-54). Run it once, after v8. It stops with an error if the `customers` table has rows or if it already ran.
@@ -127,7 +129,7 @@ docker compose down -v     # stop and delete the data
 
 The service searches a room type and a date period. The free-room search is tab "2. Quarto" of the "Reservar quarto" screen (H4Y-73). It lists the free rooms. The search does not hold a room.
 
-Run the scripts in order, v1 to v10. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
+Run the scripts in order, v1 to v11. v11 (room_items, H4Y-91) needs v6 and v7. A room or an item that has `room_items` rows cannot be deleted. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
 
 Availability tests use their own in-memory reservations and JDBC doubles. SQL Server integration is not verified.
 
