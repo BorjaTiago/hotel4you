@@ -19,7 +19,6 @@ public class StockService {
     private static final int MAX_UNIT_LENGTH = 20;
     /** The largest quantity of one movement. The column {@code stock_movements.quantity} is a SMALLINT. */
     private static final int MAX_MOVEMENT_QUANTITY = 32767;
-    private static final String QUANTITY_TEXT = "[+-]?\\d{1,9}";
 
     private final ItemRepository itemRepository;
 
@@ -109,14 +108,13 @@ public class StockService {
      * Records a stock movement of an item with the date and time of now.
      * An entry adds the quantity to the stock of the item.
      *
-     * @param item the chosen item, the service reads it again by its id
-     * @param type the kind of movement
-     * @param quantity the quantity, from 1 to 32767
+     * @param item the chosen item
+     * @param type the kind of movement; only {@link MovementType#ENTRY} exists now
+     * @param quantity the quantity, from 1 to {@value #MAX_MOVEMENT_QUANTITY}
      * @param user the logged-in user who records the movement
-     * @return the saved movement, with the item and its new stock
+     * @return the saved movement, with the item and its stock read after the save
      * @throws AccessDeniedException if the user is not a manager
-     * @throws IllegalArgumentException if no item or type is chosen,
-     *         or the quantity is 0, negative or above 32767
+     * @throws IllegalArgumentException if no item is chosen or the quantity is out of range
      * @throws StockItemNotFoundException if the item does not exist
      * @throws IllegalStateException if the database is not available
      */
@@ -125,40 +123,31 @@ public class StockService {
         if (item == null) {
             throw new IllegalArgumentException("Escolha um item.");
         }
-        if (type == null) {
-            throw new IllegalArgumentException("Escolha o tipo de movimento.");
+        if (quantity < 1 || quantity > MAX_MOVEMENT_QUANTITY) {
+            throw new IllegalArgumentException(
+                    "A quantidade tem de ser entre 1 e " + MAX_MOVEMENT_QUANTITY + ".");
         }
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("A quantidade tem de ser maior que zero.");
-        }
-        if (quantity > MAX_MOVEMENT_QUANTITY) {
-            throw new IllegalArgumentException("A quantidade máxima é " + MAX_MOVEMENT_QUANTITY + ".");
-        }
-        if (item.getId() == null) {
-            throw new StockItemNotFoundException();
-        }
-        StockItem stored = itemRepository.findById(item.getId()).orElseThrow(StockItemNotFoundException::new);
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        if (!itemRepository.addMovement(new StockMovement(stored, type, quantity, now, user))) {
+        if (!itemRepository.addMovement(new StockMovement(item, type, quantity, now, user))) {
             throw new StockItemNotFoundException();
         }
-        StockItem changed = new StockItem(stored.getId(), stored.getName(), stored.getUnit(),
-                stored.getStockQuantity() + quantity);
-        return new StockMovement(changed, type, quantity, now, user);
+        StockItem saved = itemRepository.findById(item.getId()).orElseThrow(StockItemNotFoundException::new);
+        return new StockMovement(saved, type, quantity, now, user);
     }
 
     /**
      * Turns the text of the screen into a whole number. The screen has no number rule (RNF-07).
      *
      * @param text the text, for example "5" or "-3"
-     * @return the number; {@link #registerMovement} checks that it is above zero
+     * @return the number; {@link #registerMovement} checks the range
      * @throws IllegalArgumentException if the text is not a whole number
      */
     public int parseQuantity(String text) {
-        if (text == null || !text.trim().matches(QUANTITY_TEXT)) {
+        try {
+            return Integer.parseInt(text.trim());
+        } catch (NumberFormatException e) {
             throw new IllegalArgumentException("A quantidade tem de ser um número inteiro.");
         }
-        return Integer.parseInt(text.trim());
     }
 
     private void checkManage(User actor) {

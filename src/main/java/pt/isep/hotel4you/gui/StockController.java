@@ -165,11 +165,11 @@ public class StockController {
             int quantity = facade.parseQuantity(entryQuantityField.getText());
             StockMovement movement = facade.registerMovement(entryItemBox.getValue(),
                     MovementType.ENTRY, quantity, HotelApp.currentUser);
-            loadItems();
-            clearForm();
+            entryItemBox.setValue(null);
             entryQuantityField.clear();
-            entryDateField.setText(dateText(LocalDate.now()));
+            entryDateField.setText(dateText(movement.getDateTime().toLocalDate()));
             showMessage(entryMessage(movement), true);
+            loadItems();
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
         }
@@ -215,6 +215,5 @@ public class StockController {
         itemTable.getSelectionModel().clearSelection();
         nameField.clear();
         unitField.clear();
-        entryItemBox.setValue(null);
     }
 }

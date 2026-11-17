@@ -90,41 +90,46 @@ public class JdbcItemRepository implements ItemRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>When a statement fails, the connection closes without a commit,
+     * so SQL Server undoes the stock update. Every SQL error shows the "not available" message.
+     */
     @Override
     public boolean addMovement(StockMovement movement) {
         try (Connection connection = database.connect()) {
-            return addMovementInTransaction(connection, movement);
+            connection.setAutoCommit(false);
+            if (!updateStock(connection, movement)) {
+                return false;
+            }
+            insertMovement(connection, movement);
+            connection.commit();
+            return true;
         } catch (SQLException e) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }
 
-    private static boolean addMovementInTransaction(Connection connection, StockMovement movement)
+    private static boolean updateStock(Connection connection, StockMovement movement)
             throws SQLException {
-        String updateStock = "UPDATE items SET stock_quantity = stock_quantity + ? WHERE id = ?";
-        String insertMovement = """
+        String sql = "UPDATE items SET stock_quantity = stock_quantity + ? WHERE id = ?";
+        try (PreparedStatement statement = Database.prepare(connection, sql,
+                movement.getQuantity(), movement.getItem().getId())) {
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    private static void insertMovement(Connection connection, StockMovement movement)
+            throws SQLException {
+        String sql = """
                 INSERT INTO stock_movements (item_id, type, quantity, moved_at, user_id)
                 VALUES (?, ?, ?, ?, ?)
                 """;
-        connection.setAutoCommit(false);
-        try {
-            try (PreparedStatement statement = Database.prepare(connection, updateStock,
-                    movement.getQuantity(), movement.getItem().getId())) {
-                if (statement.executeUpdate() == 0) {
-                    connection.rollback();
-                    return false;
-                }
-            }
-            try (PreparedStatement statement = Database.prepare(connection, insertMovement,
-                    movement.getItem().getId(), typeCode(movement.getType()), movement.getQuantity(),
-                    movement.getDateTime(), movement.getUser().getId())) {
-                statement.executeUpdate();
-            }
-            connection.commit();
-            return true;
-        } catch (SQLException | RuntimeException e) {
-            rollback(connection, e);
-            throw e;
+        try (PreparedStatement statement = Database.prepare(connection, sql,
+                movement.getItem().getId(), typeCode(movement.getType()), movement.getQuantity(),
+                movement.getDateTime(), movement.getUser().getId())) {
+            statement.executeUpdate();
         }
     }
 
@@ -133,14 +138,6 @@ public class JdbcItemRepository implements ItemRepository {
         return switch (type) {
             case ENTRY -> "in";
         };
-    }
-
-    private static void rollback(Connection connection, Exception cause) {
-        try {
-            connection.rollback();
-        } catch (SQLException rollbackError) {
-            cause.addSuppressed(rollbackError);
-        }
     }
 
     private Optional<StockItem> findOne(String sql, Object... values) {

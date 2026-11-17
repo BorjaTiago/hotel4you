@@ -16,7 +16,7 @@ public class StockMovement {
      *
      * @param item the item that moved
      * @param type the kind of movement
-     * @param quantity the quantity moved, always positive
+     * @param quantity the quantity moved; the service checks that it is positive
      * @param dateTime the date and time of the movement
      * @param user the user who recorded the movement
      */
@@ -50,7 +50,7 @@ public class StockMovement {
     /**
      * Returns the quantity moved.
      *
-     * @return the quantity, always positive
+     * @return the quantity
      */
     public int getQuantity() {
         return quantity;

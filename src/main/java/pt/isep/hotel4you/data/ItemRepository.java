@@ -58,6 +58,8 @@ public interface ItemRepository {
     /**
      * Saves a stock movement and adds its quantity to the stock of the item.
      * Both changes are saved together, or none is saved.
+     * Only types that raise the stock are allowed now ({@link pt.isep.hotel4you.domain.MovementType#ENTRY}).
+     * A type that lowers the stock needs a change here first.
      *
      * @param movement the movement, with the saved item, the type, the quantity, the date and the user
      * @return true if the movement was saved, false if no item has the id of the movement item
