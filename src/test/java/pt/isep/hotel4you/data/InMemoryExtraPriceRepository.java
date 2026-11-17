@@ -30,8 +30,12 @@ public class InMemoryExtraPriceRepository implements ExtraPriceRepository {
     /**
      * Adds test catalogue data.
      * @param extra the extra to add
+     * @throws IllegalArgumentException if the entry has no saved identifier
      */
     public void add(ExtraService extra) {
+        if (extra == null || extra.getId() == null) {
+            throw new IllegalArgumentException("A catalogue entry must have an id.");
+        }
         extras.add(extra);
     }
 }

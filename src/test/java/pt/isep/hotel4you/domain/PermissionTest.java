@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.domain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -11,15 +12,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 /** Tests which roles may use each function. */
 class PermissionTest {
 
-    @ParameterizedTest
-    @EnumSource(Role.class)
-    @Tag("H4Y-93-AC-5")
-    void onAllows_onlyManager_whenManagingExtraPrices(Role role) {
-        User actor = new User(1L, "Utilizador", "user", "hash", role) { };
-        org.junit.jupiter.api.Assertions.assertEquals(role == Role.MANAGER,
-                Permission.MANAGE_EXTRA_PRICES.allows(actor));
-    }
-
     private static final String HASH =
             "$2a$12$abcdefghijklmnopqrstuuAbCdEfGhIjKlMnOpQrStUvWxYz01234";
 
@@ -27,6 +19,15 @@ class PermissionTest {
     private static final User RECEPTIONIST = new Receptionist(2L, "Ana Silva", "ana", HASH);
     private static final User RESTAURANT_STAFF =
             new RestaurantStaff(3L, "Joao Lima", "joao", HASH);
+
+    @ParameterizedTest
+    @EnumSource(Role.class)
+    @Tag("H4Y-93-AC-5")
+    void onAllows_onlyManager_whenManagingExtraPrices(Role role) {
+        User actor = new User(1L, "Utilizador", "user", "hash", role) { };
+        assertEquals(role == Role.MANAGER,
+                Permission.MANAGE_EXTRA_PRICES.allows(actor));
+    }
 
     @Test
     @Tag("H4Y-23-AC-2")

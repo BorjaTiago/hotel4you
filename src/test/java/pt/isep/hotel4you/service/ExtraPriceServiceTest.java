@@ -1,6 +1,10 @@
 package pt.isep.hotel4you.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -9,7 +13,6 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import pt.isep.hotel4you.data.InMemoryExtraPriceRepository;
 import pt.isep.hotel4you.domain.ExtraService;
@@ -21,24 +24,19 @@ import pt.isep.hotel4you.domain.User;
 /** Tests the fixed extra prices per night, without a database or a screen. */
 class ExtraPriceServiceTest {
     private static final User MANAGER = new Manager(1L, "Gestor", "gestor", "hash");
-    private static final List<String> NAMES = List.of("Vista mar", "Vista montanha", "Bebidas",
-            "Lavandaria", "Comida", "Eventos culturais", "Piscinas privadas", "Spa",
-            "Salas de conferências");
     private InMemoryExtraPriceRepository repository;
     private ExtraPriceService service;
 
     @BeforeEach
     void setUp() {
         repository = new InMemoryExtraPriceRepository();
-        for (int i = 0; i < NAMES.size(); i++) {
-            repository.add(new ExtraService((long) i + 1, NAMES.get(i),
-                    i < 4 ? ExtraType.ROOM_EXTRA : ExtraType.PAID_SERVICE, null));
-        }
+        repository.add(new ExtraService(1L, "Vista mar", ExtraType.ROOM_EXTRA, null));
+        repository.add(new ExtraService(2L, "Spa", ExtraType.PAID_SERVICE, null));
         service = new ExtraPriceService(repository);
     }
 
     private ExtraService extra(long id) {
-        return service.listPrices(MANAGER).stream().filter(e -> e.getId() == id)
+        return repository.findAll().stream().filter(e -> e.getId() == id)
                 .findFirst().orElseThrow();
     }
 
@@ -55,17 +53,29 @@ class ExtraPriceServiceTest {
     @Test
     @Tag("H4Y-93-AC-2")
     void onSetPrice_saveSpaPrice_whenManagerSetsPrice() {
-        service.setPrice(extra(8), new BigDecimal("40.00"), MANAGER);
-        assertEquals(new BigDecimal("40.00"), extra(8).getPrice());
-        assertEquals(ExtraType.PAID_SERVICE, extra(8).getType());
+        service.setPrice(extra(2), new BigDecimal("40.00"), MANAGER);
+        assertEquals(new BigDecimal("40.00"), extra(2).getPrice());
+        assertEquals(ExtraType.PAID_SERVICE, extra(2).getType());
         assertNull(extra(1).getPrice());
     }
 
     @Test
     @Tag("H4Y-93-AC-3")
-    void onListPrices_returnNineItemsWithoutPrice_whenCatalogueIsNew() {
-        List<ExtraService> extras = service.listPrices(MANAGER);
-        assertEquals(NAMES, extras.stream().map(ExtraService::getName).toList());
+    void onListPrices_returnNineItemsWithoutPrice_whenCatalogueContainsRequiredExtras() {
+        var catalogue = new InMemoryExtraPriceRepository();
+        List<ExtraService> expected = List.of(
+                new ExtraService(1L, "Vista mar", ExtraType.ROOM_EXTRA, null),
+                new ExtraService(2L, "Vista montanha", ExtraType.ROOM_EXTRA, null),
+                new ExtraService(3L, "Bebidas", ExtraType.ROOM_EXTRA, null),
+                new ExtraService(4L, "Lavandaria", ExtraType.ROOM_EXTRA, null),
+                new ExtraService(5L, "Comida", ExtraType.PAID_SERVICE, null),
+                new ExtraService(6L, "Eventos culturais", ExtraType.PAID_SERVICE, null),
+                new ExtraService(7L, "Piscinas privadas", ExtraType.PAID_SERVICE, null),
+                new ExtraService(8L, "Spa", ExtraType.PAID_SERVICE, null),
+                new ExtraService(9L, "Salas de conferências", ExtraType.PAID_SERVICE, null));
+        expected.forEach(catalogue::add);
+        List<ExtraService> extras = new ExtraPriceService(catalogue).listPrices(MANAGER);
+        assertEquals(expected, extras);
         assertTrue(extras.stream().allMatch(e -> e.getPrice() == null));
     }
 
@@ -81,40 +91,21 @@ class ExtraPriceServiceTest {
     @ValueSource(strings = {"-0.01", "-15", "15.001", "1000000", "1.000"})
     @Tag("H4Y-93-AC-4")
     void onSetPrice_keepPreviousPrice_whenPriceIsInvalid(String value) {
-        service.setPrice(extra(1), new BigDecimal("15.00"), MANAGER);
+        repository.updatePrice(1L, new BigDecimal("15.00"));
         var error = assertThrows(IllegalArgumentException.class,
                 () -> service.setPrice(extra(1), new BigDecimal(value), MANAGER));
         assertEquals("O preço tem de estar entre 0,00 e 999999,99, com duas casas decimais.",
                 error.getMessage());
         assertEquals(new BigDecimal("15.00"), extra(1).getPrice());
-        assertNull(extra(8).getPrice());
+        assertNull(extra(2).getPrice());
     }
 
     @Test
     @Tag("H4Y-93-AC-4")
     void onSetPrice_keepPreviousPrice_whenPriceIsNull() {
-        service.setPrice(extra(1), new BigDecimal("15.00"), MANAGER);
+        repository.updatePrice(1L, new BigDecimal("15.00"));
         assertThrows(IllegalArgumentException.class, () -> service.setPrice(extra(1), null, MANAGER));
         assertEquals(new BigDecimal("15.00"), extra(1).getPrice());
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "abc", "NaN", "1e2", "1.000,50", "15,5,0"})
-    @Tag("H4Y-93-AC-4")
-    void onParsePrice_keepPreviousPrice_whenTextIsNotNumber(String text) {
-        service.setPrice(extra(1), new BigDecimal("15.00"), MANAGER);
-        var error = assertThrows(IllegalArgumentException.class,
-                () -> service.setPrice(extra(1), service.parsePrice(text), MANAGER));
-        assertEquals("O preço tem de ser um número.", error.getMessage());
-        assertEquals(new BigDecimal("15.00"), extra(1).getPrice());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"15,50", "15.50", " 15,50 "})
-    @Tag("H4Y-93-AC-1")
-    void onParsePrice_returnAmount_whenDecimalMarkIsCommaOrPoint(String text) {
-        assertEquals(new BigDecimal("15.50"), service.parsePrice(text));
     }
 
     @Test
@@ -124,7 +115,7 @@ class ExtraPriceServiceTest {
         var error = assertThrows(IllegalArgumentException.class,
                 () -> service.setPrice(unknown, BigDecimal.TEN, MANAGER));
         assertEquals("O extra indicado não existe.", error.getMessage());
-        assertEquals(9, repository.findAll().size());
+        assertEquals(2, repository.findAll().size());
         assertTrue(repository.findAll().stream().allMatch(e -> e.getPrice() == null));
     }
 

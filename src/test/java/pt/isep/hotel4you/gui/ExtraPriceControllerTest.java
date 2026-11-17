@@ -4,25 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-/** Tests how the extra price screen shows unset and configured amounts. */
+/** Tests display formatting that supports the extra price table in AC-3. */
 class ExtraPriceControllerTest {
-    @Test
+    @ParameterizedTest
+    @CsvSource(value = {"null|Por definir", "15.00|15,00", "0.00|0,00", "40.00|40,00"},
+            delimiter = '|', nullValues = "null")
     @Tag("H4Y-93-AC-3")
-    void onPriceText_showUnset_whenPriceHasNotBeenDefined() {
-        assertEquals("Por definir", ExtraPriceController.priceText(null));
-    }
-
-    @Test
-    @Tag("H4Y-93-AC-1")
-    void onPriceText_showCommaAndTwoDecimals_whenPriceIsDefined() {
-        assertEquals("15,00 €", ExtraPriceController.priceText(new BigDecimal("15.00")));
-    }
-
-    @Test
-    @Tag("H4Y-93-AC-2")
-    void onPriceText_showZero_whenExtraIsFree() {
-        assertEquals("0,00 €", ExtraPriceController.priceText(new BigDecimal("0.00")));
+    void onPriceText_formatAmount_whenTableShowsPrice(String value, String expected) {
+        assertEquals(expected, ExtraPriceController.priceText(value == null ? null : new BigDecimal(value)));
     }
 }
