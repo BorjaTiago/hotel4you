@@ -287,6 +287,11 @@ public class JdbcRoomRepository implements RoomRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * The MERGE uses WITH (HOLDLOCK). Without it, two saves of the same new room item at the same
+     * time can both take the "not matched" path. Then the second INSERT fails on the primary key.
+     */
     @Override
     public void saveItem(long roomId, long itemId, int quantity) {
         String sql = "MERGE room_items WITH (HOLDLOCK) AS target "
