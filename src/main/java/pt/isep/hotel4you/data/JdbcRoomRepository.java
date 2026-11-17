@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
@@ -44,6 +45,27 @@ public class JdbcRoomRepository implements RoomRepository {
                         result.getString("room_type_name")));
             }
             return List.copyOf(rooms);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public Optional<Room> findById(long id) {
+        String sql = "SELECT r.id, r.number, f.number AS floor_number, t.name AS room_type_name "
+                + "FROM rooms r JOIN floors f ON f.id = r.floor_id "
+                + "JOIN room_types t ON t.id = r.room_type_id WHERE r.id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = prepareLong(connection, sql, id);
+                ResultSet result = statement.executeQuery()) {
+            if (!result.next()) {
+                return Optional.empty();
+            }
+            return Optional.of(new Room(
+                    result.getLong("id"),
+                    result.getInt("number"),
+                    result.getInt("floor_number"),
+                    result.getString("room_type_name")));
         } catch (SQLException e) {
             throw persistenceError(e);
         }
@@ -267,46 +289,20 @@ public class JdbcRoomRepository implements RoomRepository {
 
     @Override
     public void saveItem(long roomId, long itemId, int quantity) {
-        try (Connection connection = database.connect()) {
-            saveItemInTransaction(connection, roomId, itemId, quantity);
-        } catch (SQLException e) {
-            throw persistenceError(e);
-        }
-    }
-
-    private static void saveItemInTransaction(
-            Connection connection, long roomId, long itemId, int quantity) throws SQLException {
-        connection.setAutoCommit(false);
-        try {
-            if (updateItem(connection, roomId, itemId, quantity) == 0) {
-                insertItem(connection, roomId, itemId, quantity);
-            }
-            connection.commit();
-        } catch (SQLException | RuntimeException e) {
-            rollback(connection, e);
-            throw e;
-        }
-    }
-
-    private static int updateItem(Connection connection, long roomId, long itemId, int quantity)
-            throws SQLException {
-        String sql = "UPDATE room_items SET quantity = ? WHERE room_id = ? AND item_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, quantity);
-            statement.setLong(2, roomId);
-            statement.setLong(3, itemId);
-            return statement.executeUpdate();
-        }
-    }
-
-    private static void insertItem(Connection connection, long roomId, long itemId, int quantity)
-            throws SQLException {
-        String sql = "INSERT INTO room_items (room_id, item_id, quantity) VALUES (?, ?, ?)";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        String sql = "MERGE room_items WITH (HOLDLOCK) AS target "
+                + "USING (SELECT ? AS room_id, ? AS item_id, ? AS quantity) AS source "
+                + "ON target.room_id = source.room_id AND target.item_id = source.item_id "
+                + "WHEN MATCHED THEN UPDATE SET quantity = source.quantity "
+                + "WHEN NOT MATCHED THEN INSERT (room_id, item_id, quantity) "
+                + "VALUES (source.room_id, source.item_id, source.quantity);";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, roomId);
             statement.setLong(2, itemId);
             statement.setInt(3, quantity);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            throw persistenceError(e);
         }
     }
 

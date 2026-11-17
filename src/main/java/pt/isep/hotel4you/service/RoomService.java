@@ -37,12 +37,11 @@ public class RoomService {
     private static final String PRICE_TEXT = "-?\\d+(\\.\\d+)?";
     /** The biggest quantity that fits in TINYINT. */
     private static final int MAX_ITEM_QUANTITY = 255;
-    /** Plain ASCII digits only. Integer.parseInt also accepts non-ASCII digits and a sign. */
-    private static final String QUANTITY_TEXT = "[0-9]+";
+    /** One to three ASCII digits, so the number always fits in an int. */
+    private static final String QUANTITY_TEXT = "[0-9]{1,3}";
     private static final String INVALID_QUANTITY = "A quantidade é inválida.";
     private static final String MISSING_ROOM = "O quarto não existe.";
     private static final String MISSING_ITEM = "O item não existe no catálogo.";
-    private static final String ITEM_ACCESS_DENIED = "Só o gestor pode configurar os itens do quarto.";
 
     /** Fixed labels and provisional Q-01 targets for the room summary. */
     private static final List<RoomTypeTarget> ROOM_TYPE_TARGETS = List.of(
@@ -380,7 +379,7 @@ public class RoomService {
      */
     public void configureItem(Room room, StockItem item, int quantity, User actor) {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
-            throw new AccessDeniedException(ITEM_ACCESS_DENIED);
+            throw new AccessDeniedException("Só o gestor pode configurar os itens do quarto.");
         }
         if (!roomExists(room)) {
             throw new IllegalArgumentException(MISSING_ROOM);
@@ -407,7 +406,7 @@ public class RoomService {
      */
     public void removeItem(Room room, StockItem item, User actor) {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
-            throw new AccessDeniedException(ITEM_ACCESS_DENIED);
+            throw new AccessDeniedException("Só o gestor pode configurar os itens do quarto.");
         }
         if (!roomExists(room)) {
             throw new IllegalArgumentException(MISSING_ROOM);
@@ -445,24 +444,20 @@ public class RoomService {
      *
      * @param text the text typed by the user
      * @return the quantity
-     * @throws IllegalArgumentException if the text is null, blank or not a whole number
+     * @throws IllegalArgumentException if the text is null, blank or not one to three digits
      */
     public int parseQuantity(String text) {
-        if (text == null || !text.trim().matches(QUANTITY_TEXT)) {
+        if (text == null || !text.matches(QUANTITY_TEXT)) {
             throw new IllegalArgumentException(INVALID_QUANTITY);
         }
-        try {
-            return Integer.parseInt(text.trim());
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(INVALID_QUANTITY, e);
-        }
+        return Integer.parseInt(text);
     }
 
     private boolean roomExists(Room room) {
         if (room == null || room.getId() == null) {
             return false;
         }
-        return roomRepository.findAll().stream().anyMatch(saved -> room.getId().equals(saved.getId()));
+        return roomRepository.findById(room.getId()).isPresent();
     }
 
     /** Tells if the type has an id and the catalogue holds a type with the same id and name. */

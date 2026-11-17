@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.data;
 
 import java.util.List;
+import java.util.Optional;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
@@ -14,6 +15,15 @@ public interface RoomRepository {
      * @return an immutable list of rooms
      */
     List<Room> findAll();
+
+    /**
+     * Finds a room by id.
+     *
+     * @param id the room id
+     * @return the room, or empty if it does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    Optional<Room> findById(long id);
 
     /**
      * Returns all rooms with the floor, room type and base price, ordered by room number.
@@ -67,8 +77,8 @@ public interface RoomRepository {
     List<RoomItem> findItems(long roomId);
 
     /**
-     * Sets the quantity of an item in a room. It changes the row if it exists and adds it if not.
-     * The change and the add must be one transaction.
+     * Sets the quantity of an item in a room. It adds the item or changes its quantity in one
+     * statement.
      *
      * @param roomId the room id
      * @param itemId the item id
