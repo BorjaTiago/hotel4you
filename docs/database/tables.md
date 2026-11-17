@@ -281,8 +281,8 @@ Ids above show a fresh catalogue. Code uses saved identifiers and does not assum
 
 | id | reservation_id | extra_price_id | unit_price | used_at |
 |---|---|---|---|---|
-| 1 | 1 | 1 | 40.00 | NULL |
-| 2 | 1 | 4 | 15.00 | NULL |
+| 1 | 1 | 8 | 40.00 | NULL |
+| 2 | 1 | 1 | 15.00 | NULL |
 | 3 | 2 | 3 | 4.50 | 2026-10-11 21:00 |
 | 4 | 2 | 3 | 4.50 | 2026-10-11 21:40 |
 | 5 | 2 | 3 | 4.50 | 2026-10-11 22:15 |
@@ -370,7 +370,7 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 **Why:** The manager needs one price per night for each of the nine extras.
 **Why this way:** SMALLINT identity is the key. NVARCHAR(100) keeps Portuguese names. Name is unique.
 Type is ROOM_EXTRA or PAID_SERVICE. DECIMAL(8,2) price may be null until set; zero is allowed.
-The seed uses IF NOT EXISTS for each name and never overwrites a saved price.
+The seed inserts only names that are missing and never overwrites a saved price.
 **Other option:** A separate catalogue for each type. One table makes listing and price validation simpler.
 **Example:** Vista mar (ROOM_EXTRA) costs 15.00 per night; Spa (PAID_SERVICE) costs 40.00.
 The nine seed names are Vista mar, Vista montanha, Bebidas, Lavandaria, Comida, Eventos culturais,

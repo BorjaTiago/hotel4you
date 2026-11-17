@@ -100,17 +100,17 @@ reservations
   created_by_user_id    SMALLINT NOT NULL FK users      -- Staff member who created the reservation.
 
 extra_prices
-  id                    SMALLINT IDENTITY PK            -- Internal service ID.
-  name                  NVARCHAR(100) NOT NULL UNIQUE   -- Service name (e.g. spa, laundry, drinks, sea view, mountain view).
-  type                  VARCHAR(20) NOT NULL           -- ROOM_EXTRA or PAID_SERVICE.
-  price                 DECIMAL(8,2) NULL               -- Current service price per night. NULL = no price set (see decision 5).
+  id                    SMALLINT IDENTITY PK          -- Internal service ID.
+  name                  NVARCHAR(100) NOT NULL UNIQUE -- Service name (e.g. spa, laundry, drinks, sea view, mountain view).
+  type                  VARCHAR(20) NOT NULL          -- ROOM_EXTRA or PAID_SERVICE.
+  price                 DECIMAL(8,2) NULL             -- Current service price per night. NULL = no price set (see decision 5).
 
 reservation_services
-  id                    INT IDENTITY PK                 -- Internal ID of the service in the reservation.
-  reservation_id        INT NOT NULL FK reservations    -- Reservation of the service. NO ACTION (see decision 1).
-  extra_price_id SMALLINT NOT NULL FK extra_prices -- Service included or used.
-  unit_price            DECIMAL(8,2) NULL               -- Price at that time. Does not change if the service price changes. NULL = no price.
-  used_at               DATETIME2(0) NULL               -- When the service was used. For a room service request: the time of the request. NULL = included but not used yet.
+  id                    INT IDENTITY PK               -- Internal ID of the service in the reservation.
+  reservation_id        INT NOT NULL FK reservations  -- Reservation of the service. NO ACTION (see decision 1).
+  extra_price_id        SMALLINT NOT NULL FK extra_prices-- Service included or used.
+  unit_price            DECIMAL(8,2) NULL             -- Price at that time. Does not change if the service price changes. NULL = no price.
+  used_at               DATETIME2(0) NULL             -- When the service was used. For a room service request: the time of the request. NULL = included but not used yet.
 
 access_cards
   id                    INT IDENTITY PK                 -- Internal card ID.
@@ -158,7 +158,7 @@ feedback
 
 ### Reservations and services
 - `reservations`: one customer, one room, a date range and a `status` (reserved, cancelled, checked_in, checked_out). Stores the real check-in and check-out times and the user who created it. No price column: the total is computed from `base_price` and the services.
-- `extra_prices`: catalogue of services with the current price (spa, laundry, drinks, sea view, mountain view). The view is a service.
+- `extra_prices`: the nine room extras and paid services, with a fixed price per night. SQL v14 creates and completes this catalogue by name without overwriting prices. The type is ROOM_EXTRA or PAID_SERVICE. This table replaces the earlier planned catalogue name. Run v14 after the reserved v11-v13 scripts. `reservation_services` and its catalogue link remain a design for later stories.
 - `reservation_services`: services used in a reservation. `unit_price` is a copy of the price at that time. `used_at = NULL` means included but not used yet. Room service requests (food, drink, laundry) use this table. `used_at` is the time of the request.
 
 ### Access control
@@ -275,14 +275,5 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 12. **Stock import and exit**: one supplier file load (XML or JSON, statement update 2026-11-06) is one `stock_imports` row. `file_format` keeps the format, so the report and a later check show which reader read the file (H4Y-84, Q-59). Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). Import every item from a valid XML or JSON file and create missing `items` rows (Q-10, Q-38; PR #20 decision, 2026-10-21). Save the new catalogue items, import, ENTRY movements and balances in one transaction. A failed save undoes the whole import. No rejected-item field is needed. This updates the schema documentation; no database migration is applied here. `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
 13. **Zone removal**: the backend deletes the `locations` row. If another row references it (FK NO ACTION, SQL error 547), the delete fails and the backend shows 'A zona tem associações e não pode ser removida.' (Q-36, H4Y-28).
 
-## H4Y-103 implementation
-
-SQL v14 creates extra_prices and seeds nine rows only when their names do not exist.
-It implements the catalogue previously named additional_services in this design; no existing table is dropped or renamed by the migration.
-The type is ROOM_EXTRA (views, drinks, laundry) or PAID_SERVICE (the other paid services).
-Name is unique. Price is nullable DECIMAL(8,2) and must be non-negative.
-Rerunning the script does not change prices already set by the manager.
-Run v14 after the reserved v11, v12 and v13 migrations. This subtask does not execute migrations.
-The reservation_services table and its extra_price_id relation remain planned for a later story.
 
 Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13. Reviewed by: pending.
