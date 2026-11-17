@@ -51,7 +51,8 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public boolean addMovement(StockMovement movement) {
-        StockItem item = items.get(movement.getItem().getId());
+        Long id = movement.getItem().getId();
+        StockItem item = id == null ? null : items.get(id);
         if (item == null) {
             return false;
         }
@@ -62,12 +63,12 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     /**
-     * Returns the saved movements, in the order of saving.
+     * Returns a copy of the saved movements, in the order of saving.
      *
      * @return the movements
      */
     public List<StockMovement> movements() {
-        return movements;
+        return List.copyOf(movements);
     }
 
     /**

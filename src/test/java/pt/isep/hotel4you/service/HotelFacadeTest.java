@@ -432,28 +432,16 @@ class HotelFacadeTest {
         User manager = new Manager(1L, "Rui Costa", "rui", "hash");
         StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "unidade", 10));
 
-        StockMovement movement = facade.registerMovement(towels, MovementType.ENTRY,
-                facade.parseQuantity("5"), manager);
+        StockMovement movement = facade.registerMovement(towels, MovementType.ENTRY, 5, manager);
 
         assertEquals(15, movement.getItem().getStockQuantity());
         assertEquals(15, itemRepository.findById(towels.getId()).get().getStockQuantity());
     }
 
     @Test
-    @Tag("H4Y-90-AC-1")
-    void onRegisterMovement_throwAccessDenied_whenReceptionist() {
-        User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
-        StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "unidade", 10));
-
-        assertThrows(AccessDeniedException.class,
-                () -> facade.registerMovement(towels, MovementType.ENTRY, 5, receptionist));
-        assertEquals(10, itemRepository.findById(towels.getId()).get().getStockQuantity());
-    }
-
-    @Test
     @Tag("H4Y-90-AC-2")
-    void onParseQuantity_throw_whenTextIsNotWholeNumber() {
-        assertThrows(IllegalArgumentException.class, () -> facade.parseQuantity("abc"));
+    void onParseQuantity_returnNumberThroughStockService_whenTextIsWholeNumber() {
+        assertEquals(5, facade.parseQuantity("5"));
     }
 
     @Test
