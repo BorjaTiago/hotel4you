@@ -44,6 +44,30 @@
             <Button text="Remover quarto" onAction="#onRemoveRoomClicked" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
             <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
         </HBox>
+        <Label text="Itens do quarto" styleClass="subtitle"/>
+        <TableView styleClass="data-table" fx:id="roomItemTable" prefHeight="140">
+            <columns>
+                <TableColumn fx:id="roomItemNameColumn" text="Item" prefWidth="260"/>
+                <TableColumn fx:id="roomItemQuantityColumn" text="Quantidade" prefWidth="120"/>
+            </columns>
+            <placeholder>
+                <Label text="Não há itens no quarto."/>
+            </placeholder>
+        </TableView>
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Item" labelFor="$itemBox"/>
+                <ComboBox fx:id="itemBox" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label text="Quantidade" labelFor="$itemQuantityField"/>
+                <TextField fx:id="itemQuantityField" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="12">
+            <Button text="Guardar item" onAction="#onConfigureRoomItemClicked" styleClass="action-button, save-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+            <Button text="Remover item" onAction="#onRemoveRoomItemClicked" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        </HBox>
     </VBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>
