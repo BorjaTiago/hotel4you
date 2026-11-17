@@ -11,6 +11,15 @@ import org.junit.jupiter.params.provider.EnumSource;
 /** Tests which roles may use each function. */
 class PermissionTest {
 
+    @ParameterizedTest
+    @EnumSource(Role.class)
+    @Tag("H4Y-93-AC-5")
+    void onAllows_onlyManager_whenManagingExtraPrices(Role role) {
+        User actor = new User(1L, "Utilizador", "user", "hash", role) { };
+        org.junit.jupiter.api.Assertions.assertEquals(role == Role.MANAGER,
+                Permission.MANAGE_EXTRA_PRICES.allows(actor));
+    }
+
     private static final String HASH =
             "$2a$12$abcdefghijklmnopqrstuuAbCdEfGhIjKlMnOpQrStUvWxYz01234";
 
