@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import pt.isep.hotel4you.domain.Room;
@@ -60,6 +61,11 @@ public class InMemoryRoomRepository implements RoomRepository {
     @Override
     public synchronized List<Room> findAll() {
         return List.copyOf(rooms);
+    }
+
+    @Override
+    public synchronized Optional<Room> findById(long id) {
+        return rooms.stream().filter(room -> room.getId() == id).findFirst();
     }
 
     @Override

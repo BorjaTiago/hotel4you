@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import pt.isep.hotel4you.data.InMemoryItemRepository;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
@@ -152,35 +154,22 @@ class RoomServiceItemTest {
         assertEquals(2, service.listRoomItems(room, manager()).get(0).getQuantity());
     }
 
-    @Test
-    @Tag("H4Y-91-AC-7")
-    void onParseQuantity_throw_whenTextIsNotANumber() {
-        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.parseQuantity("abc"));
-
-        assertEquals(INVALID_QUANTITY, error.getMessage());
-    }
-
     @ParameterizedTest
-    @ValueSource(strings = {" ", "2.5"})
+    @NullSource
+    @ValueSource(strings = {"abc", " ", "", "2.5", "+5", "-1", "1000", "99999999999", "\u0663"})
     @Tag("H4Y-91-AC-7")
-    void onParseQuantity_throw_whenTextIsBlankOrDecimal(String text) {
+    void onParseQuantity_throw_whenTextIsNotOneToThreeDigits(String text) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> service.parseQuantity(text));
 
         assertEquals(INVALID_QUANTITY, error.getMessage());
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({"3,3", "0,0", "255,255"})
     @Tag("H4Y-91-AC-7")
-    void onParseQuantity_throw_whenTextIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> service.parseQuantity(null));
-    }
-
-    @Test
-    @Tag("H4Y-91-AC-7")
-    void onParseQuantity_returnNumber_whenTextIsAnInteger() {
-        assertEquals(3, service.parseQuantity("3"));
+    void onParseQuantity_returnNumber_whenTextIsOneToThreeDigits(String text, int expected) {
+        assertEquals(expected, service.parseQuantity(text));
     }
 
     @Test
@@ -220,15 +209,6 @@ class RoomServiceItemTest {
                 () -> service.listRoomItems(missing, manager()));
 
         assertEquals("O quarto não existe.", error.getMessage());
-    }
-
-    @Test
-    @Tag("H4Y-91-AC-7")
-    void onParseQuantity_throw_whenNumberIsTooBig() {
-        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.parseQuantity("99999999999"));
-
-        assertEquals(INVALID_QUANTITY, error.getMessage());
     }
 
     private static User manager() {

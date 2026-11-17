@@ -581,14 +581,30 @@ class HotelFacadeTest {
         assertTrue(facade.listActiveReservations(ana).isEmpty());
     }
 
+    private Room saveRoom() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        return roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
+    }
+
+    private StockItem saveTowels() {
+        return itemRepository.save(new StockItem(null, "toalhas", "un", 20));
+    }
+
+    private static User manager() {
+        return new Manager(1L, "Rui", "rui", "hash");
+    }
+
+    private static User receptionist() {
+        return new Receptionist(2L, "Ana", "ana", "hash");
+    }
+
     @Test
     @Tag("H4Y-91-AC-1")
     void onConfigureRoomItem_addItem_whenActorIsManager() {
-        roomRepository.addFloor(2);
-        roomRepository.addRoomType("duplo");
-        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
-        StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "un", 20));
-        User manager = new Manager(1L, "Rui", "rui", "hash");
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        User manager = manager();
 
         facade.configureRoomItem(room, towels, facade.parseRoomItemQuantity("2"), manager);
 
@@ -601,11 +617,9 @@ class HotelFacadeTest {
     @Test
     @Tag("H4Y-91-AC-2")
     void onRemoveRoomItem_removeItem_whenActorIsManager() {
-        roomRepository.addFloor(2);
-        roomRepository.addRoomType("duplo");
-        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
-        StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "un", 20));
-        User manager = new Manager(1L, "Rui", "rui", "hash");
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        User manager = manager();
         facade.configureRoomItem(room, towels, 2, manager);
 
         facade.removeRoomItem(room, towels, manager);
@@ -616,10 +630,8 @@ class HotelFacadeTest {
     @Test
     @Tag("H4Y-91-AC-5")
     void onListRoomItems_throw_whenActorIsReceptionist() {
-        roomRepository.addFloor(2);
-        roomRepository.addRoomType("duplo");
-        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
-        User ana = new Receptionist(2L, "Ana", "ana", "hash");
+        Room room = saveRoom();
+        User ana = receptionist();
 
         assertThrows(AccessDeniedException.class, () -> facade.listRoomItems(room, ana));
     }
@@ -627,14 +639,25 @@ class HotelFacadeTest {
     @Test
     @Tag("H4Y-91-AC-5")
     void onConfigureRoomItem_throw_whenActorIsReceptionist() {
-        roomRepository.addFloor(2);
-        roomRepository.addRoomType("duplo");
-        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
-        StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "un", 20));
-        User ana = new Receptionist(2L, "Ana", "ana", "hash");
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        User ana = receptionist();
 
         assertThrows(AccessDeniedException.class, () -> facade.configureRoomItem(room, towels, 2, ana));
-        assertThrows(AccessDeniedException.class, () -> facade.removeRoomItem(room, towels, ana));
+
         assertTrue(roomRepository.findItems(room.getId()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-5")
+    void onRemoveRoomItem_throw_whenActorIsReceptionist() {
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        facade.configureRoomItem(room, towels, 2, manager());
+        User ana = receptionist();
+
+        assertThrows(AccessDeniedException.class, () -> facade.removeRoomItem(room, towels, ana));
+
+        assertEquals(1, roomRepository.findItems(room.getId()).size());
     }
 }
