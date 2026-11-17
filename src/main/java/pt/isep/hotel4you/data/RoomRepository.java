@@ -88,14 +88,12 @@ public interface RoomRepository {
     void saveItem(long roomId, long itemId, int quantity);
 
     /**
-     * Removes an item from a room.
-     * The refusal (false) is reserved for a later table that references room_items (open question Q-36).
-     * Deleting a row that does not exist returns true.
+     * Deletes the item from the room.
+     * Deleting an item that is not in the room does nothing.
      *
      * @param roomId the room id
      * @param itemId the item id
-     * @return true if the item was removed, false if other data still uses it
      * @throws IllegalStateException if the database is not available
      */
-    boolean deleteItem(long roomId, long itemId);
+    void deleteItem(long roomId, long itemId);
 }

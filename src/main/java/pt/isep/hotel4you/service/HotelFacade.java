@@ -597,7 +597,6 @@ public class HotelFacade {
      * @param actor the logged-in user
      * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalArgumentException if the room does not exist
-     * @throws RoomItemInUseException if other data still uses the item in the room
      * @throws IllegalStateException if the database is not available
      */
     public void removeRoomItem(Room room, StockItem item, User actor) {
