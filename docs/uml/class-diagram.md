@@ -238,9 +238,8 @@ classDiagram
         +setBasePrice(type: RoomType, price: BigDecimal, actor: User) void
         +listBasePrices(actor: User) List~RoomType~
         +parsePrice(text: String) BigDecimal
-        +setExtraPrice(extra: ExtraService, price: BigDecimal, actor: User) String
+        +setExtraPrice(extra: ExtraService, price: BigDecimal, actor: User) void
         +listExtraPrices(actor: User) List~ExtraService~
-        +parseExtraPrice(text: String) BigDecimal
         +createLocation(floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
         +editLocation(id: long, floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
         +removeLocation(id: long, actor: User) void
@@ -679,8 +678,12 @@ classDiagram
     class ExtraPriceService {
         +ExtraPriceService(repository: ExtraPriceRepository)
         +listPrices(actor: User) List~ExtraService~
-        +setPrice(extra: ExtraService, price: BigDecimal, actor: User) String
-        +parsePrice(text: String) BigDecimal
+        +setPrice(extra: ExtraService, price: BigDecimal, actor: User) void
+    }
+    class PriceRules {
+        -PriceRules()
+        ~parse(text: String) BigDecimal$
+        ~normalize(price: BigDecimal) BigDecimal$
     }
     class ExtraPriceRepository {
         <<interface>>
@@ -699,7 +702,7 @@ classDiagram
         -messageLabel: Label
         +ExtraPriceController(facade: HotelFacade)
         -initialize() void
-        -loadPrices(selectedId: Long) void
+        -loadPrices() boolean
         -onSavePriceClicked() void
         -showMessage(text: String, success: boolean) void
         ~priceText(price: BigDecimal) String$
@@ -996,6 +999,8 @@ classDiagram
     ExtraPriceController ..> HotelFacade : uses
     ExtraPriceService ..> ExtraPriceRepository : reads and updates
     ExtraPriceService ..> Permission : checks manager
+    ExtraPriceService ..> PriceRules : validates
+    RoomService ..> PriceRules : validates
     JdbcExtraPriceRepository ..|> ExtraPriceRepository
     JdbcExtraPriceRepository ..> Database : connects
     ExtraPriceRepository ..> ExtraService : returns
@@ -1071,13 +1076,15 @@ The catalogue holds nine items in `extra_prices` (SQL v14). The first four are R
 sea view, mountain view, drinks and laundry. The other five are PAID_SERVICE:
 food, cultural events, private pools, spa and conference rooms.
 Amounts follow the base price rule: 0.00 to 999999.99 with at most two decimals.
-`parsePrice` accepts a comma or a point, but not scientific notation or grouping marks.
+`PriceRules.parse` accepts at most 12 characters, with a comma or a point. It rejects scientific notation and grouping marks.
+RoomService.parsePrice delegates to it. Both price services use PriceRules.normalize for the same amount limits.
 An invalid value, missing selection or unknown id does not update the catalogue.
 H4Y-104 implements `ExtraPriceController` and `extra-prices.fxml`. MainController opens it with
 `onExtraPricesClicked`. Its menu button checks MANAGE_EXTRA_PRICES.
 The table shows the nine entries and their price per night; null shows as "Por definir".
-Selection fills the price field. Saving uses HotelFacade.parseExtraPrice and setExtraPrice.
-ExtraPriceService returns the success text. The controller shows success in green and errors in red.
-All amount and access rules stay in ExtraPriceService.
+The manager enters a price in an empty field. Saving uses HotelFacade.parsePrice and setExtraPrice.
+The controller clears the field after saving and owns the success text. Errors come from the services.
+A refresh failure after a successful save gives an explicit warning that the price was saved.
+Access rules stay in ExtraPriceService; shared amount rules stay in PriceRules.
 
 Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-82 check-in and check-out by Claude Code (claude-opus-5-5), 2026-11-08; H4Y-82 PR #55 review fixes by Claude Code (claude-opus-5-5), 2026-11-08; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09 (sync with 6faf8f8); rename by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09.; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06; merge with main after H4Y-82 by Claude Code (claude-opus-5-5), 2026-11-09; screen rename to "Reservar quarto" by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 edit staff account by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 rebase on main after H4Y-82 and review fixes by Claude Code (claude-opus-5-5), 2026-11-10; H4Y-85 rebase on main after H4Y-80 and H4Y-81 by Claude Code (claude-opus-5-5), 2026-11-11; H4Y-57 delete reservation by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13; docs, Claude Code (claude-haiku-5-5), 2026-11-13. Reviewed by: pending.

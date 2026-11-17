@@ -10,19 +10,19 @@ import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
-import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.ClientSearchField;
-import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.ExtraService;
+import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationQuote;
+import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
-import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
+import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.User;
@@ -81,23 +81,12 @@ public class HotelFacade {
      * @param extra the selected catalogue entry
      * @param price the new price per night
      * @param actor the logged-in user
-     * @return the success message in Portuguese
      * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalArgumentException if the extra or the price is invalid
      * @throws IllegalStateException if the database is not available
      */
-    public String setExtraPrice(ExtraService extra, BigDecimal price, User actor) {
-        return extraPriceService.setPrice(extra, price, actor);
-    }
-
-    /**
-     * Parses extra price text with a comma or a point as decimal mark.
-     * @param text the price entered on the extra price screen
-     * @return the numeric amount, for validation when saving
-     * @throws IllegalArgumentException if the text is not a plain decimal number
-     */
-    public BigDecimal parseExtraPrice(String text) {
-        return extraPriceService.parsePrice(text);
+    public void setExtraPrice(ExtraService extra, BigDecimal price, User actor) {
+        extraPriceService.setPrice(extra, price, actor);
     }
 
     /**

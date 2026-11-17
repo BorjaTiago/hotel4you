@@ -51,9 +51,10 @@ public class Main {
             ClientService clientService = new ClientService(new JdbcClientRepository(database));
             ReservationService reservationService = new ReservationService(reservationRepository,
                     roomService, roomTypeRepository);
+            ExtraPriceService extraPriceService = new ExtraPriceService(new JdbcExtraPriceRepository(database));
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
                     stockService, clientService, reservationService,
-                    new ExtraPriceService(new JdbcExtraPriceRepository(database)));
+                    extraPriceService);
 
             // Check now that the database works.
             database.check();

@@ -27,7 +27,7 @@ public class JdbcExtraPriceRepository implements ExtraPriceRepository {
     /**
      * Finds all catalogue entries, including entries without prices.
      * @return the entries ordered by identifier
-     * @throws IllegalStateException if the database is not available
+     * @throws IllegalStateException if the database is not available or a stored type is invalid
      */
     @Override
     public List<ExtraService> findAll() {
@@ -40,7 +40,7 @@ public class JdbcExtraPriceRepository implements ExtraPriceRepository {
                         ExtraType.valueOf(row.getString("type")), row.getBigDecimal("price")));
             }
             return extras;
-        } catch (SQLException error) {
+        } catch (SQLException | IllegalArgumentException error) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, error);
         }
     }

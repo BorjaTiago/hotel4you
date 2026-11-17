@@ -17,6 +17,6 @@
     <Label fx:id="priceLabel" text="Preço por noite (€)"/>
     <TextField fx:id="priceField" promptText="Ex.: 15,00" maxWidth="Infinity"/>
     <Button fx:id="saveButton" text="Guardar preço" onAction="#onSavePriceClicked"
-            styleClass="primary-button" maxWidth="Infinity" disable="true"/>
+            styleClass="primary-button" maxWidth="Infinity"/>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>

@@ -38,23 +38,16 @@ public class ExtraPriceController {
         nameColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
         priceColumn.setCellValueFactory(data -> new SimpleStringProperty(priceText(data.getValue().getPrice())));
         saveButton.disableProperty().bind(extraTable.getSelectionModel().selectedItemProperty().isNull());
-        extraTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, extra) -> {
-            priceField.setText(extra == null || extra.getPrice() == null ? ""
-                    : extra.getPrice().toPlainString().replace('.', ','));
-            showMessage("", false);
-        });
-        try {
-            loadPrices(null);
-        } catch (RuntimeException error) {
-            showMessage(error.getMessage(), false);
-        }
+        loadPrices();
     }
 
-    private void loadPrices(Long selectedId) {
-        extraTable.getItems().setAll(facade.listExtraPrices(HotelApp.currentUser));
-        if (selectedId != null) {
-            extraTable.getItems().stream().filter(extra -> selectedId.equals(extra.getId())).findFirst()
-                    .ifPresent(extra -> extraTable.getSelectionModel().select(extra));
+    private boolean loadPrices() {
+        try {
+            extraTable.getItems().setAll(facade.listExtraPrices(HotelApp.currentUser));
+            return true;
+        } catch (RuntimeException error) {
+            showMessage(error.getMessage(), false);
+            return false;
         }
     }
 
@@ -63,12 +56,17 @@ public class ExtraPriceController {
         showMessage("", false);
         ExtraService extra = extraTable.getSelectionModel().getSelectedItem();
         try {
-            String message = facade.setExtraPrice(extra, facade.parseExtraPrice(priceField.getText()),
+            facade.setExtraPrice(extra, facade.parsePrice(priceField.getText()),
                     HotelApp.currentUser);
-            loadPrices(extra.getId());
-            showMessage(message, true);
         } catch (RuntimeException error) {
             showMessage(error.getMessage(), false);
+            return;
+        }
+        priceField.clear();
+        if (loadPrices()) {
+            showMessage("Preço extra guardado.", true);
+        } else {
+            showMessage("Preço extra guardado, mas não foi possível atualizar a lista.", false);
         }
     }
 
@@ -80,7 +78,8 @@ public class ExtraPriceController {
         }
     }
 
+    /** Formats a price for the table; the column header states the currency. */
     static String priceText(BigDecimal price) {
-        return price == null ? "Por definir" : price.toPlainString().replace('.', ',') + " €";
+        return price == null ? "Por definir" : price.toPlainString().replace('.', ',');
     }
 }

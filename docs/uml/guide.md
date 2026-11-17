@@ -577,9 +577,11 @@ The JDBC repository uses extra_prices; the in-memory repository keeps unit tests
 **Example:** The manager sets Vista mar to 15.00 per night and Spa to 40.00. A receptionist cannot change either.
 H4Y-104 supplies extra-prices.fxml and ExtraPriceController, with the shared stylesheet.
 The manager opens "Preços extra", selects an entry, enters the amount and clicks "Guardar preço".
-The selected entry stays selected after a save. "Por definir" distinguishes an unset price from zero.
-The controller sends price text through HotelFacade.parseExtraPrice. ExtraPriceService validates the
-amount and actor and returns the success text; errors use the same service messages.
+The field clears after a save. "Por definir" distinguishes an unset price from zero.
+The controller parses text through HotelFacade.parsePrice and shows its own success text.
+RoomService and ExtraPriceService share PriceRules for text parsing (maximum 12 characters),
+amount limits and decimal scale. ExtraPriceService checks the actor.
+If saving succeeds but refreshing fails, the screen says that the price was saved and the list could not be refreshed.
 The menu uses MANAGE_EXTRA_PRICES, and the service checks it again for every read and write.
 Reservation price snapshots and totals belong to later stories.
 
