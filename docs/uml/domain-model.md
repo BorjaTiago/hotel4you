@@ -57,7 +57,13 @@ classDiagram
     class ExtraService {
         id: Long
         name: String
+        type: ExtraType
         price: BigDecimal
+    }
+    class ExtraType {
+        <<enumeration>>
+        ROOM_EXTRA
+        PAID_SERVICE
     }
     class ReservationExtra {
         quantity: int
@@ -148,6 +154,7 @@ classDiagram
     User "1" --> "*" Reservation : creates
     Reservation "1" *-- "*" ReservationExtra : includes
     ReservationExtra "*" --> "1" ExtraService : refers to
+    ExtraService --> ExtraType : classifies
     Reservation "0..1" --> "0..1" MagneticCard : has
     User "0..1" --> "*" MagneticCard : owns
     MagneticCard "1" --> "*" CardAccessRecord : generates
@@ -182,7 +189,7 @@ classDiagram
 | RoomType | Type of room with its capacity and base price per night. | name, capacity, basePrice |
 | RoomItem | Quantity of a stock item set in a room (Room item). | quantity |
 | Reservation | Booking of a room by a client for one or more nights. | startDate, endDate, status, checkedInAt, checkedOutAt |
-| ExtraService | Service that adds to the price (Extra service). | name, price |
+| ExtraService | Service that adds to the price (Extra service). | name, type, price |
 | ReservationExtra | Use of an extra service in a reservation. It keeps the price at the time. | quantity, unitPrice, usedAt |
 | MagneticCard | Magnetic card with a number. Type CLIENT or MASTER (Master magnetic card). | number, type, active, blockedAt |
 | CardAccessRecord | Saved record of a card entry (Card access record). | entryDateTime |
@@ -212,5 +219,12 @@ classDiagram
 - Every item from a valid supplier XML or JSON file enters stock. Both formats follow the same rules (statement update 2026-11-06, Q-59). The import creates missing catalogue items (RF-28, Q-10, Q-38; PR #20 decision, 2026-10-21).
 - A stock movement from a file import points to its stock import. The import keeps supplier, time and file format. Linked movements keep items and quantities. A save failure undoes all changes for that import, including new catalogue items.
 - A client may leave many feedbacks. The client link is 0..1.
+
+## H4Y-103 catalogue
+
+ExtraService has an ExtraType: ROOM_EXTRA or PAID_SERVICE. Its price is a fixed amount per night,
+or null before the manager sets it (RF-07, RF-09, Q-11). SQL v14 stores the catalogue in extra_prices.
+The nine rows cover sea view, mountain view, drinks, laundry, food, cultural events,
+private pools, spa and conference rooms. This step does not attach extras to reservations.
 
 Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

@@ -22,7 +22,7 @@ erDiagram
     customers |o--o{ feedback : "customer_id"
     rooms ||--o{ reservations : "room_id"
     reservations ||--o{ reservation_services : "reservation_id"
-    additional_services ||--o{ reservation_services : "additional_service_id"
+    extra_prices ||--o{ reservation_services : "extra_price_id"
     reservations |o--o{ access_cards : "reservation_id"
     access_cards ||--o{ access_logs : "access_card_id"
     locations |o--o{ access_logs : "location_id"
@@ -117,15 +117,16 @@ erDiagram
         DATETIME2 checked_out_at
         SMALLINT created_by_user_id FK
     }
-    additional_services {
+    extra_prices {
         SMALLINT id PK
-        VARCHAR100 name UK
-        DECIMAL price "nullable"
+        NVARCHAR100 name UK
+        VARCHAR20 type "ROOM_EXTRA or PAID_SERVICE"
+        DECIMAL price "nullable, per night"
     }
     reservation_services {
         INT id PK
         INT reservation_id FK
-        SMALLINT additional_service_id FK
+        SMALLINT extra_price_id FK
         DECIMAL unit_price "nullable"
         DATETIME2 used_at
     }
