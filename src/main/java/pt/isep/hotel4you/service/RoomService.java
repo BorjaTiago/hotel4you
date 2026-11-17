@@ -41,6 +41,8 @@ public class RoomService {
     private static final String QUANTITY_TEXT = "[0-9]+";
     private static final String INVALID_QUANTITY = "A quantidade é inválida.";
     private static final String MISSING_ROOM = "O quarto não existe.";
+    private static final String MISSING_ITEM = "O item não existe no catálogo.";
+    private static final String ITEM_ACCESS_DENIED = "Só o gestor pode configurar os itens do quarto.";
 
     /** Fixed labels and provisional Q-01 targets for the room summary. */
     private static final List<RoomTypeTarget> ROOM_TYPE_TARGETS = List.of(
@@ -378,7 +380,7 @@ public class RoomService {
      */
     public void configureItem(Room room, StockItem item, int quantity, User actor) {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
-            throw new AccessDeniedException("Só o gestor pode configurar os itens do quarto.");
+            throw new AccessDeniedException(ITEM_ACCESS_DENIED);
         }
         if (!roomExists(room)) {
             throw new IllegalArgumentException(MISSING_ROOM);
@@ -387,7 +389,7 @@ public class RoomService {
             throw new IllegalArgumentException(INVALID_QUANTITY);
         }
         if (item == null || item.getId() == null || itemRepository.findById(item.getId()).isEmpty()) {
-            throw new IllegalArgumentException("O item não existe no catálogo.");
+            throw new IllegalArgumentException(MISSING_ITEM);
         }
         roomRepository.saveItem(room.getId(), item.getId(), quantity);
     }
@@ -399,16 +401,19 @@ public class RoomService {
      * @param item the item to remove
      * @param actor the logged-in user
      * @throws AccessDeniedException if the actor is not a manager
-     * @throws IllegalArgumentException if the room does not exist
+     * @throws IllegalArgumentException if the room or the item does not exist
      * @throws RoomItemInUseException if other data still uses the item in the room
      * @throws IllegalStateException if the database is not available
      */
     public void removeItem(Room room, StockItem item, User actor) {
         if (!Permission.MANAGE_ROOMS.allows(actor)) {
-            throw new AccessDeniedException("Só o gestor pode configurar os itens do quarto.");
+            throw new AccessDeniedException(ITEM_ACCESS_DENIED);
         }
         if (!roomExists(room)) {
             throw new IllegalArgumentException(MISSING_ROOM);
+        }
+        if (item == null || item.getId() == null) {
+            throw new IllegalArgumentException(MISSING_ITEM);
         }
         if (!roomRepository.deleteItem(room.getId(), item.getId())) {
             throw new RoomItemInUseException();

@@ -310,6 +310,11 @@ public class JdbcRoomRepository implements RoomRepository {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * It returns false only on SQL error 547. That refusal is reserved for a later table that
+     * references room_items (open question Q-36). Deleting a row that does not exist returns true.
+     */
     @Override
     public boolean deleteItem(long roomId, long itemId) {
         String sql = "DELETE FROM room_items WHERE room_id = ? AND item_id = ?";

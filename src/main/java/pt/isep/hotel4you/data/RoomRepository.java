@@ -79,6 +79,8 @@ public interface RoomRepository {
 
     /**
      * Removes an item from a room.
+     * The refusal (false) is reserved for a later table that references room_items (open question Q-36).
+     * Deleting a row that does not exist returns true.
      *
      * @param roomId the room id
      * @param itemId the item id
