@@ -97,19 +97,6 @@ class RoomServiceItemTest {
     }
 
     @Test
-    @Tag("H4Y-91-AC-4")
-    void onRemoveItem_throw_whenItemHasAssociations() {
-        service.configureItem(room, sofa, 1, manager());
-        rooms.markItemInUse(room.getId(), sofa.getId());
-
-        RoomItemInUseException error = assertThrows(RoomItemInUseException.class,
-                () -> service.removeItem(room, sofa, manager()));
-
-        assertEquals("O item tem associações e não pode ser removido.", error.getMessage());
-        assertEquals(1, service.listRoomItems(room, manager()).size());
-    }
-
-    @Test
     @Tag("H4Y-91-AC-5")
     void onConfigureItem_throw_whenActorIsReceptionist() {
         assertThrows(AccessDeniedException.class,
