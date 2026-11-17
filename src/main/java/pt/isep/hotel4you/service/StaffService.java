@@ -10,7 +10,7 @@ import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
-/** Creates, lists and edits staff accounts. */
+/** Creates, lists, finds and edits staff accounts. */
 public class StaffService {
 
     private static final int MAX_NAME_LENGTH = 100;
@@ -31,12 +31,44 @@ public class StaffService {
     }
 
     /**
-     * Lists all staff accounts: receptionists, restaurant staff and managers.
+     * Lists all staff accounts: receptionists, restaurant staff and managers. Only a manager may
+     * do it.
      *
+     * @param actor the logged-in user who asks for the list
      * @return the accounts, or an empty list if none exists
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
      */
-    public List<User> listUsers() {
+    public List<User> listUsers(User actor) {
+        checkCanConsult(actor);
         return userRepository.findAll();
+    }
+
+    /**
+     * Finds one staff account by its login name. Only a manager may do it. The username is
+     * trimmed.
+     *
+     * @param username the login name of the account
+     * @param actor the logged-in user who asks for the account
+     * @return the account
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws StaffNotFoundException if the username is blank or no account uses it
+     * @throws IllegalStateException if the database is not available
+     */
+    public User findUser(String username, User actor) {
+        checkCanConsult(actor);
+        if (username == null || username.isBlank()) {
+            throw new StaffNotFoundException();
+        }
+        return userRepository.findByUsername(username.trim())
+                .orElseThrow(StaffNotFoundException::new);
+    }
+
+    /** Checks that the actor is a manager before a list or a lookup. */
+    private static void checkCanConsult(User actor) {
+        if (!Permission.MANAGE_STAFF.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode consultar contas.");
+        }
     }
 
     /**

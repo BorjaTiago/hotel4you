@@ -28,6 +28,13 @@
     <!-- Staff list -->
     <VBox spacing="12" HBox.hgrow="ALWAYS">
         <Label text="Funcionários" styleClass="subtitle"/>
+        <!-- Find one account by username -->
+        <HBox spacing="8">
+            <TextField fx:id="searchField" promptText="Nome de utilizador" HBox.hgrow="ALWAYS"
+                       onAction="#onFindUserClicked"/>
+            <Button styleClass="primary-button" text="Consultar" onAction="#onFindUserClicked"/>
+        </HBox>
+        <Label fx:id="searchResultLabel" wrapText="true" maxWidth="Infinity"/>
         <TableView styleClass="data-table" fx:id="staffTable" VBox.vgrow="ALWAYS" prefWidth="500">
             <columns>
                 <TableColumn fx:id="nameColumn" text="Nome" prefWidth="160"/>
