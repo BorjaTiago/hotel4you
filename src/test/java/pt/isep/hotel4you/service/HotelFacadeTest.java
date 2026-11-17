@@ -599,6 +599,32 @@ class HotelFacadeTest {
     }
 
     @Test
+    @Tag("H4Y-91-AC-2")
+    void onRemoveRoomItem_removeItem_whenActorIsManager() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
+        StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "un", 20));
+        User manager = new Manager(1L, "Rui", "rui", "hash");
+        facade.configureRoomItem(room, towels, 2, manager);
+
+        facade.removeRoomItem(room, towels, manager);
+
+        assertTrue(facade.listRoomItems(room, manager).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-5")
+    void onListRoomItems_throw_whenActorIsReceptionist() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        Room room = roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
+        User ana = new Receptionist(2L, "Ana", "ana", "hash");
+
+        assertThrows(AccessDeniedException.class, () -> facade.listRoomItems(room, ana));
+    }
+
+    @Test
     @Tag("H4Y-91-AC-5")
     void onConfigureRoomItem_throw_whenActorIsReceptionist() {
         roomRepository.addFloor(2);

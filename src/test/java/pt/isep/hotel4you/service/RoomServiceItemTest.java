@@ -196,6 +196,41 @@ class RoomServiceItemTest {
         assertEquals(1, service.listRoomItems(room, manager()).size());
     }
 
+    @Test
+    @Tag("H4Y-91-AC-8")
+    void onRemoveItem_throw_whenItemIsNull() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.removeItem(room, null, manager()));
+
+        assertEquals("O item não existe no catálogo.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-5")
+    void onListRoomItems_throw_whenActorIsReceptionist() {
+        assertThrows(AccessDeniedException.class, () -> service.listRoomItems(room, receptionist()));
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-3")
+    void onListRoomItems_throw_whenRoomDoesNotExist() {
+        Room missing = new Room(99L, 999, 2, "duplo");
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.listRoomItems(missing, manager()));
+
+        assertEquals("O quarto não existe.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-7")
+    void onParseQuantity_throw_whenNumberIsTooBig() {
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.parseQuantity("99999999999"));
+
+        assertEquals(INVALID_QUANTITY, error.getMessage());
+    }
+
     private static User manager() {
         return new Manager(1L, "Rui Costa", "rui", HASH);
     }
