@@ -238,11 +238,12 @@ class StaffServiceTest {
 
     @Test
     @Tag("H4Y-27-AC-1")
+    @Tag("H4Y-89-AC-1")
     void onListUsers_returnCreatedAccounts_whenAccountsExist() {
         staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
         staffService.createStaff("Joao Lima", "joao", PASSWORD, Role.RESTAURANT, manager());
 
-        List<User> users = staffService.listUsers();
+        List<User> users = staffService.listUsers(manager());
 
         assertEquals(List.of("ana", "joao"), users.stream().map(User::getUsername).toList());
         assertEquals(List.of(Role.RECEPTIONIST, Role.RESTAURANT),
@@ -252,7 +253,82 @@ class StaffServiceTest {
     @Test
     @Tag("H4Y-27-AC-1")
     void onListUsers_returnEmptyList_whenNoAccountExists() {
-        assertTrue(staffService.listUsers().isEmpty());
+        assertTrue(staffService.listUsers(manager()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-1")
+    void onListUsers_throwAccessDenied_whenActorIsReceptionist() {
+        saveAna();
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", HASH);
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> staffService.listUsers(receptionist));
+
+        assertEquals("Só o gestor pode consultar contas.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-2")
+    void onListUsers_returnSavedAccounts_whenServiceIsCreatedAgain() {
+        saveAna();
+
+        StaffService restarted = new StaffService(repository, new AuthService(repository));
+
+        assertEquals(List.of("ana"),
+                restarted.listUsers(manager()).stream().map(User::getUsername).toList());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-3")
+    void onFindUser_returnAccount_whenUsernameExists() {
+        saveAna();
+
+        User ana = staffService.findUser("ana", manager());
+
+        assertEquals("Ana Silva", ana.getName());
+        assertEquals("ana", ana.getUsername());
+        assertEquals(Role.RECEPTIONIST, ana.getRole());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-3")
+    void onFindUser_returnAccount_whenUsernameHasSpaces() {
+        saveAna();
+
+        assertEquals("ana", staffService.findUser("  ana  ", manager()).getUsername());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-3")
+    void onFindUser_throwAccessDenied_whenActorIsReceptionist() {
+        saveAna();
+        User receptionist = new Receptionist(2L, "Ana Silva", "ana", HASH);
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> staffService.findUser("ana", receptionist));
+
+        assertEquals("Só o gestor pode consultar contas.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-4")
+    void onFindUser_throwStaffNotFound_whenUsernameDoesNotExist() {
+        saveAna();
+
+        StaffNotFoundException error = assertThrows(StaffNotFoundException.class,
+                () -> staffService.findUser("xpto", manager()));
+
+        assertEquals("A conta não existe.", error.getMessage());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   "})
+    @Tag("H4Y-89-AC-4")
+    void onFindUser_throwStaffNotFound_whenUsernameIsBlank(String username) {
+        assertThrows(StaffNotFoundException.class,
+                () -> staffService.findUser(username, manager()));
     }
 
     @Test
