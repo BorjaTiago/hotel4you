@@ -82,7 +82,7 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v8-create-customers.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v9-create-reservations.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v10-alter-customers.sql
-docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -I -i /database/v11-create-room-items.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v11-create-room-items.sql
 ```
 
 Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
@@ -98,7 +98,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v7-creat
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v8-create-customers.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v9-create-reservations.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v10-alter-customers.sql
-sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -b -I -i database/v11-create-room-items.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v11-create-room-items.sql
 ```
 
 `v10-alter-customers.sql` from H4Y-52 adds the full client data (document type, birth date, phone, nationality, email, NIF; Q-54). Run it once, after v8. It stops with an error if the `customers` table has rows or if it already ran.
