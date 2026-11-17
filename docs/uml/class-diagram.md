@@ -439,6 +439,7 @@ classDiagram
     class RoomRepository {
         <<interface>>
         +findAll() List~Room~
+        +findById(id: long) Optional~Room~
         +findSummaries() List~RoomSummary~
         +save(room: Room, floorLimit: int) Room
         +update(room: Room, floorLimit: int) Room
@@ -506,6 +507,7 @@ classDiagram
     class JdbcFloorRepository
     class JdbcLocationRepository
     class JdbcRoomRepository {
+        +findById(id: long) Optional~Room~
         +update(room: Room, floorLimit: int) Room
         +delete(id: long) boolean
         +findItems(roomId: long) List~RoomItem~

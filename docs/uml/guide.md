@@ -270,7 +270,7 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
 
 ### JdbcRoomRepository
-- **What:** Read the catalogues and save rooms in SQL Server. For room items (H4Y-91), `saveItem` updates the quantity or inserts the item in one transaction, and `deleteItem` returns false when SQL Server refuses the delete (error 547).
+- **What:** Read the catalogues and save rooms in SQL Server. For room items (H4Y-91), `saveItem` runs one MERGE statement that updates the quantity or inserts the item, and `deleteItem` returns false when SQL Server refuses the delete (error 547).
 - **Why:** RF-04 and RNF-12. Room numbers must be unique and a full floor must reject new rooms.
 - **Why this way:** `save(room, floorLimit)` opens one transaction. It locks the floor row with `UPDLOCK, HOLDLOCK`, reads the count, inserts with `OUTPUT INSERTED.id` and commits. SQL and runtime errors roll back. A rollback error is kept as a suppressed error. Each statement and result closes with a resource block. Small helper methods avoid nested resource blocks.
 - **Other option:** Check the limit only in the service. This cannot protect two application instances that save at the same time.
