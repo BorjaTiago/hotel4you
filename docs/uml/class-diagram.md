@@ -139,7 +139,7 @@ classDiagram
         -onCreateStaffClicked() void
         -onSaveStaffChangesClicked() void
         -onClearClicked() void
-        +onRemoveStaffClicked() void
+        -onRemoveStaffClicked() void
         +onListUsersClicked() void
     }
     class CardController {
