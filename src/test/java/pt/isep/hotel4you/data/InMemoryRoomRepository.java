@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.StockItem;
 
 /** Keeps room and reference data in memory for unit tests. */
 public class InMemoryRoomRepository implements RoomRepository {
@@ -20,6 +23,8 @@ public class InMemoryRoomRepository implements RoomRepository {
     private final List<Room> rooms = new ArrayList<>();
     private final Map<String, BigDecimal> basePrices = new HashMap<>();
     private final Set<Long> inUse = new HashSet<>();
+    private final Map<Long, Map<Long, Integer>> roomItems = new HashMap<>();
+    private final Set<String> itemsInUse = new HashSet<>();
 
     /** Adds a floor to the test catalogue. */
     public synchronized void addFloor(int floorNumber) {
@@ -132,5 +137,37 @@ public class InMemoryRoomRepository implements RoomRepository {
     /** Marks a room as used by other data, so that delete refuses it. */
     public synchronized void markInUse(long id) {
         inUse.add(id);
+    }
+
+    /**
+     * Returns the items of a room. The stock item is a placeholder with the saved id, because
+     * this double does not hold the catalogue.
+     */
+    @Override
+    public synchronized List<RoomItem> findItems(long roomId) {
+        Map<Long, Integer> quantities = new TreeMap<>(roomItems.getOrDefault(roomId, Map.of()));
+        return quantities.entrySet().stream()
+                .map(entry -> new RoomItem(new StockItem(entry.getKey(), "item " + entry.getKey(), "un", 0),
+                        entry.getValue()))
+                .toList();
+    }
+
+    @Override
+    public synchronized void saveItem(long roomId, long itemId, int quantity) {
+        roomItems.computeIfAbsent(roomId, id -> new HashMap<>()).put(itemId, quantity);
+    }
+
+    @Override
+    public synchronized boolean deleteItem(long roomId, long itemId) {
+        if (itemsInUse.contains(roomId + ":" + itemId)) {
+            return false;
+        }
+        roomItems.getOrDefault(roomId, new HashMap<>()).remove(itemId);
+        return true;
+    }
+
+    /** Marks an item of a room as used by other data, so that deleteItem refuses it. */
+    public synchronized void markItemInUse(long roomId, long itemId) {
+        itemsInUse.add(roomId + ":" + itemId);
     }
 }

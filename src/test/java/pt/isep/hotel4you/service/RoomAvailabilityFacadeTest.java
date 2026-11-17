@@ -28,7 +28,8 @@ class RoomAvailabilityFacadeTest {
         RoomType type = new RoomType(1L, "duplo", 2, null);
         var types = new InMemoryRoomTypeRepository();
         types.add(type);
-        var service = new RoomService(rooms, types, new InMemoryReservationRepository());
+        var service = new RoomService(rooms, types, new InMemoryReservationRepository(),
+                new pt.isep.hotel4you.data.InMemoryItemRepository());
         var facade = new HotelFacade(null, null, null, service, null, null, null);
         User actor = new Receptionist(1L, "Ana", "ana", "hash");
         LocalDate start = LocalDate.of(2026, 11, 10);
