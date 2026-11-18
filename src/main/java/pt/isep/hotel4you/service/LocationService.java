@@ -11,8 +11,8 @@ import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
 
 /**
- * Shows the floors of the hotel and manages their zones. Only a manager may use it. It also holds
- * the access rule by zone for each role.
+ * Shows the floors of the hotel and manages their zones. Only a manager manages zones. It also
+ * holds the access rule by zone for each role.
  */
 public class LocationService {
 
@@ -167,17 +167,28 @@ public class LocationService {
         if (location.getId() == null) {
             return Optional.empty();
         }
-        return floorRepository.findAll().stream()
-                .filter(floor -> floor.locations().stream()
-                        .anyMatch(zone -> location.getId().equals(zone.getId())))
-                .map(Floor::number)
-                .findFirst();
+        for (Floor floor : floorRepository.findAll()) {
+            for (Location zone : floor.locations()) {
+                if (location.getId().equals(zone.getId())) {
+                    return Optional.of(floor.number());
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     private static boolean isRestaurantZone(Location location) {
         String name = location.getName();
-        return name != null && RESTAURANT_ZONES.stream()
-                .anyMatch(zone -> zone.equalsIgnoreCase(name.trim()));
+        if (name == null) {
+            return false;
+        }
+        String cleanName = name.trim();
+        for (String zone : RESTAURANT_ZONES) {
+            if (zone.equalsIgnoreCase(cleanName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkManage(User actor) {

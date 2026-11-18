@@ -268,6 +268,8 @@ classDiagram
         +removeClient(id: long, actor: User) void
     }
     class LocationService {
+        -RECEPTION_FLOORS: Set~Integer~$
+        -RESTAURANT_ZONES: List~String~$
         +createLocation(floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
         +editLocation(id: long, floorNumber: int, name: String, guestCardAccess: boolean, requiresReservation: boolean, actor: User) Location
         +removeLocation(id: long, actor: User) void
