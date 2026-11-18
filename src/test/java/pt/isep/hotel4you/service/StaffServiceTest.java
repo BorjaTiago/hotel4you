@@ -407,6 +407,98 @@ class StaffServiceTest {
         assertEquals(Role.RECEPTIONIST, ana.getRole());
     }
 
+    private User otherManager() {
+        return new Manager(99L, "Rui Lima", "ruil", HASH);
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-1")
+    void onRemoveStaff_deleteAccount_whenActorIsManager() {
+        long id = saveAna();
+
+        staffService.removeStaff(id, otherManager());
+
+        assertTrue(repository.findById(id).isEmpty());
+        assertEquals(0, repository.count());
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-1")
+    void onRemoveStaff_refuseLogin_whenAccountRemoved() {
+        long id = saveAna();
+        LoginFailedException wrongPassword = assertThrows(LoginFailedException.class,
+                () -> authService.login("ana", "wrong-pass"));
+
+        staffService.removeStaff(id, otherManager());
+
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> authService.login("ana", PASSWORD));
+        assertEquals(wrongPassword.getMessage(), error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-2")
+    void onRemoveStaff_throwStaffNotFound_whenAccountMissing() {
+        StaffNotFoundException error = assertThrows(StaffNotFoundException.class,
+                () -> staffService.removeStaff(99L, manager()));
+
+        assertEquals("A conta não existe.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-3")
+    void onRemoveStaff_throwStaffInUse_whenAccountHasReservations() {
+        long id = saveAna();
+        repository.markInUse(id);
+
+        StaffInUseException error = assertThrows(StaffInUseException.class,
+                () -> staffService.removeStaff(id, otherManager()));
+
+        assertEquals("A conta tem registos associados e não pode ser removida.",
+                error.getMessage());
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-4")
+    void onRemoveStaff_throwAccessDenied_whenActorIsReceptionist() {
+        assertRemoveDenied(new Receptionist(2L, "Bia Neves", "bia", HASH));
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-4")
+    void onRemoveStaff_throwAccessDenied_whenActorIsRestaurantStaff() {
+        assertRemoveDenied(new RestaurantStaff(3L, "Joao Lima", "joao", HASH));
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-4")
+    void onRemoveStaff_throwAccessDenied_whenActorIsNull() {
+        assertRemoveDenied(null);
+    }
+
+    private void assertRemoveDenied(User actor) {
+        long id = saveAna();
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> staffService.removeStaff(id, actor));
+
+        assertEquals("Só o gestor pode remover contas.", error.getMessage());
+        assertAnaUnchanged(id);
+    }
+
+    @Test
+    @Tag("H4Y-88-AC-5")
+    void onRemoveStaff_throwAccessDenied_whenManagerRemovesOwnAccount() {
+        User rui = repository.save(new Manager(null, "Rui Costa", "rui", HASH));
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> staffService.removeStaff(rui.getId(), rui));
+
+        assertEquals("Não pode remover a sua própria conta.", error.getMessage());
+        assertTrue(repository.findById(rui.getId()).isPresent());
+    }
+
     private long saveAna() {
         staffService.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager());
         return repository.findByUsername("ana").orElseThrow().getId();

@@ -5,7 +5,9 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -48,6 +50,9 @@ public class StaffController {
 
     @FXML
     private Button saveButton;
+
+    @FXML
+    private Button removeButton;
 
     @FXML
     private TableView<User> staffTable;
@@ -95,6 +100,7 @@ public class StaffController {
         // Create mode shows the create button and the password; edit mode shows the save button.
         BooleanBinding editing = staffTable.getSelectionModel().selectedItemProperty().isNotNull();
         showWhen(saveButton, editing);
+        showWhen(removeButton, editing);
         showWhen(createButton, editing.not());
         showWhen(passwordField, editing.not());
         showWhen(editHintLabel, editing.not());
@@ -162,6 +168,35 @@ public class StaffController {
             messageLabel.setText("Conta alterada. O novo tipo aplica-se no próximo login.");
             clearForm();
             loadStaff();
+        } catch (RuntimeException e) {
+            messageLabel.setText(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void onRemoveStaffClicked() {
+        messageLabel.setText("");
+        User selected = staffTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            messageLabel.setText("Selecione uma conta na tabela.");
+            return;
+        }
+        Alert question = new Alert(Alert.AlertType.CONFIRMATION,
+                "Remover a conta de " + selected.getUsername() + "? Esta ação não pode ser desfeita.",
+                ButtonType.YES, ButtonType.NO);
+        Button noButton = (Button) question.getDialogPane().lookupButton(ButtonType.NO);
+        Button yesButton = (Button) question.getDialogPane().lookupButton(ButtonType.YES);
+        yesButton.setDefaultButton(false);
+        noButton.setDefaultButton(true);
+        noButton.requestFocus();
+        if (question.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+        try {
+            facade.removeStaff(selected.getId(), HotelApp.currentUser);
+            clearForm();
+            loadStaff();
+            messageLabel.setText("Conta removida.");
         } catch (RuntimeException e) {
             messageLabel.setText(e.getMessage());
         }
