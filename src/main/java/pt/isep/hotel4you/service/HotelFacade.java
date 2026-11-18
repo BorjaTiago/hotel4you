@@ -636,7 +636,7 @@ public class HotelFacade {
      *
      * @param text the text typed by the user
      * @return the quantity
-     * @throws IllegalArgumentException if the text is null, blank or not a whole number
+     * @throws IllegalArgumentException if the text is null, blank or not one to three digits
      */
     public int parseRoomItemQuantity(String text) {
         return roomService.parseQuantity(text);
