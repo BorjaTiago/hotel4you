@@ -1,6 +1,5 @@
 package pt.isep.hotel4you.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -80,113 +79,127 @@ class LocationAccessRuleTest {
         return new User(9L, "Outra Pessoa", "outra", "hash", role) { };
     }
 
-    @ParameterizedTest(name = "{0} on floor {1} -> {2}")
+    @ParameterizedTest(name = "{0} on floor {1}")
     @CsvSource({
-        "Receção,              0, true",
-        "Bar,                  0, true",
-        "Salas de conferência, 0, true",
-        "Restaurante,          1, true",
-        "Piscina,              1, true",
+        "Receção,              0",
+        "Bar,                  0",
+        "Salas de conferência, 0",
+        "Restaurante,          1",
+        "Piscina,              1",
     })
     @Tag("H4Y-87-AC-1")
-    void onCanAccess_allow_whenReceptionistOnFloorZeroOrOne(String name, int floor,
-            boolean expected) {
-        assertEquals(expected, service.canAccess(zoneOn(floor, name), receptionist()));
+    void onCanAccess_returnTrue_whenReceptionistOnFloorZeroOrOne(String name, int floor) {
+        assertTrue(service.canAccess(zoneOn(floor, name), receptionist()));
     }
 
-    @ParameterizedTest(name = "{0} on floor {1} -> {2}")
+    @ParameterizedTest(name = "{0} on floor {1}")
     @CsvSource({
-        "Garagem,     -1, false",
-        "Arrecadação, -1, false",
-        "Cozinha,     -1, false",
-        "Quarto 201,   2, false",
-        "Quarto 301,   3, false",
+        "Garagem,     -1",
+        "Arrecadação, -1",
+        "Cozinha,     -1",
+        "Quarto 201,   2",
+        "Quarto 301,   3",
     })
     @Tag("H4Y-87-AC-2")
-    void onCanAccess_deny_whenReceptionistOnOtherFloor(String name, int floor, boolean expected) {
-        assertEquals(expected, service.canAccess(zoneOn(floor, name), receptionist()));
+    void onCanAccess_returnFalse_whenReceptionistOnOtherFloor(String name, int floor) {
+        assertFalse(service.canAccess(zoneOn(floor, name), receptionist()));
     }
 
     @Test
     @Tag("H4Y-87-AC-2")
-    void onCanAccess_deny_whenReceptionistZoneIsOnNoFloor() {
+    void onCanAccess_returnFalse_whenReceptionistZoneIsOnNoFloor() {
         Location unknown = zone(99, "Receção");
 
         assertFalse(service.canAccess(unknown, receptionist()));
     }
 
-    @ParameterizedTest(name = "{0} on floor {1} -> {2}")
+    @Test
+    @Tag("H4Y-87-AC-2")
+    void onCanAccess_returnFalse_whenReceptionistZoneHasNoId() {
+        Location noId = new Location(null, "Receção", false, false);
+
+        assertFalse(service.canAccess(noId, receptionist()));
+    }
+
+    @ParameterizedTest(name = "{0} on floor {1}")
     @CsvSource({
-        "Cozinha,     -1, true",
-        "Restaurante,  1, true",
+        "Cozinha,     -1",
+        "Restaurante,  1",
     })
     @Tag("H4Y-87-AC-3")
-    void onCanAccess_allow_whenRestaurantStaffInKitchenOrRestaurant(String name, int floor,
-            boolean expected) {
-        assertEquals(expected, service.canAccess(zoneOn(floor, name), restaurantStaff()));
+    void onCanAccess_returnTrue_whenRestaurantStaffInKitchenOrRestaurant(String name, int floor) {
+        assertTrue(service.canAccess(zoneOn(floor, name), restaurantStaff()));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"cozinha", "RESTAURANTE"})
     @Tag("H4Y-87-AC-3")
-    void onCanAccess_allow_whenRestaurantZoneNameHasOtherCase(String name) {
+    void onCanAccess_returnTrue_whenRestaurantZoneNameHasOtherCase(String name) {
         assertTrue(service.canAccess(zone(50, name), restaurantStaff()));
     }
 
-    @ParameterizedTest(name = "{0} on floor {1} -> {2}")
-    @CsvSource({
-        "Garagem,              -1, false",
-        "Arrecadação,          -1, false",
-        "Receção,               0, false",
-        "Bar,                   0, false",
-        "Salas de conferência,  0, false",
-        "Piscina,               1, false",
-        "Quarto 201,            2, false",
-        "Quarto 301,            3, false",
-    })
-    @Tag("H4Y-87-AC-4")
-    void onCanAccess_deny_whenRestaurantStaffInOtherZone(String name, int floor,
-            boolean expected) {
-        assertEquals(expected, service.canAccess(zoneOn(floor, name), restaurantStaff()));
+    @Test
+    @Tag("H4Y-87-AC-3")
+    void onCanAccess_returnTrue_whenRestaurantZoneNameHasSpaces() {
+        assertTrue(service.canAccess(zone(51, " Cozinha "), restaurantStaff()));
     }
 
-    @ParameterizedTest(name = "{0} on floor {1} -> {2}")
+    @Test
+    @Tag("H4Y-87-AC-4")
+    void onCanAccess_returnFalse_whenRestaurantZoneHasNoName() {
+        assertFalse(service.canAccess(zone(52, null), restaurantStaff()));
+    }
+
+    @ParameterizedTest(name = "{0} on floor {1}")
     @CsvSource({
-        "Garagem,              -1, true",
-        "Arrecadação,          -1, true",
-        "Cozinha,              -1, true",
-        "Receção,               0, true",
-        "Bar,                   0, true",
-        "Salas de conferência,  0, true",
-        "Restaurante,           1, true",
-        "Piscina,               1, true",
-        "Quarto 201,            2, true",
-        "Quarto 301,            3, true",
+        "Garagem,              -1",
+        "Arrecadação,          -1",
+        "Receção,               0",
+        "Bar,                   0",
+        "Salas de conferência,  0",
+        "Piscina,               1",
+        "Quarto 201,            2",
+        "Quarto 301,            3",
+    })
+    @Tag("H4Y-87-AC-4")
+    void onCanAccess_returnFalse_whenRestaurantStaffInOtherZone(String name, int floor) {
+        assertFalse(service.canAccess(zoneOn(floor, name), restaurantStaff()));
+    }
+
+    @ParameterizedTest(name = "{0} on floor {1}")
+    @CsvSource({
+        "Garagem,              -1",
+        "Arrecadação,          -1",
+        "Cozinha,              -1",
+        "Receção,               0",
+        "Bar,                   0",
+        "Salas de conferência,  0",
+        "Restaurante,           1",
+        "Piscina,               1",
+        "Quarto 201,            2",
+        "Quarto 301,            3",
     })
     @Tag("H4Y-87-AC-5")
-    void onCanAccess_allow_whenManagerOnAnyFloor(String name, int floor, boolean expected) {
-        assertEquals(expected, service.canAccess(zoneOn(floor, name), manager()));
+    void onCanAccess_returnTrue_whenManagerOnAnyFloor(String name, int floor) {
+        assertTrue(service.canAccess(zoneOn(floor, name), manager()));
     }
 
     @Test
     @Tag("H4Y-87-AC-2")
-    @Tag("H4Y-87-AC-4")
-    void onCanAccess_deny_whenActorIsNull() {
+    void onCanAccess_returnFalse_whenActorIsNull() {
         assertFalse(service.canAccess(zoneOn(0, "Receção"), null));
     }
 
     @Test
-    @Tag("H4Y-87-AC-2")
-    @Tag("H4Y-87-AC-4")
-    void onCanAccess_deny_whenLocationIsNull() {
+    @Tag("H4Y-87-AC-5")
+    void onCanAccess_returnFalse_whenLocationIsNull() {
         assertFalse(service.canAccess(null, manager()));
     }
 
     @ParameterizedTest
     @EnumSource(value = Role.class, names = {"CLIENT", "SUPPLIER"})
     @Tag("H4Y-87-AC-2")
-    @Tag("H4Y-87-AC-4")
-    void onCanAccess_deny_whenRoleDoesNotLogIn(Role role) {
+    void onCanAccess_returnFalse_whenRoleDoesNotLogIn(Role role) {
         assertFalse(service.canAccess(zoneOn(0, "Receção"), userWithRole(role)));
     }
 }
