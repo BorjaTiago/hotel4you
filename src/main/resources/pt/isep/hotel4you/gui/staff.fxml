@@ -17,6 +17,8 @@
                 styleClass="primary-button"/>
         <Button styleClass="action-button, edit-button" fx:id="saveButton" text="Guardar alterações" onAction="#onSaveStaffChangesClicked"
                 maxWidth="Infinity"/>
+        <Button styleClass="action-button, danger-button" fx:id="removeButton" text="Remover conta" onAction="#onRemoveStaffClicked"
+                maxWidth="Infinity"/>
         <Button styleClass="action-button, clear-button" text="Limpar" onAction="#onClearClicked" maxWidth="Infinity"/>
         <Label fx:id="editHintLabel" text="Selecione uma conta na tabela para a editar."
                wrapText="true"/>

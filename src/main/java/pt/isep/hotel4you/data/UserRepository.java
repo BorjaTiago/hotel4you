@@ -53,4 +53,12 @@ public interface UserRepository {
      * @return true if the user was changed, false if no user has this identifier
      */
     boolean update(User user);
+
+    /**
+     * Deletes a saved user.
+     *
+     * @param id the identifier of the user
+     * @return true if the user was deleted, false if another record still uses the account
+     */
+    boolean delete(long id);
 }

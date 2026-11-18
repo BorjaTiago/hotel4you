@@ -143,7 +143,7 @@ classDiagram
         -onCreateStaffClicked() void
         -onSaveStaffChangesClicked() void
         -onClearClicked() void
-        +onRemoveStaffClicked() void
+        -onRemoveStaffClicked() void
         +onListUsersClicked() void
     }
     class CardController {
@@ -222,7 +222,7 @@ classDiagram
         +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
         +canUse(actor: User, permission: Permission) boolean
         +editStaff(id: long, name: String, username: String, role: Role, actor: User) void
-        +removeStaff(user: User) void
+        +removeStaff(id: long, actor: User) void
         +listUsers() List~User~
         +searchRooms(start: LocalDate, end: LocalDate, type: RoomType, actor: User) List~Room~
         +searchRoomsWithMessage(start: LocalDate, end: LocalDate, type: RoomType, actor: User) RoomSearchResult
@@ -324,7 +324,7 @@ classDiagram
     class StaffService {
         +createStaff(name: String, username: String, password: String, role: Role, actor: User) void
         +editStaff(id: long, name: String, username: String, role: Role, actor: User) void
-        +removeStaff(user: User) void
+        +removeStaff(id: long, actor: User) void
         +listUsers() List~User~
     }
     class CardAccessService {
@@ -360,6 +360,9 @@ classDiagram
         <<exception>>
     }
     class StaffNotFoundException {
+        <<exception>>
+    }
+    class StaffInUseException {
         <<exception>>
     }
     class FloorNotFoundException {
@@ -419,6 +422,7 @@ classDiagram
         +existsByUsername(username: String) boolean
         +save(user: User) User
         +update(user: User) boolean
+        +delete(id: long) boolean
     }
     class FloorRepository {
         <<interface>>
@@ -950,6 +954,7 @@ classDiagram
     AuthService ..> LoginFailedException : throws
     StaffService ..> UsernameTakenException : throws
     StaffService ..> StaffNotFoundException : throws
+    StaffService ..> StaffInUseException : throws
     StaffService ..> AccessDeniedException : throws
     LocationService ..> FloorNotFoundException : throws
     LocationService ..> AccessDeniedException : throws

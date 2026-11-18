@@ -83,7 +83,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** A separate check-in and check-out screen (the H4Y-82 version). Not done: the reception needs the list and the buttons together.
 - **Now (H4Y-81):** The file `reservations-list.fxml` replaces the H4Y-82 screen. The search matches the client name or the document, without case. The quick filters are "Todas ativas", "Chegam hoje" (reserved and starting today) and "Hospedados" (checked in). They are the nested enum `QuickFilter`, shown as radio buttons in one ToggleGroup, so one filter is always on. The room and the dates sort by value, and the dates show as dd/MM/yyyy (nested `DateCell`). The success message shows only if the list loads again. After each action the list loads again, so a checked-out stay leaves the list. "+ Reservar quarto" opens `reservations.fxml` in the same area. The return to the list after a save comes with PR #53 (H4Y-81 AC-9). The list button "Reservas" in the menu opens this screen. For a user with MANAGE_RESERVATIONS, it is the default screen after login.
 ### StaffController
-- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Now (H4Y-27) the screen creates accounts (name, username, password and type) and shows the list of staff accounts. It shows the service message on a refusal. The list loads when the screen opens and after each new account. The type of account shows `Role.displayName()` (H4Y-61).
+- **What:** Create, edit, remove staff. Remove is refused if the account has records. List users. Now (H4Y-27) the screen creates accounts (name, username, password and type) and shows the list of staff accounts. It shows the service message on a refusal. The list loads when the screen opens and after each new account. The type of account shows `Role.displayName()` (H4Y-61). Now (H4Y-88) the manager selects an account and clicks "Remover conta", then confirms. The screen calls `HotelFacade.removeStaff` and shows the service message on a refusal.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin is a manager task.
 - **Other option:** Put it in `LoginController`. Not done: login and admin are different tasks.
@@ -198,7 +198,7 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Create, edit, remove staff. Remove is refused if the account has records. List users.
 - **Why:** RF-26, RNF-01.
 - **Why this way:** Staff admin rules in one place.
-- **Rules:** Only a manager can create accounts. `Permission.MANAGE_STAFF` holds this rule. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped. `editStaff` changes the name, the username and the role of an account (H4Y-85). It checks, in this order: the actor is a manager (else `AccessDeniedException`), the same field rules as `createStaff`, the account exists (else `StaffNotFoundException`), and no other account uses the username (else `UsernameTakenException`). The account keeps its own username, also with other case. The password does not change. The new role applies at the next login.
+- **Rules:** Only a manager can create accounts. `Permission.MANAGE_STAFF` holds this rule. `createStaff` checks, in this order: the actor is a manager (else `AccessDeniedException`), no field is blank, the name has at most 100 and the username at most 50 characters (the `users` columns), the role is receptionist, restaurant staff or manager, and the username is free. It trims the name and the username and saves the bcrypt hash (H4Y-27). `listUsers` returns all staff accounts from `UserRepository.findAll`. Rows of roles without an account (client, supplier) are skipped. `editStaff` changes the name, the username and the role of an account (H4Y-85). It checks, in this order: the actor is a manager (else `AccessDeniedException`), the same field rules as `createStaff`, the account exists (else `StaffNotFoundException`), and no other account uses the username (else `UsernameTakenException`). The account keeps its own username, also with other case. The password does not change. The new role applies at the next login. `removeStaff(id, actor)` (H4Y-88) checks, in this order: the actor is a manager (else `AccessDeniedException`, "Só o gestor pode remover contas."), the actor is not the account itself (else `AccessDeniedException`, "Não pode remover a sua própria conta."), the account exists (else `StaffNotFoundException`), and then `UserRepository.delete(id)` runs. If it returns false because a reservation uses the account, the service throws `StaffInUseException` ("A conta tem registos associados e não pode ser removida."). Only reservations count as records. A removed account cannot log in: its row is gone, so `AuthService.login` throws the same `LoginFailedException` as for a wrong password.
 - **Other option:** Put them in `AuthService`. Not done: login and admin are different.
 
 ### CardAccessService
@@ -233,8 +233,12 @@ Services hold the rules. Each service works on the domain classes.
 - **What:** Signals that a staff account does not exist. Message: "A conta não existe."
 - **Why:** RF-26, H4Y-85 AC-3.
 
+### StaffInUseException
+- **What:** Signals that a staff account has records and cannot be removed. Message: "A conta tem registos associados e não pode ser removida."
+- **Why:** RF-26, Q-36 (H4Y-88). The database keeps the reservations, so the account stays.
+
 ### AccessDeniedException
-- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` throws it when `Permission.MANAGE_STAFF` does not allow the actor. `LocationService` throws it when `Permission.MANAGE_FLOORS` does not allow the actor (H4Y-28).
+- **What:** Signals that the logged-in user may not do the action. `StaffService.createStaff` and `StaffService.removeStaff` throw it when `Permission.MANAGE_STAFF` does not allow the actor. `LocationService` throws it when `Permission.MANAGE_FLOORS` does not allow the actor (H4Y-28).
 - **Why:** RF-26. The service refuses the request even if the screen shows the button by mistake.
 
 ## Config
@@ -254,8 +258,8 @@ Services hold the rules. Each service works on the domain classes.
 Data holds the storage interfaces and the SQL Server version. Services use the interfaces.
 
 ### UserRepository
-- **What:** Interface for user storage. Finds a user by login name or by id, checks if a login name or a role exists, saves a user, and updates the name, login name and role of a user (H4Y-85).
-- **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version.
+- **What:** Interface for user storage. Finds a user by login name or by id, checks if a login name or a role exists, saves a user, updates the name, login name and role of a user (H4Y-85), and deletes an account by id (H4Y-88).
+- **Why:** RNF-08. Services depend on this interface, not on SQL. `JdbcUserRepository` is the SQL Server version. `delete` returns false when a reservation uses the account (SQL Server error 547), the same idea as `LocationRepository.delete`. `StaffService.removeStaff` then throws `StaffInUseException`.
 
 ### Database
 - **What:** Opens connections to SQL Server with the settings from `AppConfig`. `connect` opens a connection. `check` opens and closes one to test that the database works. `prepare` (static) fills the `?` values of a SQL text.

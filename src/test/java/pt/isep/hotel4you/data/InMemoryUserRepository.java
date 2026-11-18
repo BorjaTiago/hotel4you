@@ -1,8 +1,10 @@
 package pt.isep.hotel4you.data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
@@ -12,6 +14,8 @@ import pt.isep.hotel4you.domain.User;
 public class InMemoryUserRepository implements UserRepository {
 
     private final List<User> users = new ArrayList<>();
+    private final Set<Long> inUse = new HashSet<>();
+    private long nextId = 1;
 
     @Override
     public List<User> findAll() {
@@ -37,9 +41,26 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        User saved = user.getId() == null ? withId(user, users.size() + 1L) : user;
+        User saved = user.getId() == null ? withId(user, nextId++) : user;
         users.add(saved);
         return saved;
+    }
+
+    @Override
+    public boolean delete(long id) {
+        if (inUse.contains(id)) {
+            return false;
+        }
+        return users.removeIf(user -> user.getId() == id);
+    }
+
+    /**
+     * Marks an account as used by other data, so that delete refuses it.
+     *
+     * @param id the account id
+     */
+    public void markInUse(long id) {
+        inUse.add(id);
     }
 
     @Override
