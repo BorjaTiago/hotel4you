@@ -104,8 +104,8 @@ class JdbcReservationCheckInOutTest {
         assertTrue(repository.delete(5L));
 
         assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND status = 'reserved'"));
-        assertEquals(List.of(5L), database.bound);
-        assertEquals(List.of("statement", "connection"), database.closed);
+        assertEquals(List.of(5L, 5L), database.bound);
+        assertEquals(List.of("statement", "statement", "connection"), database.closed);
     }
 
     @Test
@@ -170,9 +170,9 @@ class JdbcReservationCheckInOutTest {
         assertTrue(sql().contains("ORDER BY r.start_date, r.id"));
         assertEquals(List.of(
                 new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START, END,
-                        ReservationStatus.RESERVED),
+                        ReservationStatus.RESERVED, ""),
                 new ReservationSummary(2L, "Maria Sousa", "12345678", 201, START, END,
-                        ReservationStatus.CHECKED_IN)), rows);
+                        ReservationStatus.CHECKED_IN, "")), rows);
         assertThrows(UnsupportedOperationException.class, rows::clear);
         assertEquals(List.of("result", "statement", "connection"), database.closed);
     }
@@ -223,6 +223,9 @@ class JdbcReservationCheckInOutTest {
                     new Class<?>[] {Connection.class}, (proxy, method, args) -> {
                         if (method.getName().equals("close")) {
                             closed.add("connection");
+                            return null;
+                        }
+                        if (List.of("setAutoCommit", "commit", "rollback").contains(method.getName())) {
                             return null;
                         }
                         if (method.getName().equals("prepareStatement")) {
@@ -277,6 +280,7 @@ class JdbcReservationCheckInOutTest {
                         case "getString" -> switch ((String) args[0]) {
                             case "name" -> "Maria Sousa";
                             case "document" -> "12345678";
+                            case "locations" -> null;
                             default -> row[0] == 1 ? "reserved" : "checked_in";
                         };
                         case "close" -> {

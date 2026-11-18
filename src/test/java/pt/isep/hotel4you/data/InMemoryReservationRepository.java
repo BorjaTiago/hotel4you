@@ -79,7 +79,8 @@ public class InMemoryReservationRepository implements ReservationRepository {
         }
         Reservation stored = new Reservation(nextId++, reservation.getClientId(),
                 reservation.getRoomId(), reservation.getStartDate(), reservation.getEndDate(),
-                reservation.getStatus(), reservation.getCreatedByUserId());
+                reservation.getStatus(), reservation.getCreatedByUserId(),
+                reservation.getLocations());
         reservations.add(stored);
         saved.add(stored);
         return stored;
@@ -109,7 +110,8 @@ public class InMemoryReservationRepository implements ReservationRepository {
                         clients.getOrDefault(value.getClientId(), new String[] {"", ""})[0],
                         clients.getOrDefault(value.getClientId(), new String[] {"", ""})[1],
                         roomNumbers.getOrDefault(value.getRoomId(), 0), value.getStartDate(),
-                        value.getEndDate(), value.getStatus()))
+                        value.getEndDate(), value.getStatus(),
+                        String.join(", ", value.getLocations())))
                 .toList();
     }
 
@@ -149,7 +151,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
             if (Objects.equals(value.getId(), id) && value.getStatus() == from) {
                 reservations.set(i, new Reservation(value.getId(), value.getClientId(),
                         value.getRoomId(), value.getStartDate(), value.getEndDate(), to,
-                        value.getCreatedByUserId()));
+                        value.getCreatedByUserId(), value.getLocations()));
                 return true;
             }
         }

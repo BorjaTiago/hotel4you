@@ -1,0 +1,77 @@
+package pt.isep.hotel4you.service;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.InMemoryReservationRepository;
+import pt.isep.hotel4you.data.InMemoryRoomRepository;
+import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
+import pt.isep.hotel4you.domain.Client;
+import pt.isep.hotel4you.domain.DocumentType;
+import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.Reservation;
+import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomType;
+import pt.isep.hotel4you.domain.User;
+
+/** Acceptance tests for the restaurant and the pool in a reservation (H4Y-92). */
+class ReservationLocationsTest {
+    private static final LocalDate START = LocalDate.now().plusDays(10);
+    private static final LocalDate END = START.plusDays(2);
+    private static final User RECEPTIONIST = new Receptionist(4L, "Ana", "ana", "hash");
+    private static final Client CLIENT = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
+            LocalDate.of(1990, 5, 1), "912345678", "PT", null, null);
+
+    private InMemoryReservationRepository reservations;
+    private ReservationService service;
+    private Room room;
+
+    @BeforeEach
+    void setUp() {
+        InMemoryRoomRepository rooms = new InMemoryRoomRepository();
+        rooms.addFloor(2);
+        rooms.addRoomType("duplo");
+        room = rooms.save(new Room(null, 201, 2, "duplo"), 10);
+        InMemoryRoomTypeRepository types = new InMemoryRoomTypeRepository();
+        types.add(new RoomType(1L, "duplo", 2, new BigDecimal("80.00")));
+        reservations = new InMemoryReservationRepository();
+        reservations.addRoomNumber(room.getId(), room.getNumber());
+        reservations.addClient(CLIENT.getId(), CLIENT.getName(), CLIENT.getDocument());
+        service = new ReservationService(reservations, new RoomService(rooms, types, reservations),
+                types);
+    }
+
+    @Test
+    @Tag("H4Y-92-AC-1")
+    void onCreate_includeRestaurantAndPool_whenBothAreChosen() {
+        Reservation saved = service.create(CLIENT, room, START, END, true, true, RECEPTIONIST);
+
+        assertEquals(List.of("Restaurante", "Piscina"), saved.getLocations());
+        assertEquals(List.of("Restaurante", "Piscina"), reservations.saved().get(0).getLocations());
+        assertEquals("Restaurante, Piscina", service.listActive(RECEPTIONIST).get(0).locations());
+    }
+
+    @Test
+    @Tag("H4Y-92-AC-2")
+    void onCreate_includeOnlyPool_whenOnlyPoolIsChosen() {
+        Reservation saved = service.create(CLIENT, room, START, END, false, true, RECEPTIONIST);
+
+        assertEquals(List.of("Piscina"), saved.getLocations());
+        assertEquals("Piscina", service.listActive(RECEPTIONIST).get(0).locations());
+    }
+
+    @Test
+    @Tag("H4Y-92-AC-3")
+    void onCreate_includeNoLocation_whenNoneIsChosen() {
+        Reservation saved = service.create(CLIENT, room, START, END, false, false, RECEPTIONIST);
+
+        assertTrue(saved.getLocations().isEmpty());
+        assertEquals("", service.listActive(RECEPTIONIST).get(0).locations());
+    }
+}

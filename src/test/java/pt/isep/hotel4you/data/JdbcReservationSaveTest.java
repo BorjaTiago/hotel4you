@@ -134,6 +134,9 @@ class JdbcReservationSaveTest {
                             closed.add("connection");
                             return null;
                         }
+                        if (List.of("setAutoCommit", "commit", "rollback").contains(method.getName())) {
+                            return null;
+                        }
                         if (method.getName().equals("prepareStatement")) {
                             sql = (String) args[0];
                             return statement();

@@ -559,14 +559,14 @@ class HotelFacadeTest {
         LocalDate end = start.plusDays(2);
 
         var quote = facade.quoteReservation(room, start, end, ana);
-        var saved = facade.createReservation(client, room, start, end, ana);
+        var saved = facade.createReservation(client, room, start, end, false, false, ana);
 
         assertEquals(new BigDecimal("80.00"), quote.pricePerNight());
         assertEquals(2, quote.nights());
         assertEquals(1, facade.listClientReservations(client, ana).size());
         assertEquals(saved.getId(), facade.listClientReservations(client, ana).get(0).id());
         assertThrows(RoomNotAvailableException.class,
-                () -> facade.createReservation(client, room, start, end, ana));
+                () -> facade.createReservation(client, room, start, end, false, false, ana));
     }
 
     @Test
@@ -580,7 +580,7 @@ class HotelFacadeTest {
         Client client = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
                 LocalDate.of(1990, 5, 1), "912345678", "PT", null, null);
         LocalDate start = LocalDate.now();
-        var saved = facade.createReservation(client, room, start, start.plusDays(2), ana);
+        var saved = facade.createReservation(client, room, start, start.plusDays(2), false, false, ana);
 
         facade.checkIn(saved.getId(), ana);
         var afterCheckIn = facade.listActiveReservations(ana);
