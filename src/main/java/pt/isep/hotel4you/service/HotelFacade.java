@@ -67,6 +67,8 @@ public class HotelFacade {
      * @param room the room to reserve
      * @param start the first night
      * @param end the departure date
+     * @param restaurant true if the reservation includes the restaurant (RF-18)
+     * @param pool true if the reservation includes the pool (RF-18)
      * @param actor the logged-in user who creates the reservation
      * @return the saved reservation with the state RESERVED
      * @throws AccessDeniedException if the actor may not manage reservations
@@ -76,8 +78,8 @@ public class HotelFacade {
      * @throws IllegalStateException if the database is not available
      */
     public Reservation createReservation(Client client, Room room, LocalDate start, LocalDate end,
-            User actor) {
-        return reservationService.create(client, room, start, end, actor);
+            boolean restaurant, boolean pool, User actor) {
+        return reservationService.create(client, room, start, end, restaurant, pool, actor);
     }
 
     /**

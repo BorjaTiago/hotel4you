@@ -71,6 +71,9 @@ public class ReservationsController {
     private TableColumn<ReservationSummary, String> statusColumn;
 
     @FXML
+    private TableColumn<ReservationSummary, String> locationsColumn;
+
+    @FXML
     private VBox screenRoot;
 
     @FXML
@@ -235,6 +238,8 @@ public class ReservationsController {
         endColumn.setCellFactory(column -> new DateCell());
         statusColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(statusText(data.getValue().status())));
+        locationsColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(data.getValue().locations()));
         reservationTable.getSelectionModel().selectedItemProperty()
                 .addListener((value, before, chosen) -> updateButtons(chosen));
         searchField.textProperty().addListener((value, before, text) -> applyFilter());

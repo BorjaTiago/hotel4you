@@ -1,6 +1,7 @@
 package pt.isep.hotel4you.domain;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 /** A room booking of a client for a period of nights. */
@@ -12,6 +13,7 @@ public class Reservation {
     private final LocalDate endDate;
     private final ReservationStatus status;
     private final Long createdByUserId;
+    private final List<String> locations;
 
     /**
      * Reads a booking period. This constructor does not create a database booking.
@@ -40,6 +42,24 @@ public class Reservation {
      */
     public Reservation(Long id, Long clientId, long roomId, LocalDate startDate, LocalDate endDate,
             ReservationStatus status, Long createdByUserId) {
+        this(id, clientId, roomId, startDate, endDate, status, createdByUserId, List.of());
+    }
+
+    /**
+     * Creates a booking with its client, the user who made it and the places it includes.
+     * @param id the booking identifier, or null before it is saved
+     * @param clientId the client identifier, or null when the read does not need it
+     * @param roomId the reserved room identifier
+     * @param startDate the first occupied night
+     * @param endDate the departure date, which is not occupied
+     * @param status the state
+     * @param createdByUserId the user who created the booking, or null when the read does not need it
+     * @param locations the names of the places the booking includes, for example "Restaurante"
+     *        (RF-18); empty if none
+     * @throws IllegalArgumentException if the period is invalid
+     */
+    public Reservation(Long id, Long clientId, long roomId, LocalDate startDate, LocalDate endDate,
+            ReservationStatus status, Long createdByUserId, List<String> locations) {
         validatePeriod(startDate, endDate);
         this.id = id;
         this.clientId = clientId;
@@ -48,6 +68,7 @@ public class Reservation {
         this.endDate = endDate;
         this.status = Objects.requireNonNull(status);
         this.createdByUserId = createdByUserId;
+        this.locations = List.copyOf(locations);
     }
 
     /** @return the booking identifier */
@@ -64,6 +85,8 @@ public class Reservation {
     public ReservationStatus getStatus() { return status; }
     /** @return the user who created the booking, or null when the read does not need it */
     public Long getCreatedByUserId() { return createdByUserId; }
+    /** @return the names of the places the booking includes, or an empty list */
+    public List<String> getLocations() { return locations; }
 
     /**
      * Checks that the booking allows the check-in. This method does not change the booking.

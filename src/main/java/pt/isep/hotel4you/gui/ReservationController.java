@@ -9,6 +9,7 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -54,6 +55,12 @@ public class ReservationController {
 
     @FXML
     private Button confirmButton;
+
+    @FXML
+    private CheckBox restaurantBox;
+
+    @FXML
+    private CheckBox poolBox;
 
     @FXML
     private Label clientLabel;
@@ -145,7 +152,7 @@ public class ReservationController {
         messageLabel.setText("");
         try {
             facade.createReservation(chosenClient, chosenRoom, chosenStart, chosenEnd,
-                    HotelApp.currentUser);
+                    restaurantBox.isSelected(), poolBox.isSelected(), HotelApp.currentUser);
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
             return;
@@ -165,6 +172,8 @@ public class ReservationController {
         datesLabel.setText("");
         summaryLabel.setText("");
         totalLabel.setText("");
+        restaurantBox.setSelected(false);
+        poolBox.setSelected(false);
         confirmButton.setDisable(true);
     }
 
