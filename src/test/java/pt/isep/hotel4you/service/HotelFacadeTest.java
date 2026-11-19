@@ -286,6 +286,17 @@ class HotelFacadeTest {
     }
 
     @Test
+    @Tag("H4Y-88-AC-1")
+    void onRemoveStaff_removeAccount_whenActorIsManager() {
+        User ana = saveAna();
+        User manager = new Manager(99L, "Rui Costa", "rui", "hash");
+
+        facade.removeStaff(ana.getId(), manager);
+
+        assertTrue(repository.findById(ana.getId()).isEmpty());
+    }
+
+    @Test
     @Tag("H4Y-28-AC-1")
     void onListFloors_returnFloors_whenManager() {
         floorRepository.add(new Floor(1, "Piso 1", List.of(new Location(null, "Piscina", false, false))));
