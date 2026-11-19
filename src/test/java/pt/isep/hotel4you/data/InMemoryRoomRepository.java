@@ -25,6 +25,7 @@ public class InMemoryRoomRepository implements RoomRepository {
     private final Map<String, BigDecimal> basePrices = new HashMap<>();
     private final Set<Long> inUse = new HashSet<>();
     private final Map<Long, Map<Long, Integer>> roomItems = new HashMap<>();
+    private final Set<String> itemsInUse = new HashSet<>();
 
     /** Adds a floor to the test catalogue. */
     public synchronized void addFloor(int floorNumber) {
@@ -163,7 +164,16 @@ public class InMemoryRoomRepository implements RoomRepository {
     }
 
     @Override
-    public synchronized void deleteItem(long roomId, long itemId) {
+    public synchronized boolean deleteItem(long roomId, long itemId) {
+        if (itemsInUse.contains(roomId + ":" + itemId)) {
+            return false;
+        }
         roomItems.getOrDefault(roomId, new HashMap<>()).remove(itemId);
+        return true;
+    }
+
+    /** Marks an item of a room as used by other data, so that deleteItem refuses it. */
+    public synchronized void markItemInUse(long roomId, long itemId) {
+        itemsInUse.add(roomId + ":" + itemId);
     }
 }

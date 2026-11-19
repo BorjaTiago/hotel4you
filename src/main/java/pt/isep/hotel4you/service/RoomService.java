@@ -401,6 +401,7 @@ public class RoomService {
      * @param actor the logged-in user
      * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalArgumentException if the room or the item does not exist
+     * @throws RoomItemInUseException if other data still uses the item in the room
      * @throws IllegalStateException if the database is not available
      */
     public void removeItem(Room room, StockItem item, User actor) {
@@ -413,7 +414,9 @@ public class RoomService {
         if (item == null || item.getId() == null) {
             throw new IllegalArgumentException(MISSING_ITEM);
         }
-        roomRepository.deleteItem(room.getId(), item.getId());
+        if (!roomRepository.deleteItem(room.getId(), item.getId())) {
+            throw new RoomItemInUseException();
+        }
     }
 
     /**
