@@ -2,6 +2,7 @@ package pt.isep.hotel4you.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import pt.isep.hotel4you.data.FloorRepository;
 import pt.isep.hotel4you.data.LocationRepository;
 import pt.isep.hotel4you.domain.Floor;
@@ -9,10 +10,19 @@ import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.User;
 
-/** Shows the floors of the hotel and manages their zones. Only a manager may use it. */
+/**
+ * Shows the floors of the hotel and manages their zones. Only a manager manages zones. It also
+ * holds the access rule by zone for each role.
+ */
 public class LocationService {
 
     private static final int MAX_NAME_LENGTH = 50;
+
+    /** The floors that a receptionist may enter (RF-24). */
+    private static final Set<Integer> RECEPTION_FLOORS = Set.of(0, 1);
+
+    /** The zones that a restaurant employee may enter (RF-25). */
+    private static final List<String> RESTAURANT_ZONES = List.of("Cozinha", "Restaurante");
 
     private final FloorRepository floorRepository;
     private final LocationRepository locationRepository;
@@ -126,6 +136,59 @@ public class LocationService {
         if (!locationRepository.delete(id)) {
             throw new LocationInUseException();
         }
+    }
+
+    /**
+     * Tells if the user may enter a zone. A receptionist enters only the zones of floors 0 and 1
+     * (RF-24). A restaurant employee enters only the kitchen and the restaurant (RF-25). A manager
+     * enters every zone. Other roles do not log in (RF-01), so the rule refuses them. The rule
+     * finds the floor of the zone by its id in the floor list.
+     *
+     * @param location the zone to enter, can be null
+     * @param actor the logged-in user, can be null
+     * @return true if the user may enter the zone; false if not, or if the zone or the user is
+     *         null, or if a receptionist asks for a zone that is on no floor
+     * @throws IllegalStateException if the database is not available
+     */
+    public boolean canAccess(Location location, User actor) {
+        if (location == null || actor == null) {
+            return false;
+        }
+        return switch (actor.getRole()) {
+            case MANAGER -> true;
+            case RECEPTIONIST -> floorOf(location).map(RECEPTION_FLOORS::contains).orElse(false);
+            case RESTAURANT -> isRestaurantZone(location);
+            default -> false;
+        };
+    }
+
+    /** Finds the number of the floor that holds the zone, by the zone id. */
+    private Optional<Integer> floorOf(Location location) {
+        if (location.getId() == null) {
+            return Optional.empty();
+        }
+        for (Floor floor : floorRepository.findAll()) {
+            for (Location zone : floor.locations()) {
+                if (location.getId().equals(zone.getId())) {
+                    return Optional.of(floor.number());
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static boolean isRestaurantZone(Location location) {
+        String name = location.getName();
+        if (name == null) {
+            return false;
+        }
+        String cleanName = name.trim();
+        for (String zone : RESTAURANT_ZONES) {
+            if (zone.equalsIgnoreCase(cleanName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void checkManage(User actor) {
