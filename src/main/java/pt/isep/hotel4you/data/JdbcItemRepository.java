@@ -93,21 +93,32 @@ public class JdbcItemRepository implements ItemRepository {
     /**
      * {@inheritDoc}
      *
-     * <p>When a statement fails, the connection closes without a commit,
-     * so SQL Server undoes the stock update. Every SQL error shows the "not available" message.
+     * <p>When a statement fails, the method calls a rollback, so the stock does not change.
+     * Every SQL error shows the "not available" message.
      */
     @Override
     public boolean addMovement(StockMovement movement) {
         try (Connection connection = database.connect()) {
             connection.setAutoCommit(false);
+            return saveMovement(connection, movement);
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    private static boolean saveMovement(Connection connection, StockMovement movement)
+            throws SQLException {
+        try {
             if (!updateStock(connection, movement)) {
+                connection.rollback();
                 return false;
             }
             insertMovement(connection, movement);
             connection.commit();
             return true;
         } catch (SQLException e) {
-            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+            connection.rollback();
+            throw e;
         }
     }
 

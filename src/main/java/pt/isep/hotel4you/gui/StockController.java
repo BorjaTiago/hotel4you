@@ -117,10 +117,12 @@ public class StockController {
     }
 
     private void loadItems() {
+        entryItemBox.setValue(null);
         try {
             itemTable.getItems().setAll(facade.listItems(HotelApp.currentUser));
             entryItemBox.setItems(FXCollections.observableArrayList(itemTable.getItems()));
         } catch (RuntimeException e) {
+            entryItemBox.setItems(FXCollections.observableArrayList());
             showMessage(e.getMessage(), false);
         }
     }
@@ -161,6 +163,7 @@ public class StockController {
     @FXML
     private void onRegisterMovementClicked() {
         showMessage("", false);
+        entryDateField.setText(dateText(LocalDate.now()));
         try {
             int quantity = facade.parseQuantity(entryQuantityField.getText());
             StockMovement movement = facade.registerMovement(entryItemBox.getValue(),
@@ -197,9 +200,13 @@ public class StockController {
         return date.format(DATE_FORMAT);
     }
 
+    /** Clears the item form and the stock entry form. */
     @FXML
     private void onClearClicked() {
         clearForm();
+        entryItemBox.setValue(null);
+        entryQuantityField.clear();
+        entryDateField.setText(dateText(LocalDate.now()));
         showMessage("", false);
     }
 

@@ -112,9 +112,15 @@ public class StockService {
      * @param type the kind of movement; only {@link MovementType#ENTRY} exists now
      * @param quantity the quantity, from 1 to {@value #MAX_MOVEMENT_QUANTITY}
      * @param user the logged-in user who records the movement
+     * <p>The stock limit uses the stock of the given item. If another user raises the stock
+     * at the same time, the database can still refuse the save; the user then sees the
+     * "not available" message. If the item is deleted after the save and before the read,
+     * the movement stays saved and the user sees "O item não existe.".
+     *
      * @return the saved movement, with the item and its stock read after the save
      * @throws AccessDeniedException if the user is not a manager
-     * @throws IllegalArgumentException if no item is chosen or the quantity is out of range
+     * @throws IllegalArgumentException if no item or type is chosen, the quantity is
+     *         0 or less or above the maximum, or the new stock goes above the maximum
      * @throws StockItemNotFoundException if the item does not exist
      * @throws IllegalStateException if the database is not available
      */
@@ -123,9 +129,17 @@ public class StockService {
         if (item == null) {
             throw new IllegalArgumentException("Escolha um item.");
         }
-        if (quantity < 1 || quantity > MAX_MOVEMENT_QUANTITY) {
-            throw new IllegalArgumentException(
-                    "A quantidade tem de ser entre 1 e " + MAX_MOVEMENT_QUANTITY + ".");
+        if (type == null) {
+            throw new IllegalArgumentException("Escolha o tipo de movimento.");
+        }
+        if (quantity < 1) {
+            throw new IllegalArgumentException("A quantidade tem de ser maior que zero.");
+        }
+        if (quantity > MAX_MOVEMENT_QUANTITY) {
+            throw new IllegalArgumentException("A quantidade máxima é " + MAX_MOVEMENT_QUANTITY + ".");
+        }
+        if ((long) item.getStockQuantity() + quantity > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("O stock do item ficaria acima do máximo.");
         }
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         if (!itemRepository.addMovement(new StockMovement(item, type, quantity, now, user))) {

@@ -637,7 +637,7 @@ public class HotelFacade {
      *
      * @param item the chosen item
      * @param type the kind of movement
-     * @param quantity the quantity, from 1 to the maximum of {@link StockService#registerMovement}
+     * @param quantity the quantity, from 1 to 32767
      * @param user the logged-in user who records the movement
      * @return the saved movement, with the item and its new stock
      * @throws AccessDeniedException if the user is not a manager
