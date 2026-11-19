@@ -370,15 +370,28 @@ class StockServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {0, -3, 32768})
+    @ValueSource(ints = {0, -3})
     @Tag("H4Y-90-AC-2")
-    void onRegisterMovement_throw_whenQuantityOutOfRange(int quantity) {
+    void onRegisterMovement_throw_whenQuantityZeroOrLess(int quantity) {
         StockItem towels = towelsWithStock10();
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> service.registerMovement(towels, MovementType.ENTRY, quantity, manager()));
 
-        assertEquals("A quantidade tem de ser entre 1 e 32767.", error.getMessage());
+        assertEquals("A quantidade tem de ser maior que zero.", error.getMessage());
+        assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-90-AC-2")
+    void onRegisterMovement_throw_whenQuantityAboveMaximum() {
+        StockItem towels = towelsWithStock10();
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(towels, MovementType.ENTRY, 32768, manager()));
+
+        assertEquals("A quantidade máxima é 32767.", error.getMessage());
         assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
         assertTrue(repository.movements().isEmpty());
     }
@@ -424,6 +437,44 @@ class StockServiceTest {
 
         assertEquals("Escolha um item.", error.getMessage());
         assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-90-AC-1")
+    void onRegisterMovement_throw_whenTypeIsNull() {
+        StockItem towels = towelsWithStock10();
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(towels, null, 5, manager()));
+
+        assertEquals("Escolha o tipo de movimento.", error.getMessage());
+        assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-90-AC-2")
+    void onRegisterMovement_throw_whenStockGoesAboveMaximum() {
+        StockItem full = repository.save(
+                new StockItem(null, "copos", "unidade", Integer.MAX_VALUE - 4));
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(full, MovementType.ENTRY, 5, manager()));
+
+        assertEquals("O stock do item ficaria acima do máximo.", error.getMessage());
+        assertEquals(Integer.MAX_VALUE - 4, repository.findById(full.getId()).get().getStockQuantity());
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-90-AC-2")
+    void onRegisterMovement_acceptEntry_whenStockReachesMaximum() {
+        StockItem almostFull = repository.save(
+                new StockItem(null, "copos", "unidade", Integer.MAX_VALUE - 5));
+
+        service.registerMovement(almostFull, MovementType.ENTRY, 5, manager());
+
+        assertEquals(Integer.MAX_VALUE, repository.findById(almostFull.getId()).get().getStockQuantity());
     }
 
     @ParameterizedTest
