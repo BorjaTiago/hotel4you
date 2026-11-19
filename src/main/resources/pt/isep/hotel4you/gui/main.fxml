@@ -27,6 +27,8 @@
                     maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button styleClass="navigation-button" fx:id="extraPricesButton" text="Preços extra" onAction="#onExtraPricesClicked"
+                    maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="stockButton" text="Stock" onAction="#onStockClicked"
                     maxWidth="Infinity" visible="false"/>
         </VBox>
