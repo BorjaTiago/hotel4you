@@ -10,7 +10,7 @@ import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
 
-/** Creates, lists, finds and edits staff accounts. */
+/** Creates, lists, finds, edits and removes staff accounts. */
 public class StaffService {
 
     private static final int MAX_NAME_LENGTH = 100;
@@ -134,6 +134,30 @@ public class StaffService {
         if (!userRepository.update(newUser(id, trimmedName, trimmedUsername,
                 current.getPasswordHash(), role))) {
             throw new StaffNotFoundException();
+        }
+    }
+
+    /**
+     * Removes a staff account. Only a manager may do it. A manager cannot remove their own
+     * account, so the system always keeps a manager who can log in.
+     *
+     * @param id the identifier of the account
+     * @param actor the logged-in user who asks for the removal
+     * @throws AccessDeniedException if the actor is not a manager, or removes their own account
+     * @throws StaffNotFoundException if the account does not exist
+     * @throws StaffInUseException if another record still uses the account
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeStaff(long id, User actor) {
+        if (!Permission.MANAGE_STAFF.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode remover contas.");
+        }
+        if (actor.getId() == id) {
+            throw new AccessDeniedException("Não pode remover a sua própria conta.");
+        }
+        userRepository.findById(id).orElseThrow(StaffNotFoundException::new);
+        if (!userRepository.delete(id)) {
+            throw new StaffInUseException();
         }
     }
 

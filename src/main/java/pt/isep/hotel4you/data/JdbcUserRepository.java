@@ -16,6 +16,8 @@ import pt.isep.hotel4you.domain.User;
 /** Stores and finds users in the SQL Server tables {@code users} and {@code roles}. */
 public class JdbcUserRepository implements UserRepository {
 
+    private static final int FOREIGN_KEY_ERROR = 547;
+
     private final Database database;
 
     /**
@@ -140,6 +142,21 @@ public class JdbcUserRepository implements UserRepository {
                         user.getUsername(), user.getRole().name(), user.getId())) {
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
+    public boolean delete(long id) {
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection,
+                        "DELETE FROM users WHERE id = ?", id)) {
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == FOREIGN_KEY_ERROR) {
+                return false;
+            }
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
     }

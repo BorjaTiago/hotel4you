@@ -5,7 +5,9 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -15,9 +17,11 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
+import pt.isep.hotel4you.service.AccessDeniedException;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.StaffNotFoundException;
 
-/** Controller of the screen that creates, lists, finds and edits staff accounts. */
+/** Controller of the screen that creates, lists, finds, edits and removes staff accounts. */
 public class StaffController {
 
     private final HotelFacade facade;
@@ -48,6 +52,9 @@ public class StaffController {
 
     @FXML
     private Button saveButton;
+
+    @FXML
+    private Button removeButton;
 
     @FXML
     private TextField searchField;
@@ -101,6 +108,7 @@ public class StaffController {
         // Create mode shows the create button and the password; edit mode shows the save button.
         BooleanBinding editing = staffTable.getSelectionModel().selectedItemProperty().isNotNull();
         showWhen(saveButton, editing);
+        showWhen(removeButton, editing);
         showWhen(createButton, editing.not());
         showWhen(passwordField, editing.not());
         showWhen(editHintLabel, editing.not());
@@ -130,12 +138,14 @@ public class StaffController {
         usernameField.clear();
         passwordField.clear();
         roleBox.setValue(null);
+        searchResultLabel.getStyleClass().remove("message");
+        searchResultLabel.setText("");
     }
 
     private void loadStaff() {
         try {
             staffTable.getItems().setAll(facade.listUsers(HotelApp.currentUser));
-        } catch (RuntimeException e) {
+        } catch (AccessDeniedException | IllegalStateException e) {
             messageLabel.setText(e.getMessage());
         }
     }
@@ -174,13 +184,42 @@ public class StaffController {
     }
 
     @FXML
+    private void onRemoveStaffClicked() {
+        messageLabel.setText("");
+        User selected = staffTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            messageLabel.setText("Selecione uma conta na tabela.");
+            return;
+        }
+        Alert question = new Alert(Alert.AlertType.CONFIRMATION,
+                "Remover a conta de " + selected.getUsername() + "? Esta ação não pode ser desfeita.",
+                ButtonType.YES, ButtonType.NO);
+        Button noButton = (Button) question.getDialogPane().lookupButton(ButtonType.NO);
+        Button yesButton = (Button) question.getDialogPane().lookupButton(ButtonType.YES);
+        yesButton.setDefaultButton(false);
+        noButton.setDefaultButton(true);
+        noButton.requestFocus();
+        if (question.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+        try {
+            facade.removeStaff(selected.getId(), HotelApp.currentUser);
+            clearForm();
+            loadStaff();
+            messageLabel.setText("Conta removida.");
+        } catch (RuntimeException e) {
+            messageLabel.setText(e.getMessage());
+        }
+    }
+
+    @FXML
     private void onFindUserClicked() {
         searchResultLabel.getStyleClass().remove("message");
         try {
             User user = facade.findUser(searchField.getText(), HotelApp.currentUser);
             searchResultLabel.setText("Nome: " + user.getName() + "\nNome de utilizador: "
                     + user.getUsername() + "\nTipo de conta: " + user.getRole().displayName());
-        } catch (RuntimeException e) {
+        } catch (AccessDeniedException | StaffNotFoundException | IllegalStateException e) {
             searchResultLabel.getStyleClass().add("message");
             searchResultLabel.setText(e.getMessage());
         }

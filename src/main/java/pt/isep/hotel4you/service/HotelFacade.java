@@ -345,6 +345,20 @@ public class HotelFacade {
     }
 
     /**
+     * Removes a staff account. A manager cannot remove their own account.
+     *
+     * @param id the identifier of the account
+     * @param actor the logged-in user who asks for the removal
+     * @throws AccessDeniedException if the actor is not a manager, or removes their own account
+     * @throws StaffNotFoundException if the account does not exist
+     * @throws StaffInUseException if another record still uses the account
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeStaff(long id, User actor) {
+        staffService.removeStaff(id, actor);
+    }
+
+    /**
      * Lists all staff accounts.
      *
      * @param actor the logged-in user who asks for the list
