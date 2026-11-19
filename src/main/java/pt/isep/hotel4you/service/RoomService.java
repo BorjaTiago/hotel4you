@@ -308,7 +308,7 @@ public class RoomService {
      *
      * @param text the text typed by the user
      * @return the price
-     * @throws IllegalArgumentException if the text is null, blank, longer than 12 characters or not a number
+     * @throws IllegalArgumentException if the trimmed text is longer than 12 characters or is not a number
      */
     public BigDecimal parsePrice(String text) {
         return PriceRules.parse(text);

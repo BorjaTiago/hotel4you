@@ -9,6 +9,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import pt.isep.hotel4you.domain.ExtraService;
+import pt.isep.hotel4you.service.AccessDeniedException;
 import pt.isep.hotel4you.service.HotelFacade;
 
 /** Shows the extra catalogue and sends price changes to the service through the facade. */
@@ -45,7 +46,7 @@ public class ExtraPriceController {
         try {
             extraTable.getItems().setAll(facade.listExtraPrices(HotelApp.currentUser));
             return true;
-        } catch (RuntimeException error) {
+        } catch (AccessDeniedException | IllegalStateException error) {
             showMessage(error.getMessage(), false);
             return false;
         }
@@ -58,16 +59,16 @@ public class ExtraPriceController {
         try {
             facade.setExtraPrice(extra, facade.parsePrice(priceField.getText()),
                     HotelApp.currentUser);
-        } catch (RuntimeException error) {
+        } catch (AccessDeniedException | IllegalArgumentException | IllegalStateException error) {
             showMessage(error.getMessage(), false);
             return;
         }
         priceField.clear();
-        if (loadPrices()) {
-            showMessage("Preço extra guardado.", true);
-        } else {
+        if (!loadPrices()) {
             showMessage("Preço extra guardado, mas não foi possível atualizar a lista.", false);
+            return;
         }
+        showMessage("Preço extra guardado.", true);
     }
 
     private void showMessage(String text, boolean success) {

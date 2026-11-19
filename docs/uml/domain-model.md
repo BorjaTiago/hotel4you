@@ -227,4 +227,4 @@ or null before the manager sets it (RF-07, RF-09, Q-11). SQL v14 stores the cata
 The nine rows cover sea view, mountain view, drinks, laundry, food, cultural events,
 private pools, spa and conference rooms. This step does not attach extras to reservations.
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

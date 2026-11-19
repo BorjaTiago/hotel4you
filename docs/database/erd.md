@@ -155,4 +155,4 @@ erDiagram
     }
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.

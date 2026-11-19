@@ -40,8 +40,10 @@ public class JdbcExtraPriceRepository implements ExtraPriceRepository {
                         ExtraType.valueOf(row.getString("type")), row.getBigDecimal("price")));
             }
             return extras;
-        } catch (SQLException | IllegalArgumentException error) {
+        } catch (SQLException error) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, error);
+        } catch (IllegalArgumentException error) {
+            throw new IllegalStateException("O catálogo de preços extra contém um tipo inválido.", error);
         }
     }
 

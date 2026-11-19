@@ -13,11 +13,11 @@ final class PriceRules {
 
     /** Parses a short plain decimal number, with a comma or point as decimal mark. */
     static BigDecimal parse(String text) {
-        if (text == null || text.length() > MAX_TEXT_LENGTH
-                || !text.trim().matches("-?[0-9]+([.,][0-9]+)?")) {
+        String number = text == null ? "" : text.trim();
+        if (number.length() > MAX_TEXT_LENGTH || !number.matches("-?[0-9]+([.,][0-9]+)?")) {
             throw new IllegalArgumentException("O preço tem de ser um número.");
         }
-        return new BigDecimal(text.trim().replace(',', '.'));
+        return new BigDecimal(number.replace(',', '.'));
     }
 
     /** Validates a price and returns it with the database scale. */
