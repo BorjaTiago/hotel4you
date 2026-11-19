@@ -344,7 +344,7 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | a reservation with no check-in and no card | OK. The backend first deletes its `reservation_services` and `reservation_locations`, in the same transaction. |
 | a reservation with a card | Fails. The access history stays safe. |
 | a floor, room type, room, role or item that is in use | Fails (`NO ACTION`). |
-| a room item (one row of `room_items`) | OK. Only that item leaves the room. The room and the item stay. |
+| a room item (one row of `room_items`) | OK. Only that item leaves the room. The room and the item stay. If another table uses the row, the delete fails with `RoomItemInUseException` (SQL error 547, `NO ACTION`). No table uses `room_items` yet, so this refusal does not happen yet (Q-36). |
 | a user | Do not delete. Old data points to the user. |
 
 ## Questions you may get
