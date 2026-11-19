@@ -61,7 +61,7 @@ class ExtraPriceServiceTest {
 
     @Test
     @Tag("H4Y-93-AC-3")
-    void onListPrices_returnNineItemsWithoutPrice_whenCatalogueContainsRequiredExtras() {
+    void onListPrices_returnAllEntries_whenInMemoryCatalogueHasNineExtras() {
         var catalogue = new InMemoryExtraPriceRepository();
         List<ExtraService> expected = List.of(
                 new ExtraService(1L, "Vista mar", ExtraType.ROOM_EXTRA, null),
