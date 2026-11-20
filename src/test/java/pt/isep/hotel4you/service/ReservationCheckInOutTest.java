@@ -45,7 +45,8 @@ class ReservationCheckInOutTest {
         types.add(DOUBLE);
         reservations = new InMemoryReservationRepository();
         reservations.addRoomNumber(room.getId(), room.getNumber());
-        roomService = new RoomService(rooms, types, reservations);
+        roomService = new RoomService(rooms, types, reservations,
+                new pt.isep.hotel4you.data.InMemoryItemRepository());
         service = new ReservationService(reservations, roomService, types);
     }
 

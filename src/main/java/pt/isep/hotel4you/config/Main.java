@@ -45,9 +45,10 @@ public class Main {
                     new JdbcFloorRepository(database), new JdbcLocationRepository(database));
             JdbcRoomTypeRepository roomTypeRepository = new JdbcRoomTypeRepository(database);
             JdbcReservationRepository reservationRepository = new JdbcReservationRepository(database);
+            JdbcItemRepository itemRepository = new JdbcItemRepository(database);
             RoomService roomService = new RoomService(
-                    new JdbcRoomRepository(database), roomTypeRepository, reservationRepository);
-            StockService stockService = new StockService(new JdbcItemRepository(database));
+                    new JdbcRoomRepository(database), roomTypeRepository, reservationRepository, itemRepository);
+            StockService stockService = new StockService(itemRepository);
             ClientService clientService = new ClientService(new JdbcClientRepository(database));
             ReservationService reservationService = new ReservationService(reservationRepository,
                     roomService, roomTypeRepository);

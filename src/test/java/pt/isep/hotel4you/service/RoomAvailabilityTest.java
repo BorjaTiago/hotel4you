@@ -53,7 +53,8 @@ class RoomAvailabilityTest {
         types.add(TYPE);
         types.add(new RoomType(2L, "familiar", 4, null));
         reservations = new InMemoryReservationRepository();
-        service = new RoomService(rooms, types, reservations);
+        service = new RoomService(rooms, types, reservations,
+                new pt.isep.hotel4you.data.InMemoryItemRepository());
     }
 
     @Test

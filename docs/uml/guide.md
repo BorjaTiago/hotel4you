@@ -44,7 +44,7 @@ Each controller handles one screen group. Each controller calls only `HotelFacad
 - **Other option:** Each screen loads its own FXML. Not done: the same code many times.
 
 ### RoomController
-- **What:** The "Quartos" screen. A table with number, floor (number and description, for example "3 - Quartos"), type and base price per night, and a type filter ("Todos" shows all rooms). The registration form, the edit form and the room summary show only for the manager. The manager selects a row, the form fills, the manager changes number, floor or type and clicks "Guardar alterações". The screen asks for a confirmation, then calls `HotelFacade.editRoom`. The floor box is a `ComboBox<Floor>`. The manager selects a row and clicks "Remover quarto". The screen asks for a confirmation, then calls `HotelFacade.removeRoom`. "Limpar" empties the form, clears the table selection and clears the message. Layout, top to bottom: title, type filter, summary, table, form with the "Registar quarto" and "Guardar alterações" buttons, the "Remover quarto" and "Limpar" buttons, message. Also room search, room save, room edit, room remove, form clear and room items.
+- **What:** The "Quartos" screen. A table with number, floor (number and description, for example "3 - Quartos"), type and base price per night, and a type filter ("Todos" shows all rooms). The registration form, the edit form and the room summary show only for the manager. The manager selects a row, the form fills, the manager changes number, floor or type and clicks "Guardar alterações". The screen asks for a confirmation, then calls `HotelFacade.editRoom`. The floor box is a `ComboBox<Floor>`. The manager selects a row and clicks "Remover quarto". The screen asks for a confirmation, then calls `HotelFacade.removeRoom`. "Limpar" empties the form, clears the table selection and clears the message. Layout, top to bottom: title, type filter, summary, table, form with the "Registar quarto" and "Guardar alterações" buttons, the "Remover quarto" and "Limpar" buttons, message. The "Itens do quarto" section shows for MANAGE_ROOMS only. Its table shows item and quantity. "Guardar item" adds an item or changes its quantity. "Remover item" asks for a confirmation (H4Y-91). Also room search, room save, room edit, room remove and form clear.
 - **Why:** RF-04, RF-05, RF-06, RF-08 (H4Y-50). The receptionist tells the client which rooms exist and what they cost. The manager registers and edits rooms. The edit of number, floor and type is a user decision of 2026-10-30. It is not in the course statement.
 - **Why this way:** One screen for one concept, the rooms. The form is hidden by permission: `canUse(actor, Permission.MANAGE_ROOMS)` decides if it shows. Floors 2 and 3 have the same description, so the floor shows the number too, and the manager can tell them apart. The table uses `listRoomSummaries`, which checks `LIST_ROOMS`. For the manager only, the screen also calls `listRooms` for the summary, which always counts all rooms. The controller only shows data. A type with no base price shows "—". An empty list shows "Não há quartos."
 - **Other option:** Two screens, one for the list and one for the form. Not done: both show the same rooms, and the form is hidden by permission anyway.
@@ -154,6 +154,7 @@ Services hold the rules. Each service works on the domain classes.
 - **Integration:** H4Y-28 provides the `floors` table on `main`. PR #40 (H4Y-26) is now merged and provides `room_types`. Main constructs one RoomService with RoomRepository, RoomTypeRepository and the H4Y-72 ReservationRepository. Registration and price operations share the same database catalogue. Run v5 before v6.
 - **Type names:** The chosen stored names are `individual`, `duplo`, `familiar` (user decision, 2026-10-30), as in the merged H4Y-26 script. The summary labels are Individuais, Duplos and Familiares; the type choices show the catalogue names. Tests and database documentation use the same names. The screen does not translate `single`, `double` or `family` as aliases. The existing v5 script supplies the types. No replacement table or migration is added here.
 - **Prices:** Only a manager sets or lists base prices (`Permission.MANAGE_PRICES`, else `AccessDeniedException`). `setBasePrice` refuses a missing type, a price below 0 or above 999999.99, a price with more than 2 decimals, and an unknown type. `parsePrice` turns text such as `80,50` into a price.
+- **Room items (H4Y-91):** `configureItem` adds a stock item to a room or changes its quantity (1 to 255). `removeItem` throws `RoomItemInUseException` when the item has links and the repository refuses the delete (SQL error 547, Q-36). `listRoomItems` gives the items of one room. `parseQuantity` accepts text of one to three digits and returns the number, so "0" gives 0. It refuses null, blank text and any other text, including a negative number, with "A quantidade é inválida.". `configureItem` refuses a quantity below 1 and above 255 with the same message. An item that is not in the catalogue gives "O item não existe no catálogo.". Only `MANAGE_ROOMS` may use these methods.
 
 ### Room availability (H4Y-72, RF-05)
 - **What:** RoomService searches one room type and one or more nights. Receptionists and managers use SEARCH_ROOMS. H4Y-73 adds the screen (see FreeRoomController below).
@@ -275,7 +276,7 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Other option:** SQL inside `AuthService`. Not done: rules and SQL would mix.
 
 ### JdbcRoomRepository
-- **What:** Read the catalogues and save rooms in SQL Server.
+- **What:** Read the catalogues and save rooms in SQL Server. For room items (H4Y-91), `saveItem` runs one MERGE statement that updates the quantity or inserts the item, and `deleteItem` returns false when SQL Server refuses the delete (error 547).
 - **Why:** RF-04 and RNF-12. Room numbers must be unique and a full floor must reject new rooms.
 - **Why this way:** `save(room, floorLimit)` opens one transaction. It locks the floor row with `UPDLOCK, HOLDLOCK`, reads the count, inserts with `OUTPUT INSERTED.id` and commits. SQL and runtime errors roll back. A rollback error is kept as a suppressed error. Each statement and result closes with a resource block. Small helper methods avoid nested resource blocks.
 - **Other option:** Check the limit only in the service. This cannot protect two application instances that save at the same time.
@@ -378,7 +379,7 @@ Data holds the storage interfaces and the SQL Server version. Services use the i
 - **Other option:** SQL inside `RoomService`. Not done: rules and SQL would mix.
 
 ### RoomItem
-- **What:** How many units of one stock item a room has.
+- **What:** How many units of one stock item a room has. A room item holds the stock item and the quantity, from 1 to 255 (H4Y-91).
 - **Why:** RF-08.
 - **Why this way:** Each room can have its own items.
 - **Other option:** Items per room type. Not done: the manager wants per room control.
@@ -480,7 +481,7 @@ Enums have fixed values. They stop typing errors.
 |------------|----------|---------|--------------|------------------|
 | MANAGE_STAFF | Create and list staff accounts (H4Y-27) | yes | no | no |
 | MANAGE_FLOORS | View the floors and create, edit and remove zones (H4Y-28) | yes | no | no |
-| MANAGE_ROOMS | Register, edit and remove rooms, see the room summary and read the type catalogue, on the "Quartos" screen (H4Y-25) | yes | no | no |
+| MANAGE_ROOMS | Register, edit and remove rooms, see the room summary and read the type catalogue, on the "Quartos" screen (H4Y-25), and set the items of a room (H4Y-91) | yes | no | no |
 | MANAGE_PRICES | View and set the base price of the room types (H4Y-26) | yes | no | no |
 | LIST_ROOMS | See the rooms table with type, floor and base price, on the "Quartos" screen (H4Y-50) | yes | yes | no |
 | MANAGE_STOCK | Create, edit and list stock items on the stock screen (H4Y-51) | yes | no | no |

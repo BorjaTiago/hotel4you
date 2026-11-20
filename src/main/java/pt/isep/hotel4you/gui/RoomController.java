@@ -22,7 +22,9 @@ import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.RoomService.RoomTypeTarget;
 
@@ -72,6 +74,21 @@ public class RoomController {
 
     @FXML
     private TableColumn<RoomSummary, String> basePriceColumn;
+
+    @FXML
+    private TableView<RoomItem> roomItemTable;
+
+    @FXML
+    private TableColumn<RoomItem, String> roomItemNameColumn;
+
+    @FXML
+    private TableColumn<RoomItem, Integer> roomItemQuantityColumn;
+
+    @FXML
+    private ComboBox<StockItem> itemBox;
+
+    @FXML
+    private TextField itemQuantityField;
 
     /**
      * Creates the controller.
@@ -148,7 +165,34 @@ public class RoomController {
         });
         loadRoomTypes();
         roomTable.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldRoom, selected) -> fillForm(selected));
+                (observable, oldRoom, selected) -> {
+                    fillForm(selected);
+                    loadRoomItems();
+                });
+        initRoomItems();
+    }
+
+    private void initRoomItems() {
+        roomItemNameColumn.setCellValueFactory(
+                data -> new SimpleStringProperty(data.getValue().getItem().getName()));
+        roomItemQuantityColumn.setCellValueFactory(
+                data -> new ReadOnlyObjectWrapper<>(data.getValue().getQuantity()));
+        itemBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(StockItem item) {
+                return item == null ? "" : item.getName();
+            }
+
+            @Override
+            public StockItem fromString(String text) {
+                return null;
+            }
+        });
+        try {
+            itemBox.getItems().setAll(facade.listItems(HotelApp.currentUser));
+        } catch (RuntimeException e) {
+            showMessage(e.getMessage(), false);
+        }
     }
 
     private void fillForm(RoomSummary selected) {
@@ -217,6 +261,56 @@ public class RoomController {
             clearForm();
             showMessage("Quarto removido.", true);
             loadRooms();
+        } catch (RuntimeException e) {
+            showMessage(e.getMessage(), false);
+        }
+    }
+
+    @FXML
+    private void onConfigureRoomItemClicked() {
+        RoomSummary room = roomTable.getSelectionModel().getSelectedItem();
+        if (room == null) {
+            showMessage("Escolha um quarto na tabela.", false);
+            return;
+        }
+        StockItem item = itemBox.getValue();
+        if (item == null) {
+            showMessage("Escolha um item.", false);
+            return;
+        }
+        try {
+            int quantity = facade.parseRoomItemQuantity(itemQuantityField.getText());
+            facade.configureRoomItem(toRoom(room), item, quantity, HotelApp.currentUser);
+            itemQuantityField.clear();
+            showMessage("Item do quarto guardado.", true);
+            loadRoomItems();
+        } catch (RuntimeException e) {
+            showMessage(e.getMessage(), false);
+        }
+    }
+
+    @FXML
+    private void onRemoveRoomItemClicked() {
+        RoomSummary room = roomTable.getSelectionModel().getSelectedItem();
+        if (room == null) {
+            showMessage("Escolha um quarto na tabela.", false);
+            return;
+        }
+        RoomItem chosen = roomItemTable.getSelectionModel().getSelectedItem();
+        if (chosen == null) {
+            showMessage("Escolha um item.", false);
+            return;
+        }
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION,
+                "Remover o item do quarto?",
+                ButtonType.YES, ButtonType.NO);
+        if (confirmation.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+            return;
+        }
+        try {
+            facade.removeRoomItem(toRoom(room), chosen.getItem(), HotelApp.currentUser);
+            showMessage("Item do quarto removido.", true);
+            loadRoomItems();
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
         }
@@ -297,6 +391,31 @@ public class RoomController {
             summaryLabel.setText("");
             showMessage(e.getMessage(), false);
         }
+    }
+
+    private void loadRoomItems() {
+        RoomSummary room = roomTable.getSelectionModel().getSelectedItem();
+        if (room == null) {
+            roomItemTable.getItems().clear();
+            return;
+        }
+        try {
+            roomItemTable.getItems().setAll(
+                    facade.listRoomItems(toRoom(room), HotelApp.currentUser));
+        } catch (RuntimeException e) {
+            roomItemTable.getItems().clear();
+            showMessage(e.getMessage(), false);
+        }
+    }
+
+    /**
+     * Builds the room that the facade needs from the chosen table row.
+     *
+     * @param row the chosen row of the room table
+     * @return the room with the id, number, floor and type of the row
+     */
+    static Room toRoom(RoomSummary row) {
+        return new Room(row.id(), row.number(), row.floorNumber(), row.roomTypeName());
     }
 
     private void updateSummary(List<Room> rooms) {

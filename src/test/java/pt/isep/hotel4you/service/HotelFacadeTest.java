@@ -34,6 +34,7 @@ import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.StockItem;
@@ -67,9 +68,9 @@ class HotelFacadeTest {
         roomTypeRepository = new InMemoryRoomTypeRepository();
         pt.isep.hotel4you.data.InMemoryReservationRepository reservationRepository =
                 new pt.isep.hotel4you.data.InMemoryReservationRepository();
-        RoomService roomService = new RoomService(roomRepository, roomTypeRepository,
-                reservationRepository);
         itemRepository = new InMemoryItemRepository();
+        RoomService roomService = new RoomService(roomRepository, roomTypeRepository,
+                reservationRepository, itemRepository);
         StockService stockService = new StockService(itemRepository);
         ClientService clientService = new ClientService(new InMemoryClientRepository());
         ReservationService reservationService = new ReservationService(reservationRepository,
@@ -618,5 +619,85 @@ class HotelFacadeTest {
         assertEquals(1, afterCheckIn.size());
         assertEquals(ReservationStatus.CHECKED_IN, afterCheckIn.get(0).status());
         assertTrue(facade.listActiveReservations(ana).isEmpty());
+    }
+
+    private Room saveRoom() {
+        roomRepository.addFloor(2);
+        roomRepository.addRoomType("duplo");
+        return roomRepository.save(new Room(null, 201, 2, "duplo"), 10);
+    }
+
+    private StockItem saveTowels() {
+        return itemRepository.save(new StockItem(null, "toalhas", "un", 20));
+    }
+
+    private static User manager() {
+        return new Manager(1L, "Rui", "rui", "hash");
+    }
+
+    private static User receptionist() {
+        return new Receptionist(2L, "Ana", "ana", "hash");
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-1")
+    void onConfigureRoomItem_addItem_whenActorIsManager() {
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        User manager = manager();
+
+        facade.configureRoomItem(room, towels, facade.parseRoomItemQuantity("2"), manager);
+
+        List<RoomItem> roomItems = facade.listRoomItems(room, manager);
+        assertEquals(1, roomItems.size());
+        assertEquals(towels.getId(), roomItems.get(0).getItem().getId());
+        assertEquals(2, roomItems.get(0).getQuantity());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-2")
+    void onRemoveRoomItem_removeItem_whenActorIsManager() {
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        User manager = manager();
+        facade.configureRoomItem(room, towels, 2, manager);
+
+        facade.removeRoomItem(room, towels, manager);
+
+        assertTrue(facade.listRoomItems(room, manager).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-5")
+    void onListRoomItems_throw_whenActorIsReceptionist() {
+        Room room = saveRoom();
+        User ana = receptionist();
+
+        assertThrows(AccessDeniedException.class, () -> facade.listRoomItems(room, ana));
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-5")
+    void onConfigureRoomItem_throw_whenActorIsReceptionist() {
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        User ana = receptionist();
+
+        assertThrows(AccessDeniedException.class, () -> facade.configureRoomItem(room, towels, 2, ana));
+
+        assertTrue(roomRepository.findItems(room.getId()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-91-AC-5")
+    void onRemoveRoomItem_throw_whenActorIsReceptionist() {
+        Room room = saveRoom();
+        StockItem towels = saveTowels();
+        facade.configureRoomItem(room, towels, 2, manager());
+        User ana = receptionist();
+
+        assertThrows(AccessDeniedException.class, () -> facade.removeRoomItem(room, towels, ana));
+
+        assertEquals(1, roomRepository.findItems(room.getId()).size());
     }
 }

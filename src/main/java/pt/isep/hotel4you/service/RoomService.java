@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import pt.isep.hotel4you.data.DuplicateRoomException;
+import pt.isep.hotel4you.data.ItemRepository;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomRepository;
 import pt.isep.hotel4you.data.RoomTypeRepository;
@@ -15,9 +16,11 @@ import pt.isep.hotel4you.data.ReservationRepository;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
+import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.User;
 
 /** Applies room registration and base price rules. */
@@ -26,6 +29,14 @@ public class RoomService {
     private static final int ROOMS_PER_FLOOR = 10;
     private static final Map<Integer, Integer> ROOM_FLOOR_LIMITS =
             Map.of(2, ROOMS_PER_FLOOR, 3, ROOMS_PER_FLOOR);
+
+    /** The biggest quantity that fits in TINYINT. */
+    private static final int MAX_ITEM_QUANTITY = 255;
+    /** One to three ASCII digits, so the number always fits in an int. */
+    private static final String QUANTITY_TEXT = "[0-9]{1,3}";
+    private static final String INVALID_QUANTITY = "A quantidade é inválida.";
+    private static final String MISSING_ROOM = "O quarto não existe.";
+    private static final String MISSING_ITEM = "O item não existe no catálogo.";
 
     /** Fixed labels and provisional Q-01 targets for the room summary. */
     private static final List<RoomTypeTarget> ROOM_TYPE_TARGETS = List.of(
@@ -45,6 +56,7 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final ReservationRepository reservationRepository;
+    private final ItemRepository itemRepository;
 
     /**
      * Creates the service.
@@ -52,12 +64,14 @@ public class RoomService {
      * @param roomRepository the room store
      * @param roomTypeRepository the room type store
      * @param reservationRepository the booking period reader
+     * @param itemRepository the stock item catalogue
      */
     public RoomService(RoomRepository roomRepository, RoomTypeRepository roomTypeRepository,
-            ReservationRepository reservationRepository) {
+            ReservationRepository reservationRepository, ItemRepository itemRepository) {
         this.roomRepository = roomRepository;
         this.roomTypeRepository = roomTypeRepository;
         this.reservationRepository = reservationRepository;
+        this.itemRepository = itemRepository;
     }
 
     /**
@@ -335,6 +349,100 @@ public class RoomService {
         if (!roomTypeRepository.updateBasePrice(type.getId(), amount)) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
+    }
+
+    /**
+     * Sets the quantity of a catalogue item in a room. It adds the item or changes its quantity.
+     *
+     * @param room the saved room
+     * @param item the catalogue item
+     * @param quantity the quantity, from 1 to 255
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room or the item does not exist or the quantity is invalid
+     * @throws IllegalStateException if the database is not available
+     */
+    public void configureItem(Room room, StockItem item, int quantity, User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode configurar os itens do quarto.");
+        }
+        if (!roomExists(room)) {
+            throw new IllegalArgumentException(MISSING_ROOM);
+        }
+        if (quantity < 1 || quantity > MAX_ITEM_QUANTITY) {
+            throw new IllegalArgumentException(INVALID_QUANTITY);
+        }
+        if (item == null || item.getId() == null || itemRepository.findById(item.getId()).isEmpty()) {
+            throw new IllegalArgumentException(MISSING_ITEM);
+        }
+        roomRepository.saveItem(room.getId(), item.getId(), quantity);
+    }
+
+    /**
+     * Removes an item from a room.
+     *
+     * @param room the saved room
+     * @param item the item to remove
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room or the item does not exist
+     * @throws RoomItemInUseException if other data still uses the item in the room
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeItem(Room room, StockItem item, User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode configurar os itens do quarto.");
+        }
+        if (!roomExists(room)) {
+            throw new IllegalArgumentException(MISSING_ROOM);
+        }
+        if (item == null || item.getId() == null) {
+            throw new IllegalArgumentException(MISSING_ITEM);
+        }
+        if (!roomRepository.deleteItem(room.getId(), item.getId())) {
+            throw new RoomItemInUseException();
+        }
+    }
+
+    /**
+     * Lists the items of a room.
+     *
+     * @param room the saved room
+     * @param actor the logged-in user
+     * @return the items of the room with their quantities
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<RoomItem> listRoomItems(Room room, User actor) {
+        if (!Permission.MANAGE_ROOMS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode consultar os itens do quarto.");
+        }
+        if (!roomExists(room)) {
+            throw new IllegalArgumentException(MISSING_ROOM);
+        }
+        return roomRepository.findItems(room.getId());
+    }
+
+    /**
+     * Converts the text of the screen to an item quantity.
+     *
+     * @param text the text typed by the user
+     * @return the quantity
+     * @throws IllegalArgumentException if the text is null, blank or not one to three digits
+     */
+    public int parseQuantity(String text) {
+        if (text == null || !text.matches(QUANTITY_TEXT)) {
+            throw new IllegalArgumentException(INVALID_QUANTITY);
+        }
+        return Integer.parseInt(text);
+    }
+
+    private boolean roomExists(Room room) {
+        if (room == null || room.getId() == null) {
+            return false;
+        }
+        return roomRepository.findById(room.getId()).isPresent();
     }
 
     /** Tells if the type has an id and the catalogue holds a type with the same id and name. */

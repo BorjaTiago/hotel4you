@@ -22,6 +22,7 @@ import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationQuote;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
@@ -645,6 +646,61 @@ public class HotelFacade {
      */
     public BigDecimal parsePrice(String text) {
         return roomService.parsePrice(text);
+    }
+
+    /**
+     * Sets the quantity of a catalogue item in a room.
+     *
+     * @param room the saved room
+     * @param item the catalogue item
+     * @param quantity the quantity, from 1 to 255
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room or the item does not exist or the quantity is invalid
+     * @throws IllegalStateException if the database is not available
+     */
+    public void configureRoomItem(Room room, StockItem item, int quantity, User actor) {
+        roomService.configureItem(room, item, quantity, actor);
+    }
+
+    /**
+     * Removes an item from a room.
+     *
+     * @param room the saved room
+     * @param item the item to remove
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room does not exist
+     * @throws RoomItemInUseException if other data still uses the item in the room
+     * @throws IllegalStateException if the database is not available
+     */
+    public void removeRoomItem(Room room, StockItem item, User actor) {
+        roomService.removeItem(room, item, actor);
+    }
+
+    /**
+     * Lists the items of a room.
+     *
+     * @param room the saved room
+     * @param actor the logged-in user
+     * @return the items of the room with their quantities
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the room does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<RoomItem> listRoomItems(Room room, User actor) {
+        return roomService.listRoomItems(room, actor);
+    }
+
+    /**
+     * Converts the text of the screen to an item quantity.
+     *
+     * @param text the text typed by the user
+     * @return the quantity
+     * @throws IllegalArgumentException if the text is null, blank or not one to three digits
+     */
+    public int parseRoomItemQuantity(String text) {
+        return roomService.parseQuantity(text);
     }
 
     /**

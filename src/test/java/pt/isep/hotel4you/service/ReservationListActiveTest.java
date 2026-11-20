@@ -44,7 +44,8 @@ class ReservationListActiveTest {
         reservations = new InMemoryReservationRepository();
         reservations.addRoomNumber(room.getId(), room.getNumber());
         reservations.addClient(7L, "Maria Sousa", "12345678");
-        RoomService roomService = new RoomService(rooms, types, reservations);
+        RoomService roomService = new RoomService(rooms, types, reservations,
+                new pt.isep.hotel4you.data.InMemoryItemRepository());
         service = new ReservationService(reservations, roomService, types);
     }
 

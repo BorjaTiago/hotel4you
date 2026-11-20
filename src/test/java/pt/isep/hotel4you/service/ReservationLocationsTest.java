@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.data.InMemoryItemRepository;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
 import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryRoomTypeRepository;
@@ -47,7 +48,8 @@ class ReservationLocationsTest {
         reservations.addClient(CLIENT.getId(), CLIENT.getName(), CLIENT.getDocument());
         reservations.addLocation(RESTAURANT_ID, "Restaurante");
         reservations.addLocation(POOL_ID, "Piscina");
-        service = new ReservationService(reservations, new RoomService(rooms, types, reservations),
+        service = new ReservationService(reservations, new RoomService(rooms, types, reservations,
+                new InMemoryItemRepository()),
                 types);
     }
 

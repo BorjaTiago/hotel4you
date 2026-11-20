@@ -6,8 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import pt.isep.hotel4you.domain.Room;
+import pt.isep.hotel4you.domain.RoomItem;
 import pt.isep.hotel4you.domain.RoomSummary;
+import pt.isep.hotel4you.domain.StockItem;
 
 /** Stores rooms in SQL Server. */
 public class JdbcRoomRepository implements RoomRepository {
@@ -42,6 +45,27 @@ public class JdbcRoomRepository implements RoomRepository {
                         result.getString("room_type_name")));
             }
             return List.copyOf(rooms);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public Optional<Room> findById(long id) {
+        String sql = "SELECT r.id, r.number, f.number AS floor_number, t.name AS room_type_name "
+                + "FROM rooms r JOIN floors f ON f.id = r.floor_id "
+                + "JOIN room_types t ON t.id = r.room_type_id WHERE r.id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = prepareLong(connection, sql, id);
+                ResultSet result = statement.executeQuery()) {
+            if (!result.next()) {
+                return Optional.empty();
+            }
+            return Optional.of(new Room(
+                    result.getLong("id"),
+                    result.getInt("number"),
+                    result.getInt("floor_number"),
+                    result.getString("room_type_name")));
         } catch (SQLException e) {
             throw persistenceError(e);
         }
@@ -234,6 +258,72 @@ public class JdbcRoomRepository implements RoomRepository {
             if (statement.executeUpdate() == 0) {
                 throw new IllegalArgumentException("O quarto indicado não existe.");
             }
+            return true;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == FOREIGN_KEY_ERROR) {
+                return false;
+            }
+            throw persistenceError(e);
+        }
+    }
+
+    @Override
+    public List<RoomItem> findItems(long roomId) {
+        String sql = "SELECT i.id, i.name, i.unit, i.stock_quantity, ri.quantity "
+                + "FROM room_items ri JOIN items i ON i.id = ri.item_id "
+                + "WHERE ri.room_id = ? ORDER BY i.name";
+        List<RoomItem> roomItems = new ArrayList<>();
+        try (Connection connection = database.connect();
+                PreparedStatement statement = prepareLong(connection, sql, roomId);
+                ResultSet result = statement.executeQuery()) {
+            while (result.next()) {
+                StockItem item = new StockItem(result.getLong("id"), result.getString("name"),
+                        result.getString("unit"), result.getInt("stock_quantity"));
+                roomItems.add(new RoomItem(item, result.getInt("quantity")));
+            }
+            return List.copyOf(roomItems);
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * The MERGE uses WITH (HOLDLOCK). Without it, two saves of the same new room item at the same
+     * time can both take the "not matched" path. Then the second INSERT fails on the primary key.
+     */
+    @Override
+    public void saveItem(long roomId, long itemId, int quantity) {
+        String sql = "MERGE room_items WITH (HOLDLOCK) AS target "
+                + "USING (SELECT ? AS room_id, ? AS item_id, ? AS quantity) AS source "
+                + "ON target.room_id = source.room_id AND target.item_id = source.item_id "
+                + "WHEN MATCHED THEN UPDATE SET quantity = source.quantity "
+                + "WHEN NOT MATCHED THEN INSERT (room_id, item_id, quantity) "
+                + "VALUES (source.room_id, source.item_id, source.quantity);";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, roomId);
+            statement.setLong(2, itemId);
+            statement.setInt(3, quantity);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw persistenceError(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * It returns false only on SQL error 547. That refusal is reserved for a later table that
+     * references room_items (open question Q-36). Deleting a row that does not exist returns true.
+     */
+    @Override
+    public boolean deleteItem(long roomId, long itemId) {
+        String sql = "DELETE FROM room_items WHERE room_id = ? AND item_id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, roomId);
+            statement.setLong(2, itemId);
+            statement.executeUpdate();
             return true;
         } catch (SQLException e) {
             if (e.getErrorCode() == FOREIGN_KEY_ERROR) {
