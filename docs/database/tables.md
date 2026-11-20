@@ -27,9 +27,9 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 - **Changed:**
   - `roles` has 5 rows, the actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER (upper case, the same as the Java `Role` enum).
   - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
-  - The view is a service: "sea view" and "mountain view" are rows of `additional_services`. One view per reservation (Q-37, Q-11).
+  - The view is a service: "sea view" and "mountain view" are rows of `extra_prices`. One view per reservation (Q-37, Q-11).
   - Room service requests (food, drink, laundry) use `reservation_services`. `used_at` is the request time (Q-33).
-  - `room_types.base_price` and `additional_services.price` allow NULL.
+  - `room_types.base_price` and `extra_prices.price` allow NULL.
   - `access_cards.card_number` is plain UNIQUE.
   - `feedback.customer_id` allows NULL.
   - No CASCADE. All FKs are `NO ACTION`. The backend deletes the reservation children in the same transaction (Q-36, RF-22).
@@ -84,7 +84,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
 ### rooms
 **What:** One row for each physical room.
 **Why:** A reservation needs a real room. The room has a floor and a type.
-**Why this way:** The view is not a room column. A guest chooses "sea view" or "mountain view" for the reservation, so it is a service (see `additional_services`). The price per night comes from the room type.
+**Why this way:** The view is not a room column. A guest chooses "sea view" or "mountain view" for the reservation, so it is a service (see `extra_prices`). The price per night comes from the room type.
 **Other option:** `view_type` and `view_surcharge` in `rooms`. We did not, because the view is sold with the reservation, and the backend allows one view per reservation.
 
 | id | number | floor_id | room_type_id |
@@ -247,19 +247,25 @@ Client and supplier have no account (Q-13, Q-17). The seed still creates all 5 r
 
 Reservation 1: 3 nights x 90.00 = 270.00, plus services (sea view 15.00 and spa 40.00 = 325.00).
 
-### additional_services
+### extra_prices
 **What:** The list of things a guest can buy or use (spa, pool, laundry, drinks).
 **Why:** The hotel needs a price list.
 **Why this way:** `price` is the current price only. `price = 0` is a free service. `price = NULL` means no price set yet. The price paid is saved in `reservation_services`. "Sea view" and "mountain view" are rows here (Q-37). The backend allows one view per reservation (Q-11).
 **Other option:** Keep a price history table. It is more work and not needed, because `unit_price` already keeps the old price.
 
-| id | name | price |
-|---|---|---|
-| 1 | spa | 40.00 |
-| 2 | pool | 0.00 |
-| 3 | drink | 4.50 |
-| 4 | sea view | 15.00 |
-| 5 | mountain view | 10.00 |
+| id | name | type | price at seed |
+|---|---|---|---|
+| 1 | Vista mar | ROOM_EXTRA | NULL |
+| 2 | Vista montanha | ROOM_EXTRA | NULL |
+| 3 | Bebidas | ROOM_EXTRA | NULL |
+| 4 | Lavandaria | ROOM_EXTRA | NULL |
+| 5 | Comida | PAID_SERVICE | NULL |
+| 6 | Eventos culturais | PAID_SERVICE | NULL |
+| 7 | Piscinas privadas | PAID_SERVICE | NULL |
+| 8 | Spa | PAID_SERVICE | NULL |
+| 9 | Salas de conferências | PAID_SERVICE | NULL |
+
+Ids above show a fresh catalogue. Code uses saved identifiers and does not assume fixed ids.
 
 ### reservation_services
 **What:** The services of one reservation: included, used, or requested to the room.
@@ -274,10 +280,10 @@ Reservation 1: 3 nights x 90.00 = 270.00, plus services (sea view 15.00 and spa 
 
 **Other option:** `quantity` in one row, and `ON DELETE CASCADE`. We did not. One row per use keeps each request time. No CASCADE means the database never deletes data by itself.
 
-| id | reservation_id | additional_service_id | unit_price | used_at |
+| id | reservation_id | extra_price_id | unit_price | used_at |
 |---|---|---|---|---|
-| 1 | 1 | 1 | 40.00 | NULL |
-| 2 | 1 | 4 | 15.00 | NULL |
+| 1 | 1 | 8 | 40.00 | NULL |
+| 2 | 1 | 1 | 15.00 | NULL |
 | 3 | 2 | 3 | 4.50 | 2026-10-11 21:00 |
 | 4 | 2 | 3 | 4.50 | 2026-10-11 21:40 |
 | 5 | 2 | 3 | 4.50 | 2026-10-11 22:15 |
@@ -359,4 +365,18 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | Why is there no cascade? | A delete must not erase data by itself. The access history stays safe, and the backend deletes the reservation children in the same transaction. |
 | Why is the view not in `rooms`? | The guest chooses the view for the reservation. It is a service (Q-37). |
 
-Created by: BorjaTiago. Updated by: jmbcruz. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18. Reviewed by: pending.
+## H4Y-103: extra_prices implementation (RF-07, RF-09)
+
+**What:** SQL v14 creates the fixed extra price catalogue. It replaces the planned additional_services name.
+**Why:** The manager needs one price per night for each of the nine extras.
+**Why this way:** SMALLINT identity is the key. NVARCHAR(100) keeps Portuguese names. Name is unique.
+Type is ROOM_EXTRA or PAID_SERVICE. DECIMAL(8,2) price may be null until set; zero is allowed.
+The seed inserts only names that are missing and never overwrites a saved price.
+**Other option:** A separate catalogue for each type. One table makes listing and price validation simpler.
+**Example:** Vista mar (ROOM_EXTRA) costs 15.00 per night; Spa (PAID_SERVICE) costs 40.00.
+The nine seed names are Vista mar, Vista montanha, Bebidas, Lavandaria, Comida, Eventos culturais,
+Piscinas privadas, Spa and Salas de conferências. All seed prices are null.
+The sample prices above explain the data; the migration does not set them.
+The reservation_services link is a future design and is not created by v14.
+
+Created by: BorjaTiago. Updated by: jmbcruz. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20. Reviewed by: pending.
