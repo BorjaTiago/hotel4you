@@ -82,6 +82,7 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v8-create-customers.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v9-create-reservations.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v10-alter-customers.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v11-create-room-items.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v12-create-stock-movements.sql
 ```
 
@@ -98,6 +99,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v7-creat
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v8-create-customers.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v9-create-reservations.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v10-alter-customers.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v11-create-room-items.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v12-create-stock-movements.sql
 ```
 
@@ -131,7 +133,7 @@ docker compose down -v     # stop and delete the data
 
 The service searches a room type and a date period. The free-room search is tab "2. Quarto" of the "Reservar quarto" screen (H4Y-73). It lists the free rooms. The search does not hold a room.
 
-Run the scripts in order, v1 to v10. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
+Run the scripts in order, v1 to v11. v11 (room_items, H4Y-91) needs v6 and v7. A room or an item that has `room_items` rows cannot be deleted. v8 (customers) comes from H4Y-69. v9 (reservations, H4Y-72) needs v8, because reservations has a foreign key to customers. No customer table or client service is implemented by H4Y-72. Do not skip the customer foreign key or create a replacement customer table.
 
 Availability tests use their own in-memory reservations and JDBC doubles. SQL Server integration is not verified.
 
@@ -182,4 +184,4 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06. H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06. H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16; H4Y-91 room items database, Claude Code (claude-sonnet-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20. Reviewed by: pending.

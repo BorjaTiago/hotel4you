@@ -46,6 +46,8 @@ H4Y-55 (RF-12, Q-05) adds the cancel. The receptionist and the manager cancel a 
 
 H4Y-57 (RF-22, Q-05, Q-36) adds the permanent delete of a reservation before the check-in. `Permission.DELETE_RESERVATIONS` allows only the manager. `ReservationService.delete(reservationId, actor)` checks it first and throws `AccessDeniedException` ("Só o gestor pode apagar reservas.") for other users. An unknown id throws `ReservationNotFoundException` ("A reserva não existe.", AC-3). `JdbcReservationRepository.delete` runs `DELETE FROM reservations WHERE id = ? AND status = 'reserved'`, so a check-in or a cancel at the same moment stops the delete. Only a RESERVED reservation is deleted (Q-05). The service reads the state first. For a cancelled, checked-in or checked-out reservation it throws the same message and does not call the repository, so a cancelled reservation stays in the history. When no row is deleted, the service throws "A reserva mudou de estado. Atualize a lista.". The deleted row is gone from the active list and the client history (AC-1), and the room is free again for the same nights (AC-2). On the "Reservas" screen, `ReservationsController` shows the "Apagar" button (`action-button, danger-button`) only when `canUse(actor, Permission.DELETE_RESERVATIONS)` is true. The static `canDelete` turns it on only for a `RESERVED` row (AC-4). The static `deleteQuestion` gives the confirmation text. The refusal for other roles (H4Y-58) and the refusal after the check-in with its own message (story block-delete-after-check-in) add guards to the same method. The ids replace the old planned `delete(reservation, user)` signature, as in `checkIn` and `checkOut`.
 
+H4Y-91 (RF-08) adds the room items. A `RoomItem` links one room to one stock item, with a quantity from 1 to 255. `RoomRepository` reads the items of a room (`findItems`), saves an item with its quantity (`saveItem`: it updates the row, or inserts it when no row exists, in one transaction) and removes an item (`deleteItem`: it returns false when the database refuses the delete with SQL error 547). `RoomService` takes `ItemRepository` as its fourth dependency. `configureItem(room, item, quantity, actor)` adds an item or changes its quantity (AC-1, AC-6). `removeItem(room, item, actor)` throws `RoomItemInUseException` when `deleteItem` returns false (AC-2, AC-4). `listRoomItems(room, actor)` gives the items of one room. `parseQuantity(text)` accepts text of one to three digits and returns the number, so "0" gives 0. It refuses null, blank text and text that is not one to three digits, including a negative number, with "A quantidade é inválida." (AC-7). `configureItem` refuses a quantity below 1 and above 255 with the same message. An unknown room gives "O quarto não existe." (AC-3). An item that is not in the catalogue gives "O item não existe no catálogo." (AC-8). A user without `MANAGE_ROOMS` gets `AccessDeniedException` (AC-5). No new `Permission` value is added. `HotelFacade` has `configureRoomItem`, `removeRoomItem`, `listRoomItems` and `parseRoomItemQuantity`, with the same rules. The item part of `RoomController` is the section "Itens do quarto". It shows only for `MANAGE_ROOMS`. Its table shows the item and the quantity. "Guardar item" adds an item or changes its quantity (`configureRoomItem`). "Remover item" asks for a confirmation, then calls `removeRoomItem`.
+
 ```mermaid
 classDiagram
     %% ==========================================
@@ -81,7 +83,9 @@ classDiagram
         -onSaveRoomChangesClicked() void
         -onRemoveRoomClicked() void
         -onClearClicked() void
-        +onConfigureRoomItemClicked() void
+        -onConfigureRoomItemClicked() void
+        -onRemoveRoomItemClicked() void
+        ~toRoom(row: RoomSummary) Room$
     }
     class ClientController {
         -initialize() void
@@ -236,7 +240,10 @@ classDiagram
         +listRooms(actor: User) List~Room~
         +listRoomSummaries(roomTypeName: String, actor: User) List~RoomSummary~
         +listRoomTypes(actor: User) List~String~
-        +configureRoomItem(room: Room, item: StockItem, quantity: int) void
+        +configureRoomItem(room: Room, item: StockItem, quantity: int, actor: User) void
+        +removeRoomItem(room: Room, item: StockItem, actor: User) void
+        +listRoomItems(room: Room, actor: User) List~RoomItem~
+        +parseRoomItemQuantity(text: String) int
         +setBasePrice(type: RoomType, price: BigDecimal, actor: User) void
         +listBasePrices(actor: User) List~RoomType~
         +parsePrice(text: String) BigDecimal
@@ -287,7 +294,7 @@ classDiagram
         -ROOMS_PER_FLOOR: int$
         -ROOM_FLOOR_LIMITS: Map$
         -ROOM_TYPE_TARGETS: List~RoomTypeTarget~$
-        +RoomService(roomRepository: RoomRepository, roomTypeRepository: RoomTypeRepository, reservationRepository: ReservationRepository)
+        +RoomService(roomRepository: RoomRepository, roomTypeRepository: RoomTypeRepository, reservationRepository: ReservationRepository, itemRepository: ItemRepository)
         +isAvailable(room: Room, start: LocalDate, end: LocalDate) boolean
         +searchRooms(start: LocalDate, end: LocalDate, type: RoomType, actor: User) List~Room~
         +searchRoomsWithMessage(start: LocalDate, end: LocalDate, type: RoomType, actor: User) RoomSearchResult
@@ -300,7 +307,10 @@ classDiagram
         +listRooms(actor: User) List~Room~
         +listRoomSummaries(roomTypeName: String, actor: User) List~RoomSummary~
         +listRoomTypes(actor: User) List~String~
-        +configureItem(room: Room, item: StockItem, quantity: int) void
+        +configureItem(room: Room, item: StockItem, quantity: int, actor: User) void
+        +removeItem(room: Room, item: StockItem, actor: User) void
+        +listRoomItems(room: Room, actor: User) List~RoomItem~
+        +parseQuantity(text: String) int
         +setBasePrice(type: RoomType, price: BigDecimal, actor: User) void
         +listBasePrices(actor: User) List~RoomType~
         +parsePrice(text: String) BigDecimal
@@ -382,6 +392,9 @@ classDiagram
     class RoomInUseException {
         <<exception>>
     }
+    class RoomItemInUseException {
+        <<exception>>
+    }
     class ClientNotFoundException {
         <<exception>>
     }
@@ -442,10 +455,14 @@ classDiagram
     class RoomRepository {
         <<interface>>
         +findAll() List~Room~
+        +findById(id: long) Optional~Room~
         +findSummaries() List~RoomSummary~
         +save(room: Room, floorLimit: int) Room
         +update(room: Room, floorLimit: int) Room
         +delete(id: long) boolean
+        +findItems(roomId: long) List~RoomItem~
+        +saveItem(roomId: long, itemId: long, quantity: int) void
+        +deleteItem(roomId: long, itemId: long) boolean
     }
     class ClientRepository {
         <<interface>>
@@ -507,8 +524,12 @@ classDiagram
     class JdbcFloorRepository
     class JdbcLocationRepository
     class JdbcRoomRepository {
+        +findById(id: long) Optional~Room~
         +update(room: Room, floorLimit: int) Room
         +delete(id: long) boolean
+        +findItems(roomId: long) List~RoomItem~
+        +saveItem(roomId: long, itemId: long, quantity: int) void
+        +deleteItem(roomId: long, itemId: long) boolean
     }
     class DuplicateRoomException
     class RoomNotAvailableException
@@ -626,7 +647,10 @@ classDiagram
         +totalFor(start: LocalDate, end: LocalDate) BigDecimal
     }
     class RoomItem {
+        -item: StockItem
         -quantity: int
+        +getItem() StockItem
+        +getQuantity() int
     }
     class Reservation {
         -id: Long
@@ -969,6 +993,8 @@ classDiagram
     RoomController ..> RoomTypeTarget : displays
     RoomController ..> RoomSummary : displays
     RoomController ..> Floor : displays
+    RoomController ..> RoomItem : displays
+    RoomController ..> StockItem : uses
     RoomService ..> RoomSearchResult : returns
     RoomSearchResult ..> Room : contains
     FreeRoomController ..> RoomSearchResult : displays
@@ -980,7 +1006,10 @@ classDiagram
     JdbcReservationRepository ..|> ReservationRepository : implements
     JdbcReservationRepository ..> Database : uses
     RoomService ..> RoomRepository : uses
+    RoomService ..> ItemRepository : uses
+    RoomService ..> RoomItem : returns
     RoomRepository ..> Room : stores
+    RoomRepository ..> RoomItem : stores
     JdbcRoomRepository ..|> RoomRepository : implements
     JdbcRoomRepository ..> Database : uses
     JdbcRoomTypeRepository ..|> RoomTypeRepository : implements
@@ -1003,6 +1032,7 @@ classDiagram
     LocationService ..> LocationInUseException : throws
     RoomService ..> AccessDeniedException : throws
     RoomService ..> RoomInUseException : throws
+    RoomService ..> RoomItemInUseException : throws
     StockService ..> AccessDeniedException : throws
     StockService ..> StockItemNameTakenException : throws
     StockService ..> StockItemNotFoundException : throws

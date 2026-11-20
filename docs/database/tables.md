@@ -24,6 +24,7 @@ This version applies the schema decisions of PR #3 (branch `backlog-requirements
   - `stock_movements.exit_reason`: discard, return, loss (Q-34).
   - `stock_imports` and `stock_movements.import_id`. `supplier_name` moves to `stock_imports` (RF-28, Q-10).
   - `stock_imports.file_format`: `xml` or `json` (statement update 2026-11-06, H4Y-84, Q-59).
+  - `room_items` (v11, H4Y-91, RF-08): items of each room. `quantity` is 1 to 255.
 - **Changed:**
   - `roles` has 5 rows, the actor types of RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT, SUPPLIER (upper case, the same as the Java `Role` enum).
   - Example data follows RF-03 (floor 1 has restaurant and pool; floors 2 and 3 have rooms) and RF-04 (20 rooms).
@@ -148,7 +149,7 @@ Floor ids: 1 = floor -1, 2 = floor 0, 3 = floor 1.
 ### room_items
 **What:** The items each room must have, and how many.
 **Why:** The manager configures what is in each room.
-**Why this way:** The PK is (`room_id`, `item_id`). It is a link table for a many-to-many relation: a room has many items, and an item is in many rooms. No row means the room does not have the item.
+**Why this way:** The PK is (`room_id`, `item_id`). It is a link table for a many-to-many relation: a room has many items, and an item is in many rooms. No row means the room does not have the item. `quantity` is 1 to 255 (CHECK `quantity > 0`). A room or an item with rows here cannot be deleted (SQL error 547). Deleting a row removes only that item from the room.
 **Other option:** Set items per room type. It is less work to configure, but a room with a special setup is not possible. We chose per room for flexibility.
 
 | room_id | item_id | quantity |
@@ -349,6 +350,7 @@ Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new c
 | a reservation with no check-in and no card | OK. The backend first deletes its `reservation_services` and `reservation_locations`, in the same transaction. |
 | a reservation with a card | Fails. The access history stays safe. |
 | a floor, room type, room, role or item that is in use | Fails (`NO ACTION`). |
+| a room item (one row of `room_items`) | OK. Only that item leaves the room. The room and the item stay. If another table uses the row, the delete fails with `RoomItemInUseException` (SQL error 547, `NO ACTION`). No table uses `room_items` yet, so this refusal does not happen yet (Q-36). |
 | a user | Do not delete. Old data points to the user. |
 
 ## Questions you may get
@@ -378,4 +380,4 @@ Piscinas privadas, Spa and Salas de conferências. All seed prices are null.
 The sample prices above explain the data; the migration does not set them.
 The reservation_services link is a future design and is not created by v14.
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-91 room items docs, Claude Code (claude-haiku-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20. Reviewed by: pending.
