@@ -90,4 +90,21 @@ class ReservationLocationsTest {
 
         assertEquals("Restaurante Mar", service.listActive(RECEPTIONIST).get(0).locations());
     }
+
+    @Test
+    @Tag("H4Y-92-AC-3")
+    void onCreate_includeNoLocation_whenZoneListIsNull() {
+        Reservation saved = service.create(CLIENT, room, START, END, null, RECEPTIONIST);
+
+        assertTrue(saved.getLocationIds().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-92-AC-1")
+    void onCreate_keepZoneOnce_whenSameIdIsSentTwice() {
+        Reservation saved = service.create(CLIENT, room, START, END,
+                List.of(RESTAURANT_ID, RESTAURANT_ID), RECEPTIONIST);
+
+        assertEquals(List.of(RESTAURANT_ID), saved.getLocationIds());
+    }
 }
