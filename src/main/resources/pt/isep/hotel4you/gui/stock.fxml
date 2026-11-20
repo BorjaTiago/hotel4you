@@ -34,5 +34,23 @@
             <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
         </HBox>
     </VBox>
+    <Label text="Entrada de stock" styleClass="subtitle"/>
+    <VBox spacing="12">
+        <HBox spacing="12">
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="entryItemLabel" text="Item"/>
+                <ComboBox fx:id="entryItemBox" promptText="Escolha o item" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="entryQuantityLabel" text="Quantidade"/>
+                <TextField fx:id="entryQuantityField" promptText="Quantidade" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="entryDateLabel" text="Data"/>
+                <TextField fx:id="entryDateField" editable="false" focusTraversable="false" maxWidth="Infinity"/>
+            </VBox>
+        </HBox>
+        <Button text="Registar entrada" onAction="#onRegisterMovementClicked" styleClass="action-button, save-button" maxWidth="Infinity"/>
+    </VBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>

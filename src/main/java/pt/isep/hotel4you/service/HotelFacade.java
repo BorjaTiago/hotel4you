@@ -16,6 +16,7 @@ import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
+import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationQuote;
@@ -25,6 +26,7 @@ import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 import pt.isep.hotel4you.domain.User;
 
 /** Single entry point for the GUI. */
@@ -673,5 +675,33 @@ public class HotelFacade {
      */
     public List<StockItem> listItems(User actor) {
         return stockService.listItems(actor);
+    }
+
+    /**
+     * Records a stock movement of an item with the date of today. An entry raises the stock.
+     *
+     * @param item the chosen item
+     * @param type the kind of movement
+     * @param quantity the quantity, from 1 to 32767
+     * @param user the logged-in user who records the movement
+     * @return the saved movement, with the item and its new stock
+     * @throws AccessDeniedException if the user is not a manager
+     * @throws IllegalArgumentException if no item is chosen or the quantity is out of range
+     * @throws StockItemNotFoundException if the item does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public StockMovement registerMovement(StockItem item, MovementType type, int quantity, User user) {
+        return stockService.registerMovement(item, type, quantity, user);
+    }
+
+    /**
+     * Turns the quantity text of the screen into a whole number.
+     *
+     * @param text the text of the quantity field
+     * @return the number
+     * @throws IllegalArgumentException if the text is not a whole number
+     */
+    public int parseQuantity(String text) {
+        return stockService.parseQuantity(text);
     }
 }

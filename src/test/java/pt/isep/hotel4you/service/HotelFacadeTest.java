@@ -27,6 +27,7 @@ import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
@@ -36,6 +37,7 @@ import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests that the facade passes calls to the services. */
@@ -442,6 +444,24 @@ class HotelFacadeTest {
         User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
 
         assertThrows(AccessDeniedException.class, () -> facade.listItems(receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-90-AC-1")
+    void onRegisterMovement_raiseStockThroughStockService_whenManagerRecordsEntry() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "unidade", 10));
+
+        StockMovement movement = facade.registerMovement(towels, MovementType.ENTRY, 5, manager);
+
+        assertEquals(15, movement.getItem().getStockQuantity());
+        assertEquals(15, itemRepository.findById(towels.getId()).get().getStockQuantity());
+    }
+
+    @Test
+    @Tag("H4Y-90-AC-2")
+    void onParseQuantity_returnNumberThroughStockService_whenTextIsWholeNumber() {
+        assertEquals(5, facade.parseQuantity("5"));
     }
 
     @Test
