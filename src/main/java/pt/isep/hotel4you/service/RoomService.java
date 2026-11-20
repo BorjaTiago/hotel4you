@@ -27,12 +27,6 @@ public class RoomService {
     private static final Map<Integer, Integer> ROOM_FLOOR_LIMITS =
             Map.of(2, ROOMS_PER_FLOOR, 3, ROOMS_PER_FLOOR);
 
-    /** The biggest price that fits in DECIMAL(8,2). */
-    private static final BigDecimal MAX_PRICE = new BigDecimal("999999.99");
-    private static final int PRICE_SCALE = 2;
-    /** Plain ASCII digits only. BigDecimal alone also accepts exponents and non-ASCII digits. */
-    private static final String PRICE_TEXT = "-?\\d+(\\.\\d+)?";
-
     /** Fixed labels and provisional Q-01 targets for the room summary. */
     private static final List<RoomTypeTarget> ROOM_TYPE_TARGETS = List.of(
             new RoomTypeTarget("individual", "Individuais", 7),
@@ -314,17 +308,10 @@ public class RoomService {
      *
      * @param text the text typed by the user
      * @return the price
-     * @throws IllegalArgumentException if the text is null, blank or not a number
+     * @throws IllegalArgumentException if the trimmed text is longer than 12 characters or is not a number
      */
     public BigDecimal parsePrice(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("O preço tem de ser um número.");
-        }
-        String number = text.trim().replace(',', '.');
-        if (!number.matches(PRICE_TEXT)) {
-            throw new IllegalArgumentException("O preço tem de ser um número.");
-        }
-        return new BigDecimal(number);
+        return PriceRules.parse(text);
     }
 
     /**
@@ -344,11 +331,8 @@ public class RoomService {
         if (type == null || type.getId() == null) {
             throw new IllegalArgumentException("Indique o tipo de quarto.");
         }
-        if (!isValidPrice(price)) {
-            throw new IllegalArgumentException(
-                    "O preço tem de estar entre 0,00 e 999999,99, com duas casas decimais.");
-        }
-        if (!roomTypeRepository.updateBasePrice(type.getId(), price.setScale(PRICE_SCALE))) {
+        BigDecimal amount = PriceRules.normalize(price);
+        if (!roomTypeRepository.updateBasePrice(type.getId(), amount)) {
             throw new IllegalArgumentException("O tipo de quarto indicado não existe.");
         }
     }
@@ -363,10 +347,4 @@ public class RoomService {
                         && value.getName().equals(type.getName()));
     }
 
-    private static boolean isValidPrice(BigDecimal price) {
-        return price != null
-                && price.signum() >= 0
-                && price.scale() <= PRICE_SCALE
-                && price.compareTo(MAX_PRICE) <= 0;
-    }
 }

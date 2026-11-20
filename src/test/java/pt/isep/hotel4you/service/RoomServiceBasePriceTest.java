@@ -160,9 +160,18 @@ class RoomServiceBasePriceTest {
     }
 
     @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {" ", "abc", "1.000,50", "1e2", "8e1", "٨٠", "100e2147483647"})
+    @ValueSource(strings = {"000000080,50", " 000000080,50 "})
     @Tag("H4Y-26-AC-3")
+    @Tag("H4Y-93-AC-4")
+    void onParsePrice_returnPrice_whenTrimmedTextHasTwelveCharacters(String text) {
+        assertEquals(new BigDecimal("80.50"), service.parsePrice(text));
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {" ", "abc", "1.000,50", "1e2", "8e1", "٨٠", "100e2147483647", "0000000000000"})
+    @Tag("H4Y-26-AC-3")
+    @Tag("H4Y-93-AC-4")
     void onParsePrice_throw_whenTextIsNotNumber(String text) {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
                 () -> service.parsePrice(text));
