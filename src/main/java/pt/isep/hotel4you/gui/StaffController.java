@@ -17,9 +17,11 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.User;
+import pt.isep.hotel4you.service.AccessDeniedException;
 import pt.isep.hotel4you.service.HotelFacade;
+import pt.isep.hotel4you.service.StaffNotFoundException;
 
-/** Controller of the screen that creates, lists and edits staff accounts. */
+/** Controller of the screen that creates, lists, finds, edits and removes staff accounts. */
 public class StaffController {
 
     private final HotelFacade facade;
@@ -53,6 +55,12 @@ public class StaffController {
 
     @FXML
     private Button removeButton;
+
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private Label searchResultLabel;
 
     @FXML
     private TableView<User> staffTable;
@@ -130,12 +138,14 @@ public class StaffController {
         usernameField.clear();
         passwordField.clear();
         roleBox.setValue(null);
+        searchResultLabel.getStyleClass().remove("message");
+        searchResultLabel.setText("");
     }
 
     private void loadStaff() {
         try {
-            staffTable.getItems().setAll(facade.listUsers());
-        } catch (IllegalStateException e) {
+            staffTable.getItems().setAll(facade.listUsers(HotelApp.currentUser));
+        } catch (AccessDeniedException | IllegalStateException e) {
             messageLabel.setText(e.getMessage());
         }
     }
@@ -199,6 +209,19 @@ public class StaffController {
             messageLabel.setText("Conta removida.");
         } catch (RuntimeException e) {
             messageLabel.setText(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void onFindUserClicked() {
+        searchResultLabel.getStyleClass().remove("message");
+        try {
+            User user = facade.findUser(searchField.getText(), HotelApp.currentUser);
+            searchResultLabel.setText("Nome: " + user.getName() + "\nNome de utilizador: "
+                    + user.getUsername() + "\nTipo de conta: " + user.getRole().displayName());
+        } catch (AccessDeniedException | StaffNotFoundException | IllegalStateException e) {
+            searchResultLabel.getStyleClass().add("message");
+            searchResultLabel.setText(e.getMessage());
         }
     }
 

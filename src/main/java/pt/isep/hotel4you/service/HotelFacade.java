@@ -392,11 +392,27 @@ public class HotelFacade {
     /**
      * Lists all staff accounts.
      *
+     * @param actor the logged-in user who asks for the list
      * @return the accounts, or an empty list if none exists
+     * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalStateException if the database is not available
      */
-    public List<User> listUsers() {
-        return staffService.listUsers();
+    public List<User> listUsers(User actor) {
+        return staffService.listUsers(actor);
+    }
+
+    /**
+     * Finds one staff account by its login name.
+     *
+     * @param username the login name of the account
+     * @param actor the logged-in user who asks for the account
+     * @return the account
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws StaffNotFoundException if the username is blank or no account uses it
+     * @throws IllegalStateException if the database is not available
+     */
+    public User findUser(String username, User actor) {
+        return staffService.findUser(username, actor);
     }
 
     /**

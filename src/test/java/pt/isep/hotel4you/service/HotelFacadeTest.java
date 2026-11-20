@@ -263,7 +263,16 @@ class HotelFacadeTest {
 
         facade.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager);
 
-        assertEquals("ana", facade.listUsers().get(0).getUsername());
+        assertEquals("ana", facade.listUsers(manager).get(0).getUsername());
+    }
+
+    @Test
+    @Tag("H4Y-89-AC-3")
+    void onFindUser_returnAccount_whenUsernameExists() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        facade.createStaff("Ana Silva", "ana", PASSWORD, Role.RECEPTIONIST, manager);
+
+        assertEquals(Role.RECEPTIONIST, facade.findUser("ana", manager).getRole());
     }
 
     @Test
