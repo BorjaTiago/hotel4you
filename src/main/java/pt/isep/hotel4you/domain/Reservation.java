@@ -55,7 +55,7 @@ public class Reservation {
      * @param status the state
      * @param createdByUserId the user who created the booking, or null when the read does not need it
      * @param locationIds the ids of the zones the booking includes, for example the restaurant
-     *        (RF-18); empty if none
+     *        (RF-18); empty if none, and empty in the reads that do not need it
      * @throws IllegalArgumentException if the period is invalid
      */
     public Reservation(Long id, Long clientId, long roomId, LocalDate startDate, LocalDate endDate,
@@ -85,7 +85,10 @@ public class Reservation {
     public ReservationStatus getStatus() { return status; }
     /** @return the user who created the booking, or null when the read does not need it */
     public Long getCreatedByUserId() { return createdByUserId; }
-    /** @return the ids of the zones the booking includes, or an empty list */
+    /**
+     * @return the ids of the zones the booking includes, or an empty list. Only save fills it:
+     *         findById, findByRoom and findByRooms do not read the zones, so the list is empty there
+     */
     public List<Long> getLocationIds() { return locationIds; }
 
     /**
