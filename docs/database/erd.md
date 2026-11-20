@@ -22,7 +22,7 @@ erDiagram
     customers |o--o{ feedback : "customer_id"
     rooms ||--o{ reservations : "room_id"
     reservations ||--o{ reservation_services : "reservation_id"
-    additional_services ||--o{ reservation_services : "additional_service_id"
+    extra_prices ||--o{ reservation_services : "extra_price_id"
     reservations |o--o{ access_cards : "reservation_id"
     access_cards ||--o{ access_logs : "access_card_id"
     locations |o--o{ access_logs : "location_id"
@@ -78,11 +78,11 @@ erDiagram
         INT id PK
         SMALLINT item_id FK
         VARCHAR5 type
-        VARCHAR10 exit_reason "nullable"
+        VARCHAR10 exit_reason "nullable, exit story (not in v12)"
         SMALLINT quantity
         DATETIME2 moved_at
         SMALLINT user_id FK
-        INT import_id FK
+        INT import_id FK "import story (not in v12)"
     }
     customers {
         INT id PK
@@ -117,15 +117,16 @@ erDiagram
         DATETIME2 checked_out_at
         SMALLINT created_by_user_id FK
     }
-    additional_services {
+    extra_prices {
         SMALLINT id PK
-        VARCHAR100 name UK
-        DECIMAL price "nullable"
+        NVARCHAR100 name UK
+        VARCHAR20 type "ROOM_EXTRA or PAID_SERVICE"
+        DECIMAL price "nullable, per night"
     }
     reservation_services {
         INT id PK
         INT reservation_id FK
-        SMALLINT additional_service_id FK
+        SMALLINT extra_price_id FK
         DECIMAL unit_price "nullable"
         DATETIME2 used_at
     }
@@ -154,4 +155,4 @@ erDiagram
     }
 ```
 
-Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. H4Y-90 PR #65 review fixes by Claude Code (claude-opus-5-5), 2026-11-17; H4Y-90 merge of main (H4Y-93) by Claude Code (claude-opus-5-5), 2026-11-20. Reviewed by: pending.

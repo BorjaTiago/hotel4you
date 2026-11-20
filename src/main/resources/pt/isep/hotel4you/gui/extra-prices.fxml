@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.ExtraPriceController">
+    <Label text="Preços extra" styleClass="subtitle"/>
+    <Label fx:id="extraLabel" text="Selecione um extra para definir o preço por noite." wrapText="true"/>
+    <TableView fx:id="extraTable" styleClass="data-table" VBox.vgrow="ALWAYS" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Extra ou serviço" prefWidth="300"/>
+            <TableColumn fx:id="priceColumn" text="Preço por noite (€)" prefWidth="210"/>
+        </columns>
+        <placeholder><Label text="Não existem extras no catálogo."/></placeholder>
+    </TableView>
+    <Label fx:id="priceLabel" text="Preço por noite (€)"/>
+    <TextField fx:id="priceField" promptText="Ex.: 15,00" maxWidth="Infinity"/>
+    <Button fx:id="saveButton" text="Guardar preço" onAction="#onSavePriceClicked"
+            styleClass="primary-button" maxWidth="Infinity"/>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>

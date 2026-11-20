@@ -58,11 +58,11 @@ stock_movements
   id                    INT IDENTITY PK                 -- Internal movement ID.
   item_id               SMALLINT NOT NULL FK items      -- Item that came in, was used or left.
   type                  VARCHAR(5) NOT NULL             -- Type: in, use, out.
-  exit_reason           VARCHAR(10) NULL                -- Reason for an "out": discard, return, loss. NULL for "in" and "use".
+  exit_reason           VARCHAR(10) NULL                -- Reason for an "out": discard, return, loss. NULL for "in" and "use". Not in v12: the exit story adds it.
   quantity              SMALLINT NOT NULL               -- Quantity moved. Always positive. The type says add or subtract.
   moved_at              DATETIME2(0) NOT NULL           -- Date and time of the movement.
   user_id               SMALLINT NOT NULL FK users      -- Staff member or manager who recorded the movement.
-  import_id             INT NULL FK stock_imports       -- Supplier file load (XML or JSON) that created this movement. NULL = entered by hand.
+  import_id             INT NULL FK stock_imports       -- Supplier file load (XML or JSON) that created this movement. NULL = entered by hand. Not in v12: the import script adds it with stock_imports.
 
 customers
   id                    INT IDENTITY PK                 -- Internal customer ID.
@@ -99,17 +99,18 @@ reservations
   checked_out_at        DATETIME2(0) NULL               -- Real check-out date and time.
   created_by_user_id    SMALLINT NOT NULL FK users      -- Staff member who created the reservation.
 
-additional_services
-  id                    SMALLINT IDENTITY PK            -- Internal service ID.
-  name                  VARCHAR(100) NOT NULL UNIQUE    -- Service name (e.g. spa, laundry, drinks, sea view, mountain view).
-  price                 DECIMAL(8,2) NULL               -- Current service price. NULL = no price set (see decision 5).
+extra_prices
+  id                    SMALLINT IDENTITY PK          -- Internal service ID.
+  name                  NVARCHAR(100) NOT NULL UNIQUE -- Service name (e.g. spa, laundry, drinks, sea view, mountain view).
+  type                  VARCHAR(20) NOT NULL          -- ROOM_EXTRA or PAID_SERVICE.
+  price                 DECIMAL(8,2) NULL             -- Current service price per night. NULL = no price set (see decision 5).
 
 reservation_services
-  id                    INT IDENTITY PK                 -- Internal ID of the service in the reservation.
-  reservation_id        INT NOT NULL FK reservations    -- Reservation of the service. NO ACTION (see decision 1).
-  additional_service_id SMALLINT NOT NULL FK additional_services -- Service included or used.
-  unit_price            DECIMAL(8,2) NULL               -- Price at that time. Does not change if the service price changes. NULL = no price.
-  used_at               DATETIME2(0) NULL               -- When the service was used. For a room service request: the time of the request. NULL = included but not used yet.
+  id                    INT IDENTITY PK               -- Internal ID of the service in the reservation.
+  reservation_id        INT NOT NULL FK reservations  -- Reservation of the service. NO ACTION (see decision 1).
+  extra_price_id        SMALLINT NOT NULL FK extra_prices -- Service included or used.
+  unit_price            DECIMAL(8,2) NULL             -- Price at that time. Does not change if the service price changes. NULL = no price.
+  used_at               DATETIME2(0) NULL             -- When the service was used. For a room service request: the time of the request. NULL = included but not used yet.
 
 access_cards
   id                    INT IDENTITY PK                 -- Internal card ID.
@@ -157,7 +158,7 @@ feedback
 
 ### Reservations and services
 - `reservations`: one customer, one room, a date range and a `status` (reserved, cancelled, checked_in, checked_out). Stores the real check-in and check-out times and the user who created it. No price column: the total is computed from `base_price` and the services.
-- `additional_services`: catalogue of services with the current price (spa, laundry, drinks, sea view, mountain view). The view is a service.
+- `extra_prices`: the nine room extras and paid services, with a fixed price per night. SQL v14 creates and completes this catalogue by name without overwriting prices. The type is ROOM_EXTRA or PAID_SERVICE. This table replaces the earlier planned catalogue name. Run v14 after the reserved v11-v13 scripts. `reservation_services` and its catalogue link remain a design for later stories.
 - `reservation_services`: services used in a reservation. `unit_price` is a copy of the price at that time. `used_at = NULL` means included but not used yet. Room service requests (food, drink, laundry) use this table. `used_at` is the time of the request.
 
 ### Access control
@@ -189,7 +190,7 @@ feedback
 | customers | feedback | customer_id | no | NO ACTION |
 | rooms | reservations | room_id | yes | NO ACTION |
 | reservations | reservation_services | reservation_id | yes | NO ACTION |
-| additional_services | reservation_services | additional_service_id | yes | NO ACTION |
+| extra_prices | reservation_services | extra_price_id | yes | NO ACTION |
 | reservations | access_cards | reservation_id | no | NO ACTION |
 | access_cards | access_logs | access_card_id | yes | NO ACTION |
 | locations | access_logs | location_id | no | NO ACTION |
@@ -208,12 +209,12 @@ T-SQL has no boolean type. Do not compare two conditions with `=` or `<>`. Use A
 | reservation_locations | PK (`reservation_id`, `location_id`) |
 | items | `name` UNIQUE; `stock_quantity >= 0` |
 | room_items | PK (`room_id`, `item_id`); `quantity > 0` |
-| additional_services | `name` UNIQUE; `price IS NULL OR price >= 0` |
+| extra_prices | `name` UNIQUE; `type IN ('ROOM_EXTRA','PAID_SERVICE')`; `price IS NULL OR price >= 0` |
 | reservations | `end_date > start_date`; `status` in the 4 values, default `'reserved'`; check-in and check-out dates match the status (see below); `checked_out_at >= checked_in_at` |
 | reservation_services | all FKs NO ACTION; `unit_price IS NULL OR unit_price >= 0` |
 | access_cards | card belongs to a reservation OR a user; `is_master = 0 OR user_id IS NOT NULL`; `card_number` UNIQUE |
 | access_logs | entry is in a location OR a room |
-| stock_movements | `type IN ('in','use','out')`; `quantity > 0`; `exit_reason IN ('discard','return','loss')` or NULL; `type = 'out' OR exit_reason IS NULL` |
+| stock_movements | `type IN ('in','use','out')`; `quantity > 0` (v12). The exit story adds `exit_reason IN ('discard','return','loss')` or NULL and `type = 'out' OR exit_reason IS NULL`. |
 | stock_imports | `supplier_name` NOT NULL; `file_format IN ('xml','json')` |
 | feedback | `type IN ('suggestion','complaint')` |
 
@@ -253,7 +254,7 @@ CREATE INDEX ix_access_logs_room_time    ON access_logs (room_id, entered_at);
 CREATE INDEX ix_reservation_services_reservation ON reservation_services (reservation_id);
 CREATE INDEX ix_access_cards_reservation         ON access_cards (reservation_id) WHERE reservation_id IS NOT NULL;
 
--- Stock history per item
+-- Stock history per item (not in v12: the story that lists the movements adds it)
 CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at);
 ```
 
@@ -268,10 +269,10 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 
 7. **Card number**: `card_number` is plain UNIQUE. A card number never repeats. The backend sets `active = 0` at check-out. A block sets `blocked_at`. The card row is never deleted, so `access_logs` stay as history (RF-30, Q-26, Q-31).
 8. **Room items per room**: the manager sets items for each room (`room_items` links `rooms` and `items`). This is more flexible than per room type and costs only one extra row per item. A room or an item with rows here cannot be deleted (NO ACTION, SQL error 547). Removing a row removes only that item from the room.
-9. **Views**: "sea view" and "mountain view" are 2 rows in `additional_services`, linked by `reservation_services`. The backend allows one view per reservation (Q-37, Q-11).
+9. **Views**: "sea view" and "mountain view" are 2 rows in `extra_prices`, linked by `reservation_services`. The backend allows one view per reservation (Q-37, Q-11).
 10. **Room service**: a request for food, drink or laundry is a `reservation_services` row. `used_at` is the request time (Q-33).
 11. **Zones and the client card**: the backend decides in this order. (a) `guest_card_access = 0`: refuse the client card (bar, conference rooms, garage, storeroom, private pools, spa; Q-20). (b) `guest_card_access = 1` and `requires_reservation = 0`: open. (c) `guest_card_access = 1` and `requires_reservation = 1`: open only if `reservation_locations` lists the place for that reservation (restaurant and pool; Q-09, Q-32, RF-18). We chose one extra BIT column because it is the simplest way to say "never". The default is 0, so a new zone is closed to client cards until the manager opens it. Staff and master cards do not use these two flags.
-12. **Stock import and exit**: one supplier file load (XML or JSON, statement update 2026-11-06) is one `stock_imports` row. `file_format` keeps the format, so the report and a later check show which reader read the file (H4Y-84, Q-59). Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). Import every item from a valid XML or JSON file and create missing `items` rows (Q-10, Q-38; PR #20 decision, 2026-10-21). Save the new catalogue items, import, ENTRY movements and balances in one transaction. A failed save undoes the whole import. No rejected-item field is needed. This updates the schema documentation; no database migration is applied here. `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
+12. **Stock import and exit**: one supplier file load (XML or JSON, statement update 2026-11-06) is one `stock_imports` row. `file_format` keeps the format, so the report and a later check show which reader read the file (H4Y-84, Q-59). Its movements point to it by `import_id`. The supplier is stored here only (RF-28, Q-10). Import every item from a valid XML or JSON file and create missing `items` rows (Q-10, Q-38; PR #20 decision, 2026-10-21). Save the new catalogue items, import, ENTRY movements and balances in one transaction. A failed save undoes the whole import. No rejected-item field is needed. `database/v12-create-stock-movements.sql` (H4Y-90) creates `stock_movements` without `exit_reason`, `import_id` and the history index. The exit and import stories add them in their own scripts. `exit_reason` (discard, return, loss) explains an `out` (Q-34). `items.unit` gives the unit (Q-38).
 13. **Zone removal**: the backend deletes the `locations` row. If another row references it (FK NO ACTION, SQL error 547), the delete fails and the backend shows 'A zona tem associações e não pode ser removida.' (Q-36, H4Y-28).
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13; docs, Claude Code (claude-haiku-5-5), 2026-11-17. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: antonioprmartinho. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; PR-32 seed example by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13. H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16. H4Y-90 PR #65 review fixes by Claude Code (claude-opus-5-5), 2026-11-17; H4Y-90 merge of main (H4Y-93) by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-91 room items docs, Claude Code (claude-haiku-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20. Reviewed by: pending.

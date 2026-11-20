@@ -13,8 +13,10 @@ import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.ClientSearchField;
+import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
+import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationQuote;
@@ -25,6 +27,7 @@ import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 import pt.isep.hotel4you.domain.User;
 
 /** Single entry point for the GUI. */
@@ -37,6 +40,7 @@ public class HotelFacade {
     private final StockService stockService;
     private final ClientService clientService;
     private final ReservationService reservationService;
+    private final ExtraPriceService extraPriceService;
 
     /**
      * Creates the facade.
@@ -48,10 +52,12 @@ public class HotelFacade {
      * @param stockService the stock item service
      * @param clientService the client registration service
      * @param reservationService the reservation service
+     * @param extraPriceService the extra price service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
-            ClientService clientService, ReservationService reservationService) {
+            ClientService clientService, ReservationService reservationService,
+            ExtraPriceService extraPriceService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -59,6 +65,31 @@ public class HotelFacade {
         this.stockService = stockService;
         this.clientService = clientService;
         this.reservationService = reservationService;
+        this.extraPriceService = extraPriceService;
+    }
+
+    /**
+     * Lists the extra prices per night, including those not yet set.
+     * @param actor the logged-in user
+     * @return the extra catalogue ordered by identifier
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<ExtraService> listExtraPrices(User actor) {
+        return extraPriceService.listPrices(actor);
+    }
+
+    /**
+     * Sets the fixed extra price per night.
+     * @param extra the selected catalogue entry
+     * @param price the new price per night
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the extra or the price is invalid
+     * @throws IllegalStateException if the database is not available
+     */
+    public void setExtraPrice(ExtraService extra, BigDecimal price, User actor) {
+        extraPriceService.setPrice(extra, price, actor);
     }
 
     /**
@@ -362,11 +393,27 @@ public class HotelFacade {
     /**
      * Lists all staff accounts.
      *
+     * @param actor the logged-in user who asks for the list
      * @return the accounts, or an empty list if none exists
+     * @throws AccessDeniedException if the actor is not a manager
      * @throws IllegalStateException if the database is not available
      */
-    public List<User> listUsers() {
-        return staffService.listUsers();
+    public List<User> listUsers(User actor) {
+        return staffService.listUsers(actor);
+    }
+
+    /**
+     * Finds one staff account by its login name.
+     *
+     * @param username the login name of the account
+     * @param actor the logged-in user who asks for the account
+     * @return the account
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws StaffNotFoundException if the username is blank or no account uses it
+     * @throws IllegalStateException if the database is not available
+     */
+    public User findUser(String username, User actor) {
+        return staffService.findUser(username, actor);
     }
 
     /**
@@ -684,5 +731,33 @@ public class HotelFacade {
      */
     public List<StockItem> listItems(User actor) {
         return stockService.listItems(actor);
+    }
+
+    /**
+     * Records a stock movement of an item with the date of today. An entry raises the stock.
+     *
+     * @param item the chosen item
+     * @param type the kind of movement
+     * @param quantity the quantity, from 1 to 32767
+     * @param user the logged-in user who records the movement
+     * @return the saved movement, with the item and its new stock
+     * @throws AccessDeniedException if the user is not a manager
+     * @throws IllegalArgumentException if no item is chosen or the quantity is out of range
+     * @throws StockItemNotFoundException if the item does not exist
+     * @throws IllegalStateException if the database is not available
+     */
+    public StockMovement registerMovement(StockItem item, MovementType type, int quantity, User user) {
+        return stockService.registerMovement(item, type, quantity, user);
+    }
+
+    /**
+     * Turns the quantity text of the screen into a whole number.
+     *
+     * @param text the text of the quantity field
+     * @return the number
+     * @throws IllegalArgumentException if the text is not a whole number
+     */
+    public int parseQuantity(String text) {
+        return stockService.parseQuantity(text);
     }
 }
