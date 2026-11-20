@@ -50,15 +50,18 @@ public class ReservationService {
      * @param room the room to reserve
      * @param start the first night
      * @param end the departure date
+     * @param locationIds the ids of the zones the reservation includes, for example the restaurant
+     *        and the pool (RF-18); empty or null if none. A repeated id counts once
      * @param actor the logged-in user who creates the reservation
-     * @return the saved reservation with the state RESERVED
+     * @return the saved reservation with the state RESERVED and the chosen places
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws IllegalArgumentException if data is missing (the message names all missing fields),
      *         the departure is not after the arrival, or the arrival is before today
      * @throws RoomNotAvailableException if the room has a reservation in the nights
      * @throws IllegalStateException if the database is not available
      */
-    public Reservation create(Client client, Room room, LocalDate start, LocalDate end, User actor) {
+    public Reservation create(Client client, Room room, LocalDate start, LocalDate end,
+            List<Long> locationIds, User actor) {
         checkPermission(actor);
         List<String> missing = new ArrayList<>();
         if (client == null || client.getId() == null) {
@@ -77,7 +80,8 @@ public class ReservationService {
             throw new RoomNotAvailableException();
         }
         return reservationRepository.save(new Reservation(null, client.getId(), room.getId(),
-                start, end, ReservationStatus.RESERVED, actor.getId()));
+                start, end, ReservationStatus.RESERVED, actor.getId(),
+                locationIds == null ? List.of() : locationIds.stream().distinct().toList()));
     }
 
     /**

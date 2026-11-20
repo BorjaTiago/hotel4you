@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
@@ -61,6 +62,29 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public Reservation save(Reservation reservation) {
+        try (Connection connection = database.connect()) {
+            connection.setAutoCommit(false);
+            try {
+                long id = insertReservation(connection, reservation);
+                for (long location : reservation.getLocationIds()) {
+                    insertLocation(connection, id, location);
+                }
+                connection.commit();
+                return new Reservation(id, reservation.getClientId(), reservation.getRoomId(),
+                        reservation.getStartDate(), reservation.getEndDate(),
+                        reservation.getStatus(), reservation.getCreatedByUserId(),
+                        reservation.getLocationIds());
+            } catch (SQLException | RuntimeException error) {
+                connection.rollback();
+                throw error;
+            }
+        } catch (SQLException error) {
+            throw new IllegalStateException("Não foi possível guardar a reserva.", error);
+        }
+    }
+
+    private static long insertReservation(Connection connection, Reservation reservation)
+            throws SQLException {
         // The lock hints keep the checked rows and range locked until the insert ends.
         String sql = """
                 INSERT INTO reservations
@@ -71,8 +95,7 @@ public class JdbcReservationRepository implements ReservationRepository {
                     SELECT 1 FROM reservations WITH (UPDLOCK, HOLDLOCK)
                     WHERE room_id = ? AND status <> 'cancelled' AND start_date < ? AND end_date > ?)
                 """;
-        try (Connection connection = database.connect();
-                PreparedStatement statement = Database.prepare(connection, sql,
+        try (PreparedStatement statement = Database.prepare(connection, sql,
                         reservation.getClientId(), reservation.getRoomId(),
                         Date.valueOf(reservation.getStartDate()), Date.valueOf(reservation.getEndDate()),
                         reservation.getStatus().name().toLowerCase(Locale.ROOT),
@@ -82,11 +105,21 @@ public class JdbcReservationRepository implements ReservationRepository {
             if (!row.next()) {
                 throw new RoomNotAvailableException();
             }
-            return new Reservation(row.getLong("id"), reservation.getClientId(),
-                    reservation.getRoomId(), reservation.getStartDate(), reservation.getEndDate(),
-                    reservation.getStatus(), reservation.getCreatedByUserId());
-        } catch (SQLException error) {
-            throw new IllegalStateException("Não foi possível guardar a reserva.", error);
+            return row.getLong("id");
+        }
+    }
+
+    private static void insertLocation(Connection connection, long reservationId, long locationId)
+            throws SQLException {
+        // requires_reservation = 1 refuses a zone that the manager changed after the screen loaded.
+        String sql = "INSERT INTO reservation_locations (reservation_id, location_id) "
+                + "SELECT ?, id FROM locations WHERE id = ? AND requires_reservation = 1";
+        try (PreparedStatement statement = Database.prepare(connection, sql, reservationId,
+                locationId)) {
+            if (statement.executeUpdate() != 1) {
+                throw new IllegalStateException(
+                        "Um dos locais escolhidos já não existe ou já não precisa de reserva.");
+            }
         }
     }
 
@@ -133,7 +166,10 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public List<ReservationSummary> findActive() {
-        String sql = "SELECT r.id, c.name, c.document, rm.number, r.start_date, r.end_date, r.status "
+        String sql = "SELECT r.id, c.name, c.document, rm.number, r.start_date, r.end_date, r.status, "
+                + "(SELECT STRING_AGG(l.name, ', ') WITHIN GROUP (ORDER BY l.id) "
+                + "FROM reservation_locations rl JOIN locations l ON l.id = rl.location_id "
+                + "WHERE rl.reservation_id = r.id) AS locations "
                 + "FROM reservations r JOIN rooms rm ON rm.id = r.room_id "
                 + "JOIN customers c ON c.id = r.customer_id "
                 + "WHERE r.status IN ('reserved', 'checked_in') ORDER BY r.start_date, r.id";
@@ -147,7 +183,8 @@ public class JdbcReservationRepository implements ReservationRepository {
                         result.getInt("number"),
                         result.getDate("start_date").toLocalDate(),
                         result.getDate("end_date").toLocalDate(),
-                        ReservationStatus.fromDatabase(result.getString("status"))));
+                        ReservationStatus.fromDatabase(result.getString("status")),
+                        Objects.requireNonNullElse(result.getString("locations"), "")));
             }
             return List.copyOf(reservations);
         } catch (SQLException error) {
@@ -177,8 +214,32 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public boolean delete(long id) {
-        String sql = "DELETE FROM reservations WHERE id = ? AND status = 'reserved'";
-        return update(sql, id, "Não foi possível apagar a reserva.");
+        // reservation_locations has no CASCADE: delete its rows first, in the same transaction.
+        try (Connection connection = database.connect()) {
+            connection.setAutoCommit(false);
+            try {
+                execute(connection, "DELETE FROM reservation_locations WHERE reservation_id = ?", id);
+                boolean deleted = execute(connection,
+                        "DELETE FROM reservations WHERE id = ? AND status = 'reserved'", id) == 1;
+                if (deleted) {
+                    connection.commit();
+                } else {
+                    connection.rollback();
+                }
+                return deleted;
+            } catch (SQLException error) {
+                connection.rollback();
+                throw error;
+            }
+        } catch (SQLException error) {
+            throw new IllegalStateException("Não foi possível apagar a reserva.", error);
+        }
+    }
+
+    private static int execute(Connection connection, String sql, long id) throws SQLException {
+        try (PreparedStatement statement = Database.prepare(connection, sql, id)) {
+            return statement.executeUpdate();
+        }
     }
 
     private boolean update(String sql, long id, String errorMessage) {

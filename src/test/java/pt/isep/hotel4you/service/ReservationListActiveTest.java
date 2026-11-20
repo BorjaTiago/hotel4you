@@ -61,7 +61,7 @@ class ReservationListActiveTest {
         List<ReservationSummary> rows = service.listActive(RECEPTIONIST);
 
         assertEquals(List.of(new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START, END,
-                ReservationStatus.RESERVED)), rows);
+                ReservationStatus.RESERVED, "")), rows);
     }
 
     @Test

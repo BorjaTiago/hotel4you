@@ -19,13 +19,13 @@ class ReservationsControllerTest {
 
     private static ReservationSummary row(ReservationStatus status) {
         return new ReservationSummary(1L, "Maria Sousa", "12345678", 201, START,
-                START.plusDays(2), status);
+                START.plusDays(2), status, "");
     }
 
     private static ReservationSummary row(long id, String name, String document, LocalDate start,
             ReservationStatus status) {
         return new ReservationSummary(id, name, document, 200 + (int) id, start, start.plusDays(2),
-                status);
+                status, "");
     }
 
     private static List<ReservationSummary> sample() {

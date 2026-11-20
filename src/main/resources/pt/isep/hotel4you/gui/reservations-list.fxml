@@ -30,6 +30,7 @@
             <TableColumn fx:id="startColumn" text="Entrada" prefWidth="100"/>
             <TableColumn fx:id="endColumn" text="Saída" prefWidth="100"/>
             <TableColumn fx:id="statusColumn" text="Estado" prefWidth="120"/>
+            <TableColumn fx:id="locationsColumn" text="Locais" prefWidth="150"/>
         </columns>
         <placeholder>
             <Label text="Não há reservas ativas."/>

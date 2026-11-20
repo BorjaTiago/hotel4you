@@ -64,7 +64,7 @@ class ReservationServiceTest {
     @Test
     @Tag("H4Y-56-AC-1")
     void onCreate_saveReservedReservation_whenRoomIsFree() {
-        Reservation saved = service.create(CLIENT, room, START, END, RECEPTIONIST);
+        Reservation saved = service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
         assertNotNull(saved.getId());
         assertEquals(ReservationStatus.RESERVED, saved.getStatus());
@@ -78,7 +78,7 @@ class ReservationServiceTest {
     @Test
     @Tag("H4Y-56-AC-1")
     void onCreate_takeRoomOffFreeList_whenReservationIsSaved() {
-        service.create(CLIENT, room, START, END, RECEPTIONIST);
+        service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
         assertFalse(roomService.isAvailable(room, START, END));
         assertTrue(roomService.searchRooms(START, END, DOUBLE, RECEPTIONIST).isEmpty());
@@ -87,7 +87,7 @@ class ReservationServiceTest {
     @Test
     @Tag("H4Y-56-AC-1")
     void onCreate_keepCreator_whenReservationIsSaved() {
-        Reservation saved = service.create(CLIENT, room, START, END, RECEPTIONIST);
+        Reservation saved = service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
         assertEquals(RECEPTIONIST.getId(), saved.getCreatedByUserId());
     }
@@ -95,10 +95,10 @@ class ReservationServiceTest {
     @Test
     @Tag("H4Y-56-AC-2")
     void onCreate_throw_whenRoomHasOverlappingReservation() {
-        service.create(CLIENT, room, START, END, RECEPTIONIST);
+        service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
         RoomNotAvailableException error = assertThrows(RoomNotAvailableException.class,
-                () -> service.create(CLIENT, room, START.plusDays(1), END.plusDays(1), RECEPTIONIST));
+                () -> service.create(CLIENT, room, START.plusDays(1), END.plusDays(1), List.of(), RECEPTIONIST));
         assertEquals("O quarto já está reservado nessas datas.", error.getMessage());
         assertEquals(1, reservations.saved().size());
     }
@@ -109,7 +109,7 @@ class ReservationServiceTest {
         reservations.loseNextSave = true;
 
         RoomNotAvailableException error = assertThrows(RoomNotAvailableException.class,
-                () -> service.create(CLIENT, room, START, END, RECEPTIONIST));
+                () -> service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST));
         assertEquals("O quarto já está reservado nessas datas.", error.getMessage());
         assertTrue(reservations.saved().isEmpty());
     }
@@ -117,9 +117,9 @@ class ReservationServiceTest {
     @Test
     @Tag("H4Y-56-AC-2")
     void onCreate_saveReservation_whenPreviousGuestLeavesOnArrival() {
-        service.create(CLIENT, room, START, END, RECEPTIONIST);
+        service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
-        service.create(CLIENT, room, END, END.plusDays(2), RECEPTIONIST);
+        service.create(CLIENT, room, END, END.plusDays(2), List.of(), RECEPTIONIST);
 
         assertEquals(2, reservations.saved().size());
     }
@@ -129,7 +129,7 @@ class ReservationServiceTest {
     void onCreate_saveReservation_whenOverlappingReservationIsCancelled() {
         reservations.add(new Reservation(1L, room.getId(), START, END, ReservationStatus.CANCELLED));
 
-        Reservation saved = service.create(CLIENT, room, START, END, RECEPTIONIST);
+        Reservation saved = service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
         assertEquals(ReservationStatus.RESERVED, saved.getStatus());
     }
@@ -140,7 +140,7 @@ class ReservationServiceTest {
         LocalDate yesterday = LocalDate.now().minusDays(1);
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.create(CLIENT, room, yesterday, yesterday.plusDays(2), RECEPTIONIST));
+                () -> service.create(CLIENT, room, yesterday, yesterday.plusDays(2), List.of(), RECEPTIONIST));
         assertEquals("A data de entrada não pode ser antes de hoje.", error.getMessage());
         assertTrue(reservations.saved().isEmpty());
     }
@@ -150,7 +150,7 @@ class ReservationServiceTest {
     void onCreateReservation_save_whenStartIsToday() {
         LocalDate today = LocalDate.now();
 
-        Reservation saved = service.create(CLIENT, room, today, today.plusDays(1), RECEPTIONIST);
+        Reservation saved = service.create(CLIENT, room, today, today.plusDays(1), List.of(), RECEPTIONIST);
 
         assertEquals(today, saved.getStartDate());
         assertEquals(1, reservations.saved().size());
@@ -160,7 +160,7 @@ class ReservationServiceTest {
     @Tag("H4Y-56-AC-3")
     void onCreate_throwWithClient_whenClientIsMissing() {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.create(null, room, START, END, RECEPTIONIST));
+                () -> service.create(null, room, START, END, List.of(), RECEPTIONIST));
         assertEquals("Faltam dados: cliente.", error.getMessage());
         assertTrue(reservations.saved().isEmpty());
     }
@@ -169,7 +169,7 @@ class ReservationServiceTest {
     @Tag("H4Y-56-AC-3")
     void onCreate_throwWithDates_whenPeriodIsMissing() {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.create(CLIENT, room, null, null, RECEPTIONIST));
+                () -> service.create(CLIENT, room, null, null, List.of(), RECEPTIONIST));
         assertEquals("Faltam dados: data de entrada, data de saída.", error.getMessage());
         assertTrue(reservations.saved().isEmpty());
     }
@@ -178,7 +178,7 @@ class ReservationServiceTest {
     @Tag("H4Y-56-AC-3")
     void onCreate_throwWithAllFields_whenEverythingIsMissing() {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.create(null, null, null, null, RECEPTIONIST));
+                () -> service.create(null, null, null, null, List.of(), RECEPTIONIST));
         assertEquals("Faltam dados: cliente, quarto, data de entrada, data de saída.",
                 error.getMessage());
     }
@@ -190,7 +190,7 @@ class ReservationServiceTest {
                 LocalDate.of(1980, 1, 1), "913333333", "PT", null, null);
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.create(unsaved, room, START, END, RECEPTIONIST));
+                () -> service.create(unsaved, room, START, END, List.of(), RECEPTIONIST));
         assertEquals("Faltam dados: cliente.", error.getMessage());
     }
 
@@ -198,7 +198,7 @@ class ReservationServiceTest {
     @Tag("H4Y-56-AC-3")
     void onCreate_throw_whenDepartureIsNotAfterArrival() {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.create(CLIENT, room, END, START, RECEPTIONIST));
+                () -> service.create(CLIENT, room, END, START, List.of(), RECEPTIONIST));
         assertEquals("A data de saída tem de ser depois da data de entrada.", error.getMessage());
         assertTrue(reservations.saved().isEmpty());
     }
@@ -209,9 +209,9 @@ class ReservationServiceTest {
         User staff = new RestaurantStaff(2L, "Joao", "joao", "hash");
 
         assertThrows(AccessDeniedException.class,
-                () -> service.create(CLIENT, room, START, END, staff));
+                () -> service.create(CLIENT, room, START, END, List.of(), staff));
         assertThrows(AccessDeniedException.class,
-                () -> service.create(CLIENT, room, START, END, null));
+                () -> service.create(CLIENT, room, START, END, List.of(), null));
         assertTrue(reservations.saved().isEmpty());
     }
 
@@ -220,7 +220,7 @@ class ReservationServiceTest {
     void onCreate_saveReservation_whenActorIsManager() {
         User manager = new Manager(1L, "Rui", "rui", "hash");
 
-        Reservation saved = service.create(CLIENT, room, START, END, manager);
+        Reservation saved = service.create(CLIENT, room, START, END, List.of(), manager);
 
         assertEquals(manager.getId(), saved.getCreatedByUserId());
     }
@@ -263,7 +263,7 @@ class ReservationServiceTest {
     @Test
     @Tag("H4Y-56-AC-1")
     void onListClientReservations_showNewReservation_whenReservationIsSaved() {
-        Reservation saved = service.create(CLIENT, room, START, END, RECEPTIONIST);
+        Reservation saved = service.create(CLIENT, room, START, END, List.of(), RECEPTIONIST);
 
         List<ClientReservation> rows = service.listClientReservations(CLIENT, RECEPTIONIST);
 
