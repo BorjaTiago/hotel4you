@@ -61,6 +61,19 @@ class JdbcReservationSaveTest {
     }
 
     @Test
+    @Tag("H4Y-92-AC-1")
+    void onSave_insertLocationById_whenReservationHasZones() {
+        repository.save(new Reservation(null, 7L, 8L, START, END, ReservationStatus.RESERVED, 4L,
+                List.of(3L)));
+
+        String sql = database.sql.replaceAll("\\s+", " ");
+        assertTrue(sql.contains("INSERT INTO reservation_locations (reservation_id, location_id)"));
+        assertTrue(sql.contains("FROM locations WHERE id = ? AND requires_reservation = 1"));
+        assertEquals(List.<Object>of(55L, 3L), database.bound.subList(database.bound.size() - 2,
+                database.bound.size()));
+    }
+
+    @Test
     @Tag("H4Y-56-AC-2")
     void onSave_throwRoomNotAvailable_whenOverlapBlocksInsert() {
         database.noRow = true;
@@ -153,6 +166,7 @@ class JdbcReservationSaveTest {
                             bound.add(args[1]);
                             yield null;
                         }
+                        case "executeUpdate" -> 1;
                         case "executeQuery" -> {
                             if (failure != null) {
                                 throw failure;

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.Reservation;
@@ -17,6 +18,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
     private final List<Reservation> saved = new ArrayList<>();
     private final Map<Long, Integer> roomNumbers = new HashMap<>();
     private final Map<Long, String[]> clients = new HashMap<>();
+    private final Map<Long, String> locationNames = new HashMap<>();
     private long nextId = 100;
     public int findByRoomCalls;
     public int findByRoomsCalls;
@@ -54,6 +56,15 @@ public class InMemoryReservationRepository implements ReservationRepository {
         clients.put(clientId, new String[] {name, document});
     }
 
+    /**
+     * Sets the name of a zone, as the locations table does in SQL. A second call renames it.
+     * @param locationId the zone identifier
+     * @param name the zone name
+     */
+    public void addLocation(long locationId, String name) {
+        locationNames.put(locationId, name);
+    }
+
     /** @return the reservations saved through save, in save order */
     public List<Reservation> saved() {
         return List.copyOf(saved);
@@ -80,7 +91,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
         Reservation stored = new Reservation(nextId++, reservation.getClientId(),
                 reservation.getRoomId(), reservation.getStartDate(), reservation.getEndDate(),
                 reservation.getStatus(), reservation.getCreatedByUserId(),
-                reservation.getLocations());
+                reservation.getLocationIds());
         reservations.add(stored);
         saved.add(stored);
         return stored;
@@ -111,7 +122,9 @@ public class InMemoryReservationRepository implements ReservationRepository {
                         clients.getOrDefault(value.getClientId(), new String[] {"", ""})[1],
                         roomNumbers.getOrDefault(value.getRoomId(), 0), value.getStartDate(),
                         value.getEndDate(), value.getStatus(),
-                        String.join(", ", value.getLocations())))
+                        value.getLocationIds().stream()
+                                .map(id -> locationNames.getOrDefault(id, ""))
+                                .collect(Collectors.joining(", "))))
                 .toList();
     }
 
@@ -151,7 +164,7 @@ public class InMemoryReservationRepository implements ReservationRepository {
             if (Objects.equals(value.getId(), id) && value.getStatus() == from) {
                 reservations.set(i, new Reservation(value.getId(), value.getClientId(),
                         value.getRoomId(), value.getStartDate(), value.getEndDate(), to,
-                        value.getCreatedByUserId(), value.getLocations()));
+                        value.getCreatedByUserId(), value.getLocationIds()));
                 return true;
             }
         }

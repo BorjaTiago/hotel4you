@@ -20,6 +20,7 @@ import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Receptionist;
+import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.User;
 
 /** Tests that the manager can view the hotel floors and manage their zones. */
@@ -363,5 +364,29 @@ class LocationServiceTest {
 
         assertEquals(MANAGE_DENIED_MESSAGE, error.getMessage());
         assertTrue(locationRepository.findById(zone.getId()).isPresent());
+    }
+
+    @Test
+    @Tag("H4Y-92-AC-1")
+    void onListReservableZones_returnOnlyZonesThatNeedReservation_whenReceptionistAsks() {
+        InMemoryFloorRepository floors = new InMemoryFloorRepository();
+        floors.add(new Floor(0, "Piso 0", List.of(new Location(1L, "Bar", true, false))));
+        floors.add(new Floor(1, "Piso 1", List.of(new Location(3L, "Restaurante", true, true),
+                new Location(4L, "Piscina", true, true))));
+        LocationService zones = new LocationService(floors, locationRepository);
+
+        List<Location> result = zones.listReservableZones(
+                new Receptionist(4L, "Ana", "ana", "hash"));
+
+        assertEquals(List.of(3L, 4L), result.stream().map(Location::getId).toList());
+    }
+
+    @Test
+    @Tag("H4Y-92-AC-1")
+    void onListReservableZones_throw_whenActorCannotManageReservations() {
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> service.listReservableZones(new RestaurantStaff(5L, "Rui", "rui", "hash")));
+
+        assertEquals("Não tem permissão para gerir reservas.", error.getMessage());
     }
 }
