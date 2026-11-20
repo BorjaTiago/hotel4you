@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,8 +16,10 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ClientReservation;
+import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.ReservationQuote;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.domain.Room;
@@ -57,10 +60,7 @@ public class ReservationController {
     private Button confirmButton;
 
     @FXML
-    private CheckBox restaurantBox;
-
-    @FXML
-    private CheckBox poolBox;
+    private HBox locationsBox;
 
     @FXML
     private Label clientLabel;
@@ -116,6 +116,28 @@ public class ReservationController {
                 data -> new SimpleStringProperty(statusText(data.getValue().status())));
         clientStepController.setOnClientChosen(this::onClientChosen);
         roomStepController.setOnRoomChosen(this::onRoomChosen);
+        showZones();
+    }
+
+    /** Shows one check box for each zone that needs a reservation. The box keeps the zone id. */
+    private void showZones() {
+        try {
+            for (Location zone : facade.listReservableZones(HotelApp.currentUser)) {
+                CheckBox box = new CheckBox(zone.getName());
+                box.setUserData(zone.getId());
+                locationsBox.getChildren().add(box);
+            }
+        } catch (RuntimeException e) {
+            showMessage(e.getMessage(), false);
+        }
+    }
+
+    private List<Long> chosenZones() {
+        return locationsBox.getChildren().stream()
+                .map(CheckBox.class::cast)
+                .filter(CheckBox::isSelected)
+                .map(box -> (Long) box.getUserData())
+                .toList();
     }
 
     private void onClientChosen(Client client) {
@@ -152,7 +174,7 @@ public class ReservationController {
         messageLabel.setText("");
         try {
             facade.createReservation(chosenClient, chosenRoom, chosenStart, chosenEnd,
-                    restaurantBox.isSelected(), poolBox.isSelected(), HotelApp.currentUser);
+                    chosenZones(), HotelApp.currentUser);
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
             return;
@@ -172,8 +194,7 @@ public class ReservationController {
         datesLabel.setText("");
         summaryLabel.setText("");
         totalLabel.setText("");
-        restaurantBox.setSelected(false);
-        poolBox.setSelected(false);
+        locationsBox.getChildren().forEach(box -> ((CheckBox) box).setSelected(false));
         confirmButton.setDisable(true);
     }
 

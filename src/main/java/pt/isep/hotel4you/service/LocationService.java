@@ -67,6 +67,25 @@ public class LocationService {
     }
 
     /**
+     * Lists the zones that need a reservation, for example the restaurant and the pool (RF-18).
+     * The reception uses their ids to add them to a reservation.
+     *
+     * @param actor the logged-in user who asks
+     * @return the zones that need a reservation, in floor order
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Location> listReservableZones(User actor) {
+        if (!Permission.MANAGE_RESERVATIONS.allows(actor)) {
+            throw new AccessDeniedException("Não tem permissão para gerir reservas.");
+        }
+        return floorRepository.findAll().stream()
+                .flatMap(floor -> floor.locations().stream())
+                .filter(Location::isRequiresReservation)
+                .toList();
+    }
+
+    /**
      * Creates a zone on a floor.
      *
      * @param floorNumber the floor number

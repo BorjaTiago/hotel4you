@@ -13,7 +13,7 @@ public class Reservation {
     private final LocalDate endDate;
     private final ReservationStatus status;
     private final Long createdByUserId;
-    private final List<String> locations;
+    private final List<Long> locationIds;
 
     /**
      * Reads a booking period. This constructor does not create a database booking.
@@ -54,12 +54,12 @@ public class Reservation {
      * @param endDate the departure date, which is not occupied
      * @param status the state
      * @param createdByUserId the user who created the booking, or null when the read does not need it
-     * @param locations the names of the places the booking includes, for example "Restaurante"
+     * @param locationIds the ids of the zones the booking includes, for example the restaurant
      *        (RF-18); empty if none
      * @throws IllegalArgumentException if the period is invalid
      */
     public Reservation(Long id, Long clientId, long roomId, LocalDate startDate, LocalDate endDate,
-            ReservationStatus status, Long createdByUserId, List<String> locations) {
+            ReservationStatus status, Long createdByUserId, List<Long> locationIds) {
         validatePeriod(startDate, endDate);
         this.id = id;
         this.clientId = clientId;
@@ -68,7 +68,7 @@ public class Reservation {
         this.endDate = endDate;
         this.status = Objects.requireNonNull(status);
         this.createdByUserId = createdByUserId;
-        this.locations = List.copyOf(locations);
+        this.locationIds = List.copyOf(locationIds);
     }
 
     /** @return the booking identifier */
@@ -85,8 +85,8 @@ public class Reservation {
     public ReservationStatus getStatus() { return status; }
     /** @return the user who created the booking, or null when the read does not need it */
     public Long getCreatedByUserId() { return createdByUserId; }
-    /** @return the names of the places the booking includes, or an empty list */
-    public List<String> getLocations() { return locations; }
+    /** @return the ids of the zones the booking includes, or an empty list */
+    public List<Long> getLocationIds() { return locationIds; }
 
     /**
      * Checks that the booking allows the check-in. This method does not change the booking.

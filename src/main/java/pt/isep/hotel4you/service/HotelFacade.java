@@ -98,8 +98,7 @@ public class HotelFacade {
      * @param room the room to reserve
      * @param start the first night
      * @param end the departure date
-     * @param restaurant true if the reservation includes the restaurant (RF-18)
-     * @param pool true if the reservation includes the pool (RF-18)
+     * @param locationIds the ids of the zones the reservation includes (RF-18); empty if none
      * @param actor the logged-in user who creates the reservation
      * @return the saved reservation with the state RESERVED
      * @throws AccessDeniedException if the actor may not manage reservations
@@ -109,8 +108,8 @@ public class HotelFacade {
      * @throws IllegalStateException if the database is not available
      */
     public Reservation createReservation(Client client, Room room, LocalDate start, LocalDate end,
-            boolean restaurant, boolean pool, User actor) {
-        return reservationService.create(client, room, start, end, restaurant, pool, actor);
+            List<Long> locationIds, User actor) {
+        return reservationService.create(client, room, start, end, locationIds, actor);
     }
 
     /**
@@ -415,6 +414,18 @@ public class HotelFacade {
      */
     public User findUser(String username, User actor) {
         return staffService.findUser(username, actor);
+    }
+
+    /**
+     * Lists the zones that need a reservation (RF-18).
+     *
+     * @param actor the logged-in user who asks
+     * @return the zones that need a reservation
+     * @throws AccessDeniedException if the actor may not manage reservations
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Location> listReservableZones(User actor) {
+        return locationService.listReservableZones(actor);
     }
 
     /**

@@ -66,14 +66,14 @@ public class JdbcReservationRepository implements ReservationRepository {
             connection.setAutoCommit(false);
             try {
                 long id = insertReservation(connection, reservation);
-                for (String location : reservation.getLocations()) {
+                for (long location : reservation.getLocationIds()) {
                     insertLocation(connection, id, location);
                 }
                 connection.commit();
                 return new Reservation(id, reservation.getClientId(), reservation.getRoomId(),
                         reservation.getStartDate(), reservation.getEndDate(),
                         reservation.getStatus(), reservation.getCreatedByUserId(),
-                        reservation.getLocations());
+                        reservation.getLocationIds());
             } catch (SQLException | RuntimeException error) {
                 connection.rollback();
                 throw error;
@@ -109,15 +109,16 @@ public class JdbcReservationRepository implements ReservationRepository {
         }
     }
 
-    private static void insertLocation(Connection connection, long reservationId, String name)
+    private static void insertLocation(Connection connection, long reservationId, long locationId)
             throws SQLException {
-        // ponytail: finds the zone by name; a second zone with the same name and
-        // requires_reservation = 1 on another floor stops the save. Pass location ids if that happens.
+        // requires_reservation = 1 refuses a zone that the manager changed after the screen loaded.
         String sql = "INSERT INTO reservation_locations (reservation_id, location_id) "
-                + "SELECT ?, id FROM locations WHERE name = ? AND requires_reservation = 1";
-        try (PreparedStatement statement = Database.prepare(connection, sql, reservationId, name)) {
+                + "SELECT ?, id FROM locations WHERE id = ? AND requires_reservation = 1";
+        try (PreparedStatement statement = Database.prepare(connection, sql, reservationId,
+                locationId)) {
             if (statement.executeUpdate() != 1) {
-                throw new IllegalStateException("O local " + name + " não existe.");
+                throw new IllegalStateException(
+                        "Um dos locais escolhidos já não existe ou já não precisa de reserva.");
             }
         }
     }

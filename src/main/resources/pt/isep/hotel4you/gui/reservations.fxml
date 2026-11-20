@@ -27,10 +27,7 @@
                     <Label fx:id="roomLabel" wrapText="true" maxWidth="Infinity"/>
                     <Label fx:id="datesLabel" wrapText="true" maxWidth="Infinity"/>
                     <Label fx:id="summaryLabel" wrapText="true" maxWidth="Infinity"/>
-                    <HBox spacing="16" alignment="CENTER_LEFT">
-                        <CheckBox fx:id="restaurantBox" text="Restaurante"/>
-                        <CheckBox fx:id="poolBox" text="Piscina"/>
-                    </HBox>
+                    <HBox fx:id="locationsBox" spacing="16" alignment="CENTER_LEFT"/>
                     <HBox spacing="12" alignment="CENTER_LEFT" styleClass="summary-footer">
                         <Label fx:id="totalLabel" styleClass="summary-total" wrapText="true" maxWidth="Infinity"
                                HBox.hgrow="ALWAYS"/>

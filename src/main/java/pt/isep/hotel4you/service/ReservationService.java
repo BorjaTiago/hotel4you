@@ -24,10 +24,6 @@ public class ReservationService {
 
     private static final String NO_PERMISSION = "Não tem permissão para gerir reservas.";
     private static final String STATE_CHANGED = "A reserva mudou de estado. Atualize a lista.";
-    /** Name of the restaurant zone in the reference data (v4). */
-    static final String RESTAURANT = "Restaurante";
-    /** Name of the pool zone in the reference data (v4). */
-    static final String POOL = "Piscina";
 
     private final ReservationRepository reservationRepository;
     private final RoomService roomService;
@@ -54,8 +50,8 @@ public class ReservationService {
      * @param room the room to reserve
      * @param start the first night
      * @param end the departure date
-     * @param restaurant true if the reservation includes the restaurant (RF-18)
-     * @param pool true if the reservation includes the pool (RF-18)
+     * @param locationIds the ids of the zones the reservation includes, for example the restaurant
+     *        and the pool (RF-18); empty if none
      * @param actor the logged-in user who creates the reservation
      * @return the saved reservation with the state RESERVED and the chosen places
      * @throws AccessDeniedException if the actor may not manage reservations
@@ -65,7 +61,7 @@ public class ReservationService {
      * @throws IllegalStateException if the database is not available
      */
     public Reservation create(Client client, Room room, LocalDate start, LocalDate end,
-            boolean restaurant, boolean pool, User actor) {
+            List<Long> locationIds, User actor) {
         checkPermission(actor);
         List<String> missing = new ArrayList<>();
         if (client == null || client.getId() == null) {
@@ -83,15 +79,8 @@ public class ReservationService {
         if (!roomService.isAvailable(room, start, end)) {
             throw new RoomNotAvailableException();
         }
-        List<String> locations = new ArrayList<>();
-        if (restaurant) {
-            locations.add(RESTAURANT);
-        }
-        if (pool) {
-            locations.add(POOL);
-        }
         return reservationRepository.save(new Reservation(null, client.getId(), room.getId(),
-                start, end, ReservationStatus.RESERVED, actor.getId(), locations));
+                start, end, ReservationStatus.RESERVED, actor.getId(), locationIds));
     }
 
     /**
