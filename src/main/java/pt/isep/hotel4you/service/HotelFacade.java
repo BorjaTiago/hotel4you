@@ -13,6 +13,7 @@ import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.ClientSearchField;
+import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.MovementType;
@@ -38,6 +39,7 @@ public class HotelFacade {
     private final StockService stockService;
     private final ClientService clientService;
     private final ReservationService reservationService;
+    private final ExtraPriceService extraPriceService;
 
     /**
      * Creates the facade.
@@ -49,10 +51,12 @@ public class HotelFacade {
      * @param stockService the stock item service
      * @param clientService the client registration service
      * @param reservationService the reservation service
+     * @param extraPriceService the extra price service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
-            ClientService clientService, ReservationService reservationService) {
+            ClientService clientService, ReservationService reservationService,
+            ExtraPriceService extraPriceService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -60,6 +64,31 @@ public class HotelFacade {
         this.stockService = stockService;
         this.clientService = clientService;
         this.reservationService = reservationService;
+        this.extraPriceService = extraPriceService;
+    }
+
+    /**
+     * Lists the extra prices per night, including those not yet set.
+     * @param actor the logged-in user
+     * @return the extra catalogue ordered by identifier
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<ExtraService> listExtraPrices(User actor) {
+        return extraPriceService.listPrices(actor);
+    }
+
+    /**
+     * Sets the fixed extra price per night.
+     * @param extra the selected catalogue entry
+     * @param price the new price per night
+     * @param actor the logged-in user
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalArgumentException if the extra or the price is invalid
+     * @throws IllegalStateException if the database is not available
+     */
+    public void setExtraPrice(ExtraService extra, BigDecimal price, User actor) {
+        extraPriceService.setPrice(extra, price, actor);
     }
 
     /**

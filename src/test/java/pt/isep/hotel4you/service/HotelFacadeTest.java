@@ -75,7 +75,7 @@ class HotelFacadeTest {
         ReservationService reservationService = new ReservationService(reservationRepository,
                 roomService, roomTypeRepository);
         facade = new HotelFacade(authService, staffService, locationService, roomService,
-                stockService, clientService, reservationService);
+                stockService, clientService, reservationService, null);
     }
 
     private User saveAna() {
