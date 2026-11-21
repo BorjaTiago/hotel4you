@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<title>Sprint Retrospective - Sprint 6</title>
+<style>
+html{background:#fff}
+body{margin:0;padding:35pt 42.5pt 14pt 42.5pt;width:510pt;font-family:"Arial MT",Arial,"Liberation Sans",Helvetica,sans-serif;font-size:11pt;color:#000;background:#fff;box-sizing:content-box}
+p,h1,div{margin:0;padding:0}
+.title{font-size:14pt;font-weight:normal;color:#172A4D;margin:3.65pt 0 0 0;line-height:16pt}
+.sp{display:block}
+h1{font-size:11.5pt;font-weight:normal;color:#172A4D;margin-left:0;position:relative;line-height:13.2pt}
+.body{font-size:8pt;color:#172A4D;margin-left:5.4pt;line-height:9.2pt}
+.body a{color:#0052CC;text-decoration:none}
+table{border-collapse:collapse;table-layout:fixed;margin-left:0;border:.75pt solid #C1C7D0;font-family:Arial,"Liberation Sans",Helvetica,sans-serif}
+td,th{box-sizing:border-box}
+td{border:.75pt solid #C1C7D0;padding:0;vertical-align:top}
+.info td{height:12.9pt}
+.info td:first-child{background:#F4F5F6;width:164.3pt;font-size:8pt;font-weight:bold;color:#172A4D;padding:2pt 0 0 4.2pt;vertical-align:middle}
+.retro{width:498.5pt}
+.retro th{font-size:8pt;font-weight:bold;color:#172A4D;text-align:left;padding:2pt 0 0 3.3pt;height:14.4pt;border:.75pt solid #C1C7D0;vertical-align:top}
+.retro td{height:14.4pt}
+.retro tr:last-child td{height:13.5pt}
+.l{margin:0;padding:0 0 0 14pt;font-size:8pt;line-height:1.5;color:#172a4d;list-style:disc}
+.dot{display:block;width:1.55pt;height:1.55pt;border-radius:50%;background:#172a4d;margin:7pt 0 0 4.2pt}
+.panel{position:relative;margin-left:5.4pt;width:499.1pt;height:37.3pt;background:#deebff;border-radius:1.3pt}
+.panel img{position:absolute;left:5.1pt;top:7.15pt;width:10.25pt;height:10.25pt}
+.panel p{position:absolute;left:0;top:0;margin:6.75pt 7.8pt 0 20.4pt;font-size:8pt;line-height:12pt;color:#172A4D;font-family:"Arial MT",Arial,"Liberation Sans",sans-serif}
+.q{font-family:Arial,"Liberation Sans",Helvetica,sans-serif;font-size:8pt;font-weight:bold;color:#172A4D}
+@page{size:A4;margin:0}
+html,body,table,td,th,.panel,img{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+table,h1,.panel,h1{break-after:avoid;page-break-after:avoid}
+</style>
+</head>
+<body>
+<p class="title">Sprint Retrospective - Sprint 6</p>
+<div class="sp" style="height:53.5pt"></div>
+<h1>📋 Visão geral</h1>
+<div class="sp" style="height:21.3pt"></div>
+<table class="info"><colgroup><col style="width:164.3pt"><col style="width:334.2pt"></colgroup>
+<tr><td>Data</td><td class="body" style="padding:2pt 0 0 4.2pt">20/11/2026</td></tr>
+<tr><td>Equipa</td><td class="body" style="padding:2pt 0 0 4.2pt">Grupo 1</td></tr>
+<tr><td>Participantes</td><td class="body" style="padding:2pt 0 0 4.2pt">Lukas Sperandio, Pedro Costa, António Martinho, Tiago Borja, José Cruz</td></tr></table>
+<div class="sp" style="height:24.3pt"></div>
+<h1 style="margin-top:0">💭 Retrospetiva</h1>
+<div class="sp" style="height:6.5pt"></div>
+<table class="retro"><colgroup><col style="width:166.35pt"><col style="width:166.35pt"><col style="width:165.85pt"></colgroup>
+<tr><th style="background:#E3FBEF">Começar a fazer</th><th style="background:#FFEBE6">Parar de fazer</th><th style="background:#E6FBFF">Continuar a fazer</th></tr>
+<tr><td><ul class="l" style="padding-top:3pt;padding-bottom:3pt"><li>Equipa: Entregar os ficheiros da entrega apenas em PDF</li><li>Equipa: Fechar e entregar a retrospetiva no último dia de cada sprint, logo a seguir à sprint review</li></ul></td><td><ul class="l" style="padding-top:3pt;padding-bottom:3pt"><li>Pedro: Falhar a entrega da retrospetiva (a da Sprint 5 ficou por entregar). Não pode voltar a acontecer</li><li>Equipa: Juntar na mesma história regras de acesso de papéis diferentes (a H4Y-87 junta a receção e o restaurante)</li></ul></td><td><ul class="l" style="padding-top:3pt;padding-bottom:3pt"><li>António: A sprint correu muito bem, com uma sprint review limpa</li><li>Tiago: Boa comunicação e entreajuda, com todas as histórias entregues dentro do prazo</li><li>Pedro: Sprint limpa e boa colaboração da equipa</li><li>Equipa: Fechar a sprint sem carry-over (as 7 histórias ficaram Done no Jira)</li></ul></td></tr></table>
+<div class="sp" style="height:26pt"></div>
+<h1 style="margin-top:0">🗣️ Feedback do cliente</h1>
+<div class="act" style="margin-top:13pt;font-size:10pt;line-height:1.5;color:#172a4d">- A retrospetiva da Sprint 5 não foi entregue</div>
+<div class="sp" style="height:26pt"></div>
+<h1 style="margin-top:0">✅ Ações a tomar</h1>
+<div class="act" style="margin-top:13pt;font-size:10pt;line-height:1.5;color:#172a4d">- Separar a H4Y-87 em duas histórias: a regra de acesso da receção (pisos 0 e 1) e a regra de acesso do restaurante (cozinha e restaurante)<br>- Na remoção de um funcionário, fazer soft-delete: a conta fica inativa e não é apagada da base de dados<br>- Importar o stock dos fornecedores por ficheiro XML. O ficheiro JSON fica para o fim, se sobrar tempo<br>- Cartões: o cliente só pode iniciar sessão depois de o check-in ser feito<br>- Entregar os ficheiros da entrega apenas em PDF<br>- Entregar a retrospetiva da Sprint 7 no último dia da sprint</div>
+<div class="sp" style="height:26pt"></div>
+<h1 style="margin-top:0">📌 Backlog da sprint</h1>
+<div class="body" style="margin-top:6pt">Comprometido: 21 pontos em 7 histórias. Done no Jira: H4Y-87 (3), H4Y-88 (3), H4Y-89 (2), H4Y-90 (3), H4Y-91 (5), H4Y-92 (2) e H4Y-93 (3) = 21 pontos. Velocidade: 21 pontos. Sem carry-over para a Sprint 7.</div>
+<img src="backlog-final.png" alt="Quadro do Jira no fim da Sprint 6" style="display:block;width:470pt;height:auto;margin:9pt auto 0;break-inside:avoid">
+<div class="body" style="margin-top:18pt">Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: run-retro, Claude Code (claude-opus-5-5), 2026-11-21. Reviewed by: pending.</div>
+
+</body>
+</html>
