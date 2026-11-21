@@ -87,7 +87,8 @@
     <tr><td>A 1.ª entrega vale 35% da nota. O prazo no Moodle é 01/12/2026 às 23:59 (o enunciado indica 23:55), a meio da sprint. Só entra no zip o que estiver integrado e testado.</td><td>Congelar a branch de entrega a 30/11 e marcar a tag. O dia 01/12 serve para o executável, o Javadoc, os diagramas e o zip. Submeter até às 20:00 de 01/12. O que não estiver integrado a 30/11 continua em feature branches até 04/12 e fica para a 2.ª entrega.</td></tr>
     <tr><td>As histórias de cartões usam as tabelas e o serviço da tarefa 1 na mesma sprint.</td><td>A tarefa 1 fecha o serviço completo dos cartões (emitir, ativar, desativar, bloquear, consultar) nos primeiros 2 a 3 dias. As histórias ficam por cima, com as regras de acesso e os ecrãs.</td></tr>
     <tr><td>Vários itens criam tabelas novas (cartões, passagens, importações, extras, pedidos de quarto, sugestões). Dois scripts SQL com o mesmo número quebram a base de dados.</td><td>Um número fixo por item, combinado na reunião. Se um item atrasar, o número fica reservado. Cada tarefa que cria uma tabela já inclui o código para a atualizar e consultar.</td></tr>
-    <tr><td>Itens que dependem uns dos outros ou mudam o mesmo código ao mesmo tempo (decisão de acesso dos cartões, ecrã de carregar ficheiros, ecrã de reservas).</td><td>A tabela segue a ordem segura: primeiro as bases (cartões e importação XML), depois as histórias que as usam. A mesma pessoa faz em sequência os itens que mexem no mesmo código: abrir o quarto, recusar e restaurante e piscina; carregar como gestor e como rececionista; extras do quarto e serviços extra. As dependências estão ligadas no Jira.</td></tr>
+    <tr><td>Itens que dependem uns dos outros ou mudam o mesmo código ao mesmo tempo.</td><td>Cada assunto tem uma só pessoa, que faz todos os itens dele pela ordem da tabela: cartões, importação e stock, extras da reserva, apoio ao cliente e entrega. Cada pessoa só mexe nos itens do seu assunto. As dependências entre assuntos estão ligadas no Jira.</td></tr>
+    <tr><td>O assunto dos cartões tem 48 pontos numa só pessoa (importação e stock 24, extras da reserva 15, apoio ao cliente 7).</td><td>Os cartões são o caminho crítico. Se atrasarem, corta-se do fim do assunto (itens 18, 17 e 15). Propor revisões cruzadas dos cartões por quem acabar primeiro, sem mudar o dono dos itens.</td></tr>
     <tr><td>Muitos itens alteram o Permission, o HotelFacade, o menu principal e o ecrã de reservas. Conflitos de merge.</td><td>Integrar alterações pequenas e fazer rebase com frequência. Combinar os ficheiros partilhados no primeiro daily.</td></tr>
     <tr><td>A importação precisa da biblioteca Gson (para JSON), que não está em docs/libraries.md, e a Q-59 (nomes dos campos JSON) está em aberto. Item desconhecido no ficheiro: rejeitar ou criar.</td><td>Registar a Gson em docs/libraries.md antes de usar. Usar os mesmos nomes de campos do XML no JSON até a Q-59 ter resposta. Item desconhecido: rejeitar e listar no relatório.</td></tr>
   </table>
@@ -96,31 +97,31 @@
   <table>
     <colgroup><col style="width:22pt"><col style="width:44pt"><col style="width:200pt"><col style="width:42pt"><col style="width:48pt"><col style="width:36pt"><col style="width:106.5pt"></colgroup>
     <tr><th>N.º</th><th>Chave</th><th>Item (título no quadro)</th><th>Tipo</th><th>Prioridade</th><th>Pontos (Fibonacci)</th><th>Responsável</th></tr>
-    <tr><td>1</td><td>H4Y-179</td><td>Preparar e entregar o zip LP3-GY da 1.ª entrega</td><td>Tarefa</td><td>Máxima</td><td>0</td><td>A atribuir</td></tr>
-    <tr><td>2</td><td>H4Y-109</td><td>Cartões: tabelas, serviço completo, simulador de leitor e cartão mestre inicial</td><td>Tarefa</td><td>Máxima</td><td>13</td><td>A atribuir</td></tr>
-    <tr><td>3</td><td>H4Y-125</td><td>Importar ficheiros XML de fornecedor: leitura, validação, atualização do stock e relatório</td><td>Tarefa</td><td>Máxima</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>4</td><td>H4Y-134</td><td>Emitir o cartão magnético no check-in</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>5</td><td>H4Y-135</td><td>Abrir o quarto com o cartão</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>6</td><td>H4Y-152</td><td>Abrir todos os locais com o cartão mestre</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>7</td><td>H4Y-126</td><td>Importar ficheiros JSON de fornecedor</td><td>Tarefa</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>8</td><td>H4Y-127</td><td>Carregar um ficheiro de fornecedor como gestor</td><td>História</td><td>Máxima</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>9</td><td>H4Y-129</td><td>Ver o relatório de importação com os itens rejeitados</td><td>História</td><td>Alta</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>10</td><td>H4Y-137</td><td>Recusar o cartão em locais não permitidos</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>11</td><td>H4Y-136</td><td>Abrir o restaurante e a piscina reservados com o cartão</td><td>História</td><td>Máxima</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>12</td><td>H4Y-150</td><td>Registar as passagens do cartão</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>13</td><td>H4Y-153</td><td>Bloquear um cartão mestre</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>14</td><td>H4Y-154</td><td>Emitir um novo cartão mestre</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>15</td><td>H4Y-151</td><td>Desativar o cartão no check-out</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>16</td><td>H4Y-128</td><td>Carregar um ficheiro de fornecedor como rececionista</td><td>História</td><td>Alta</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>17</td><td>H4Y-155</td><td>Consultar os locais de um cartão</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>18</td><td>H4Y-156</td><td>Consultar as passagens de um quarto</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>19</td><td>H4Y-106</td><td>Registar saída e uso de stock</td><td>História</td><td>Alta</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>20</td><td>H4Y-107</td><td>Adicionar vista especial, bebidas ou lavandaria à reserva</td><td>História</td><td>Alta</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>21</td><td>H4Y-108</td><td>Adicionar serviços extra pagos à reserva</td><td>História</td><td>Alta</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>22</td><td>H4Y-110</td><td>Registar um pedido de serviço de quarto</td><td>História</td><td>Média</td><td>3</td><td>A atribuir</td></tr>
-    <tr><td>23</td><td>H4Y-111</td><td>Registar uma sugestão ou reclamação de um cliente</td><td>História</td><td>Média</td><td>2</td><td>A atribuir</td></tr>
-    <tr><td>24</td><td>H4Y-130</td><td>Calcular o preço total da reserva</td><td>História</td><td>Média</td><td>5</td><td>A atribuir</td></tr>
-    <tr><td>25</td><td>H4Y-131</td><td>Consultar sugestões e reclamações</td><td>História</td><td>Baixa</td><td>2</td><td>A atribuir</td></tr>
+    <tr><td>1</td><td>H4Y-179</td><td>Preparar e entregar o zip LP3-GY da 1.ª entrega</td><td>Tarefa</td><td>Máxima</td><td>0</td><td>A atribuir (Entrega)</td></tr>
+    <tr><td>2</td><td>H4Y-109</td><td>Cartões: tabelas, serviço completo, simulador de leitor e cartão mestre inicial</td><td>Tarefa</td><td>Máxima</td><td>13</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>3</td><td>H4Y-125</td><td>Importar ficheiros XML de fornecedor: leitura, validação, atualização do stock e relatório</td><td>Tarefa</td><td>Máxima</td><td>5</td><td>A atribuir (Importação e stock)</td></tr>
+    <tr><td>4</td><td>H4Y-134</td><td>Emitir o cartão magnético no check-in</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>5</td><td>H4Y-135</td><td>Abrir o quarto com o cartão</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>6</td><td>H4Y-152</td><td>Abrir todos os locais com o cartão mestre</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>7</td><td>H4Y-126</td><td>Importar ficheiros JSON de fornecedor</td><td>Tarefa</td><td>Máxima</td><td>3</td><td>A atribuir (Importação e stock)</td></tr>
+    <tr><td>8</td><td>H4Y-127</td><td>Carregar um ficheiro de fornecedor como gestor</td><td>História</td><td>Máxima</td><td>5</td><td>A atribuir (Importação e stock)</td></tr>
+    <tr><td>9</td><td>H4Y-129</td><td>Ver o relatório de importação com os itens rejeitados</td><td>História</td><td>Alta</td><td>3</td><td>A atribuir (Importação e stock)</td></tr>
+    <tr><td>10</td><td>H4Y-137</td><td>Recusar o cartão em locais não permitidos</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>11</td><td>H4Y-136</td><td>Abrir o restaurante e a piscina reservados com o cartão</td><td>História</td><td>Máxima</td><td>5</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>12</td><td>H4Y-150</td><td>Registar as passagens do cartão</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>13</td><td>H4Y-153</td><td>Bloquear um cartão mestre</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>14</td><td>H4Y-154</td><td>Emitir um novo cartão mestre</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>15</td><td>H4Y-151</td><td>Desativar o cartão no check-out</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>16</td><td>H4Y-128</td><td>Carregar um ficheiro de fornecedor como rececionista</td><td>História</td><td>Alta</td><td>3</td><td>A atribuir (Importação e stock)</td></tr>
+    <tr><td>17</td><td>H4Y-155</td><td>Consultar os locais de um cartão</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>18</td><td>H4Y-156</td><td>Consultar as passagens de um quarto</td><td>História</td><td>Máxima</td><td>3</td><td>A atribuir (Cartões)</td></tr>
+    <tr><td>19</td><td>H4Y-106</td><td>Registar saída e uso de stock</td><td>História</td><td>Alta</td><td>5</td><td>A atribuir (Importação e stock)</td></tr>
+    <tr><td>20</td><td>H4Y-107</td><td>Adicionar vista especial, bebidas ou lavandaria à reserva</td><td>História</td><td>Alta</td><td>5</td><td>A atribuir (Extras da reserva)</td></tr>
+    <tr><td>21</td><td>H4Y-108</td><td>Adicionar serviços extra pagos à reserva</td><td>História</td><td>Alta</td><td>5</td><td>A atribuir (Extras da reserva)</td></tr>
+    <tr><td>22</td><td>H4Y-110</td><td>Registar um pedido de serviço de quarto</td><td>História</td><td>Média</td><td>3</td><td>A atribuir (Apoio ao cliente)</td></tr>
+    <tr><td>23</td><td>H4Y-111</td><td>Registar uma sugestão ou reclamação de um cliente</td><td>História</td><td>Média</td><td>2</td><td>A atribuir (Apoio ao cliente)</td></tr>
+    <tr><td>24</td><td>H4Y-130</td><td>Calcular o preço total da reserva</td><td>História</td><td>Média</td><td>5</td><td>A atribuir (Extras da reserva)</td></tr>
+    <tr><td>25</td><td>H4Y-131</td><td>Consultar sugestões e reclamações</td><td>História</td><td>Baixa</td><td>2</td><td>A atribuir (Apoio ao cliente)</td></tr>
     <tr><th></th><th></th><th>Total</th><th></th><th></th><th>94</th><th></th></tr>
   </table>
 
