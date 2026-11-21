@@ -63,8 +63,8 @@
   <h2 class="page">Detalhes</h2>
   <table>
     <colgroup><col style="width:84.7pt"><col style="width:413.8pt"></colgroup>
-    <tr><th>Data de início</th><td>21/11/2026</td></tr>
-    <tr><th>Data de término</th><td>04/12/2026</td></tr>
+    <tr><th>Data de início</th><td>20/11/2026</td></tr>
+    <tr><th>Data de término</th><td>01/12/2026</td></tr>
     <tr><th>Sprint goal</th><td>Os clientes entram nos quartos, no restaurante e na piscina com o cartão magnético, e o hotel recebe o stock dos fornecedores por ficheiro XML ou JSON.</td></tr>
   </table>
 
@@ -72,7 +72,7 @@
   <table>
     <colgroup><col style="width:105.15pt"><col style="width:178.65pt"><col style="width:214.7pt"></colgroup>
     <tr><th></th><th>Sprint atual</th><th>Sprint anterior</th></tr>
-    <tr><th>Total de dias</th><td>14 dias de calendário; 9 dias úteis, mais o dia 01/12 (feriado) para a entrega</td><td>7 dias de calendário; 5 dias úteis (14/11 a 20/11)</td></tr>
+    <tr><th>Total de dias</th><td>12 dias de calendário; 7 dias úteis, mais o dia 01/12 (feriado), que é o dia da entrega</td><td>7 dias de calendário; 5 dias úteis (14/11 a 20/11)</td></tr>
     <tr><th>Capacidade da equipa</th><td>5 elementos. Horas a confirmar na reunião.</td><td>A confirmar</td></tr>
     <tr><th>Capacidade prevista</th><td>94 pontos selecionados (limite aumentado pela equipa para dar o máximo de valor ao cliente). Compromisso: 67 pontos, itens 2 a 18 (cartões e importação), mais a tarefa de entrega do item 1.</td><td>21 pontos planeados. 21 concluídos.</td></tr>
     <tr><th>Capacidade individual</th><td>A confirmar na reunião</td><td>A confirmar</td></tr>
@@ -83,8 +83,8 @@
   <table>
     <colgroup><col style="width:249.55pt"><col style="width:248.95pt"></colgroup>
     <tr><th>Risco</th><th>Mitigação proposta</th></tr>
-    <tr><td>94 pontos em duas semanas; a velocidade foi 21 (Sprint 6) e 26 (Sprint 5) por semana.</td><td>O compromisso são os itens 2 a 18 (67 pontos) e a entrega (item 1). Os itens 19 a 25 são extra. Ordem de corte: de baixo para cima, do item 25 ao 19.</td></tr>
-    <tr><td>A 1.ª entrega vale 35% da nota. O prazo no Moodle é 01/12/2026 às 23:59 (o enunciado indica 23:55), a meio da sprint. Só entra no zip o que estiver integrado e testado.</td><td>Congelar a branch de entrega a 30/11 e marcar a tag. O dia 01/12 serve para o executável, o Javadoc, os diagramas e o zip. Submeter até às 20:00 de 01/12. O que não estiver integrado a 30/11 continua em feature branches até 04/12 e fica para a 2.ª entrega.</td></tr>
+    <tr><td>94 pontos em 12 dias; a velocidade foi 21 (Sprint 6) e 26 (Sprint 5) por semana.</td><td>O compromisso são os itens 2 a 18 (67 pontos) e a entrega (item 1). Os itens 19 a 25 são extra. Ordem de corte: de baixo para cima, do item 25 ao 19.</td></tr>
+    <tr><td>A 1.ª entrega vale 35% da nota. O prazo no Moodle é 01/12/2026 às 23:59 (o enunciado indica 23:55), o último dia da sprint. Só entra no zip o que estiver integrado e testado.</td><td>Congelar a branch de entrega a 30/11 e marcar a tag. O dia 01/12 serve para o executável, o Javadoc, os diagramas e o zip. Submeter até às 20:00 de 01/12. O que não estiver integrado a 30/11 não entra no zip e passa para a Sprint 8.</td></tr>
     <tr><td>As histórias de cartões usam as tabelas e o serviço da tarefa 1 na mesma sprint.</td><td>A tarefa 1 fecha o serviço completo dos cartões (emitir, ativar, desativar, bloquear, consultar) nos primeiros 2 a 3 dias. As histórias ficam por cima, com as regras de acesso e os ecrãs.</td></tr>
     <tr><td>Vários itens criam tabelas novas (cartões, passagens, importações, extras, pedidos de quarto, sugestões). Dois scripts SQL com o mesmo número quebram a base de dados.</td><td>Um número fixo por item, combinado na reunião. Se um item atrasar, o número fica reservado. Cada tarefa que cria uma tabela já inclui o código para a atualizar e consultar.</td></tr>
     <tr><td>Itens que dependem uns dos outros ou mudam o mesmo código ao mesmo tempo.</td><td>Cada assunto tem uma só pessoa, que faz todos os itens dele pela ordem da tabela: cartões (Tiago), importação (António), stock e apoio ao cliente (Lukas), extras da reserva (Pedro) e entrega (José). Cada pessoa só mexe nos itens do seu assunto. As dependências entre assuntos estão ligadas no Jira. Durante a sprint a equipa ajuda-se com revisões e testes.</td></tr>
