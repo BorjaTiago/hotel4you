@@ -24,6 +24,7 @@ import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.DocumentType;
+import pt.isep.hotel4you.domain.ExitReason;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.Manager;
@@ -453,10 +454,24 @@ class HotelFacadeTest {
         User manager = new Manager(1L, "Rui Costa", "rui", "hash");
         StockItem towels = itemRepository.save(new StockItem(null, "toalhas", "unidade", 10));
 
-        StockMovement movement = facade.registerMovement(towels, MovementType.ENTRY, 5, manager);
+        StockMovement movement =
+                facade.registerMovement(towels, MovementType.ENTRY, 5, null, manager);
 
         assertEquals(15, movement.getItem().getStockQuantity());
         assertEquals(15, itemRepository.findById(towels.getId()).get().getStockQuantity());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-1")
+    void onRegisterMovement_lowerStockThroughStockService_whenManagerRecordsExit() {
+        User manager = new Manager(1L, "Rui Costa", "rui", "hash");
+        StockItem sheets = itemRepository.save(new StockItem(null, "lençóis", "unidade", 20));
+
+        StockMovement movement = facade.registerMovement(sheets, MovementType.EXIT, 6,
+                ExitReason.DISCARD, manager);
+
+        assertEquals(ExitReason.DISCARD, movement.getExitReason());
+        assertEquals(14, itemRepository.findById(sheets.getId()).get().getStockQuantity());
     }
 
     @Test
