@@ -2,6 +2,7 @@ package pt.isep.hotel4you.gui;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -10,13 +11,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import pt.isep.hotel4you.domain.ExitReason;
 import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.StockMovement;
 import pt.isep.hotel4you.service.HotelFacade;
 
-/** Controller of the screen that creates, lists and edits the stock items and records stock entries. */
+/**
+ * Controller of the screen that creates, lists and edits the stock items and records stock
+ * entries, uses and exits.
+ */
 public class StockController {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -39,22 +45,37 @@ public class StockController {
     private Label messageLabel;
 
     @FXML
-    private Label entryItemLabel;
+    private Label movementItemLabel;
 
     @FXML
-    private Label entryQuantityLabel;
+    private Label movementQuantityLabel;
 
     @FXML
-    private Label entryDateLabel;
+    private Label movementDateLabel;
 
     @FXML
-    private ComboBox<StockItem> entryItemBox;
+    private Label movementTypeLabel;
 
     @FXML
-    private TextField entryQuantityField;
+    private Label exitReasonLabel;
 
     @FXML
-    private TextField entryDateField;
+    private ComboBox<MovementType> movementTypeBox;
+
+    @FXML
+    private ComboBox<ExitReason> exitReasonBox;
+
+    @FXML
+    private VBox exitReasonPane;
+
+    @FXML
+    private ComboBox<StockItem> movementItemBox;
+
+    @FXML
+    private TextField movementQuantityField;
+
+    @FXML
+    private TextField movementDateField;
 
     @FXML
     private TableView<StockItem> itemTable;
@@ -71,7 +92,7 @@ public class StockController {
     /**
      * Creates the controller.
      *
-     * @param facade the facade that creates, lists and edits the items and records the entries
+     * @param facade the facade that creates, lists and edits the items and records the movements
      */
     public StockController(HotelFacade facade) {
         this.facade = facade;
@@ -81,10 +102,39 @@ public class StockController {
     private void initialize() {
         nameLabel.setLabelFor(nameField);
         unitLabel.setLabelFor(unitField);
-        entryItemLabel.setLabelFor(entryItemBox);
-        entryQuantityLabel.setLabelFor(entryQuantityField);
-        entryDateLabel.setLabelFor(entryDateField);
-        entryItemBox.setConverter(new StringConverter<>() {
+        movementItemLabel.setLabelFor(movementItemBox);
+        movementQuantityLabel.setLabelFor(movementQuantityField);
+        movementDateLabel.setLabelFor(movementDateField);
+        movementTypeLabel.setLabelFor(movementTypeBox);
+        exitReasonLabel.setLabelFor(exitReasonBox);
+        movementTypeBox.setItems(FXCollections.observableArrayList(MovementType.values()));
+        movementTypeBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(MovementType type) {
+                return type == null ? "" : typeText(type);
+            }
+
+            @Override
+            public MovementType fromString(String text) {
+                return null;
+            }
+        });
+        exitReasonBox.setItems(FXCollections.observableArrayList(ExitReason.values()));
+        exitReasonBox.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(ExitReason reason) {
+                return reason == null ? "" : reasonText(reason);
+            }
+
+            @Override
+            public ExitReason fromString(String text) {
+                return null;
+            }
+        });
+        movementTypeBox.valueProperty().addListener(
+                (observable, oldType, newType) -> updateReasonBox(newType));
+        movementTypeBox.setValue(MovementType.ENTRY);
+        movementItemBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(StockItem item) {
                 return item == null ? "" : item.getName() + " (" + item.getUnit() + ")";
@@ -95,7 +145,7 @@ public class StockController {
                 return null;
             }
         });
-        entryDateField.setText(dateText(LocalDate.now()));
+        movementDateField.setText(dateText(LocalDate.now()));
         nameColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().getName()));
         unitColumn.setCellValueFactory(
@@ -107,22 +157,32 @@ public class StockController {
         loadItems();
     }
 
+    /** Only an exit has a reason, so the reason box shows only for an exit. */
+    private void updateReasonBox(MovementType type) {
+        boolean exit = type == MovementType.EXIT;
+        exitReasonPane.setVisible(exit);
+        exitReasonPane.setManaged(exit);
+        if (!exit) {
+            exitReasonBox.setValue(null);
+        }
+    }
+
     private void fillForm(StockItem item) {
         if (item == null) {
             return;
         }
         nameField.setText(item.getName());
         unitField.setText(item.getUnit());
-        entryItemBox.setValue(item);
+        movementItemBox.setValue(item);
     }
 
     private void loadItems() {
-        entryItemBox.setValue(null);
+        movementItemBox.setValue(null);
         try {
             itemTable.getItems().setAll(facade.listItems(HotelApp.currentUser));
-            entryItemBox.setItems(FXCollections.observableArrayList(itemTable.getItems()));
+            movementItemBox.setItems(FXCollections.observableArrayList(itemTable.getItems()));
         } catch (RuntimeException e) {
-            entryItemBox.setItems(FXCollections.observableArrayList());
+            movementItemBox.setItems(FXCollections.observableArrayList());
             showMessage(e.getMessage(), false);
         }
     }
@@ -163,15 +223,15 @@ public class StockController {
     @FXML
     private void onRegisterMovementClicked() {
         showMessage("", false);
-        entryDateField.setText(dateText(LocalDate.now()));
+        movementDateField.setText(dateText(LocalDate.now()));
         try {
-            int quantity = facade.parseQuantity(entryQuantityField.getText());
-            StockMovement movement = facade.registerMovement(entryItemBox.getValue(),
-                    MovementType.ENTRY, quantity, HotelApp.currentUser);
-            entryItemBox.setValue(null);
-            entryQuantityField.clear();
-            entryDateField.setText(dateText(movement.getDateTime().toLocalDate()));
-            showMessage(entryMessage(movement), true);
+            int quantity = facade.parseQuantity(movementQuantityField.getText());
+            StockMovement movement = facade.registerMovement(movementItemBox.getValue(),
+                    movementTypeBox.getValue(), quantity, exitReasonBox.getValue(),
+                    HotelApp.currentUser);
+            clearMovementForm();
+            movementDateField.setText(dateText(movement.getDateTime().toLocalDate()));
+            showMessage(movementMessage(movement), true);
             loadItems();
         } catch (RuntimeException e) {
             showMessage(e.getMessage(), false);
@@ -179,15 +239,50 @@ public class StockController {
     }
 
     /**
-     * Gives the success text of a stock entry, with the new stock of the item.
+     * Gives the success text of a stock movement, with the new stock of the item.
+     * An exit also shows its reason.
      *
-     * @param movement the saved entry, with the item and its new stock
+     * @param movement the saved movement, with the item and its new stock
      * @return the text for the screen
      */
-    static String entryMessage(StockMovement movement) {
+    static String movementMessage(StockMovement movement) {
         StockItem item = movement.getItem();
-        return "Entrada registada: " + movement.getQuantity() + " " + item.getUnit() + " de "
+        String start = switch (movement.getType()) {
+            case ENTRY -> "Entrada registada";
+            case USE -> "Uso registado";
+            case EXIT -> "Saída registada ("
+                    + reasonText(movement.getExitReason()).toLowerCase(Locale.ROOT) + ")";
+        };
+        return start + ": " + movement.getQuantity() + " " + item.getUnit() + " de "
                 + item.getName() + ". Stock atual: " + item.getStockQuantity() + ".";
+    }
+
+    /**
+     * Gives the name of a movement type for the screen.
+     *
+     * @param type the movement type
+     * @return the name, for example "Saída"
+     */
+    static String typeText(MovementType type) {
+        return switch (type) {
+            case ENTRY -> "Entrada";
+            case USE -> "Uso";
+            case EXIT -> "Saída";
+        };
+    }
+
+    /**
+     * Gives the name of an exit reason for the screen.
+     *
+     * @param reason the exit reason
+     * @return the name, for example "Devolução"
+     */
+    static String reasonText(ExitReason reason) {
+        return switch (reason) {
+            case DISCARD -> "Descarte";
+            case RETURN -> "Devolução";
+            case LOSS -> "Perda";
+        };
     }
 
     /**
@@ -200,14 +295,21 @@ public class StockController {
         return date.format(DATE_FORMAT);
     }
 
-    /** Clears the item form and the stock entry form. */
+    /** Clears the item form and the stock movement form. */
     @FXML
     private void onClearClicked() {
         clearForm();
-        entryItemBox.setValue(null);
-        entryQuantityField.clear();
-        entryDateField.setText(dateText(LocalDate.now()));
+        clearMovementForm();
+        movementDateField.setText(dateText(LocalDate.now()));
         showMessage("", false);
+    }
+
+    /** Clears the movement form. The type goes back to entry, so the reason box hides. */
+    private void clearMovementForm() {
+        movementItemBox.setValue(null);
+        movementTypeBox.setValue(MovementType.ENTRY);
+        exitReasonBox.setValue(null);
+        movementQuantityField.clear();
     }
 
     private void showMessage(String message, boolean success) {
