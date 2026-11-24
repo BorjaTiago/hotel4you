@@ -38,7 +38,8 @@ import pt.isep.hotel4you.domain.User;
 
 /**
  * Tests the card service: issue, activate, deactivate, block, replace the master card, the door
- * rule, the entry log and the queries by card and by room (H4Y-109 AC-3, RF-16 to RF-21, RF-23).
+ * rule, the entry log, the queries by card and by room (H4Y-109 AC-3, RF-16 to RF-21, RF-23) and the
+ * login with the card (H4Y-109 AC-4).
  */
 class CardAccessServiceTest {
 
@@ -564,5 +565,101 @@ class CardAccessServiceTest {
     @Tag("H4Y-109-AC-3")
     void onGetPassesByRoom_throw_whenActorIsReceptionist() {
         assertThrows(AccessDeniedException.class, () -> service.getPassesByRoom(ROOM_202, RECEPTIONIST));
+    }
+
+    // --- login with the card (H4Y-133) ---
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_returnCard_whenNumberAndCodeMatch() {
+        IssuedCard issued = service.issueCard(reservationById(1L), RECEPTIONIST);
+
+        MagneticCard card = service.login(issued.card().getNumber(), issued.accessCode());
+
+        assertEquals(issued.card().getNumber(), card.getNumber());
+        assertTrue(service.canOpenRoom(card, ROOM_202));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_returnCard_whenInputHasSpacesAndLowerCaseCode() {
+        IssuedCard issued = service.issueCard(reservationById(1L), RECEPTIONIST);
+
+        MagneticCard card = service.login(" " + issued.card().getNumber() + " ",
+                " " + issued.accessCode().toLowerCase() + " ");
+
+        assertEquals(issued.card().getNumber(), card.getNumber());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_returnMasterCard_whenManagerUsesMasterCode() {
+        IssuedCard issued = service.issueMasterCard(MANAGER, MANAGER);
+
+        MagneticCard card = service.login(issued.card().getNumber(), issued.accessCode());
+
+        assertEquals(CardType.MASTER, card.getType());
+        assertTrue(service.canOpen(card, GARAGE));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_throw_whenCardDoesNotExist() {
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> service.login("99999999", "ABCDEF"));
+
+        assertEquals("Número do cartão ou código errado.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_throw_whenCodeIsWrong() {
+        IssuedCard issued = service.issueCard(reservationById(1L), RECEPTIONIST);
+        String wrong = issued.accessCode().equals("AAAAAA") ? "BBBBBB" : "AAAAAA";
+
+        LoginFailedException error = assertThrows(LoginFailedException.class,
+                () -> service.login(issued.card().getNumber(), wrong));
+
+        assertEquals("Número do cartão ou código errado.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_throw_whenCardHasNoCode() {
+        MagneticCard card = cards.save(new MagneticCard(null, "90001", CardType.MASTER, null,
+                MANAGER.getId(), true, null));
+
+        assertThrows(LoginFailedException.class, () -> service.login(card.getNumber(), "ABCDEF"));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_throw_whenCardIsInactive() {
+        IssuedCard issued = service.issueCard(reservationById(1L), RECEPTIONIST);
+        service.deactivateCard(issued.card().getNumber(), RECEPTIONIST);
+
+        CardInactiveException error = assertThrows(CardInactiveException.class,
+                () -> service.login(issued.card().getNumber(), issued.accessCode()));
+
+        assertEquals("O cartão não está ativo.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_throw_whenCardIsBlocked() {
+        IssuedCard issued = service.issueCard(reservationById(1L), RECEPTIONIST);
+        service.blockCard(issued.card().getNumber(), MANAGER);
+
+        CardBlockedException error = assertThrows(CardBlockedException.class,
+                () -> service.login(issued.card().getNumber(), issued.accessCode()));
+
+        assertEquals("O cartão está bloqueado.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-4")
+    void onLogin_throw_whenNumberOrCodeIsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> service.login(" ", "ABCDEF"));
+        assertThrows(IllegalArgumentException.class, () -> service.login("12345678", null));
     }
 }
