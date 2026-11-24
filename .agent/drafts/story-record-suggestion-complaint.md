@@ -50,7 +50,7 @@ Para que o gestor a receba.
 - [ ] AC-4: O funcionário do restaurante não consegue registar sugestões nem reclamações.
 
 ## Notas
-Enunciado, secção 2. RF-27. Q-18: a receção regista na aplicação. O cliente não tem login (Q-13). Fase: Q-25.
+Enunciado, secção 2. RF-27. Q-18: a receção regista na aplicação. O cliente só entra com o cartão para abrir locais (Q-13, H4Y-109); não regista sugestões na aplicação. Fase: Q-25.
 Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: sessões simuladas de rececionista e restaurante (foundation T0), base de teste (T4).
 
 points_suggested: 2
@@ -63,4 +63,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Q-13 card login sync by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
