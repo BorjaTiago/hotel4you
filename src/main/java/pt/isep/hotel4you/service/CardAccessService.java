@@ -48,7 +48,7 @@ public class CardAccessService {
     private static final String NO_ROOM = "Este cartão não abre quartos.";
     private static final String OTHER_ROOM = "Este quarto não é o da sua reserva.";
     private static final String ROLE_ZONE = "O seu perfil não dá acesso a este local.";
-    private static final String CLIENT_ZONE = "O cartão não abre este local.";
+    private static final String NOT_FOR_CLIENTS = "Este local não é para clientes.";
     private static final String NOT_RESERVED = "A sua reserva não inclui este local.";
 
     private final CardRepository cardRepository;
@@ -476,7 +476,7 @@ public class CardAccessService {
 
     private static Optional<String> clientZoneRefusal(Reservation reservation, Location location) {
         if (!location.isGuestCardAccess()) {
-            return Optional.of(CLIENT_ZONE);
+            return Optional.of(NOT_FOR_CLIENTS);
         }
         if (location.isRequiresReservation() && !reservation.getLocationIds().contains(location.getId())) {
             return Optional.of(NOT_RESERVED);
