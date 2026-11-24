@@ -304,18 +304,21 @@ Reservation 2: 3 x 4.50 = 13.50.
 - `card_number` is plain UNIQUE. A number is never used twice.
 - The backend creates the card at check-in and sets `active = 0` at check-out.
 - `blocked_at` records when a card was blocked (RF-30, Q-26, Q-31). The card row is never deleted, so the access history stays.
+- `access_code_hash` keeps the BCrypt hash of the 6-character access code of the card (H4Y-132). The client uses the card number and this code to log in (H4Y-109). The code is shown once, when the card is issued. The clear code is never saved.
 
 **Other option:** `card_number` unique only among active cards (filtered index), to reuse a physical card. We did not. It needs a special index and a reuse rule. A plain UNIQUE is simpler.
 
-| id | card_number | reservation_id | user_id | is_master | active | blocked_at |
-|---|---|---|---|---|---|---|
-| 1 | 12345 | 2 | NULL | 0 | 0 | NULL |
-| 2 | 12346 | 1 | NULL | 0 | 1 | NULL |
-| 3 | 90001 | NULL | 2 | 1 | 1 | NULL |
+| id | card_number | reservation_id | user_id | is_master | active | blocked_at | access_code_hash |
+|---|---|---|---|---|---|---|---|
+| 1 | 12345 | 2 | NULL | 0 | 0 | NULL | (hash) |
+| 2 | 12346 | 1 | NULL | 0 | 1 | NULL | (hash) |
+| 3 | 90001 | NULL | 2 | 1 | 1 | NULL | NULL |
 
 Card 12345 served reservation 2 (now off). After Ana checks in, she gets a new card with a new number for reservation 1. If a card is lost, the backend sets `blocked_at`.
 
 **Script and first master card (H4Y-109, H4Y-121):** SQL `v16-create-access-cards.sql` creates `access_cards` and `access_logs`. You can run it again. It adds the first master card (number `90001`) for the first manager when no master card exists. It holds no login data. The places a client card may open are not in a new table: `reservation_locations` already lists them.
+
+**Script v17 (H4Y-132):** SQL `v17-alter-access-cards-access-code.sql` adds the column `access_code_hash` (NULL allowed). It stops with an error when v16 did not run. You can run it again. It adds no row and no hash, so the first master card `90001` has no code.
 
 ### access_logs
 **What:** Every card swipe.
@@ -383,4 +386,4 @@ Piscinas privadas, Spa and Salas de conferências. All seed prices are null.
 The sample prices above explain the data; the migration does not set them.
 The reservation_services link is a future design and is not created by v14.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-91 room items docs, Claude Code (claude-haiku-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 zone id after review by Claude Code (claude-opus-5-5), 2026-11-20; merge with main after H4Y-91 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 review by antonioprmartinho by Claude Code (claude-opus-5-5), 2026-11-20; tdd-guide, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: main session, Claude Code (claude-opus-5-5), 2026-10-17; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; PR-32 seed rows by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-26 room type name alignment, OpenAI Codex (gpt-6.1-sol), 2026-10-30. H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-91 room items docs, Claude Code (claude-haiku-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 zone id after review by Claude Code (claude-opus-5-5), 2026-11-20; merge with main after H4Y-91 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 review by antonioprmartinho by Claude Code (claude-opus-5-5), 2026-11-20; tdd-guide, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-132 access code column by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
