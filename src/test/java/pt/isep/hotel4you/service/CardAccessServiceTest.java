@@ -21,8 +21,10 @@ import pt.isep.hotel4you.data.InMemoryCardRepository;
 import pt.isep.hotel4you.data.InMemoryFloorRepository;
 import pt.isep.hotel4you.data.InMemoryLocationRepository;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
+import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.CardAccessRecord;
+import pt.isep.hotel4you.domain.CardPlace;
 import pt.isep.hotel4you.domain.CardType;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.IssuedCard;
@@ -39,7 +41,7 @@ import pt.isep.hotel4you.domain.User;
 /**
  * Tests the card service: issue, activate, deactivate, block, replace the master card, the door
  * rule, the entry log, the queries by card and by room (H4Y-109 AC-3, RF-16 to RF-21, RF-23) and the
- * login with the card (H4Y-109 AC-4).
+ * login with the card (H4Y-109 AC-4) and the places of the screen "O meu cartão" (H4Y-109 AC-6).
  */
 class CardAccessServiceTest {
 
@@ -53,8 +55,8 @@ class CardAccessServiceTest {
     private static final Location POOL = new Location(8L, "Piscina", true, true);
     private static final Location GARDEN = new Location(9L, "Jardim", true, false);
 
-    private static final Room ROOM_202 = new Room(10L, 202, 2, "Duplo");
-    private static final Room ROOM_203 = new Room(11L, 203, 2, "Duplo");
+    private static final Room ROOM_202 = new Room(1L, 202, 2, "Duplo");
+    private static final Room ROOM_203 = new Room(2L, 203, 2, "Duplo");
 
     private static final User MANAGER = new Manager(1L, "Rui Costa", "gestor", "hash");
     private static final User RECEPTIONIST = new Receptionist(2L, "Ana Silva", "ana", "hash");
@@ -70,6 +72,11 @@ class CardAccessServiceTest {
     @BeforeEach
     void setUp() {
         InMemoryFloorRepository floors = new InMemoryFloorRepository();
+        InMemoryRoomRepository rooms = new InMemoryRoomRepository();
+        rooms.addFloor(2);
+        rooms.addRoomType("Duplo");
+        rooms.save(ROOM_202, 10);
+        rooms.save(ROOM_203, 10);
         floors.add(new Floor(-1, "Garagem e arrecadação", List.of(GARAGE)));
         floors.add(new Floor(0, "Receção e bar", List.of(BAR, GARDEN)));
         floors.add(new Floor(1, "Restaurante e piscina", List.of(RESTAURANT, POOL)));
@@ -81,7 +88,7 @@ class CardAccessServiceTest {
         reservations.add(reservation(3L, ROOM_203, ReservationStatus.CANCELLED, List.of()));
         reservations.add(reservation(4L, ROOM_202, ReservationStatus.RESERVED, List.of()));
         Clock clock = Clock.fixed(NOW.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
-        service = new CardAccessService(cards, records, reservations, users,
+        service = new CardAccessService(cards, records, reservations, users, rooms, floors,
                 new LocationService(floors, new InMemoryLocationRepository()),
                 new CardNumberGenerator(cards), new AccessCodeGenerator(), authService, clock);
     }
@@ -661,5 +668,93 @@ class CardAccessServiceTest {
     void onLogin_throw_whenNumberOrCodeIsBlank() {
         assertThrows(IllegalArgumentException.class, () -> service.login(" ", "ABCDEF"));
         assertThrows(IllegalArgumentException.class, () -> service.login("12345678", null));
+    }
+
+    // --- places of the screen "O meu cartão" ---
+
+    private static List<String> names(List<CardPlace> places) {
+        return places.stream().map(CardPlace::name).toList();
+    }
+
+    private static List<Boolean> allowed(List<CardPlace> places) {
+        return places.stream().map(CardPlace::allowed).toList();
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-6")
+    void onListPlaces_showReservationRoomAndAllZones_whenClientCardIsCheckedIn() {
+        List<CardPlace> places = service.listPlaces(clientCard());
+
+        assertEquals(List.of("Quarto 202", "Garagem", "Bar", "Jardim", "Restaurante", "Piscina"),
+                names(places));
+        assertEquals(List.of(true, false, false, true, true, false), allowed(places));
+        assertEquals(ROOM_202.getId(), places.get(0).room().getId());
+        assertNull(places.get(0).location());
+        assertEquals(RESTAURANT.getId(), places.get(4).location().getId());
+        assertNull(places.get(4).room());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-6")
+    void onListPlaces_lockEveryPlace_whenReservationHasNoCheckIn() {
+        MagneticCard card = service.issueCard(reservationById(4L), RECEPTIONIST).card();
+
+        List<CardPlace> places = service.listPlaces(card);
+
+        assertEquals("Quarto 202", places.get(0).name());
+        assertTrue(places.stream().noneMatch(CardPlace::allowed));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-6")
+    void onListPlaces_allowEveryRoomAndZone_whenCardIsMaster() {
+        List<CardPlace> places = service.listPlaces(masterCard());
+
+        assertEquals(List.of("Quarto 202", "Quarto 203", "Garagem", "Bar", "Jardim", "Restaurante",
+                "Piscina"), names(places));
+        assertTrue(places.stream().allMatch(CardPlace::allowed));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-6")
+    void onListPlaces_throw_whenCardIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> service.listPlaces(null));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-7")
+    void onEnter_recordEntry_whenPlaceIsAllowed() {
+        MagneticCard card = clientCard();
+        CardPlace restaurant = service.listPlaces(card).get(4);
+
+        CardAccessRecord record = service.enter(card, restaurant);
+
+        assertEquals(RESTAURANT.getId(), record.getLocationId());
+        assertEquals(NOW, record.getEntryDateTime());
+        assertEquals(1, records.findByCardId(card.getId()).size());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-7")
+    void onEnter_refuseAndRecordNothing_whenPlaceIsLocked() {
+        MagneticCard card = clientCard();
+        CardPlace pool = service.listPlaces(card).get(5);
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> service.enter(card, pool));
+
+        assertEquals("Entrada recusada.", error.getMessage());
+        assertTrue(records.findByCardId(card.getId()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-7")
+    void onEnter_recordRoomEntry_whenMasterCardOpensAnyRoom() {
+        MagneticCard card = masterCard();
+        CardPlace room203 = service.listPlaces(card).get(1);
+
+        CardAccessRecord record = service.enter(card, room203);
+
+        assertEquals(ROOM_203.getId(), record.getRoomId());
     }
 }
