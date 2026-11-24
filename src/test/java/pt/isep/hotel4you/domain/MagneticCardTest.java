@@ -101,4 +101,20 @@ class MagneticCardTest {
         assertTrue(blocked.isBlocked());
         assertFalse(free.isBlocked());
     }
+
+    @Test
+    @Tag("H4Y-109-AC-3")
+    void onCreate_keepAccessCodeHash_whenHashIsGiven() {
+        MagneticCard card = new MagneticCard(1L, "12345", CardType.CLIENT, 3L, null, true, null, "hash");
+
+        assertEquals("hash", card.getAccessCodeHash());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-3")
+    void onCreate_haveNoAccessCodeHash_whenOldConstructorIsUsed() {
+        MagneticCard card = new MagneticCard(1L, "12345", CardType.CLIENT, 3L, null, true, null);
+
+        assertNull(card.getAccessCodeHash());
+    }
 }

@@ -130,13 +130,15 @@ class JdbcReservationCheckInOutTest {
 
     @Test
     @Tag("H4Y-82-AC-4")
+    @Tag("H4Y-109-AC-3")
     void onFindById_mapRow_whenReservationExists() {
         database.rows = 1;
 
         Optional<Reservation> found = repository.findById(5L);
 
-        assertTrue(sql().contains("FROM reservations WHERE id = ?"));
-        assertEquals(List.of(5L), database.bound);
+        assertTrue(database.statements.get(0).contains("FROM reservations WHERE id = ?"));
+        assertTrue(database.statements.get(1).contains("FROM reservation_locations WHERE reservation_id = ?"));
+        assertEquals(List.of(5L, 5L), database.bound);
         Reservation reservation = found.orElseThrow();
         assertEquals(1L, reservation.getId());
         assertEquals(7L, reservation.getClientId());
@@ -145,7 +147,8 @@ class JdbcReservationCheckInOutTest {
         assertEquals(END, reservation.getEndDate());
         assertEquals(ReservationStatus.RESERVED, reservation.getStatus());
         assertEquals(4L, reservation.getCreatedByUserId());
-        assertEquals(List.of("result", "statement", "connection"), database.closed);
+        assertEquals(List.of(1L), reservation.getLocationIds());
+        assertEquals(List.of("result", "statement", "result", "statement", "connection"), database.closed);
     }
 
     @Test
@@ -208,6 +211,7 @@ class JdbcReservationCheckInOutTest {
     private static class RecordingDatabase extends Database {
         private final List<String> closed = new ArrayList<>();
         private final List<Object> bound = new ArrayList<>();
+        private final List<String> statements = new ArrayList<>();
         private int updated = 1;
         private int rows;
         private String sql;
@@ -230,6 +234,7 @@ class JdbcReservationCheckInOutTest {
                         }
                         if (method.getName().equals("prepareStatement")) {
                             sql = (String) args[0];
+                            statements.add(sql.replaceAll("\\s+", " "));
                             return statement();
                         }
                         throw new UnsupportedOperationException(method.getName());

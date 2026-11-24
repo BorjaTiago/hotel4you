@@ -67,4 +67,16 @@ class JdbcCardRepositoryTest {
     void onUpdate_keepSqlCause_whenSqlFails() {
         assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.update(card)));
     }
+
+    @Test
+    @Tag("H4Y-109-AC-3")
+    void onFindByReservationId_keepSqlCause_whenSqlFails() {
+        assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.findByReservationId(3L)));
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-3")
+    void onFindByUserId_keepSqlCause_whenSqlFails() {
+        assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.findByUserId(1L)));
+    }
 }

@@ -1,7 +1,10 @@
 package pt.isep.hotel4you.data;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.MagneticCard;
 
@@ -22,9 +25,25 @@ public class InMemoryCardRepository implements CardRepository {
     }
 
     @Override
+    public Optional<MagneticCard> findByReservationId(long reservationId) {
+        return cards.values().stream()
+                .filter(card -> Objects.equals(card.getReservationId(), reservationId))
+                .findFirst();
+    }
+
+    @Override
+    public List<MagneticCard> findByUserId(long userId) {
+        return cards.values().stream()
+                .filter(card -> Objects.equals(card.getUserId(), userId))
+                .sorted(Comparator.comparing(MagneticCard::getId))
+                .toList();
+    }
+
+    @Override
     public MagneticCard save(MagneticCard card) {
         MagneticCard saved = new MagneticCard(nextId++, card.getNumber(), card.getType(),
-                card.getReservationId(), card.getUserId(), card.isActive(), card.getBlockedAt());
+                card.getReservationId(), card.getUserId(), card.isActive(), card.getBlockedAt(),
+                card.getAccessCodeHash());
         cards.put(saved.getNumber(), saved);
         return saved;
     }
