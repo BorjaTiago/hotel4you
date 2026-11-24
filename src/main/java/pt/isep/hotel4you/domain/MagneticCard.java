@@ -15,6 +15,7 @@ public class MagneticCard {
     private final Long userId;
     private final boolean active;
     private final LocalDateTime blockedAt;
+    private final String accessCodeHash;
 
     /**
      * Creates a card.
@@ -31,6 +32,26 @@ public class MagneticCard {
      */
     public MagneticCard(Long id, String number, CardType type, Long reservationId, Long userId,
             boolean active, LocalDateTime blockedAt) {
+        this(id, number, type, reservationId, userId, active, blockedAt, null);
+    }
+
+    /**
+     * Creates a card with the hash of its access code. The client uses the card number and the
+     * code to log in.
+     *
+     * @param id the identifier, or null if the card is not saved yet
+     * @param number the card number, not blank and at most 20 characters
+     * @param type the card type
+     * @param reservationId the reservation of the guest, or null for a staff card
+     * @param userId the staff user or manager, or null for a guest card
+     * @param active true if the card works
+     * @param blockedAt when the card was blocked, or null if it was never blocked
+     * @param accessCodeHash the hash of the access code, or null if the card has no code
+     * @throws IllegalArgumentException if the number or type is not valid, if the card has both
+     *         owners or none, or if a master card has no user
+     */
+    public MagneticCard(Long id, String number, CardType type, Long reservationId, Long userId,
+            boolean active, LocalDateTime blockedAt, String accessCodeHash) {
         if (number == null || number.isBlank() || number.length() > MAX_NUMBER_LENGTH) {
             throw new IllegalArgumentException("O número do cartão é inválido.");
         }
@@ -50,6 +71,7 @@ public class MagneticCard {
         this.userId = userId;
         this.active = active;
         this.blockedAt = blockedAt;
+        this.accessCodeHash = accessCodeHash;
     }
 
     /**
@@ -122,5 +144,14 @@ public class MagneticCard {
      */
     public boolean isBlocked() {
         return blockedAt != null;
+    }
+
+    /**
+     * Returns the hash of the access code. The plain code is never stored.
+     *
+     * @return the hash, or null if the card has no code
+     */
+    public String getAccessCodeHash() {
+        return accessCodeHash;
     }
 }

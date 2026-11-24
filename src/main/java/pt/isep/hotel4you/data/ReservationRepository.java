@@ -46,7 +46,7 @@ public interface ReservationRepository {
     List<ClientReservation> findByClient(long clientId);
 
     /**
-     * Reads one booking with its client, room, period, state and creator.
+     * Reads one booking with its client, room, period, state, creator and reserved zones.
      * @param id the booking identifier
      * @return the booking, or empty if it does not exist
      * @throws IllegalStateException if the database cannot be read

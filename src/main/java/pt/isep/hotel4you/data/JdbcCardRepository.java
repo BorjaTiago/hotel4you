@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.CardType;
 import pt.isep.hotel4you.domain.MagneticCard;
@@ -12,7 +14,7 @@ import pt.isep.hotel4you.domain.MagneticCard;
 /** Stores and finds cards in the SQL Server table {@code access_cards}. */
 public class JdbcCardRepository implements CardRepository {
 
-    private static final String COLUMNS = "id, card_number, reservation_id, user_id, is_master, active, blocked_at";
+    private static final String COLUMNS = "id, card_number, reservation_id, user_id, is_master, active, blocked_at, access_code_hash";
 
     private final Database database;
 
@@ -50,21 +52,51 @@ public class JdbcCardRepository implements CardRepository {
     }
 
     @Override
+    public Optional<MagneticCard> findByReservationId(long reservationId) {
+        String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE reservation_id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, reservationId);
+                ResultSet row = statement.executeQuery()) {
+            return row.next() ? Optional.of(read(row)) : Optional.empty();
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
+    public List<MagneticCard> findByUserId(long userId) {
+        String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE user_id = ? ORDER BY id";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, userId);
+                ResultSet row = statement.executeQuery()) {
+            List<MagneticCard> cards = new ArrayList<>();
+            while (row.next()) {
+                cards.add(read(row));
+            }
+            return cards;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
     public MagneticCard save(MagneticCard card) {
         String sql = """
-                INSERT INTO access_cards (card_number, reservation_id, user_id, is_master, active, blocked_at)
+                INSERT INTO access_cards (card_number, reservation_id, user_id, is_master, active, blocked_at,
+                    access_code_hash)
                 OUTPUT INSERTED.id
-                VALUES (?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, card.getNumber(),
                         card.getReservationId(), card.getUserId(),
                         bit(card.getType() == CardType.MASTER), bit(card.isActive()),
-                        timestamp(card));
+                        timestamp(card), card.getAccessCodeHash());
                 ResultSet row = statement.executeQuery()) {
             row.next();
             return new MagneticCard(row.getLong("id"), card.getNumber(), card.getType(),
-                    card.getReservationId(), card.getUserId(), card.isActive(), card.getBlockedAt());
+                    card.getReservationId(), card.getUserId(), card.isActive(), card.getBlockedAt(),
+                    card.getAccessCodeHash());
         } catch (SQLException e) {
             throw new IllegalStateException(Database.NOT_AVAILABLE, e);
         }
@@ -90,7 +122,8 @@ public class JdbcCardRepository implements CardRepository {
         Timestamp blockedAt = row.getTimestamp("blocked_at");
         return new MagneticCard(row.getLong("id"), row.getString("card_number"),
                 row.getBoolean("is_master") ? CardType.MASTER : CardType.CLIENT, reservation, user,
-                row.getBoolean("active"), blockedAt == null ? null : blockedAt.toLocalDateTime());
+                row.getBoolean("active"), blockedAt == null ? null : blockedAt.toLocalDateTime(),
+                row.getString("access_code_hash"));
     }
 
     private static String bit(boolean value) {

@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.data;
 
+import java.util.List;
 import java.util.Optional;
 import pt.isep.hotel4you.domain.MagneticCard;
 
@@ -25,7 +26,25 @@ public interface CardRepository {
     boolean existsByNumber(String number);
 
     /**
-     * Saves a new card.
+     * Finds the card of a reservation.
+     *
+     * @param reservationId the reservation id
+     * @return the card, or empty if the reservation has no card
+     * @throws IllegalStateException if the database is not available
+     */
+    Optional<MagneticCard> findByReservationId(long reservationId);
+
+    /**
+     * Finds the cards of a staff user or manager, the oldest card first.
+     *
+     * @param userId the user id
+     * @return the cards of the user, or an empty list
+     * @throws IllegalStateException if the database is not available
+     */
+    List<MagneticCard> findByUserId(long userId);
+
+    /**
+     * Saves a new card with the hash of its access code.
      *
      * @param card the new card, its id is ignored
      * @return the saved card with its new id

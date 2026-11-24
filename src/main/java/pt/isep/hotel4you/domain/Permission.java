@@ -39,7 +39,10 @@ public enum Permission {
     MANAGE_RESERVATIONS(Role.RECEPTIONIST, Role.MANAGER),
 
     /** Delete a reservation for good before the check-in (RF-22, Q-05). */
-    DELETE_RESERVATIONS(Role.MANAGER);
+    DELETE_RESERVATIONS(Role.MANAGER),
+
+    /** Block cards, issue or replace the master card and read the card entries (RF-19 to RF-21, RF-23). */
+    MANAGE_CARDS(Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 
