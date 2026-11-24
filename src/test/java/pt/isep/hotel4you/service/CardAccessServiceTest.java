@@ -827,4 +827,63 @@ class CardAccessServiceTest {
 
         assertEquals("A reserva do cartão não tem check-in.", refusedEntry(card, ROOM_202, null).getReason());
     }
+
+    // --- open the reserved restaurant and pool with the card (H4Y-136) ---
+
+    private MagneticCard poolCard() {
+        reservations.add(reservation(5L, ROOM_203, ReservationStatus.CHECKED_IN, List.of(POOL.getId())));
+        return service.issueCard(reservationById(5L), RECEPTIONIST).card();
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-1")
+    void onRegister_saveZoneEntry_whenReservationIncludesRestaurant() {
+        CardAccessRecord record = service.register(clientCard(), null, RESTAURANT);
+
+        assertEquals(RESTAURANT.getId(), record.getLocationId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-2")
+    void onRegister_saveZoneEntry_whenReservationIncludesPool() {
+        CardAccessRecord record = service.register(poolCard(), null, POOL);
+
+        assertEquals(POOL.getId(), record.getLocationId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-3")
+    void onRegister_refuseWithReason_whenReservationDoesNotIncludeRestaurant() {
+        EntryRefusedException error = refusedEntry(poolCard(), null, RESTAURANT);
+
+        assertEquals("A sua reserva não inclui este local.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-4")
+    void onRegister_refuseWithReason_whenReservationDoesNotIncludePool() {
+        EntryRefusedException error = refusedEntry(clientCard(), null, POOL);
+
+        assertEquals("A sua reserva não inclui este local.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-5")
+    void onEnter_allowRestaurantThenRefusePoolWithReason_whenReservationIncludesOnlyRestaurant() {
+        MagneticCard card = clientCard();
+        List<CardPlace> places = service.listPlaces(card);
+        CardPlace restaurant = places.get(4);
+        CardPlace pool = places.get(5);
+
+        assertTrue(restaurant.allowed());
+        assertFalse(pool.allowed());
+        assertEquals(RESTAURANT.getId(), service.enter(card, restaurant).getLocationId());
+        EntryRefusedException error = assertThrows(EntryRefusedException.class, () -> service.enter(card, pool));
+        assertEquals("A sua reserva não inclui este local.", error.getReason());
+        assertEquals(1, records.count());
+    }
 }
