@@ -49,6 +49,7 @@ public class CardAccessService {
     private static final String OTHER_ROOM = "Este quarto não é o da sua reserva.";
     private static final String ROLE_ZONE = "O seu perfil não dá acesso a este local.";
     private static final String CLIENT_ZONE = "O cartão não abre este local.";
+    private static final String NOT_RESERVED = "A sua reserva não inclui este local.";
 
     private final CardRepository cardRepository;
     private final CardAccessRecordRepository recordRepository;
@@ -469,12 +470,18 @@ public class CardAccessService {
             return allowed ? Optional.empty() : Optional.of(ROLE_ZONE);
         }
         return checkedInReservation(card)
-                .map(reservation -> location.isGuestCardAccess()
-                        && (!location.isRequiresReservation()
-                                || reservation.getLocationIds().contains(location.getId()))
-                        ? Optional.<String>empty()
-                        : Optional.of(CLIENT_ZONE))
+                .map(reservation -> clientZoneRefusal(reservation, location))
                 .orElse(Optional.of(NO_CHECK_IN));
+    }
+
+    private static Optional<String> clientZoneRefusal(Reservation reservation, Location location) {
+        if (!location.isGuestCardAccess()) {
+            return Optional.of(CLIENT_ZONE);
+        }
+        if (location.isRequiresReservation() && !reservation.getLocationIds().contains(location.getId())) {
+            return Optional.of(NOT_RESERVED);
+        }
+        return Optional.empty();
     }
 
     private List<Room> roomsOf(MagneticCard card) {
