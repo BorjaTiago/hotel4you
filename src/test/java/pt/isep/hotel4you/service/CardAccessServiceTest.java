@@ -757,4 +757,74 @@ class CardAccessServiceTest {
 
         assertEquals(ROOM_203.getId(), record.getRoomId());
     }
+
+    // --- open the room with the card (H4Y-135) ---
+
+    private EntryRefusedException refusedEntry(MagneticCard card, Room room, Location zone) {
+        EntryRefusedException error = assertThrows(EntryRefusedException.class,
+                () -> service.register(card, room, zone));
+        assertEquals("Entrada recusada.", error.getMessage());
+        return error;
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-1")
+    void onEnter_saveRoomEntry_whenRoomIsTheCheckedInReservationRoom() {
+        MagneticCard card = clientCard();
+        CardPlace room202 = service.listPlaces(card).get(0);
+
+        CardAccessRecord record = service.enter(card, room202);
+
+        assertEquals(ROOM_202.getId(), record.getRoomId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-2")
+    void onRegister_refuseWithReason_whenRoomIsNotTheReservationRoom() {
+        EntryRefusedException error = refusedEntry(clientCard(), ROOM_203, null);
+
+        assertEquals("Este quarto não é o da sua reserva.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-3")
+    void onRegister_refuseWithReason_whenCardNumberDoesNotExist() {
+        MagneticCard unknown = new MagneticCard(99L, "99999", CardType.CLIENT, 1L, null, true, null);
+
+        EntryRefusedException error = refusedEntry(unknown, ROOM_202, null);
+
+        assertEquals("Cartão desconhecido.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onRegister_refuseWithReason_whenCardWasDeactivatedAfterLogin() {
+        MagneticCard card = clientCard();
+        service.deactivateCard(card.getNumber(), RECEPTIONIST);
+
+        EntryRefusedException error = refusedEntry(card, ROOM_202, null);
+
+        assertEquals("O cartão não está ativo.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onRegister_refuseWithReason_whenCardWasBlockedAfterLogin() {
+        MagneticCard card = clientCard();
+        service.blockCard(card.getNumber(), MANAGER);
+
+        assertEquals("O cartão está bloqueado.", refusedEntry(card, ROOM_202, null).getReason());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onRegister_refuseWithReason_whenReservationHasNoCheckIn() {
+        MagneticCard card = service.issueCard(reservationById(4L), RECEPTIONIST).card();
+
+        assertEquals("A reserva do cartão não tem check-in.", refusedEntry(card, ROOM_202, null).getReason());
+    }
 }

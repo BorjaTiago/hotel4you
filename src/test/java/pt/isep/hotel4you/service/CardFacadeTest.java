@@ -116,4 +116,20 @@ class CardFacadeTest {
 
         assertTrue(facade.listCardPlaces(card).stream().allMatch(CardPlace::allowed));
     }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onEnterPlace_allowRoomThenRefuseWithReason_whenCardIsDeactivated() {
+        MagneticCard card = facade.loginWithCard(clientCard.card().getNumber(), clientCard.accessCode());
+        CardPlace room = facade.listCardPlaces(card).get(0);
+
+        facade.enterPlace(card, room);
+        cardService.deactivateCard(card.getNumber(), RECEPTIONIST);
+        EntryRefusedException error = assertThrows(EntryRefusedException.class,
+                () -> facade.enterPlace(card, room));
+
+        assertEquals("Quarto 202", room.name());
+        assertEquals("O cartão não está ativo.", error.getReason());
+        assertEquals(1, records.findByCardId(card.getId()).size());
+    }
 }
