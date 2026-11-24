@@ -9,6 +9,8 @@ import pt.isep.hotel4you.data.ClientInUseException;
 import pt.isep.hotel4you.data.DuplicateRoomException;
 import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
+import pt.isep.hotel4you.domain.CardAccessRecord;
+import pt.isep.hotel4you.domain.CardPlace;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
@@ -16,6 +18,7 @@ import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
+import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
@@ -41,6 +44,7 @@ public class HotelFacade {
     private final ClientService clientService;
     private final ReservationService reservationService;
     private final ExtraPriceService extraPriceService;
+    private final CardAccessService cardAccessService;
 
     /**
      * Creates the facade.
@@ -53,11 +57,12 @@ public class HotelFacade {
      * @param clientService the client registration service
      * @param reservationService the reservation service
      * @param extraPriceService the extra price service
+     * @param cardAccessService the card service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
             ClientService clientService, ReservationService reservationService,
-            ExtraPriceService extraPriceService) {
+            ExtraPriceService extraPriceService, CardAccessService cardAccessService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -66,6 +71,49 @@ public class HotelFacade {
         this.clientService = clientService;
         this.reservationService = reservationService;
         this.extraPriceService = extraPriceService;
+        this.cardAccessService = cardAccessService;
+    }
+
+    /**
+     * Logs in with a card: the card number and the access code (H4Y-109 AC-4, Q-13).
+     *
+     * @param number the card number
+     * @param code the access code, not case sensitive
+     * @return the card
+     * @throws IllegalArgumentException if the number or the code is blank
+     * @throws LoginFailedException if the card does not exist or the code is wrong
+     * @throws CardBlockedException if the card is blocked
+     * @throws CardInactiveException if the card is not active
+     * @throws IllegalStateException if the database is not available
+     */
+    public MagneticCard loginWithCard(String number, String code) {
+        return cardAccessService.login(number, code);
+    }
+
+    /**
+     * Lists the places of the screen "O meu cartão", each with its allowed flag (H4Y-109 AC-6).
+     *
+     * @param card the card of the logged-in person
+     * @return the rooms first, then the zones
+     * @throws IllegalArgumentException if the card is null
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardPlace> listCardPlaces(MagneticCard card) {
+        return cardAccessService.listPlaces(card);
+    }
+
+    /**
+     * Passes the card at a place and logs the entry (H4Y-109 AC-7).
+     *
+     * @param card the card of the logged-in person
+     * @param place the clicked place
+     * @return the saved entry
+     * @throws IllegalArgumentException if the card or the place is null
+     * @throws AccessDeniedException if the card may not enter the place; nothing is saved
+     * @throws IllegalStateException if the database is not available
+     */
+    public CardAccessRecord enterPlace(MagneticCard card, CardPlace place) {
+        return cardAccessService.enter(card, place);
     }
 
     /**
