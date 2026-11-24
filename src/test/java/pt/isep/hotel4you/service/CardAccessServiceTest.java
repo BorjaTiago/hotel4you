@@ -886,4 +886,59 @@ class CardAccessServiceTest {
         assertEquals("A sua reserva não inclui este local.", error.getReason());
         assertEquals(1, records.count());
     }
+
+    // --- refuse the card in places that are not for clients (H4Y-137) ---
+
+    private static final String NOT_FOR_CLIENTS = "Este local não é para clientes.";
+
+    @Test
+    @Tag("H4Y-137-AC-1")
+    void onRegister_refuseWithReason_whenClientCardEntersBar() {
+        EntryRefusedException error = refusedEntry(clientCard(), null, BAR);
+
+        assertEquals(NOT_FOR_CLIENTS, error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-137-AC-2")
+    void onRegister_refuseWithReason_whenClientCardEntersRestrictedPlace() {
+        MagneticCard card = clientCard();
+        List<Location> restricted = List.of(
+                new Location(2L, "Arrecadação", false, false),
+                new Location(6L, "Salas de conferência", false, false),
+                new Location(10L, "Piscina privada", false, false),
+                new Location(11L, "Spa", false, false),
+                GARAGE);
+
+        for (Location zone : restricted) {
+            assertEquals(NOT_FOR_CLIENTS, refusedEntry(card, null, zone).getReason(), zone.getName());
+        }
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-137-AC-3")
+    void onRegister_saveRoomEntry_whenRestrictedPlacesWereRefused() {
+        MagneticCard card = clientCard();
+        refusedEntry(card, null, BAR);
+
+        CardAccessRecord record = service.register(card, ROOM_202, null);
+
+        assertEquals(ROOM_202.getId(), record.getRoomId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-137-AC-4")
+    void onEnter_refuseWithReasonAndSaveNothing_whenClientClicksLockedBar() {
+        MagneticCard card = clientCard();
+        CardPlace bar = service.listPlaces(card).get(2);
+
+        assertEquals("Bar", bar.name());
+        assertFalse(bar.allowed());
+        EntryRefusedException error = assertThrows(EntryRefusedException.class, () -> service.enter(card, bar));
+        assertEquals(NOT_FOR_CLIENTS, error.getReason());
+        assertTrue(records.findByCardId(card.getId()).isEmpty());
+    }
 }
