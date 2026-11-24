@@ -3,6 +3,7 @@ package pt.isep.hotel4you.service;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import pt.isep.hotel4you.data.CardAccessRecordRepository;
 import pt.isep.hotel4you.data.CardRepository;
@@ -24,12 +25,16 @@ import pt.isep.hotel4you.domain.User;
  * Manages the magnetic cards: issue, activate, deactivate and block a card, issue and replace the
  * master card, tell which doors a card opens, log the entries and read them by card or by room
  * (RF-16 to RF-21, RF-23). Every new card gets a 6 character access code. The service returns the
- * plain code once and stores only its hash.
+ * plain code once and stores only its hash. The client and the manager log in with the card number
+ * and this code (H4Y-109 AC-4).
  */
 public class CardAccessService {
 
     /** The message when the card may not enter the place. */
     public static final String ENTRY_REFUSED = "Entrada recusada.";
+
+    /** The message when the card number or the access code is wrong. */
+    public static final String LOGIN_FAILED = "Número do cartão ou código errado.";
 
     private final CardRepository cardRepository;
     private final CardAccessRecordRepository recordRepository;
@@ -308,6 +313,37 @@ public class CardAccessService {
             throw new IllegalArgumentException("O quarto é obrigatório.");
         }
         return recordRepository.findByRoomId(room.getId());
+    }
+
+    /**
+     * Logs in with a card, as if the card was passed in a reader (H4Y-109 AC-4). The client uses the
+     * card number and the access code that was shown when the card was issued. The manager uses the
+     * master card in the same way. The code is not case sensitive.
+     *
+     * @param number the card number
+     * @param code the access code of the card
+     * @return the card, to use with {@link #canOpen}, {@link #canOpenRoom} and {@link #register}
+     * @throws IllegalArgumentException if the number or the code is blank
+     * @throws LoginFailedException if the card does not exist, has no code or the code is wrong
+     * @throws CardBlockedException if the card is blocked
+     * @throws CardInactiveException if the card is not active, for example after the check-out
+     */
+    public MagneticCard login(String number, String code) {
+        if (number == null || number.isBlank() || code == null || code.isBlank()) {
+            throw new IllegalArgumentException("Preencha o número do cartão e o código.");
+        }
+        MagneticCard card = cardRepository.findByNumber(number.trim())
+                .orElseThrow(() -> new LoginFailedException(LOGIN_FAILED));
+        if (!authService.matchesPassword(code.trim().toUpperCase(Locale.ROOT), card.getAccessCodeHash())) {
+            throw new LoginFailedException(LOGIN_FAILED);
+        }
+        if (card.isBlocked()) {
+            throw new CardBlockedException();
+        }
+        if (!card.isActive()) {
+            throw new CardInactiveException();
+        }
+        return card;
     }
 
     private static void require(Permission permission, User actor, String message) {
