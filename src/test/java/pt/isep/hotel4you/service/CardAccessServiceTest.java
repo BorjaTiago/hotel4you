@@ -66,13 +66,13 @@ class CardAccessServiceTest {
     private final InMemoryCardAccessRecordRepository records = new InMemoryCardAccessRecordRepository();
     private final InMemoryReservationRepository reservations = new InMemoryReservationRepository();
     private final InMemoryUserRepository users = new InMemoryUserRepository();
+    private final InMemoryRoomRepository rooms = new InMemoryRoomRepository();
     private final AuthService authService = new AuthService(users);
     private CardAccessService service;
 
     @BeforeEach
     void setUp() {
         InMemoryFloorRepository floors = new InMemoryFloorRepository();
-        InMemoryRoomRepository rooms = new InMemoryRoomRepository();
         rooms.addFloor(2);
         rooms.addRoomType("Duplo");
         rooms.save(ROOM_202, 10);
@@ -940,5 +940,89 @@ class CardAccessServiceTest {
         EntryRefusedException error = assertThrows(EntryRefusedException.class, () -> service.enter(card, bar));
         assertEquals(NOT_FOR_CLIENTS, error.getReason());
         assertTrue(records.findByCardId(card.getId()).isEmpty());
+    }
+
+    // --- open all the places with the master card (H4Y-152) ---
+
+    @Test
+    @Tag("H4Y-152-AC-1")
+    void onRegister_saveRoomEntry_whenMasterCardOpensRoom301() {
+        rooms.addFloor(3);
+        Room room301 = rooms.save(new Room(null, 301, 3, "Duplo"), 10);
+
+        CardAccessRecord record = service.register(masterCard(), room301, null);
+
+        assertEquals(room301.getId(), record.getRoomId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-2")
+    void onRegister_saveZoneEntry_whenMasterCardOpensEveryZone() {
+        MagneticCard card = masterCard();
+        List<Location> zones = List.of(GARAGE, BAR, GARDEN, RESTAURANT, POOL);
+
+        for (Location zone : zones) {
+            assertEquals(zone.getId(), service.register(card, null, zone).getLocationId());
+        }
+        assertEquals(zones.size(), records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-3")
+    void onRegister_savePlaceAndTime_whenMasterCardEnters() {
+        MagneticCard card = masterCard();
+
+        CardAccessRecord record = service.register(card, null, BAR);
+
+        assertEquals(BAR.getId(), record.getLocationId());
+        assertEquals(NOW, record.getEntryDateTime());
+        assertEquals(1, records.findByCardId(card.getId()).size());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-4")
+    void onRegister_refuseWithReason_whenMasterCardIsBlocked() {
+        MagneticCard card = masterCard();
+        service.blockCard(card.getNumber(), MANAGER);
+
+        assertEquals("O cartão está bloqueado.", refusedEntry(card, ROOM_202, null).getReason());
+        assertEquals("O cartão está bloqueado.", refusedEntry(card, null, BAR).getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-4")
+    void onRegister_refuseWithReason_whenZoneWasRemoved() {
+        Location removed = new Location(12L, "Sauna", true, false);
+
+        EntryRefusedException error = refusedEntry(masterCard(), null, removed);
+
+        assertEquals("Este local já não existe.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-5")
+    void onEnter_savePassage_whenMasterCardLogsInAndClicksPlace() {
+        IssuedCard issued = service.issueMasterCard(MANAGER, MANAGER);
+        MagneticCard card = service.login(issued.card().getNumber(), issued.accessCode());
+        List<CardPlace> places = service.listPlaces(card);
+
+        assertTrue(places.stream().allMatch(CardPlace::allowed));
+        CardAccessRecord record = service.enter(card, places.get(places.size() - 1));
+        assertEquals(POOL.getId(), record.getLocationId());
+        assertEquals(NOW, record.getEntryDateTime());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-5")
+    void onLogin_throwAndSaveNothing_whenMasterCardIsBlocked() {
+        IssuedCard issued = service.issueMasterCard(MANAGER, MANAGER);
+        service.blockCard(issued.card().getNumber(), MANAGER);
+
+        assertThrows(CardBlockedException.class,
+                () -> service.login(issued.card().getNumber(), issued.accessCode()));
+        assertEquals(0, records.count());
     }
 }
