@@ -168,7 +168,8 @@ public class HotelFacade {
     }
 
     /**
-     * Does the check-out of a reservation.
+     * Does the check-out of a reservation and deactivates its card, if it has one.
+     * A refused check-out does not change the card. The card entries stay saved.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-out
@@ -178,6 +179,8 @@ public class HotelFacade {
      */
     public void checkOut(long reservationId, User actor) {
         reservationService.checkOut(reservationId, actor);
+        cardAccessService.findCardByReservation(reservationId).ifPresent(
+                card -> cardAccessService.deactivateCard(card.getNumber(), actor));
     }
 
     /**
