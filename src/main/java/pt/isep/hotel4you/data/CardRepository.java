@@ -44,6 +44,14 @@ public interface CardRepository {
     List<MagneticCard> findByUserId(long userId);
 
     /**
+     * Finds all master cards, blocked or not, the oldest card first.
+     *
+     * @return the master cards, or an empty list
+     * @throws IllegalStateException if the database is not available
+     */
+    List<MagneticCard> findMasters();
+
+    /**
      * Saves a new card with the hash of its access code.
      *
      * @param card the new card, its id is ignored

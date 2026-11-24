@@ -16,6 +16,7 @@ import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
+import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
@@ -41,6 +42,7 @@ public class HotelFacade {
     private final ClientService clientService;
     private final ReservationService reservationService;
     private final ExtraPriceService extraPriceService;
+    private final CardAccessService cardAccessService;
 
     /**
      * Creates the facade.
@@ -53,11 +55,12 @@ public class HotelFacade {
      * @param clientService the client registration service
      * @param reservationService the reservation service
      * @param extraPriceService the extra price service
+     * @param cardAccessService the card service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
             ClientService clientService, ReservationService reservationService,
-            ExtraPriceService extraPriceService) {
+            ExtraPriceService extraPriceService, CardAccessService cardAccessService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -66,6 +69,34 @@ public class HotelFacade {
         this.clientService = clientService;
         this.reservationService = reservationService;
         this.extraPriceService = extraPriceService;
+        this.cardAccessService = cardAccessService;
+    }
+
+    /**
+     * Lists all master cards, blocked or not, for the screen of the master cards (H4Y-153).
+     *
+     * @param actor the logged-in user
+     * @return the master cards, the oldest first
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<MagneticCard> listMasterCards(User actor) {
+        return cardAccessService.listMasterCards(actor);
+    }
+
+    /**
+     * Blocks a lost master card at once (H4Y-153).
+     *
+     * @param number the number of the master card
+     * @param actor the logged-in user
+     * @return the blocked card
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no master card has this number
+     * @throws CardBlockedException if the card is already blocked
+     * @throws IllegalStateException if the database is not available
+     */
+    public MagneticCard blockMasterCard(String number, User actor) {
+        return cardAccessService.blockMasterCard(number, actor);
     }
 
     /**

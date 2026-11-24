@@ -80,6 +80,22 @@ public class JdbcCardRepository implements CardRepository {
     }
 
     @Override
+    public List<MagneticCard> findMasters() {
+        String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE is_master = 1 ORDER BY id";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql);
+                ResultSet row = statement.executeQuery()) {
+            List<MagneticCard> cards = new ArrayList<>();
+            while (row.next()) {
+                cards.add(read(row));
+            }
+            return cards;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
     public MagneticCard save(MagneticCard card) {
         String sql = """
                 INSERT INTO access_cards (card_number, reservation_id, user_id, is_master, active, blocked_at,

@@ -9,4 +9,13 @@ public class CardBlockedException extends RuntimeException {
     public CardBlockedException() {
         super("O cartão está bloqueado.");
     }
+
+    /**
+     * Creates the exception with its own message.
+     *
+     * @param message the message to show
+     */
+    public CardBlockedException(String message) {
+        super(message);
+    }
 }

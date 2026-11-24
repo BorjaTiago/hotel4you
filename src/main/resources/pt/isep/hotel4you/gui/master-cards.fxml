@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.MasterCardController">
+    <Label text="Cartões mestre" styleClass="subtitle"/>
+    <Label fx:id="cardsLabel" text="Selecione o cartão mestre perdido para o bloquear." wrapText="true"/>
+    <TableView fx:id="cardTable" styleClass="data-table" VBox.vgrow="ALWAYS" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="numberColumn" text="Número" prefWidth="180"/>
+            <TableColumn fx:id="stateColumn" text="Estado" prefWidth="160"/>
+            <TableColumn fx:id="blockedAtColumn" text="Bloqueado em" prefWidth="200"/>
+        </columns>
+        <placeholder><Label text="Não existem cartões mestre."/></placeholder>
+    </TableView>
+    <HBox spacing="10">
+        <Button fx:id="blockButton" text="Bloquear cartão" onAction="#onBlockClicked"
+                styleClass="action-button, danger-button"/>
+    </HBox>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
