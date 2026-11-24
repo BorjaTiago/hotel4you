@@ -9,10 +9,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import pt.isep.hotel4you.domain.IssuedCard;
 import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.service.HotelFacade;
 
-/** Shows the master cards and lets the manager block a lost master card (H4Y-153). */
+/** Shows the master cards. The manager blocks a lost master card (H4Y-153) and issues a new one (H4Y-154). */
 public class MasterCardController {
 
     private static final DateTimeFormatter BLOCKED_AT_FORMAT = DateTimeFormatter.ofPattern("dd/MM/uuuu HH:mm");
@@ -24,6 +25,7 @@ public class MasterCardController {
     @FXML private TableColumn<MagneticCard, String> stateColumn;
     @FXML private TableColumn<MagneticCard, String> blockedAtColumn;
     @FXML private Button blockButton;
+    @FXML private Button replaceButton;
     @FXML private Label messageLabel;
 
     /**
@@ -42,6 +44,7 @@ public class MasterCardController {
         stateColumn.setCellValueFactory(data -> new SimpleStringProperty(stateText(data.getValue())));
         blockedAtColumn.setCellValueFactory(data -> new SimpleStringProperty(blockedAtText(data.getValue())));
         blockButton.disableProperty().bind(cardTable.getSelectionModel().selectedItemProperty().isNull());
+        replaceButton.disableProperty().bind(cardTable.getSelectionModel().selectedItemProperty().isNull());
         loadCards();
     }
 
@@ -80,6 +83,25 @@ public class MasterCardController {
         }
     }
 
+    @FXML
+    private void onReplaceClicked() {
+        showMessage("", false);
+        MagneticCard chosen = cardTable.getSelectionModel().getSelectedItem();
+        if (chosen == null) {
+            return;
+        }
+        try {
+            IssuedCard issued = facade.replaceMasterCard(chosen.getNumber(), HotelApp.currentUser);
+            loadCards();
+            showMessage(issuedMessage(issued.card()), true);
+            Alert codeAlert = new Alert(Alert.AlertType.INFORMATION, issuedText(issued), ButtonType.OK);
+            codeAlert.setHeaderText("Novo cartão mestre");
+            codeAlert.showAndWait();
+        } catch (RuntimeException error) {
+            showMessage(error.getMessage(), false);
+        }
+    }
+
     private void showMessage(String text, boolean success) {
         messageLabel.setText(text);
         messageLabel.getStyleClass().remove("message-success");
@@ -104,5 +126,17 @@ public class MasterCardController {
     /** Gives the message after the block of a card. */
     static String blockedMessage(MagneticCard card) {
         return "Cartão mestre " + card.getNumber() + " bloqueado.";
+    }
+
+    /** Gives the text that shows the new number and its code. The screen shows it only once. */
+    static String issuedText(IssuedCard issued) {
+        return "Número do novo cartão mestre: " + issued.card().getNumber() + "\n"
+                + "Código: " + issued.accessCode() + "\n"
+                + "Guarde o código agora. Não volta a ser mostrado.";
+    }
+
+    /** Gives the message after the issue of a new master card, without the code. */
+    static String issuedMessage(MagneticCard card) {
+        return "Novo cartão mestre " + card.getNumber() + " emitido.";
     }
 }

@@ -6,7 +6,7 @@
 <VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
       fx:controller="pt.isep.hotel4you.gui.MasterCardController">
     <Label text="Cartões mestre" styleClass="subtitle"/>
-    <Label fx:id="cardsLabel" text="Selecione o cartão mestre perdido para o bloquear." wrapText="true"/>
+    <Label fx:id="cardsLabel" text="Selecione o cartão mestre perdido para o bloquear. Depois emita um novo cartão mestre." wrapText="true"/>
     <TableView fx:id="cardTable" styleClass="data-table" VBox.vgrow="ALWAYS" prefWidth="600">
         <columns>
             <TableColumn fx:id="numberColumn" text="Número" prefWidth="180"/>
@@ -18,6 +18,8 @@
     <HBox spacing="10">
         <Button fx:id="blockButton" text="Bloquear cartão" onAction="#onBlockClicked"
                 styleClass="action-button, danger-button"/>
+        <Button fx:id="replaceButton" text="Novo cartão mestre" onAction="#onReplaceClicked"
+                styleClass="action-button, primary-button"/>
     </HBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>
