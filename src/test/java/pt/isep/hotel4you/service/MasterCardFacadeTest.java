@@ -17,6 +17,7 @@ import pt.isep.hotel4you.data.InMemoryCardRepository;
 import pt.isep.hotel4you.data.InMemoryFloorRepository;
 import pt.isep.hotel4you.data.InMemoryLocationRepository;
 import pt.isep.hotel4you.data.InMemoryReservationRepository;
+import pt.isep.hotel4you.data.InMemoryRoomRepository;
 import pt.isep.hotel4you.data.InMemoryUserRepository;
 import pt.isep.hotel4you.domain.CardType;
 import pt.isep.hotel4you.domain.Location;
@@ -51,8 +52,10 @@ class MasterCardFacadeTest {
         reservations.add(new Reservation(1L, 50L, ROOM_202.getId(), NOW.toLocalDate(),
                 NOW.toLocalDate().plusDays(2), ReservationStatus.CHECKED_IN, 2L, List.of()));
         Clock clock = Clock.fixed(NOW.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
+        InMemoryFloorRepository floors = new InMemoryFloorRepository();
         service = new CardAccessService(cards, new InMemoryCardAccessRecordRepository(), reservations, users,
-                new LocationService(new InMemoryFloorRepository(), new InMemoryLocationRepository()),
+                new InMemoryRoomRepository(), floors,
+                new LocationService(floors, new InMemoryLocationRepository()),
                 new CardNumberGenerator(cards), new AccessCodeGenerator(), authService, clock);
         facade = new HotelFacade(null, null, null, null, null, null, null, null, service);
     }

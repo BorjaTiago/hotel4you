@@ -2,15 +2,20 @@ package pt.isep.hotel4you.service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import pt.isep.hotel4you.data.CardAccessRecordRepository;
 import pt.isep.hotel4you.data.CardRepository;
+import pt.isep.hotel4you.data.FloorRepository;
 import pt.isep.hotel4you.data.ReservationRepository;
+import pt.isep.hotel4you.data.RoomRepository;
 import pt.isep.hotel4you.data.UserRepository;
 import pt.isep.hotel4you.domain.CardAccessRecord;
+import pt.isep.hotel4you.domain.CardPlace;
 import pt.isep.hotel4you.domain.CardType;
+import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.IssuedCard;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.MagneticCard;
@@ -40,6 +45,8 @@ public class CardAccessService {
     private final CardAccessRecordRepository recordRepository;
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
+    private final FloorRepository floorRepository;
     private final LocationService locationService;
     private final CardNumberGenerator numberGenerator;
     private final AccessCodeGenerator codeGenerator;
@@ -53,6 +60,8 @@ public class CardAccessService {
      * @param recordRepository stores the card entries
      * @param reservationRepository reads the reservation of a client card
      * @param userRepository reads the user of a staff card
+     * @param roomRepository reads the rooms of the screen "O meu cartão"
+     * @param floorRepository reads the zones of the screen "O meu cartão"
      * @param locationService gives the zone rule of a staff role
      * @param numberGenerator makes new card numbers
      * @param codeGenerator makes new access codes
@@ -61,12 +70,14 @@ public class CardAccessService {
      */
     public CardAccessService(CardRepository cardRepository, CardAccessRecordRepository recordRepository,
             ReservationRepository reservationRepository, UserRepository userRepository,
-            LocationService locationService, CardNumberGenerator numberGenerator,
+            RoomRepository roomRepository, FloorRepository floorRepository, LocationService locationService, CardNumberGenerator numberGenerator,
             AccessCodeGenerator codeGenerator, AuthService authService, Clock clock) {
         this.cardRepository = cardRepository;
         this.recordRepository = recordRepository;
         this.reservationRepository = reservationRepository;
         this.userRepository = userRepository;
+        this.roomRepository = roomRepository;
+        this.floorRepository = floorRepository;
         this.locationService = locationService;
         this.numberGenerator = numberGenerator;
         this.codeGenerator = codeGenerator;
@@ -321,6 +332,51 @@ public class CardAccessService {
     }
 
     /**
+     * Lists the places of the screen "O meu cartão" (H4Y-109 AC-6). A client card gets the room
+     * of its reservation. A master card gets every room. Then every zone follows, in floor order.
+     * Each place tells if the card may enter it, with the rules of {@link #canOpenRoom} and
+     * {@link #canOpen}.
+     *
+     * @param card the card of the logged-in person
+     * @return the rooms first, then the zones
+     * @throws IllegalArgumentException if the card is null
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardPlace> listPlaces(MagneticCard card) {
+        if (card == null) {
+            throw new IllegalArgumentException("O cartão é obrigatório.");
+        }
+        List<CardPlace> places = new ArrayList<>();
+        for (Room room : roomsOf(card)) {
+            places.add(new CardPlace("Quarto " + room.getNumber(), room, null, canOpenRoom(card, room)));
+        }
+        for (Floor floor : floorRepository.findAll()) {
+            for (Location zone : floor.locations()) {
+                places.add(new CardPlace(zone.getName(), null, zone, canOpen(card, zone)));
+            }
+        }
+        return places;
+    }
+
+    /**
+     * Passes the card at a place of the screen "O meu cartão" (H4Y-109 AC-7). The rule is checked
+     * again, so an old screen cannot log a refused entry.
+     *
+     * @param card the card of the logged-in person
+     * @param place the room or the zone that the person clicked
+     * @return the saved entry
+     * @throws IllegalArgumentException if the card or the place is null
+     * @throws AccessDeniedException if the card may not enter the place; nothing is saved
+     * @throws IllegalStateException if the database is not available
+     */
+    public CardAccessRecord enter(MagneticCard card, CardPlace place) {
+        if (place == null) {
+            throw new IllegalArgumentException("Escolha um quarto ou um local.");
+        }
+        return register(card, place.room(), place.location());
+    }
+
+    /**
      * Lists the entries of a card, the oldest first (RF-23).
      *
      * @param number the card number
@@ -424,6 +480,19 @@ public class CardAccessService {
 
     private static boolean isUsable(MagneticCard card) {
         return card != null && card.isActive() && !card.isBlocked();
+    }
+
+    private List<Room> roomsOf(MagneticCard card) {
+        if (card.getType() == CardType.MASTER) {
+            return roomRepository.findAll();
+        }
+        if (card.getReservationId() == null) {
+            return List.of();
+        }
+        return reservationRepository.findById(card.getReservationId())
+                .flatMap(reservation -> roomRepository.findById(reservation.getRoomId()))
+                .stream()
+                .toList();
     }
 
     private Optional<Reservation> checkedInReservation(MagneticCard card) {

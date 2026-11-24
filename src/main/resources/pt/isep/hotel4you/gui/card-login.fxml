@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="12" prefWidth="320" styleClass="app-view, login-box" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.CardLoginController">
+    <padding>
+        <javafx.geometry.Insets top="32" right="32" bottom="32" left="32"/>
+    </padding>
+    <Label text="Entrar com cartão" styleClass="title"/>
+    <Label text="Use o número e o código que recebeu no check-in." wrapText="true" styleClass="subtitle"/>
+    <Label text="Número do cartão" labelFor="$numberField" maxWidth="Infinity"/>
+    <TextField fx:id="numberField"/>
+    <Label text="Código" labelFor="$codeField" maxWidth="Infinity"/>
+    <PasswordField fx:id="codeField"/>
+    <Button text="Entrar" onAction="#onLoginClicked" defaultButton="true"
+            maxWidth="Infinity" styleClass="primary-button"/>
+    <Button text="Voltar" onAction="#onBackClicked" cancelButton="true"
+            maxWidth="Infinity" styleClass="secondary-button"/>
+    <Label fx:id="messageLabel" wrapText="true" styleClass="message"/>
+</VBox>

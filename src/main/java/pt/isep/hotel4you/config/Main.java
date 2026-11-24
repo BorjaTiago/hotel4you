@@ -47,13 +47,15 @@ public class Main {
             JdbcUserRepository userRepository = new JdbcUserRepository(database);
             AuthService authService = new AuthService(userRepository);
             StaffService staffService = new StaffService(userRepository, authService);
+            JdbcFloorRepository floorRepository = new JdbcFloorRepository(database);
             LocationService locationService = new LocationService(
-                    new JdbcFloorRepository(database), new JdbcLocationRepository(database));
+                    floorRepository, new JdbcLocationRepository(database));
             JdbcRoomTypeRepository roomTypeRepository = new JdbcRoomTypeRepository(database);
             JdbcReservationRepository reservationRepository = new JdbcReservationRepository(database);
             JdbcItemRepository itemRepository = new JdbcItemRepository(database);
+            JdbcRoomRepository roomRepository = new JdbcRoomRepository(database);
             RoomService roomService = new RoomService(
-                    new JdbcRoomRepository(database), roomTypeRepository, reservationRepository, itemRepository);
+                    roomRepository, roomTypeRepository, reservationRepository, itemRepository);
             StockService stockService = new StockService(itemRepository);
             ClientService clientService = new ClientService(new JdbcClientRepository(database));
             ReservationService reservationService = new ReservationService(reservationRepository,
@@ -62,7 +64,7 @@ public class Main {
             JdbcCardRepository cardRepository = new JdbcCardRepository(database);
             CardAccessService cardAccessService = new CardAccessService(cardRepository,
                     new JdbcCardAccessRecordRepository(database), reservationRepository, userRepository,
-                    locationService, new CardNumberGenerator(cardRepository),
+                    roomRepository, floorRepository, locationService, new CardNumberGenerator(cardRepository),
                     new AccessCodeGenerator(), authService, Clock.systemDefaultZone());
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
                     stockService, clientService, reservationService,

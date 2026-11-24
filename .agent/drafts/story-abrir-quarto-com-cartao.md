@@ -6,7 +6,7 @@ requirements: [RF-17]
 points: 3
 points_suggested: 3
 status: approved
-jira_key:
+jira_key: H4Y-135
 labels: [access-control, final-delivery]
 sprint:
 ---
@@ -34,14 +34,21 @@ Para que eu entre no quarto da minha reserva.
   Quando o cliente passa o cartão na porta de um quarto
   Então o sistema recusa a entrada
 
+### Cenário AC-4: Fluxo completo
+  Dado que existe um cartão de uma reserva com check-in no quarto 202
+  Quando o cliente entra com o cartão, abre o ecrã "O meu cartão" e clica no quarto
+  Então o serviço procura o cartão, aplica a regra do quarto e decide
+  E o ecrã mostra "entrada permitida" ou "entrada recusada" com o motivo
+
 ## Critérios de aceite (checklist)
 
 - [ ] AC-1: O cartão associado a uma reserva com check-in abre a porta do quarto da reserva.
 - [ ] AC-2: O cartão é recusado na porta de um quarto que não é o da sua reserva.
 - [ ] AC-3: Um cartão que não existe no sistema é recusado na porta de um quarto.
+- [ ] AC-4: O cliente entra com o cartão, abre "O meu cartão" e clica no quarto; o ecrã mostra "entrada permitida" ou "entrada recusada" com o motivo.
 
 ## Notas
-Leitores físicos fora de âmbito: entrada simulada na GUI. Entrega final (Q-06). Q-09 (decisão da equipa). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: cartões de teste ligados a reservas com check-in (foundation T4), sem depender de story-emitir-cartao-check-in; regra própria (`AccessRule`, T0) e leitor simulado (T6). Estado do cartão após check-out: Q-30 (decisão da equipa), o cenário está em story-check-out (AC-4).
+Leitores físicos fora de âmbito: entrada simulada na aplicação. Usa o CardAccessService e o login com o cartão e o ecrã "O meu cartão" da H4Y-109 e junta só a regra de acesso ao quarto e o ecrã desta história. Não cria tabelas. Cartões de teste ligados a reservas com check-in. Depois do check-out o cartão deixa de funcionar (ver "Desativar o cartão no check-out").
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -53,4 +60,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Jira sync (login and "O meu cartão" flow, H4Y-122) by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
