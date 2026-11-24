@@ -1025,4 +1025,59 @@ class CardAccessServiceTest {
                 () -> service.login(issued.card().getNumber(), issued.accessCode()));
         assertEquals(0, records.count());
     }
+
+    // --- save the passages of the card (H4Y-150) ---
+
+    @Test
+    @Tag("H4Y-150-AC-1")
+    void onRegister_savePlaceAndTime_whenClientEntersRestaurant() {
+        MagneticCard card = clientCard();
+
+        service.register(card, null, RESTAURANT);
+
+        List<CardAccessRecord> saved = records.findByCardId(card.getId());
+        assertEquals(1, saved.size());
+        assertEquals(RESTAURANT.getId(), saved.get(0).getLocationId());
+        assertEquals(NOW, saved.get(0).getEntryDateTime());
+    }
+
+    @Test
+    @Tag("H4Y-150-AC-2")
+    void onRegister_savePlaceAndTime_whenClientEntersRoom202() {
+        MagneticCard card = clientCard();
+
+        service.register(card, ROOM_202, null);
+
+        List<CardAccessRecord> saved = records.findByCardId(card.getId());
+        assertEquals(1, saved.size());
+        assertEquals(ROOM_202.getId(), saved.get(0).getRoomId());
+        assertEquals(NOW, saved.get(0).getEntryDateTime());
+    }
+
+    @Test
+    @Tag("H4Y-150-AC-3")
+    void onRegister_saveNothing_whenClientIsRefusedAtBar() {
+        MagneticCard card = clientCard();
+
+        refusedEntry(card, null, BAR);
+
+        assertTrue(records.findByCardId(card.getId()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-150-AC-4")
+    void onEnter_saveOnlyRoomPassage_whenClientClicksRoom202ThenBar() {
+        MagneticCard card = clientCard();
+        List<CardPlace> places = service.listPlaces(card);
+        CardPlace room202 = places.get(0);
+        CardPlace bar = places.get(2);
+
+        service.enter(card, room202);
+        assertThrows(EntryRefusedException.class, () -> service.enter(card, bar));
+
+        List<CardAccessRecord> saved = records.findByCardId(card.getId());
+        assertEquals(1, saved.size());
+        assertEquals(ROOM_202.getId(), saved.get(0).getRoomId());
+        assertEquals(NOW, saved.get(0).getEntryDateTime());
+    }
 }
