@@ -31,6 +31,8 @@
                     maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="stockButton" text="Stock" onAction="#onStockClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button styleClass="navigation-button" fx:id="cardPlacesButton" text="Locais de um cartão" onAction="#onCardPlacesClicked"
+                    maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
 
