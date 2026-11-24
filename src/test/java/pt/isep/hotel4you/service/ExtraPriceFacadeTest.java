@@ -26,7 +26,7 @@ class ExtraPriceFacadeTest {
         repository = new InMemoryExtraPriceRepository();
         repository.add(extra);
         facade = new HotelFacade(null, null, null, null, null, null, null,
-                new ExtraPriceService(repository));
+                new ExtraPriceService(repository), null);
     }
 
     @Test

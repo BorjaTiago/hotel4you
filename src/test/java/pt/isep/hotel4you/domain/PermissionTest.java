@@ -125,6 +125,18 @@ class PermissionTest {
         assertTrue(Permission.DELETE_RESERVATIONS.allows(MANAGER));
     }
 
+    @Test
+    @Tag("H4Y-110-AC-4")
+    void onAllows_returnTrue_whenReceptionistRegistersRoomService() {
+        assertTrue(Permission.REGISTER_ROOM_SERVICE.allows(RECEPTIONIST));
+    }
+
+    @Test
+    @Tag("H4Y-110-AC-4")
+    void onAllows_returnFalse_whenRestaurantStaffRegistersRoomService() {
+        assertFalse(Permission.REGISTER_ROOM_SERVICE.allows(RESTAURANT_STAFF));
+    }
+
     @ParameterizedTest
     @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")
