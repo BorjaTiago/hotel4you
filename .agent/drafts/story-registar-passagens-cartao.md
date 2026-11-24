@@ -54,11 +54,11 @@ Registo de cada passagem, incluindo quartos. O RF-19 fala só de entradas; regis
 points_suggested: 3
 reference: Registar um cliente (3)
 compared: equal
-reasoning: Nova tabela de passagens e gravação em cada entrada permitida. Sem GUI própria. Regra: recusa não grava.
+reasoning: Usa a tabela de passagens da H4Y-109 (não cria tabelas). Grava cada entrada permitida com o local e a hora. Usa o ecrã "O meu cartão". Regra: recusa não grava.
 split_needed: no
 
 ready: true
 dor_failed: []
 questions: []
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Jira sync (login and "O meu cartão" flow, H4Y-122) by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Jira sync (login and "O meu cartão" flow, H4Y-122) by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-150 reasoning fix (no new table) and passages tests by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
