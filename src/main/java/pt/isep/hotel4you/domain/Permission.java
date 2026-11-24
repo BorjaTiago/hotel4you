@@ -27,7 +27,7 @@ public enum Permission {
     LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
 
     /**
-     * Register, list, search, edit and remove clients. Clients do not log in (Q-13), so the
+     * Register, list, search, edit and remove clients. Clients have no user account (Q-13), so the
      * receptionist or the manager does it (Q-54).
      */
     MANAGE_CLIENTS(Role.RECEPTIONIST, Role.MANAGER),
