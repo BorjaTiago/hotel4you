@@ -50,6 +50,7 @@ public class CardAccessService {
     private static final String ROLE_ZONE = "O seu perfil não dá acesso a este local.";
     private static final String NOT_FOR_CLIENTS = "Este local não é para clientes.";
     private static final String NOT_RESERVED = "A sua reserva não inclui este local.";
+    private static final String REMOVED_ZONE = "Este local já não existe.";
 
     private final CardRepository cardRepository;
     private final CardAccessRecordRepository recordRepository;
@@ -238,10 +239,10 @@ public class CardAccessService {
     }
 
     /**
-     * Tells if a card opens a zone (RF-17, RF-19, Q-45). An active master card opens every zone. A
-     * client card opens a zone only after the check-in, if the zone accepts client cards, and, for
-     * a zone that needs a reservation, only if the reservation includes it. A staff card follows
-     * the zone rule of the role of its user.
+     * Tells if a card opens a zone (RF-17, RF-19, Q-45). An active master card opens every zone of
+     * a floor; a removed zone stays closed (H4Y-152). A client card opens a zone only after the
+     * check-in, if the zone accepts client cards, and, for a zone that needs a reservation, only if
+     * the reservation includes it. A staff card follows the zone rule of the role of its user.
      *
      * @param card the card, can be null
      * @param location the zone, can be null
@@ -460,8 +461,11 @@ public class CardAccessService {
 
     private Optional<String> zoneRefusal(MagneticCard card, Location location) {
         Optional<String> refusal = cardRefusal(card);
-        if (refusal.isPresent() || card.getType() == CardType.MASTER) {
+        if (refusal.isPresent()) {
             return refusal;
+        }
+        if (card.getType() == CardType.MASTER) {
+            return zoneExists(location) ? Optional.empty() : Optional.of(REMOVED_ZONE);
         }
         if (card.getUserId() != null) {
             boolean allowed = userRepository.findById(card.getUserId())
@@ -482,6 +486,12 @@ public class CardAccessService {
             return Optional.of(NOT_RESERVED);
         }
         return Optional.empty();
+    }
+
+    private boolean zoneExists(Location location) {
+        return floorRepository.findAll().stream()
+                .flatMap(floor -> floor.locations().stream())
+                .anyMatch(zone -> zone.getId() != null && zone.getId().equals(location.getId()));
     }
 
     private List<Room> roomsOf(MagneticCard card) {
