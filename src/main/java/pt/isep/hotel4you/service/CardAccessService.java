@@ -41,6 +41,15 @@ public class CardAccessService {
     /** The message when the card number or the access code is wrong. */
     public static final String LOGIN_FAILED = "Número do cartão ou código errado.";
 
+    private static final String UNKNOWN_CARD = "Cartão desconhecido.";
+    private static final String BLOCKED_CARD = "O cartão está bloqueado.";
+    private static final String INACTIVE_CARD = "O cartão não está ativo.";
+    private static final String NO_CHECK_IN = "A reserva do cartão não tem check-in.";
+    private static final String NO_ROOM = "Este cartão não abre quartos.";
+    private static final String OTHER_ROOM = "Este quarto não é o da sua reserva.";
+    private static final String ROLE_ZONE = "O seu perfil não dá acesso a este local.";
+    private static final String CLIENT_ZONE = "O cartão não abre este local.";
+
     private final CardRepository cardRepository;
     private final CardAccessRecordRepository recordRepository;
     private final ReservationRepository reservationRepository;
@@ -224,15 +233,7 @@ public class CardAccessService {
      * @throws IllegalStateException if the database is not available
      */
     public boolean canOpenRoom(MagneticCard card, Room room) {
-        if (!isUsable(card) || room == null) {
-            return false;
-        }
-        if (card.getType() == CardType.MASTER) {
-            return true;
-        }
-        return checkedInReservation(card)
-                .map(reservation -> room.getId() != null && reservation.getRoomId() == room.getId())
-                .orElse(false);
+        return card != null && room != null && roomRefusal(card, room).isEmpty();
     }
 
     /**
@@ -247,48 +248,39 @@ public class CardAccessService {
      * @throws IllegalStateException if the database is not available
      */
     public boolean canOpen(MagneticCard card, Location location) {
-        if (!isUsable(card) || location == null) {
-            return false;
-        }
-        if (card.getType() == CardType.MASTER) {
-            return true;
-        }
-        if (card.getUserId() != null) {
-            return userRepository.findById(card.getUserId())
-                    .map(user -> locationService.canAccess(location, user))
-                    .orElse(false);
-        }
-        return checkedInReservation(card)
-                .map(reservation -> location.isGuestCardAccess()
-                        && (!location.isRequiresReservation()
-                                || reservation.getLocationIds().contains(location.getId())))
-                .orElse(false);
+        return card != null && location != null && zoneRefusal(card, location).isEmpty();
     }
 
     /**
      * Logs an entry of a card into a room or a zone, with the current time (RF-23). Only entries
-     * are logged: a new entry means that the person left the place before.
+     * are logged: a new entry means that the person left the place before. The service reads the
+     * card again by its number, so a card that is unknown, or was blocked or deactivated after the
+     * login, is refused (H4Y-135).
      *
-     * @param card the saved card
+     * @param card the card that is passed at the door
      * @param room the room, or null for a zone
      * @param location the zone, or null for a room
      * @return the saved entry
      * @throws IllegalArgumentException if the card is null, or if there is no place or two places
-     * @throws AccessDeniedException if the card may not enter the place; nothing is saved
+     * @throws EntryRefusedException if the card may not enter the place, with the reason; nothing
+     *         is saved
      * @throws IllegalStateException if the database is not available
      */
     public CardAccessRecord register(MagneticCard card, Room room, Location location) {
-        if (card == null || card.getId() == null) {
+        if (card == null) {
             throw new IllegalArgumentException("O cartão é obrigatório.");
         }
         if ((room == null) == (location == null)) {
             throw new IllegalArgumentException("Escolha um quarto ou um local.");
         }
-        boolean allowed = room != null ? canOpenRoom(card, room) : canOpen(card, location);
-        if (!allowed) {
-            throw new AccessDeniedException(ENTRY_REFUSED);
+        MagneticCard saved = Optional.ofNullable(card.getNumber())
+                .flatMap(cardRepository::findByNumber)
+                .orElseThrow(() -> new EntryRefusedException(UNKNOWN_CARD));
+        Optional<String> refusal = room != null ? roomRefusal(saved, room) : zoneRefusal(saved, location);
+        if (refusal.isPresent()) {
+            throw new EntryRefusedException(refusal.get());
         }
-        return recordRepository.save(new CardAccessRecord(null, card.getId(),
+        return recordRepository.save(new CardAccessRecord(null, saved.getId(),
                 room == null ? null : room.getId(), location == null ? null : location.getId(),
                 LocalDateTime.now(clock)));
     }
@@ -328,7 +320,7 @@ public class CardAccessService {
      * @param place the room or the zone that the person clicked
      * @return the saved entry
      * @throws IllegalArgumentException if the card or the place is null
-     * @throws AccessDeniedException if the card may not enter the place; nothing is saved
+     * @throws EntryRefusedException if the card may not enter the place, with the reason; nothing is saved
      * @throws IllegalStateException if the database is not available
      */
     public CardAccessRecord enter(MagneticCard card, CardPlace place) {
@@ -440,8 +432,49 @@ public class CardAccessService {
         return changed;
     }
 
-    private static boolean isUsable(MagneticCard card) {
-        return card != null && card.isActive() && !card.isBlocked();
+    private static Optional<String> cardRefusal(MagneticCard card) {
+        if (card.isBlocked()) {
+            return Optional.of(BLOCKED_CARD);
+        }
+        if (!card.isActive()) {
+            return Optional.of(INACTIVE_CARD);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> roomRefusal(MagneticCard card, Room room) {
+        Optional<String> refusal = cardRefusal(card);
+        if (refusal.isPresent() || card.getType() == CardType.MASTER) {
+            return refusal;
+        }
+        if (card.getReservationId() == null) {
+            return Optional.of(NO_ROOM);
+        }
+        return checkedInReservation(card)
+                .map(reservation -> room.getId() != null && reservation.getRoomId() == room.getId()
+                        ? Optional.<String>empty()
+                        : Optional.of(OTHER_ROOM))
+                .orElse(Optional.of(NO_CHECK_IN));
+    }
+
+    private Optional<String> zoneRefusal(MagneticCard card, Location location) {
+        Optional<String> refusal = cardRefusal(card);
+        if (refusal.isPresent() || card.getType() == CardType.MASTER) {
+            return refusal;
+        }
+        if (card.getUserId() != null) {
+            boolean allowed = userRepository.findById(card.getUserId())
+                    .map(user -> locationService.canAccess(location, user))
+                    .orElse(false);
+            return allowed ? Optional.empty() : Optional.of(ROLE_ZONE);
+        }
+        return checkedInReservation(card)
+                .map(reservation -> location.isGuestCardAccess()
+                        && (!location.isRequiresReservation()
+                                || reservation.getLocationIds().contains(location.getId()))
+                        ? Optional.<String>empty()
+                        : Optional.of(CLIENT_ZONE))
+                .orElse(Optional.of(NO_CHECK_IN));
     }
 
     private List<Room> roomsOf(MagneticCard card) {

@@ -10,14 +10,14 @@ import javafx.scene.shape.SVGPath;
 import pt.isep.hotel4you.domain.CardAccessRecord;
 import pt.isep.hotel4you.domain.CardPlace;
 import pt.isep.hotel4you.domain.MagneticCard;
-import pt.isep.hotel4you.service.AccessDeniedException;
+import pt.isep.hotel4you.service.EntryRefusedException;
 import pt.isep.hotel4you.service.HotelFacade;
 
 /**
  * Controller of the screen "O meu cartão" (H4Y-109 AC-6, AC-7). It shows one big button per place:
  * green if the card may enter, grey with a lock if not. A click passes the card at the place. An
  * allowed place shows "Entrada permitida" and logs the entry. A locked place shows "Entrada
- * recusada" and logs nothing.
+ * recusada" with the reason and logs nothing (H4Y-135).
  */
 public class MyCardController {
 
@@ -83,8 +83,8 @@ public class MyCardController {
             CardAccessRecord entry = facade.enterPlace(card, place);
             showResult("Entrada permitida: " + place.name() + " às "
                     + entry.getEntryDateTime().format(TIME) + ".", true);
-        } catch (AccessDeniedException e) {
-            showResult("Entrada recusada: " + place.name() + ".", false);
+        } catch (EntryRefusedException e) {
+            showResult("Entrada recusada: " + place.name() + ". " + e.getReason(), false);
         } catch (IllegalArgumentException | IllegalStateException e) {
             showResult(e.getMessage(), false);
         }

@@ -109,7 +109,7 @@ public class HotelFacade {
      * @param place the clicked place
      * @return the saved entry
      * @throws IllegalArgumentException if the card or the place is null
-     * @throws AccessDeniedException if the card may not enter the place; nothing is saved
+     * @throws EntryRefusedException if the card may not enter the place, with the reason; nothing is saved
      * @throws IllegalStateException if the database is not available
      */
     public CardAccessRecord enterPlace(MagneticCard card, CardPlace place) {
