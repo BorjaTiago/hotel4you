@@ -61,7 +61,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - `gui`: JavaFX (ecrãs, controladores, registo de navegação).
    - `config`: leitura da configuração (ligação à base de dados, conta inicial). Valores fora do Git.
 2. Classes de domínio essenciais (fonte: `docs/requirements` e o esquema H4Y-10 do PR #4, branch `chore/db-schema-update`):
-   - `Role` (enum de 5 tipos, RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT_STAFF, SUPPLIER; só os 3 do pessoal têm conta, Q-13, Q-17), `User`. O utilizador com sessão iniciada fica em `HotelApp.currentUser`.
+   - `Role` (enum de 5 tipos, RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT_STAFF, SUPPLIER; só os 3 do pessoal têm conta de utilizador, Q-13, Q-17; o cliente e o gestor também entram com o cartão, `HotelApp.currentCard`), `User`. O utilizador com sessão iniciada fica em `HotelApp.currentUser`.
    - `Floor`, `Location` (zona: nome, piso, marca "exige reserva", Q-32), `RoomType`, `Room`, `RoomItem`.
    - `Customer`, `Reservation` (estado: RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT), locais incluídos na reserva.
    - `AdditionalService` (extras e serviços pagos, vista incluída, Q-37), `ReservationService` (extra ou pedido de serviço na reserva, preço copiado).
@@ -73,7 +73,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - Edifício e quartos: `BuildingService` (pisos, zonas), `RoomService` (quartos, tipos, preço base, itens do quarto).
    - Clientes e reservas: `CustomerService`, `RoomAvailability` (quartos livres e sobreposição de datas, uma só implementação), `ReservationService` (criar, cancelar, apagar, check-in, check-out, locais).
    - Preços: `PricingService` (preços extra, total), `ReservationExtrasService` (extras e serviços na reserva).
-   - Cartões e acesso: `CardService` (emitir, desativar, bloquear, novo mestre), `CardNumberGenerator`, `AccessService.enter(cartão, local)` que percorre uma lista de `AccessRule` e chama `AccessLogger` quando a entrada é permitida. Cada história de acesso acrescenta uma regra numa classe própria.
+   - Cartões e acesso: `CardAccessService` (emitir, ativar, desativar, bloquear, substituir o cartão mestre, `login(número, código)`, `canOpen`, `canOpenRoom`, `register`, `listPlaces(cartão)` e `enter(cartão, local)`), `CardNumberGenerator`, `AccessCodeGenerator`. `enter` chama `register`, que confere de novo a regra e guarda só as entradas permitidas; uma entrada recusada lança `AccessDeniedException` ("Entrada recusada.") e não guarda nada. Cada história de acesso muda só as regras em `canOpen` ou `canOpenRoom`.
    - Stock: `StockService` (catálogo, entrada, uso, saída), `XmlStockImporter`, `ImportReportService`.
    - Apoio ao cliente: `GuestSupportService` (pedidos de serviço de quarto, sugestões e reclamações).
    - Dados: um repositório por agregado (`UserRepository`, `RoomRepository`, `ReservationRepository`, `CardRepository`, `AccessLogRepository`, `StockRepository`, ...), com versão JDBC e versão em memória.
@@ -134,4 +134,4 @@ Sub-tarefas: H4Y-121 (tabelas e domínio), H4Y-132 (`CardAccessService`), H4Y-13
 
 Notas: só se registam entradas (local e hora), sem saídas: uma entrada nova quer dizer que o cliente saiu do local anterior. Testes primeiro com `@Tag("H4Y-109-AC-n")`, Javadoc nas classes novas, docs/uml e docs/database no mesmo PR.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19; T6 update to match H4Y-109 in Jira (card login) by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19; T6 update to match H4Y-109 in Jira (card login) by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; Q-13 card login sync by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
