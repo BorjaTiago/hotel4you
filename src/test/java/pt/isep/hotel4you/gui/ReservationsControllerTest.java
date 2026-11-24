@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.domain.CardType;
+import pt.isep.hotel4you.domain.IssuedCard;
+import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.gui.ReservationsController.QuickFilter;
@@ -191,5 +194,16 @@ class ReservationsControllerTest {
                 .isEmpty());
         assertTrue(ReservationsController.filter(List.of(), QuickFilter.CHECKED_IN, "", TODAY)
                 .isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-134-AC-5")
+    void onIssuedCardText_showNumberAndCode_whenCheckInIssuesCard() {
+        MagneticCard card = new MagneticCard(5L, "10007", CardType.CLIENT, 1L, null, true, null, "hash");
+
+        String text = ReservationsController.issuedCardText(new IssuedCard(card, "K7P2QX"));
+
+        assertEquals("Número do cartão: 10007\nCódigo: K7P2QX\n\n"
+                + "Entregue estes dados ao cliente. O código só aparece agora.", text);
     }
 }

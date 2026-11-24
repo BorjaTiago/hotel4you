@@ -75,8 +75,14 @@ class HotelFacadeTest {
         ClientService clientService = new ClientService(new InMemoryClientRepository());
         ReservationService reservationService = new ReservationService(reservationRepository,
                 roomService, roomTypeRepository);
+        pt.isep.hotel4you.data.InMemoryCardRepository cardRepository =
+                new pt.isep.hotel4you.data.InMemoryCardRepository();
+        CardAccessService cardAccessService = new CardAccessService(cardRepository,
+                new pt.isep.hotel4you.data.InMemoryCardAccessRecordRepository(), reservationRepository,
+                repository, locationService, new CardNumberGenerator(cardRepository),
+                new AccessCodeGenerator(), authService, java.time.Clock.systemDefaultZone());
         facade = new HotelFacade(authService, staffService, locationService, roomService,
-                stockService, clientService, reservationService, null);
+                stockService, clientService, reservationService, null, cardAccessService);
     }
 
     private User saveAna() {
