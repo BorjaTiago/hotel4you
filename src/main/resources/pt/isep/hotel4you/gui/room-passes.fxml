@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.RoomPassesController">
+    <Label text="Passagens de um quarto" styleClass="subtitle"/>
+    <Label fx:id="roomNumberLabel" text="Número do quarto"/>
+    <HBox spacing="10">
+        <ComboBox fx:id="roomNumberBox" editable="true" promptText="Ex.: 301" onAction="#onSearchClicked" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+        <Button text="Consultar" onAction="#onSearchClicked" styleClass="primary-button"/>
+    </HBox>
+    <TableView fx:id="entryTable" styleClass="data-table" VBox.vgrow="ALWAYS" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="cardColumn" text="Cartão" prefWidth="200"/>
+            <TableColumn fx:id="typeColumn" text="Tipo" prefWidth="120"/>
+            <TableColumn fx:id="timeColumn" text="Hora da entrada" prefWidth="210"/>
+        </columns>
+        <placeholder><Label text="Escolha o quarto e clique em Consultar."/></placeholder>
+    </TableView>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>

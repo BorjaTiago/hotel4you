@@ -88,6 +88,21 @@ public class HotelFacade {
     }
 
     /**
+     * Lists the cards that entered a room, with the time of each entry (RF-21, H4Y-156). Master card
+     * entries are included.
+     *
+     * @param roomNumber the room number
+     * @param actor the logged-in user
+     * @return the entries, the oldest first, or an empty list
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws RoomNotFoundException if no room has this number
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardEntry> getPassesByRoom(String roomNumber, User actor) {
+        return cardQueryService.getPassesByRoom(roomNumber, actor);
+    }
+
+    /**
      * Lists the extra prices per night, including those not yet set.
      * @param actor the logged-in user
      * @return the extra catalogue ordered by identifier

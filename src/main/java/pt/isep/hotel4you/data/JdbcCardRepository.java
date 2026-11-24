@@ -40,6 +40,18 @@ public class JdbcCardRepository implements CardRepository {
     }
 
     @Override
+    public Optional<MagneticCard> findById(long id) {
+        String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, id);
+                ResultSet row = statement.executeQuery()) {
+            return row.next() ? Optional.of(read(row)) : Optional.empty();
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
     public boolean existsByNumber(String number) {
         String sql = "SELECT 1 FROM access_cards WHERE card_number = ?";
         try (Connection connection = database.connect();

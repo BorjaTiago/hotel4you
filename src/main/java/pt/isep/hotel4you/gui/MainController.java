@@ -49,6 +49,9 @@ public class MainController {
     private Button cardPlacesButton;
 
     @FXML
+    private Button roomPassesButton;
+
+    @FXML
     private StackPane contentPane;
 
     /**
@@ -84,6 +87,8 @@ public class MainController {
         stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
         cardPlacesButton.managedProperty().bind(cardPlacesButton.visibleProperty());
         cardPlacesButton.setVisible(facade.canUse(user, Permission.MANAGE_CARDS));
+        roomPassesButton.managedProperty().bind(roomPassesButton.visibleProperty());
+        roomPassesButton.setVisible(facade.canUse(user, Permission.MANAGE_CARDS));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
         if (facade.canUse(user, Permission.MANAGE_RESERVATIONS)) {
@@ -136,6 +141,12 @@ public class MainController {
     @FXML
     private void onCardPlacesClicked() {
         Parent screen = new ScreenLoader(facade).load("card-places.fxml");
+        contentPane.getChildren().setAll(screen);
+    }
+
+    @FXML
+    private void onRoomPassesClicked() {
+        Parent screen = new ScreenLoader(facade).load("room-passes.fxml");
         contentPane.getChildren().setAll(screen);
     }
 

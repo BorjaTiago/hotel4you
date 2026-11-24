@@ -11,6 +11,7 @@ import pt.isep.hotel4you.domain.CardAccessRecord;
 import pt.isep.hotel4you.domain.CardEntry;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.MagneticCard;
+import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.User;
 
@@ -61,6 +62,45 @@ public class CardQueryService {
                 .map(record -> new CardEntry(card.getNumber(), card.getType(), placeName(record, rooms),
                         record.getEntryDateTime()))
                 .toList();
+    }
+
+    /**
+     * Lists the cards that entered a room, the oldest first (RF-21). Master card entries are
+     * included.
+     *
+     * @param roomNumber the room number, as typed or chosen by the manager
+     * @param actor the logged-in user
+     * @return one line per entry, or an empty list if nobody entered the room
+     * @throws AccessDeniedException if the user is not a manager
+     * @throws RoomNotFoundException if no room has this number
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardEntry> getPassesByRoom(String roomNumber, User actor) {
+        if (!Permission.MANAGE_CARDS.allows(actor)) {
+            throw new AccessDeniedException("Só o gestor pode consultar as entradas.");
+        }
+        Room room = findRoom(roomNumber);
+        String place = "Quarto " + room.getNumber();
+        return cardAccessService.getPassesByRoom(room, actor).stream()
+                .map(record -> {
+                    MagneticCard card = cardRepository.findById(record.getCardId())
+                            .orElseThrow(CardNotFoundException::new);
+                    return new CardEntry(card.getNumber(), card.getType(), place, record.getEntryDateTime());
+                })
+                .toList();
+    }
+
+    private Room findRoom(String roomNumber) {
+        int number;
+        try {
+            number = Integer.parseInt(roomNumber == null ? "" : roomNumber.trim());
+        } catch (NumberFormatException e) {
+            throw new RoomNotFoundException();
+        }
+        return roomRepository.findAll().stream()
+                .filter(room -> room.getNumber() == number)
+                .findFirst()
+                .orElseThrow(RoomNotFoundException::new);
     }
 
     private String placeName(CardAccessRecord record, Map<Long, Room> rooms) {
