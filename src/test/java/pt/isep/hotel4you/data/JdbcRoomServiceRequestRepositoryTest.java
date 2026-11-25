@@ -44,7 +44,7 @@ class JdbcRoomServiceRequestRepositoryTest {
         assertTrue(sql(1).contains(
                 "INSERT INTO reservation_services (reservation_id, extra_price_id, unit_price, used_at)"));
         assertTrue(sql(1).contains("OUTPUT INSERTED.id, INSERTED.reservation_id, INSERTED.used_at"));
-        assertTrue(sql(1).contains("SELECT r.id, ?, ?, SYSDATETIME() FROM reservations r"));
+        assertTrue(sql(1).contains("SELECT TOP (1) r.id, ?, ?, SYSDATETIME() FROM reservations r"));
         assertTrue(sql(1).contains("JOIN rooms ro ON ro.id = r.room_id"));
         assertTrue(sql(1).contains("WHERE ro.number = ? AND r.status = 'checked_in'"));
         assertEquals(List.of("Bebidas", 3L, new BigDecimal("4.50"), 202), database.bound);
