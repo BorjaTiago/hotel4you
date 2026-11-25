@@ -21,6 +21,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import pt.isep.hotel4you.domain.IssuedCard;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ReservationStatus;
@@ -29,8 +30,8 @@ import pt.isep.hotel4you.service.HotelFacade;
 /**
  * Controller of the Reservas screen. It lists the active reservations, searches them by name or
  * document, filters them, and turns on only the check-in, check-out or delete button that the
- * chosen row allows. Only the manager sees the delete button. It also opens the screen to create a
- * reservation.
+ * chosen row allows. The check-in issues the card of the reservation and shows its number and code
+ * once. Only the manager sees the delete button. It also opens the screen to create a reservation.
  */
 public class ReservationsController {
 
@@ -179,6 +180,18 @@ public class ReservationsController {
     }
 
     /**
+     * Gives the text of the dialog that shows the new card after the check-in (H4Y-134). The code
+     * is stored only as a hash, so this is the only time that it shows.
+     *
+     * @param issued the new card and its access code
+     * @return the card number and the code, with a note for the receptionist
+     */
+    static String issuedCardText(IssuedCard issued) {
+        return "Número do cartão: " + issued.card().getNumber() + "\nCódigo: " + issued.accessCode()
+                + "\n\nEntregue estes dados ao cliente. O código só aparece agora.";
+    }
+
+    /**
      * Gives the Portuguese label of a reservation state.
      *
      * @param status the reservation state
@@ -264,11 +277,13 @@ public class ReservationsController {
             return;
         }
         try {
-            facade.checkIn(chosen.id(), HotelApp.currentUser);
+            IssuedCard issued = facade.checkIn(chosen.id(), HotelApp.currentUser);
             if (loadReservations()) {
-                showMessage("Check-in feito: quarto " + chosen.roomNumber() + ".", true);
+                showMessage("Check-in feito: quarto " + chosen.roomNumber() + ". Cartão "
+                        + issued.card().getNumber() + " emitido.", true);
                 reservationTable.requestFocus();
             }
+            showIssuedCard(issued);
         } catch (RuntimeException e) {
             loadReservations();
             showMessage(e.getMessage(), false);
@@ -339,6 +354,13 @@ public class ReservationsController {
             loadReservations();
             showMessage(e.getMessage(), false);
         }
+    }
+
+    private static void showIssuedCard(IssuedCard issued) {
+        Alert dialog = new Alert(Alert.AlertType.INFORMATION, issuedCardText(issued), ButtonType.OK);
+        dialog.setTitle("Cartão emitido");
+        dialog.setHeaderText("Cartão do cliente");
+        dialog.showAndWait();
     }
 
     /** Loads the list again. On an error it shows the error and returns false. */

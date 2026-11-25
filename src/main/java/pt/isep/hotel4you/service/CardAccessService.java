@@ -125,6 +125,17 @@ public class CardAccessService {
     }
 
     /**
+     * Finds the client card of a reservation.
+     *
+     * @param reservationId the reservation identifier
+     * @return the card, or empty if the reservation has no card
+     * @throws IllegalStateException if the database is not available
+     */
+    public Optional<MagneticCard> findCardByReservation(long reservationId) {
+        return cardRepository.findByReservationId(reservationId);
+    }
+
+    /**
      * Issues a master card for a manager (RF-20). The manager may have only one master card that
      * is not blocked.
      *

@@ -17,6 +17,7 @@ import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
+import pt.isep.hotel4you.domain.IssuedCard;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.domain.MovementType;
@@ -192,20 +193,28 @@ public class HotelFacade {
     }
 
     /**
-     * Does the check-in of a reservation.
+     * Does the check-in of a reservation and issues its card (RF-13, RF-16). The card is checked
+     * first: if the reservation already has a card, nothing is saved.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-in
+     * @return the new card and its access code, to show once
+     * @throws CardAlreadyIssuedException if the reservation already has a card
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws ReservationNotFoundException if the reservation does not exist
      * @throws IllegalStateException if the state does not allow the check-in or the database fails
      */
-    public void checkIn(long reservationId, User actor) {
-        reservationService.checkIn(reservationId, actor);
+    public IssuedCard checkIn(long reservationId, User actor) {
+        if (cardAccessService.findCardByReservation(reservationId).isPresent()) {
+            throw new CardAlreadyIssuedException();
+        }
+        Reservation reservation = reservationService.checkIn(reservationId, actor);
+        return cardAccessService.issueCard(reservation, actor);
     }
 
     /**
-     * Does the check-out of a reservation.
+     * Does the check-out of a reservation and deactivates its card, if it has one.
+     * A refused check-out does not change the card. The card entries stay saved.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-out
@@ -215,6 +224,8 @@ public class HotelFacade {
      */
     public void checkOut(long reservationId, User actor) {
         reservationService.checkOut(reservationId, actor);
+        cardAccessService.findCardByReservation(reservationId).ifPresent(
+                card -> cardAccessService.deactivateCard(card.getNumber(), actor));
     }
 
     /**
