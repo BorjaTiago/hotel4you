@@ -8,9 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.RoomServiceRequest;
 import pt.isep.hotel4you.domain.RoomServiceType;
-import pt.isep.hotel4you.service.AccessDeniedException;
 import pt.isep.hotel4you.service.HotelFacade;
-import pt.isep.hotel4you.service.RoomNotOccupiedException;
 
 /** Screen where the receptionist registers a room service request (H4Y-110). */
 public class RoomServiceController {
@@ -58,8 +56,7 @@ public class RoomServiceController {
         try {
             request = facade.registerRoomService(roomField.getText(), typeBox.getValue(),
                     HotelApp.currentUser);
-        } catch (AccessDeniedException | IllegalArgumentException | RoomNotOccupiedException
-                | IllegalStateException error) {
+        } catch (RuntimeException error) {
             showMessage(error.getMessage(), false);
             return;
         }

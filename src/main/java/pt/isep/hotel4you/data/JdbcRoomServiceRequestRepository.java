@@ -15,9 +15,10 @@ public class JdbcRoomServiceRequestRepository implements RoomServiceRequestRepos
     private static final String INSERT =
             "INSERT INTO reservation_services (reservation_id, extra_price_id, unit_price, used_at) "
             + "OUTPUT INSERTED.id, INSERTED.reservation_id, INSERTED.used_at "
-            + "SELECT r.id, ?, ?, SYSDATETIME() FROM reservations r "
+            + "SELECT TOP (1) r.id, ?, ?, SYSDATETIME() FROM reservations r "
             + "JOIN rooms ro ON ro.id = r.room_id "
-            + "WHERE ro.number = ? AND r.status = 'checked_in'";
+            + "WHERE ro.number = ? AND r.status = 'checked_in' "
+            + "ORDER BY r.id";
 
     private final Database database;
 
