@@ -10,11 +10,16 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import pt.isep.hotel4you.domain.ExitReason;
+import pt.isep.hotel4you.domain.Manager;
+import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.StockMovement;
 
-/** Tests that the stock item repository keeps the SQL error as the cause. */
+/** Tests that the stock item repository keeps the SQL error as the cause and maps the stock check. */
 class JdbcItemRepositoryTest {
 
     /** A database that gives a connection where each SQL statement fails. */
@@ -180,6 +185,37 @@ class JdbcItemRepositoryTest {
 
         assertSqlCause(assertThrows(IllegalStateException.class,
                 () -> other.update(new StockItem(1L, "toalhas", "unidade", 0))));
+    }
+
+    private static StockMovement exitOfSheets() {
+        return new StockMovement(new StockItem(1L, "lençóis", "unidade", 2), MovementType.EXIT, 6,
+                ExitReason.DISCARD, LocalDateTime.of(2026, 11, 22, 10, 0),
+                new Manager(1L, "Rui Costa", "rui", "hash"));
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-2")
+    void onAddMovement_throwNotEnoughStock_whenStockCheckFails() {
+        JdbcItemRepository lowStock = failingWith(547);
+
+        assertThrows(NotEnoughStockException.class, () -> lowStock.addMovement(exitOfSheets()));
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-2")
+    void onAddMovement_keepSqlCause_whenSqlErrorIsOther() {
+        JdbcItemRepository other = failingWith(208);
+
+        assertSqlCause(assertThrows(IllegalStateException.class,
+                () -> other.addMovement(exitOfSheets())));
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-7")
+    void onAddMovement_returnFalse_whenItemDoesNotExist() {
+        JdbcItemRepository none = new JdbcItemRepository(new StatementDatabase(null, 0));
+
+        assertFalse(none.addMovement(exitOfSheets()));
     }
 
     @Test

@@ -7,12 +7,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import pt.isep.hotel4you.domain.ExitReason;
 import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.StockMovement;
 
 /** Stores and finds stock items in the SQL Server tables {@code items} and {@code stock_movements}. */
 public class JdbcItemRepository implements ItemRepository {
+
+    /**
+     * The SQL Server error of a failed CHECK or FOREIGN KEY constraint. In the stock UPDATE
+     * only the CHECK {@code stock_quantity >= 0} can fail.
+     */
+    private static final int CONSTRAINT_FAILED = 547;
 
     private final Database database;
 
@@ -94,7 +101,9 @@ public class JdbcItemRepository implements ItemRepository {
      * {@inheritDoc}
      *
      * <p>When a statement fails, the method calls a rollback, so the stock does not change.
-     * Every SQL error shows the "not available" message.
+     * The CHECK {@code stock_quantity >= 0} refuses a stock below zero (SQL error 547), also when
+     * another user lowered the stock at the same time. Every other SQL error shows the
+     * "not available" message.
      */
     @Override
     public boolean addMovement(StockMovement movement) {
@@ -116,7 +125,7 @@ public class JdbcItemRepository implements ItemRepository {
             insertMovement(connection, movement);
             connection.commit();
             return true;
-        } catch (SQLException e) {
+        } catch (SQLException | RuntimeException e) {
             connection.rollback();
             throw e;
         }
@@ -126,19 +135,31 @@ public class JdbcItemRepository implements ItemRepository {
             throws SQLException {
         String sql = "UPDATE items SET stock_quantity = stock_quantity + ? WHERE id = ?";
         try (PreparedStatement statement = Database.prepare(connection, sql,
-                movement.getQuantity(), movement.getItem().getId())) {
+                stockChange(movement), movement.getItem().getId())) {
             return statement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            if (e.getErrorCode() == CONSTRAINT_FAILED) {
+                throw new NotEnoughStockException();
+            }
+            throw e;
         }
+    }
+
+    /** Gives the quantity to add to the stock: positive for an entry, negative for a use or an exit. */
+    private static int stockChange(StockMovement movement) {
+        return movement.getType() == MovementType.ENTRY
+                ? movement.getQuantity() : -movement.getQuantity();
     }
 
     private static void insertMovement(Connection connection, StockMovement movement)
             throws SQLException {
         String sql = """
-                INSERT INTO stock_movements (item_id, type, quantity, moved_at, user_id)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO stock_movements (item_id, type, exit_reason, quantity, moved_at, user_id)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
         try (PreparedStatement statement = Database.prepare(connection, sql,
-                movement.getItem().getId(), typeCode(movement.getType()), movement.getQuantity(),
+                movement.getItem().getId(), typeCode(movement.getType()),
+                reasonCode(movement.getExitReason()), movement.getQuantity(),
                 movement.getDateTime(), movement.getUser().getId())) {
             statement.executeUpdate();
         }
@@ -148,6 +169,20 @@ public class JdbcItemRepository implements ItemRepository {
     private static String typeCode(MovementType type) {
         return switch (type) {
             case ENTRY -> "in";
+            case USE -> "use";
+            case EXIT -> "out";
+        };
+    }
+
+    /** Gives the code of the reason in the {@code stock_movements.exit_reason} column, or null. */
+    private static String reasonCode(ExitReason reason) {
+        if (reason == null) {
+            return null;
+        }
+        return switch (reason) {
+            case DISCARD -> "discard";
+            case RETURN -> "return";
+            case LOSS -> "loss";
         };
     }
 
