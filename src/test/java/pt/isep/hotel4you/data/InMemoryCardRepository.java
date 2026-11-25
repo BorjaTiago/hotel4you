@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import pt.isep.hotel4you.domain.CardType;
 import pt.isep.hotel4you.domain.MagneticCard;
 
 /** Keeps cards in memory. Unit tests use it instead of the database. */
@@ -35,6 +36,14 @@ public class InMemoryCardRepository implements CardRepository {
     public List<MagneticCard> findByUserId(long userId) {
         return cards.values().stream()
                 .filter(card -> Objects.equals(card.getUserId(), userId))
+                .sorted(Comparator.comparing(MagneticCard::getId))
+                .toList();
+    }
+
+    @Override
+    public List<MagneticCard> findMasters() {
+        return cards.values().stream()
+                .filter(card -> card.getType() == CardType.MASTER)
                 .sorted(Comparator.comparing(MagneticCard::getId))
                 .toList();
     }

@@ -179,6 +179,44 @@ public class CardAccessService {
     }
 
     /**
+     * Lists all master cards, blocked or not, the oldest first (H4Y-153). The screen of the master
+     * cards shows them with the block time.
+     *
+     * @param actor the logged-in user
+     * @return the master cards, or an empty list
+     * @throws AccessDeniedException if the user is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<MagneticCard> listMasterCards(User actor) {
+        require(Permission.MANAGE_CARDS, actor, "Só o gestor pode consultar os cartões mestre.");
+        return cardRepository.findMasters();
+    }
+
+    /**
+     * Blocks a lost master card (RF-21, H4Y-153). The card stops working at once and keeps its
+     * entries. After the block, the manager may issue a new master card.
+     *
+     * @param number the number of the master card
+     * @param actor the logged-in user
+     * @return the blocked card
+     * @throws AccessDeniedException if the user is not a manager
+     * @throws CardNotFoundException if no master card has this number
+     * @throws CardBlockedException if the card is already blocked
+     * @throws IllegalStateException if the database is not available
+     */
+    public MagneticCard blockMasterCard(String number, User actor) {
+        require(Permission.MANAGE_CARDS, actor, "Só o gestor pode bloquear o cartão mestre.");
+        MagneticCard card = find(number);
+        if (card.getType() != CardType.MASTER) {
+            throw new CardNotFoundException();
+        }
+        if (card.isBlocked()) {
+            throw new CardBlockedException("O cartão já está bloqueado.");
+        }
+        return change(card, false, LocalDateTime.now(clock));
+    }
+
+    /**
      * Activates a card again, for example after a check-out by mistake.
      *
      * @param number the card number

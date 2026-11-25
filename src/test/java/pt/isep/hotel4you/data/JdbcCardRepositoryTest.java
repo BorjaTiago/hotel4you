@@ -79,4 +79,10 @@ class JdbcCardRepositoryTest {
     void onFindByUserId_keepSqlCause_whenSqlFails() {
         assertSqlCause(assertThrows(IllegalStateException.class, () -> repository.findByUserId(1L)));
     }
+
+    @Test
+    @Tag("H4Y-153-AC-6")
+    void onFindMasters_keepSqlCause_whenSqlFails() {
+        assertSqlCause(assertThrows(IllegalStateException.class, repository::findMasters));
+    }
 }

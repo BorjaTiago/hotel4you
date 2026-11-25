@@ -76,6 +76,50 @@ public class HotelFacade {
     }
 
     /**
+     * Lists all master cards, blocked or not, for the screen of the master cards (H4Y-153).
+     *
+     * @param actor the logged-in user
+     * @return the master cards, the oldest first
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<MagneticCard> listMasterCards(User actor) {
+        return cardAccessService.listMasterCards(actor);
+    }
+
+    /**
+     * Blocks a lost master card at once (H4Y-153).
+     *
+     * @param number the number of the master card
+     * @param actor the logged-in user
+     * @return the blocked card
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no master card has this number
+     * @throws CardBlockedException if the card is already blocked
+     * @throws IllegalStateException if the database is not available
+     */
+    public MagneticCard blockMasterCard(String number, User actor) {
+        return cardAccessService.blockMasterCard(number, actor);
+    }
+
+    /**
+     * Issues a new master card after the block of the lost one (H4Y-154). The new card has a new
+     * number. The old card and its entries stay.
+     *
+     * @param oldNumber the number of the blocked master card
+     * @param actor the logged-in user
+     * @return the new card and its access code; show the code only once
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no card has this number
+     * @throws IllegalArgumentException if the card is not a master card
+     * @throws MasterCardActiveException if the old card is not blocked
+     * @throws IllegalStateException if the database is not available
+     */
+    public IssuedCard replaceMasterCard(String oldNumber, User actor) {
+        return cardAccessService.replaceMasterCard(oldNumber, actor);
+    }
+
+    /**
      * Logs in with a card: the card number and the access code (H4Y-109 AC-4, Q-13).
      *
      * @param number the card number
