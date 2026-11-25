@@ -11,6 +11,7 @@ import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.CardAccessRecord;
 import pt.isep.hotel4you.domain.CardPlace;
+import pt.isep.hotel4you.domain.CardEntry;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
@@ -46,6 +47,7 @@ public class HotelFacade {
     private final ReservationService reservationService;
     private final ExtraPriceService extraPriceService;
     private final CardAccessService cardAccessService;
+    private final CardQueryService cardQueryService;
 
     /**
      * Creates the facade.
@@ -59,11 +61,13 @@ public class HotelFacade {
      * @param reservationService the reservation service
      * @param extraPriceService the extra price service
      * @param cardAccessService the card service
+     * @param cardQueryService the card query service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
             ClientService clientService, ReservationService reservationService,
-            ExtraPriceService extraPriceService, CardAccessService cardAccessService) {
+            ExtraPriceService extraPriceService, CardAccessService cardAccessService,
+            CardQueryService cardQueryService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -73,6 +77,7 @@ public class HotelFacade {
         this.reservationService = reservationService;
         this.extraPriceService = extraPriceService;
         this.cardAccessService = cardAccessService;
+        this.cardQueryService = cardQueryService;
     }
 
     /**
@@ -159,6 +164,36 @@ public class HotelFacade {
      */
     public CardAccessRecord enterPlace(MagneticCard card, CardPlace place) {
         return cardAccessService.enter(card, place);
+    }
+
+    /**
+     * Lists the places a card entered, with the time of each entry (RF-20, H4Y-155). Blocked cards
+     * can still be queried.
+     *
+     * @param number the card number
+     * @param actor the logged-in user
+     * @return the entries, the oldest first, or an empty list
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no card has this number
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardEntry> getPlacesByCard(String number, User actor) {
+        return cardQueryService.getPlacesByCard(number, actor);
+    }
+
+    /**
+     * Lists the cards that entered a room, with the time of each entry (RF-21, H4Y-156). Master card
+     * entries are included.
+     *
+     * @param roomNumber the room number
+     * @param actor the logged-in user
+     * @return the entries, the oldest first, or an empty list
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws RoomNotFoundException if no room has this number
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardEntry> getPassesByRoom(String roomNumber, User actor) {
+        return cardQueryService.getPassesByRoom(roomNumber, actor);
     }
 
     /**

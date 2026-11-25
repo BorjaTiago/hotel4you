@@ -21,6 +21,13 @@ public class InMemoryCardRepository implements CardRepository {
     }
 
     @Override
+    public Optional<MagneticCard> findById(long id) {
+        return cards.values().stream()
+                .filter(card -> Objects.equals(card.getId(), id))
+                .findFirst();
+    }
+
+    @Override
     public boolean existsByNumber(String number) {
         return cards.containsKey(number);
     }

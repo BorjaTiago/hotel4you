@@ -58,7 +58,7 @@ class ReplaceMasterCardFacadeTest {
         CardAccessService service = new CardAccessService(cards, records, new InMemoryReservationRepository(),
                 users, rooms, floors, new LocationService(floors, new InMemoryLocationRepository()),
                 new CardNumberGenerator(cards), new AccessCodeGenerator(), authService, Clock.systemDefaultZone());
-        facade = new HotelFacade(authService, null, null, null, null, null, null, null, service);
+        facade = new HotelFacade(authService, null, null, null, null, null, null, null, service, null);
         oldMaster = service.issueMasterCard(MANAGER, MANAGER);
     }
 
