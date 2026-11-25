@@ -13,6 +13,7 @@ import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.ClientSearchField;
+import pt.isep.hotel4you.domain.ExitReason;
 import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
@@ -770,19 +771,23 @@ public class HotelFacade {
 
     /**
      * Records a stock movement of an item with the date of today. An entry raises the stock.
+     * A use or an exit lowers it.
      *
      * @param item the chosen item
      * @param type the kind of movement
      * @param quantity the quantity, from 1 to 32767
+     * @param exitReason the reason of an exit, or null for an entry or a use
      * @param user the logged-in user who records the movement
      * @return the saved movement, with the item and its new stock
      * @throws AccessDeniedException if the user is not a manager
-     * @throws IllegalArgumentException if no item is chosen or the quantity is out of range
+     * @throws IllegalArgumentException if no item or type is chosen, the reason does not match
+     *         the type, the quantity is out of range, or a use or an exit is larger than the stock
      * @throws StockItemNotFoundException if the item does not exist
      * @throws IllegalStateException if the database is not available
      */
-    public StockMovement registerMovement(StockItem item, MovementType type, int quantity, User user) {
-        return stockService.registerMovement(item, type, quantity, user);
+    public StockMovement registerMovement(StockItem item, MovementType type, int quantity,
+            ExitReason exitReason, User user) {
+        return stockService.registerMovement(item, type, quantity, exitReason, user);
     }
 
     /**
