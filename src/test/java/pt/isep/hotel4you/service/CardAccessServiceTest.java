@@ -503,6 +503,17 @@ class CardAccessServiceTest {
 
     @Test
     @Tag("H4Y-109-AC-3")
+    void onRegister_throwAccessDenied_whenCardWasBlockedAfterLogin() {
+        MagneticCard loggedIn = masterCard();
+        service.blockCard(loggedIn.getNumber(), MANAGER);
+
+        assertThrows(AccessDeniedException.class, () -> service.register(loggedIn, ROOM_202, null));
+        assertThrows(AccessDeniedException.class, () -> service.register(loggedIn, null, BAR));
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-109-AC-3")
     void onRegister_throw_whenPlaceIsBothOrNone() {
         MagneticCard card = masterCard();
 
