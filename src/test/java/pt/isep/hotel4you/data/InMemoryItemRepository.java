@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.StockMovement;
 
@@ -49,6 +50,11 @@ public class InMemoryItemRepository implements ItemRepository {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>Like the CHECK of the database, it refuses a stock below zero.
+     */
     @Override
     public boolean addMovement(StockMovement movement) {
         Long id = movement.getItem().getId();
@@ -56,8 +62,14 @@ public class InMemoryItemRepository implements ItemRepository {
         if (item == null) {
             return false;
         }
+        int change = movement.getType() == MovementType.ENTRY
+                ? movement.getQuantity() : -movement.getQuantity();
+        int newStock = item.getStockQuantity() + change;
+        if (newStock < 0) {
+            throw new NotEnoughStockException();
+        }
         items.put(item.getId(), new StockItem(item.getId(), item.getName(), item.getUnit(),
-                item.getStockQuantity() + movement.getQuantity()));
+                newStock));
         movements.add(movement);
         return true;
     }
