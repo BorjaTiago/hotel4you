@@ -83,7 +83,7 @@ class HotelFacadeTest {
                 repository, roomRepository, floorRepository, locationService, new CardNumberGenerator(cardRepository),
                 new AccessCodeGenerator(), authService, java.time.Clock.systemDefaultZone());
         facade = new HotelFacade(authService, staffService, locationService, roomService,
-                stockService, clientService, reservationService, null, cardAccessService);
+                stockService, clientService, reservationService, null, cardAccessService, null);
     }
 
     private User saveAna() {

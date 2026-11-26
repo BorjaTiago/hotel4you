@@ -2,11 +2,11 @@
 type: story
 summary: Consultar as passagens de cartões num quarto
 parent: epic-master-card-audit
-requirements: [RF-21, RF-19]
+requirements: [RF-21]
 points: 3
 points_suggested: 3
 status: approved
-jira_key:
+jira_key: H4Y-156
 labels: [access-control, final-delivery]
 sprint:
 ---
@@ -44,6 +44,12 @@ Para que eu saiba quem entrou nesse quarto e quando.
   Quando tenta consultar as passagens de um quarto
   Então o sistema recusa a consulta
 
+### Cenário AC-6: Fluxo completo
+  Dado que o gestor tem sessão iniciada e o quarto 301 tem passagens de um cartão de cliente e de um cartão mestre
+  Quando o gestor abre o ecrã de consulta de quartos no menu, escolhe o quarto 301 e consulta
+  Então o serviço lê as passagens da base de dados e o ecrã mostra cada cartão com a hora da entrada
+  E, se o quarto não existe ou não tem passagens, o ecrã mostra a mensagem correspondente
+
 ## Critérios de aceite (checklist)
 
 - [ ] AC-1: A consulta de um quarto mostra o cartão do cliente que entrou com a hora da entrada.
@@ -51,9 +57,10 @@ Para que eu saiba quem entrou nesse quarto e quando.
 - [ ] AC-3: Um quarto sem passagens mostra uma lista vazia.
 - [ ] AC-4: Consultar um quarto inexistente mostra que o quarto não existe.
 - [ ] AC-5: O rececionista não consegue consultar as passagens de um quarto.
+- [ ] AC-6: O gestor abre o ecrã no menu, escolhe o quarto e vê cada cartão com a hora; um quarto inexistente ou sem passagens mostra a mensagem correspondente.
 
 ## Notas
-Exemplo do enunciado: quarto 301. Entrega final (Q-06). Dependências (auditoria 2026-10-16): nenhuma forte. Construir e testar sozinha: passagens de teste próprias, incluindo uma de cartão mestre (foundation T4, Q-19).
+Exemplo do enunciado: quarto 301. Usa o CardAccessService (consultar por quarto) da H4Y-109 e junta só a regra de permissão do gestor e o ecrã. Não cria tabelas. Entrega final (Q-06).
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -65,4 +72,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Jira sync (AC-6, notes) by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
