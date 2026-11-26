@@ -275,6 +275,8 @@ public class HotelFacade {
     /**
      * Does the check-in of a reservation and issues its card (RF-13, RF-16). The card is checked
      * first: if the reservation already has a card, nothing is saved.
+     * The two steps are not in one transaction. If the database fails after the check-in, the
+     * reservation is CHECKED_IN without a card. The receptionist then issues the card again.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-in
@@ -295,6 +297,8 @@ public class HotelFacade {
     /**
      * Does the check-out of a reservation and deactivates its card, if it has one.
      * A refused check-out does not change the card. The card entries stay saved.
+     * The two steps are not in one transaction. If the database fails after the check-out, the
+     * reservation is CHECKED_OUT and its card stays active until it is deactivated by hand.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-out
