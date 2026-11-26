@@ -56,13 +56,16 @@ public interface ItemRepository {
     boolean update(StockItem item);
 
     /**
-     * Saves a stock movement and adds its quantity to the stock of the item.
+     * Saves a stock movement and changes the stock of the item.
+     * An {@link pt.isep.hotel4you.domain.MovementType#ENTRY} adds the quantity.
+     * A {@link pt.isep.hotel4you.domain.MovementType#USE} or an
+     * {@link pt.isep.hotel4you.domain.MovementType#EXIT} subtracts it.
      * Both changes are saved together, or none is saved.
-     * Only types that raise the stock are allowed now ({@link pt.isep.hotel4you.domain.MovementType#ENTRY}).
-     * A type that lowers the stock needs a change here first.
      *
-     * @param movement the movement, with the saved item, the type, the quantity, the date and the user
+     * @param movement the movement, with the saved item, the type, the quantity, the exit reason,
+     *        the date and the user
      * @return true if the movement was saved, false if no item has the id of the movement item
+     * @throws NotEnoughStockException if the stock of the item would go below zero
      * @throws IllegalStateException if the database is not available
      */
     boolean addMovement(StockMovement movement);

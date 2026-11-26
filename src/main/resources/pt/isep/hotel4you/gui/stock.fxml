@@ -34,23 +34,31 @@
             <Button text="Limpar" onAction="#onClearClicked" styleClass="action-button, clear-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
         </HBox>
     </VBox>
-    <Label text="Entrada de stock" styleClass="subtitle"/>
+    <Label text="Movimento de stock (entrada, uso ou saída)" styleClass="subtitle"/>
     <VBox spacing="12">
         <HBox spacing="12">
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label fx:id="entryItemLabel" text="Item"/>
-                <ComboBox fx:id="entryItemBox" promptText="Escolha o item" maxWidth="Infinity"/>
+                <Label fx:id="movementItemLabel" text="Item"/>
+                <ComboBox fx:id="movementItemBox" promptText="Escolha o item" maxWidth="Infinity"/>
             </VBox>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label fx:id="entryQuantityLabel" text="Quantidade"/>
-                <TextField fx:id="entryQuantityField" promptText="Quantidade" maxWidth="Infinity"/>
+                <Label fx:id="movementTypeLabel" text="Tipo"/>
+                <ComboBox fx:id="movementTypeBox" promptText="Escolha o tipo" maxWidth="Infinity"/>
+            </VBox>
+            <VBox fx:id="exitReasonPane" spacing="4" HBox.hgrow="ALWAYS" visible="false" managed="false">
+                <Label fx:id="exitReasonLabel" text="Motivo da saída"/>
+                <ComboBox fx:id="exitReasonBox" promptText="Escolha o motivo" maxWidth="Infinity"/>
             </VBox>
             <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label fx:id="entryDateLabel" text="Data"/>
-                <TextField fx:id="entryDateField" editable="false" focusTraversable="false" maxWidth="Infinity"/>
+                <Label fx:id="movementQuantityLabel" text="Quantidade"/>
+                <TextField fx:id="movementQuantityField" promptText="Quantidade" maxWidth="Infinity"/>
+            </VBox>
+            <VBox spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="movementDateLabel" text="Data"/>
+                <TextField fx:id="movementDateField" editable="false" focusTraversable="false" maxWidth="Infinity"/>
             </VBox>
         </HBox>
-        <Button text="Registar entrada" onAction="#onRegisterMovementClicked" styleClass="action-button, save-button" maxWidth="Infinity"/>
+        <Button text="Registar movimento" onAction="#onRegisterMovementClicked" styleClass="action-button, save-button" maxWidth="Infinity"/>
     </VBox>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>
