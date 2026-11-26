@@ -267,7 +267,8 @@ public class CardAccessService {
 
     /**
      * Logs an entry of a card into a room or a zone, with the current time (RF-23). Only entries
-     * are logged: a new entry means that the person left the place before.
+     * are logged: a new entry means that the person left the place before. The card is read again
+     * by its number, so a card that was blocked or deactivated after the login is refused.
      *
      * @param card the saved card
      * @param room the room, or null for a zone
@@ -284,11 +285,13 @@ public class CardAccessService {
         if ((room == null) == (location == null)) {
             throw new IllegalArgumentException("Escolha um quarto ou um local.");
         }
-        boolean allowed = room != null ? canOpenRoom(card, room) : canOpen(card, location);
+        MagneticCard saved = cardRepository.findByNumber(card.getNumber())
+                .orElseThrow(() -> new AccessDeniedException(ENTRY_REFUSED));
+        boolean allowed = room != null ? canOpenRoom(saved, room) : canOpen(saved, location);
         if (!allowed) {
             throw new AccessDeniedException(ENTRY_REFUSED);
         }
-        return recordRepository.save(new CardAccessRecord(null, card.getId(),
+        return recordRepository.save(new CardAccessRecord(null, saved.getId(),
                 room == null ? null : room.getId(), location == null ? null : location.getId(),
                 LocalDateTime.now(clock)));
     }
