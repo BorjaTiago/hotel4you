@@ -54,6 +54,7 @@ public interface CardRepository {
 
     /**
      * Changes the active flag and the block time of a saved card. The number and the owner stay the same.
+     * The access code hash is not changed. A feature that gives a card a new access code must add it here.
      *
      * @param card the card with its number and the new values
      * @return true if the card was changed, false if no card has this number
