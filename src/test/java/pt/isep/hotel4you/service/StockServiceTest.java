@@ -3,6 +3,7 @@ package pt.isep.hotel4you.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -17,10 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import pt.isep.hotel4you.data.DuplicateItemException;
 import pt.isep.hotel4you.data.InMemoryItemRepository;
+import pt.isep.hotel4you.data.NotEnoughStockException;
+import pt.isep.hotel4you.domain.ExitReason;
 import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Receptionist;
@@ -29,7 +33,7 @@ import pt.isep.hotel4you.domain.StockItem;
 import pt.isep.hotel4you.domain.StockMovement;
 import pt.isep.hotel4you.domain.User;
 
-/** Tests that the manager can create, edit and list stock items. */
+/** Tests that the manager can create, edit and list stock items and record stock movements. */
 class StockServiceTest {
 
     private static final String DENIED_MESSAGE = "Só o gestor pode gerir o stock.";
@@ -336,7 +340,8 @@ class StockServiceTest {
         User manager = manager();
         LocalDateTime before = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-        StockMovement movement = service.registerMovement(towels, MovementType.ENTRY, 5, manager);
+        StockMovement movement =
+                service.registerMovement(towels, MovementType.ENTRY, 5, null, manager);
 
         LocalDateTime after = LocalDateTime.now();
         assertEquals(MovementType.ENTRY, movement.getType());
@@ -362,7 +367,7 @@ class StockServiceTest {
         StockItem towels = towelsWithStock10();
 
         AccessDeniedException error = assertThrows(AccessDeniedException.class,
-                () -> service.registerMovement(towels, MovementType.ENTRY, 5, user));
+                () -> service.registerMovement(towels, MovementType.ENTRY, 5, null, user));
 
         assertEquals(DENIED_MESSAGE, error.getMessage());
         assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
@@ -376,7 +381,8 @@ class StockServiceTest {
         StockItem towels = towelsWithStock10();
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.registerMovement(towels, MovementType.ENTRY, quantity, manager()));
+                () -> service.registerMovement(towels, MovementType.ENTRY, quantity, null,
+                        manager()));
 
         assertEquals("A quantidade tem de ser maior que zero.", error.getMessage());
         assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
@@ -389,7 +395,7 @@ class StockServiceTest {
         StockItem towels = towelsWithStock10();
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.registerMovement(towels, MovementType.ENTRY, 32768, manager()));
+                () -> service.registerMovement(towels, MovementType.ENTRY, 32768, null, manager()));
 
         assertEquals("A quantidade máxima é 32767.", error.getMessage());
         assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
@@ -402,7 +408,7 @@ class StockServiceTest {
     void onRegisterMovement_acceptQuantity_whenQuantityAtLimit(int quantity) {
         StockItem towels = towelsWithStock10();
 
-        service.registerMovement(towels, MovementType.ENTRY, quantity, manager());
+        service.registerMovement(towels, MovementType.ENTRY, quantity, null, manager());
 
         assertEquals(10 + quantity, repository.findById(towels.getId()).get().getStockQuantity());
     }
@@ -413,7 +419,7 @@ class StockServiceTest {
         StockItem rockets = new StockItem(99L, "foguetes", "unidade", 0);
 
         assertThrows(StockItemNotFoundException.class,
-                () -> service.registerMovement(rockets, MovementType.ENTRY, 5, manager()));
+                () -> service.registerMovement(rockets, MovementType.ENTRY, 5, null, manager()));
 
         assertTrue(repository.movements().isEmpty());
     }
@@ -424,7 +430,7 @@ class StockServiceTest {
         StockItem unsaved = new StockItem(null, "foguetes", "unidade", 0);
 
         assertThrows(StockItemNotFoundException.class,
-                () -> service.registerMovement(unsaved, MovementType.ENTRY, 5, manager()));
+                () -> service.registerMovement(unsaved, MovementType.ENTRY, 5, null, manager()));
 
         assertTrue(repository.movements().isEmpty());
     }
@@ -433,7 +439,7 @@ class StockServiceTest {
     @Tag("H4Y-90-AC-3")
     void onRegisterMovement_throw_whenNoItemChosen() {
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.registerMovement(null, MovementType.ENTRY, 5, manager()));
+                () -> service.registerMovement(null, MovementType.ENTRY, 5, null, manager()));
 
         assertEquals("Escolha um item.", error.getMessage());
         assertTrue(repository.movements().isEmpty());
@@ -445,7 +451,7 @@ class StockServiceTest {
         StockItem towels = towelsWithStock10();
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.registerMovement(towels, null, 5, manager()));
+                () -> service.registerMovement(towels, null, 5, null, manager()));
 
         assertEquals("Escolha o tipo de movimento.", error.getMessage());
         assertEquals(10, repository.findById(towels.getId()).get().getStockQuantity());
@@ -459,7 +465,7 @@ class StockServiceTest {
                 new StockItem(null, "copos", "unidade", Integer.MAX_VALUE - 4));
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> service.registerMovement(full, MovementType.ENTRY, 5, manager()));
+                () -> service.registerMovement(full, MovementType.ENTRY, 5, null, manager()));
 
         assertEquals("O stock do item ficaria acima do máximo.", error.getMessage());
         assertEquals(Integer.MAX_VALUE - 4, repository.findById(full.getId()).get().getStockQuantity());
@@ -472,9 +478,215 @@ class StockServiceTest {
         StockItem almostFull = repository.save(
                 new StockItem(null, "copos", "unidade", Integer.MAX_VALUE - 5));
 
-        service.registerMovement(almostFull, MovementType.ENTRY, 5, manager());
+        service.registerMovement(almostFull, MovementType.ENTRY, 5, null, manager());
 
         assertEquals(Integer.MAX_VALUE, repository.findById(almostFull.getId()).get().getStockQuantity());
+    }
+
+    private StockItem sheetsWithStock(int stock) {
+        return repository.save(new StockItem(null, "lençóis", "unidade", stock));
+    }
+
+    private StockItem towelsWithStock(int stock) {
+        return repository.save(new StockItem(null, "toalhas", "unidade", stock));
+    }
+
+    private int stockOf(StockItem item) {
+        return repository.findById(item.getId()).get().getStockQuantity();
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-1")
+    void onRegisterMovement_saveExitAndLowerStock_whenManagerRecordsDiscard() {
+        StockItem sheets = sheetsWithStock(20);
+        User manager = manager();
+        LocalDateTime before = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+        StockMovement movement = service.registerMovement(sheets, MovementType.EXIT, 6,
+                ExitReason.DISCARD, manager);
+
+        LocalDateTime after = LocalDateTime.now();
+        assertEquals(MovementType.EXIT, movement.getType());
+        assertEquals(6, movement.getQuantity());
+        assertEquals(ExitReason.DISCARD, movement.getExitReason());
+        assertFalse(movement.getDateTime().isBefore(before));
+        assertFalse(movement.getDateTime().isAfter(after));
+        assertEquals(manager, movement.getUser());
+        assertEquals(14, movement.getItem().getStockQuantity());
+        assertEquals(14, stockOf(sheets));
+        assertEquals(1, repository.movements().size());
+        assertEquals(ExitReason.DISCARD, repository.movements().get(0).getExitReason());
+    }
+
+    @ParameterizedTest
+    @EnumSource(ExitReason.class)
+    @Tag("H4Y-106-AC-1")
+    void onRegisterMovement_saveExit_whenReasonIsAnyAllowedReason(ExitReason reason) {
+        StockItem sheets = sheetsWithStock(20);
+
+        StockMovement movement = service.registerMovement(sheets, MovementType.EXIT, 6, reason,
+                manager());
+
+        assertEquals(reason, movement.getExitReason());
+        assertEquals(14, stockOf(sheets));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = MovementType.class, names = {"USE", "EXIT"})
+    @Tag("H4Y-106-AC-1")
+    void onRegisterMovement_throwAccessDenied_whenNotManagerLowersStock(MovementType type) {
+        StockItem sheets = sheetsWithStock(20);
+        ExitReason reason = type == MovementType.EXIT ? ExitReason.LOSS : null;
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> service.registerMovement(sheets, type, 6, reason, receptionist()));
+
+        assertEquals(DENIED_MESSAGE, error.getMessage());
+        assertEquals(20, stockOf(sheets));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-2")
+    void onRegisterMovement_throw_whenExitIsAboveStock() {
+        StockItem sheets = sheetsWithStock(2);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(sheets, MovementType.EXIT, 6, ExitReason.DISCARD,
+                        manager()));
+
+        assertEquals("A quantidade é maior que o stock do item.", error.getMessage());
+        assertEquals(2, stockOf(sheets));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-2")
+    void onRegisterMovement_acceptExit_whenExitIsEqualToStock() {
+        StockItem sheets = sheetsWithStock(6);
+
+        StockMovement movement = service.registerMovement(sheets, MovementType.EXIT, 6,
+                ExitReason.RETURN, manager());
+
+        assertEquals(0, movement.getItem().getStockQuantity());
+        assertEquals(0, stockOf(sheets));
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-2")
+    void onRegisterMovement_useSavedStock_whenScreenItemIsOld() {
+        StockItem sheets = sheetsWithStock(2);
+        StockItem oldCopy = new StockItem(sheets.getId(), "lençóis", "unidade", 20);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(oldCopy, MovementType.EXIT, 6, ExitReason.DISCARD,
+                        manager()));
+
+        assertEquals("A quantidade é maior que o stock do item.", error.getMessage());
+        assertEquals(2, stockOf(sheets));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-2")
+    void onRegisterMovement_throw_whenStockFallsBeforeSave() {
+        StockService raceService = new StockService(new StockFallsRepository());
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> raceService.registerMovement(new StockItem(1L, "lençóis", "unidade", 20),
+                        MovementType.EXIT, 6, ExitReason.DISCARD, manager()));
+
+        assertEquals("A quantidade é maior que o stock do item.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-3")
+    void onRegisterMovement_throw_whenExitHasNoReason() {
+        StockItem sheets = sheetsWithStock(20);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(sheets, MovementType.EXIT, 6, null, manager()));
+
+        assertEquals("Escolha o motivo da saída.", error.getMessage());
+        assertEquals(20, stockOf(sheets));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = MovementType.class, names = {"ENTRY", "USE"})
+    @Tag("H4Y-106-AC-3")
+    void onRegisterMovement_throw_whenReasonIsGivenForEntryOrUse(MovementType type) {
+        StockItem sheets = sheetsWithStock(20);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(sheets, type, 6, ExitReason.LOSS, manager()));
+
+        assertEquals("Só a saída tem motivo.", error.getMessage());
+        assertEquals(20, stockOf(sheets));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-4")
+    void onRegisterMovement_saveUseAndLowerStock_whenManagerRecordsUse() {
+        StockItem towels = towelsWithStock(15);
+        User manager = manager();
+        LocalDateTime before = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+        StockMovement movement = service.registerMovement(towels, MovementType.USE, 4, null,
+                manager);
+
+        LocalDateTime after = LocalDateTime.now();
+        assertEquals(MovementType.USE, movement.getType());
+        assertEquals(4, movement.getQuantity());
+        assertNull(movement.getExitReason());
+        assertFalse(movement.getDateTime().isBefore(before));
+        assertFalse(movement.getDateTime().isAfter(after));
+        assertEquals(11, movement.getItem().getStockQuantity());
+        assertEquals(11, stockOf(towels));
+        assertEquals(1, repository.movements().size());
+    }
+
+    @Test
+    @Tag("H4Y-106-AC-5")
+    void onRegisterMovement_throw_whenUseIsAboveStock() {
+        StockItem towels = towelsWithStock(3);
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(towels, MovementType.USE, 5, null, manager()));
+
+        assertEquals("A quantidade é maior que o stock do item.", error.getMessage());
+        assertEquals(3, stockOf(towels));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"USE, 0", "USE, -3", "EXIT, 0", "EXIT, -3"})
+    @Tag("H4Y-106-AC-6")
+    void onRegisterMovement_throw_whenUseOrExitQuantityZeroOrLess(MovementType type,
+            int quantity) {
+        StockItem towels = towelsWithStock(15);
+        ExitReason reason = type == MovementType.EXIT ? ExitReason.DISCARD : null;
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> service.registerMovement(towels, type, quantity, reason, manager()));
+
+        assertEquals("A quantidade tem de ser maior que zero.", error.getMessage());
+        assertEquals(15, stockOf(towels));
+        assertTrue(repository.movements().isEmpty());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = MovementType.class, names = {"USE", "EXIT"})
+    @Tag("H4Y-106-AC-7")
+    void onRegisterMovement_throwNotFound_whenUseOrExitItemDoesNotExist(MovementType type) {
+        StockItem rockets = new StockItem(99L, "foguetes", "unidade", 0);
+        ExitReason reason = type == MovementType.EXIT ? ExitReason.DISCARD : null;
+
+        assertThrows(StockItemNotFoundException.class,
+                () -> service.registerMovement(rockets, type, 5, reason, manager()));
+
+        assertTrue(repository.movements().isEmpty());
     }
 
     @ParameterizedTest
@@ -493,6 +705,20 @@ class StockServiceTest {
                 () -> service.parseQuantity(text));
 
         assertEquals("A quantidade tem de ser um número inteiro.", error.getMessage());
+    }
+
+    /** A repository whose item 1 has stock 20 at the read, but the save finds less stock. */
+    private static class StockFallsRepository extends InMemoryItemRepository {
+
+        @Override
+        public Optional<StockItem> findById(long id) {
+            return Optional.of(new StockItem(id, "lençóis", "unidade", 20));
+        }
+
+        @Override
+        public boolean addMovement(StockMovement movement) {
+            throw new NotEnoughStockException();
+        }
     }
 
     /** A repository that finds item 1 but fails at update, as when another user changes it. */
