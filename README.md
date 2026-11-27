@@ -86,6 +86,7 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v12-create-stock-movements.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v13-create-reservation-locations.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v15-alter-stock-movements-exit-reason.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v19-create-feedback.sql
 ```
 
 Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
@@ -105,6 +106,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v11-crea
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v12-create-stock-movements.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v13-create-reservation-locations.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v15-alter-stock-movements-exit-reason.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v19-create-feedback.sql
 ```
 
 `v10-alter-customers.sql` from H4Y-52 adds the full client data (document type, birth date, phone, nationality, email, NIF; Q-54). Run it once, after v8. It stops with an error if the `customers` table has rows or if it already ran.
@@ -114,6 +116,8 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v15-alte
 `v13-create-reservation-locations.sql` from H4Y-92 creates the `reservation_locations` table: the restaurant and the pool of a reservation (RF-18). Without it, the reservation save fails. You can run it again: it skips what already exists.
 
 `v15-alter-stock-movements-exit-reason.sql` from H4Y-106 adds the `exit_reason` column to `stock_movements`, for the stock use and exit (RF-29, Q-34). Run it after v12. You can run it again: it skips what already exists, also on an old database that already has the column. Without it, every stock movement save fails.
+
+`v19-create-feedback.sql` from H4Y-111 creates the `feedback` table for the client suggestions and complaints (RF-27, Q-18). Run it after v8. You can run it again: it skips what already exists. Without it, the save on the screen "Sugestões e reclamações" fails.
 
 `v5-create-room-types.sql` from H4Y-26 creates `individual`, `duplo` and `familiar`. Run it before `v6-create-rooms.sql`. The manager then uses "Quartos" to register rooms. The separate "Preços" screen sets base prices. No room registration requires a base price to be set.
 
@@ -192,4 +196,4 @@ More details and the build tool versions: [docs/setup.md](docs/setup.md).
 - [setup.md](docs/setup.md): setup and build
 - [libraries.md](docs/libraries.md): external libraries
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06. H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16; H4Y-91 room items database, Claude Code (claude-sonnet-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20; merge with main after H4Y-91 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-106 stock use and exit by Claude Code (claude-opus-5-5), 2026-11-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: lukassperandio. AI use: Claude Code (claude-opus-5-5), 2026-10-23; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-52 client registration by main session, Claude Code (claude-opus-5-5), 2026-11-01; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; H4Y-72 Sprint 04 scope alignment, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06. H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16; H4Y-91 room items database, Claude Code (claude-sonnet-5-5), 2026-11-17; H4Y-91 merge of main by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20; merge with main after H4Y-91 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-106 stock use and exit by Claude Code (claude-opus-5-5), 2026-11-22; H4Y-111 suggestion and complaint by Claude Code (claude-opus-5-5), 2026-11-27. Reviewed by: pending.
