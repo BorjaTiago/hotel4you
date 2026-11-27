@@ -28,6 +28,8 @@ import pt.isep.hotel4you.domain.MovementType;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Reservation;
 import pt.isep.hotel4you.domain.ReservationQuote;
+import pt.isep.hotel4you.domain.ReservationExtra;
+import pt.isep.hotel4you.domain.ReservationPrice;
 import pt.isep.hotel4you.domain.Role;
 import pt.isep.hotel4you.domain.Room;
 import pt.isep.hotel4you.domain.RoomItem;
@@ -55,6 +57,8 @@ public class HotelFacade {
     private final CardQueryService cardQueryService;
     private final RoomServiceRequestService roomServiceRequestService;
     private final FeedbackService feedbackService;
+    private final ReservationExtrasService reservationExtrasService;
+    private final ReservationPriceService reservationPriceService;
 
     /**
      * Creates the facade.
@@ -78,6 +82,36 @@ public class HotelFacade {
             ExtraPriceService extraPriceService, CardAccessService cardAccessService,
             CardQueryService cardQueryService, RoomServiceRequestService roomServiceRequestService,
             FeedbackService feedbackService) {
+        this(authService, staffService, locationService, roomService, stockService, clientService,
+                reservationService, extraPriceService, cardAccessService, cardQueryService,
+                roomServiceRequestService, feedbackService, null, null);
+    }
+
+    /**
+     * Creates the facade.
+     *
+     * @param authService the login service
+     * @param staffService the staff service
+     * @param locationService the floor and zone service
+     * @param roomService the room registration service
+     * @param stockService the stock item service
+     * @param clientService the client registration service
+     * @param reservationService the reservation service
+     * @param extraPriceService the extra price service
+     * @param cardAccessService the card service
+     * @param cardQueryService the card query service
+     * @param roomServiceRequestService the room service request service
+     * @param feedbackService the suggestion and complaint service
+     * @param reservationExtrasService the service for room extras on reservations
+     * @param reservationPriceService the price calculation for saved reservations
+     */
+    public HotelFacade(AuthService authService, StaffService staffService,
+            LocationService locationService, RoomService roomService, StockService stockService,
+            ClientService clientService, ReservationService reservationService,
+            ExtraPriceService extraPriceService, CardAccessService cardAccessService,
+            CardQueryService cardQueryService, RoomServiceRequestService roomServiceRequestService,
+            FeedbackService feedbackService, ReservationExtrasService reservationExtrasService,
+            ReservationPriceService reservationPriceService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -90,6 +124,8 @@ public class HotelFacade {
         this.cardQueryService = cardQueryService;
         this.roomServiceRequestService = roomServiceRequestService;
         this.feedbackService = feedbackService;
+        this.reservationExtrasService = reservationExtrasService;
+        this.reservationPriceService = reservationPriceService;
     }
 
     /**
@@ -251,6 +287,55 @@ public class HotelFacade {
      */
     public List<ExtraService> listExtraPrices(User actor) {
         return extraPriceService.listPrices(actor);
+    }
+
+    /**
+     * Lists catalogue options the user may add to a reservation.
+     * @param actor the logged-in user
+     * @return the options for the selected group
+     */
+    public List<ExtraService> listReservationExtraOptions(User actor) {
+        return reservationExtrasService.listCatalogue(actor);
+    }
+
+    /**
+     * Reads the extras already included with their saved prices.
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user
+     * @return the included extras
+     */
+    public List<ReservationExtra> listReservationExtras(long reservationId, User actor) {
+        return reservationExtrasService.listExtras(reservationId, actor);
+    }
+
+    /**
+     * Adds an extra to the reservation.
+     * @param reservationId the reservation identifier
+     * @param extraPriceId the catalogue identifier
+     * @param actor the logged-in user
+     */
+    public void addReservationExtra(long reservationId, long extraPriceId, User actor) {
+        reservationExtrasService.addExtra(reservationId, extraPriceId, actor);
+    }
+
+    /**
+     * Removes an extra from the reservation.
+     * @param reservationId the reservation identifier
+     * @param extraPriceId the catalogue identifier
+     * @param actor the logged-in user
+     */
+    public void removeReservationExtra(long reservationId, long extraPriceId, User actor) {
+        reservationExtrasService.removeExtra(reservationId, extraPriceId, actor);
+    }
+
+    /**
+     * Gets the total price and its parts for a saved reservation.
+     * @param reservationId the reservation identifier
+     * @param actor the logged-in user
+     * @return the price summary
+     */
+    public ReservationPrice quoteReservationPrice(long reservationId, User actor) {
+        return reservationPriceService.quote(reservationId, actor);
     }
 
     /**

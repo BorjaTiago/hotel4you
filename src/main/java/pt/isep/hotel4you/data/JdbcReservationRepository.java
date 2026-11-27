@@ -214,10 +214,15 @@ public class JdbcReservationRepository implements ReservationRepository {
 
     @Override
     public boolean delete(long id) {
-        // reservation_locations has no CASCADE: delete its rows first, in the same transaction.
         try (Connection connection = database.connect()) {
             connection.setAutoCommit(false);
             try {
+                if (!lockReserved(connection, id)) {
+                    connection.rollback();
+                    return false;
+                }
+                execute(connection, "IF OBJECT_ID('dbo.reservation_extras', 'U') IS NOT NULL "
+                        + "DELETE FROM reservation_extras WHERE reservation_id = ?", id);
                 execute(connection, "DELETE FROM reservation_locations WHERE reservation_id = ?", id);
                 boolean deleted = execute(connection,
                         "DELETE FROM reservations WHERE id = ? AND status = 'reserved'", id) == 1;
@@ -246,6 +251,16 @@ public class JdbcReservationRepository implements ReservationRepository {
                 ids.add(result.getLong("location_id"));
             }
             return ids;
+        }
+    }
+
+    // Take the same lock before deleting, adding an extra or replacing a view.
+    static boolean lockReserved(Connection connection, long reservationId) throws SQLException {
+        String sql = "SELECT id FROM reservations WITH (UPDLOCK, HOLDLOCK) "
+                + "WHERE id = ? AND status = 'reserved'";
+        try (PreparedStatement statement = Database.prepare(connection, sql, reservationId);
+                ResultSet rows = statement.executeQuery()) {
+            return rows.next();
         }
     }
 

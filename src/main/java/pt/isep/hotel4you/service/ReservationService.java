@@ -105,13 +105,18 @@ public class ReservationService {
         addMissingDates(missing, start, end);
         throwIfMissing(missing);
         Reservation.validatePeriod(start, end);
+        return new ReservationQuote(findBasePrice(roomTypeRepository, room.getRoomTypeName()),
+                ChronoUnit.DAYS.between(start, end));
+    }
+
+    static BigDecimal findBasePrice(RoomTypeRepository types, String roomTypeName) {
         BigDecimal price = null;
-        for (RoomType type : roomTypeRepository.findAll()) {
-            if (type.getName().equalsIgnoreCase(room.getRoomTypeName())) {
+        for (RoomType type : types.findAll()) {
+            if (type.getName().equalsIgnoreCase(roomTypeName)) {
                 price = type.getBasePrice();
             }
         }
-        return new ReservationQuote(price, ChronoUnit.DAYS.between(start, end));
+        return price;
     }
 
     /**
