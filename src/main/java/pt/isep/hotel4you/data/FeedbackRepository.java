@@ -1,10 +1,11 @@
 package pt.isep.hotel4you.data;
 
+import java.util.List;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.Feedback;
 import pt.isep.hotel4you.domain.FeedbackType;
 
-/** Saves the client suggestions and complaints. */
+/** Saves and reads the client suggestions and complaints. */
 public interface FeedbackRepository {
     /**
      * Saves a feedback with the current date and time.
@@ -17,4 +18,12 @@ public interface FeedbackRepository {
      * @throws IllegalStateException if the database is not available
      */
     Feedback save(Client client, FeedbackType type, String description);
+
+    /**
+     * Reads all saved feedback, the newest first.
+     *
+     * @return the feedback with its client, or an empty list
+     * @throws IllegalStateException if the database is not available
+     */
+    List<Feedback> findAll();
 }

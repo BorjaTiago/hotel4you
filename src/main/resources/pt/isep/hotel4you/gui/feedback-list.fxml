@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.FeedbackListController">
+    <Label text="Consultar sugestões e reclamações" styleClass="subtitle"/>
+    <Label fx:id="listLabel" text="Sugestões e reclamações registadas pela receção, as mais recentes primeiro."
+           wrapText="true"/>
+    <TableView fx:id="feedbackTable" styleClass="data-table" VBox.vgrow="ALWAYS" prefWidth="700">
+        <columns>
+            <TableColumn fx:id="typeColumn" text="Tipo" prefWidth="110"/>
+            <TableColumn fx:id="descriptionColumn" text="Texto" prefWidth="320"/>
+            <TableColumn fx:id="createdAtColumn" text="Data e hora" prefWidth="130"/>
+            <TableColumn fx:id="clientColumn" text="Cliente" prefWidth="140"/>
+        </columns>
+    </TableView>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>

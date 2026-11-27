@@ -44,6 +44,9 @@ public enum Permission {
      */
     REGISTER_FEEDBACK(Role.RECEPTIONIST, Role.MANAGER),
 
+    /** Read the suggestions and complaints that the reception recorded (RF-27, H4Y-131). */
+    VIEW_FEEDBACK(Role.MANAGER),
+
     /** Delete a reservation for good before the check-in (RF-22, Q-05). */
     DELETE_RESERVATIONS(Role.MANAGER);
 
