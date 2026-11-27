@@ -56,7 +56,7 @@ public class ReservationPriceService {
         BigDecimal basePrice = ReservationService.findBasePrice(roomTypes, room.getRoomTypeName());
         long nights = ChronoUnit.DAYS.between(reservation.getStartDate(), reservation.getEndDate());
         return new ReservationPrice(basePrice, sum(reservationId, ExtraType.ROOM_EXTRA),
-                BigDecimal.ZERO, nights);
+                sum(reservationId, ExtraType.PAID_SERVICE), nights);
     }
 
     private BigDecimal sum(long reservationId, ExtraType type) {

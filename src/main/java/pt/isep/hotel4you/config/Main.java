@@ -31,6 +31,7 @@ import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.LocationService;
 import pt.isep.hotel4you.service.ReservationService;
 import pt.isep.hotel4you.service.ReservationExtrasService;
+import pt.isep.hotel4you.service.ReservationServicesService;
 import pt.isep.hotel4you.service.ReservationPriceService;
 import pt.isep.hotel4you.service.RoomService;
 import pt.isep.hotel4you.service.RoomServiceRequestService;
@@ -88,7 +89,8 @@ public class Main {
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
                     stockService, clientService, reservationService,
                     extraPriceService, cardAccessService, cardQueryService, roomServiceRequestService,
-                    feedbackService, reservationExtras, reservationPricing);
+                    feedbackService, reservationExtras, new ReservationServicesService(reservationExtras),
+                    reservationPricing);
 
             // Check now that the database works.
             database.check();

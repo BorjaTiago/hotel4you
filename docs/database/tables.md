@@ -273,6 +273,8 @@ Ids above show a fresh catalogue. Code uses saved identifiers and does not assum
 SQL v20 stores each room extra at the agreed nightly price. The key combines the reservation and the catalogue entry. Selecting a new view replaces the old view in the same transaction.
 
 ### reservation_services
+
+SQL v21 requires a saved price for an included service and adds a unique index for its reservation and catalogue entry. Room service requests keep their own `used_at` value and are separate from the nightly price.
 **What:** The services of one reservation: included, used, or requested to the room.
 **Why:** The final bill needs them.
 **Why this way:**

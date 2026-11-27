@@ -223,6 +223,8 @@ public class JdbcReservationRepository implements ReservationRepository {
                 }
                 execute(connection, "IF OBJECT_ID('dbo.reservation_extras', 'U') IS NOT NULL "
                         + "DELETE FROM reservation_extras WHERE reservation_id = ?", id);
+                execute(connection, "IF OBJECT_ID('dbo.reservation_services', 'U') IS NOT NULL "
+                        + "DELETE FROM reservation_services WHERE reservation_id = ? AND used_at IS NULL", id);
                 execute(connection, "DELETE FROM reservation_locations WHERE reservation_id = ?", id);
                 boolean deleted = execute(connection,
                         "DELETE FROM reservations WHERE id = ? AND status = 'reserved'", id) == 1;

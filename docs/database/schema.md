@@ -222,7 +222,7 @@ T-SQL has no boolean type. Do not compare two conditions with `=` or `<>`. Use A
 | room_items | PK (`room_id`, `item_id`); `quantity > 0` |
 | extra_prices | `name` UNIQUE; `type IN ('ROOM_EXTRA','PAID_SERVICE')`; `price IS NULL OR price >= 0` |
 | reservations | `end_date > start_date`; `status` in the 4 values, default `'reserved'`; check-in and check-out dates match the status (see below); `checked_out_at >= checked_in_at` |
-| reservation_services | all FKs NO ACTION; `unit_price IS NULL OR unit_price >= 0` |
+| reservation_services | all FKs NO ACTION; a paid service included in the reservation requires a non-negative price; v21 allows one included row per reservation and catalogue entry |
 | reservation_extras | one row per reservation and catalogue entry; `unit_price >= 0` |
 | access_cards | card belongs to a reservation OR a user; `is_master = 0 OR user_id IS NOT NULL`; `card_number` UNIQUE |
 | access_logs | entry is in a location OR a room |

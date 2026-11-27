@@ -5,12 +5,15 @@ import java.text.NumberFormat;
 import java.util.Locale;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
+import javafx.util.StringConverter;
 import pt.isep.hotel4you.domain.ExtraService;
+import pt.isep.hotel4you.domain.ExtraType;
 import pt.isep.hotel4you.domain.ReservationExtra;
 import pt.isep.hotel4you.domain.ReservationStatus;
 import pt.isep.hotel4you.domain.ReservationSummary;
@@ -24,6 +27,7 @@ public class ReservationExtrasController {
     private ReservationSummary reservation;
 
     @FXML private TitledPane details;
+    @FXML private ChoiceBox<ExtraType> extraType;
     @FXML private ComboBox<ExtraService> catalogue;
     @FXML private ListView<ReservationExtra> included;
     @FXML private Button addButton;
@@ -41,6 +45,21 @@ public class ReservationExtrasController {
 
     @FXML
     private void initialize() {
+        extraType.getItems().setAll(ExtraType.values());
+        extraType.setConverter(new StringConverter<>() {
+            @Override public String toString(ExtraType type) {
+                return switch (type) {
+                    case ROOM_EXTRA -> "Extras do quarto";
+                    case PAID_SERVICE -> "Serviços pagos";
+                    case null -> "";
+                };
+            }
+            @Override public ExtraType fromString(String text) {
+                throw new UnsupportedOperationException();
+            }
+        });
+        extraType.setValue(ExtraType.ROOM_EXTRA);
+        extraType.valueProperty().addListener((value, before, selected) -> refreshContents());
         catalogue.setCellFactory(list -> catalogueCell());
         catalogue.setButtonCell(catalogueCell());
         included.setCellFactory(list -> new ListCell<>() {
@@ -80,7 +99,7 @@ public class ReservationExtrasController {
         ExtraService selected = catalogue.getValue();
         if (canEdit(reservation) && selected != null) {
             applyChange(() -> facade.addReservationExtra(
-                    reservation.id(), selected.getId(), HotelApp.currentUser));
+                    reservation.id(), selected.getId(), extraType.getValue(), HotelApp.currentUser));
         }
     }
 
@@ -89,7 +108,7 @@ public class ReservationExtrasController {
         ReservationExtra selected = included.getSelectionModel().getSelectedItem();
         if (canEdit(reservation) && selected != null) {
             applyChange(() -> facade.removeReservationExtra(
-                    reservation.id(), selected.extraPriceId(), HotelApp.currentUser));
+                    reservation.id(), selected.extraPriceId(), extraType.getValue(), HotelApp.currentUser));
         }
     }
 
@@ -103,13 +122,14 @@ public class ReservationExtrasController {
         }
         try {
             if (canEdit(reservation)) {
-                catalogue.getItems().setAll(facade.listReservationExtraOptions( HotelApp.currentUser));
+                catalogue.getItems().setAll(facade.listReservationExtraOptions(
+                        extraType.getValue(), HotelApp.currentUser));
             }
             included.getItems().setAll(facade.listReservationExtras(reservation.id(),
-                    HotelApp.currentUser));
+                    extraType.getValue(), HotelApp.currentUser));
             BigDecimal charge = included.getItems().stream().map(ReservationExtra::unitPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            priceLabel.setText("Extras por noite: " + money(charge));
+            priceLabel.setText("Subtotal desta categoria por noite: " + money(charge));
             BigDecimal nightly = facade.quoteReservationPrice(reservation.id(), HotelApp.currentUser).pricePerNight();
             priceLabel.setText(priceLabel.getText() + "\nPreço da reserva por noite: "
                     + (nightly == null ? "falta o preço base" : money(nightly)));

@@ -8,6 +8,7 @@
     <content>
         <VBox spacing="8">
             <HBox spacing="8" alignment="CENTER_LEFT">
+                <ChoiceBox fx:id="extraType" accessibleText="Categoria dos extras"/>
                 <ComboBox fx:id="catalogue" promptText="Escolher extra" accessibleText="Extra a adicionar"
                           maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
                 <Button fx:id="addButton" text="Adicionar" onAction="#onAddClicked" disable="true"
