@@ -108,10 +108,12 @@ class JdbcReservationCheckInOutTest {
         assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND status = 'reserved'"));
         assertTrue(database.statements.getFirst().contains("WITH (UPDLOCK, HOLDLOCK)"));
         assertTrue(database.statements.get(1).contains("DELETE FROM reservation_extras"));
-        assertTrue(database.statements.get(2).contains("DELETE FROM reservation_locations"));
-        assertEquals(List.of(5L, 5L, 5L, 5L), database.bound);
+        assertTrue(database.statements.get(2).contains("DELETE FROM reservation_services"));
+        assertTrue(database.statements.get(2).contains("used_at IS NULL"));
+        assertTrue(database.statements.get(3).contains("DELETE FROM reservation_locations"));
+        assertEquals(List.of(5L, 5L, 5L, 5L, 5L), database.bound);
         assertEquals(List.of("result", "statement", "statement", "statement", "statement",
-                "connection"), database.closed);
+                "statement", "connection"), database.closed);
     }
 
     @Test
