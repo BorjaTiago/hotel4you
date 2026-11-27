@@ -17,6 +17,8 @@ import pt.isep.hotel4you.domain.ClientReservation;
 import pt.isep.hotel4you.domain.ClientSearchField;
 import pt.isep.hotel4you.domain.ExitReason;
 import pt.isep.hotel4you.domain.ExtraService;
+import pt.isep.hotel4you.domain.Feedback;
+import pt.isep.hotel4you.domain.FeedbackType;
 import pt.isep.hotel4you.domain.Floor;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.MagneticCard;
@@ -49,6 +51,7 @@ public class HotelFacade {
     private final ExtraPriceService extraPriceService;
     private final CardAccessService cardAccessService;
     private final RoomServiceRequestService roomServiceRequestService;
+    private final FeedbackService feedbackService;
 
     /**
      * Creates the facade.
@@ -63,12 +66,13 @@ public class HotelFacade {
      * @param extraPriceService the extra price service
      * @param cardAccessService the card service
      * @param roomServiceRequestService the room service request service
+     * @param feedbackService the suggestion and complaint service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
             ClientService clientService, ReservationService reservationService,
             ExtraPriceService extraPriceService, CardAccessService cardAccessService,
-            RoomServiceRequestService roomServiceRequestService) {
+            RoomServiceRequestService roomServiceRequestService, FeedbackService feedbackService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -79,6 +83,7 @@ public class HotelFacade {
         this.extraPriceService = extraPriceService;
         this.cardAccessService = cardAccessService;
         this.roomServiceRequestService = roomServiceRequestService;
+        this.feedbackService = feedbackService;
     }
 
     /**
@@ -138,6 +143,23 @@ public class HotelFacade {
      */
     public RoomServiceRequest registerRoomService(String roomNumber, RoomServiceType type, User actor) {
         return roomServiceRequestService.register(roomNumber, type, actor);
+    }
+
+    /**
+     * Registers a suggestion or a complaint of a client for the manager.
+     *
+     * @param client the saved client, or null if no client is known
+     * @param type the feedback type
+     * @param description the text of the client
+     * @param actor the logged-in user
+     * @return the saved feedback with the date and time
+     * @throws AccessDeniedException if the actor may not register feedback
+     * @throws IllegalArgumentException if the type is missing, the text is empty or too long, or
+     *         the client no longer exists
+     * @throws IllegalStateException if the database is not available
+     */
+    public Feedback saveFeedback(Client client, FeedbackType type, String description, User actor) {
+        return feedbackService.save(client, type, description, actor);
     }
 
     /**

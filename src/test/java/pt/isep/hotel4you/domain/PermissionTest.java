@@ -137,6 +137,18 @@ class PermissionTest {
         assertFalse(Permission.REGISTER_ROOM_SERVICE.allows(RESTAURANT_STAFF));
     }
 
+    @Test
+    @Tag("H4Y-111-AC-1")
+    void onAllows_returnTrue_whenReceptionistRegistersFeedback() {
+        assertTrue(Permission.REGISTER_FEEDBACK.allows(RECEPTIONIST));
+    }
+
+    @Test
+    @Tag("H4Y-111-AC-4")
+    void onAllows_returnFalse_whenRestaurantStaffRegistersFeedback() {
+        assertFalse(Permission.REGISTER_FEEDBACK.allows(RESTAURANT_STAFF));
+    }
+
     @ParameterizedTest
     @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")

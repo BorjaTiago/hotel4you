@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.FeedbackController">
+    <Label text="Sugestões e reclamações" styleClass="subtitle"/>
+    <Label text="Registe a sugestão ou a reclamação de um cliente. O gestor recebe-a."
+           wrapText="true"/>
+    <Label fx:id="typeLabel" text="Tipo"/>
+    <ComboBox fx:id="typeBox" promptText="Escolha sugestão ou reclamação" maxWidth="Infinity"/>
+    <Label fx:id="clientLabel" text="Cliente (opcional)"/>
+    <HBox spacing="8">
+        <ComboBox fx:id="clientBox" promptText="Sem cliente" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="Sem cliente" onAction="#onNoClientClicked" styleClass="secondary-button"/>
+    </HBox>
+    <Label fx:id="descriptionLabel" text="Texto"/>
+    <TextArea fx:id="descriptionArea" promptText="Escreva o que o cliente disse (máximo 500 caracteres)"
+              wrapText="true" prefRowCount="5" maxWidth="Infinity"/>
+    <Button text="Registar" onAction="#onSaveFeedbackClicked"
+            styleClass="primary-button" maxWidth="Infinity"/>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>
