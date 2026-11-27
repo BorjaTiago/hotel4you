@@ -21,6 +21,12 @@ public class InMemoryFeedbackRepository implements FeedbackRepository {
         return feedback;
     }
 
+    /** @return the saved rows, the newest first, like the SQL Server repository */
+    @Override
+    public List<Feedback> findAll() {
+        return List.copyOf(saved.reversed());
+    }
+
     /** @return the saved rows, in save order */
     public List<Feedback> saved() {
         return List.copyOf(saved);

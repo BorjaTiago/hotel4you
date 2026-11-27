@@ -1,5 +1,6 @@
 package pt.isep.hotel4you.service;
 
+import java.util.List;
 import pt.isep.hotel4you.data.FeedbackRepository;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.Feedback;
@@ -49,5 +50,20 @@ public class FeedbackService {
                     "O texto tem no máximo " + Feedback.MAX_DESCRIPTION_LENGTH + " caracteres.");
         }
         return repository.save(client, type, text);
+    }
+
+    /**
+     * Lists all suggestions and complaints for the manager, the newest first.
+     *
+     * @param actor the logged-in user
+     * @return the saved feedback, or an empty list
+     * @throws AccessDeniedException if the actor may not view feedback
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Feedback> list(User actor) {
+        if (!Permission.VIEW_FEEDBACK.allows(actor)) {
+            throw new AccessDeniedException("Não tem permissão para consultar sugestões ou reclamações.");
+        }
+        return repository.findAll();
     }
 }

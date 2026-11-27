@@ -35,6 +35,8 @@
                     onAction="#onRoomServiceClicked" maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="feedbackButton" text="Sugestões e reclamações"
                     onAction="#onFeedbackClicked" maxWidth="Infinity" visible="false"/>
+            <Button styleClass="navigation-button" fx:id="feedbackListButton" text="Consultar sugestões"
+                    onAction="#onFeedbackListClicked" maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
 

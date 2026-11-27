@@ -163,6 +163,18 @@ public class HotelFacade {
     }
 
     /**
+     * Lists all suggestions and complaints for the manager, the newest first.
+     *
+     * @param actor the logged-in user
+     * @return the saved feedback, or an empty list
+     * @throws AccessDeniedException if the actor may not view feedback
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<Feedback> listFeedback(User actor) {
+        return feedbackService.list(actor);
+    }
+
+    /**
      * Lists the extra prices per night, including those not yet set.
      * @param actor the logged-in user
      * @return the extra catalogue ordered by identifier

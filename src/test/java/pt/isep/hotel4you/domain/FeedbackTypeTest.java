@@ -31,4 +31,16 @@ class FeedbackTypeTest {
     void onDatabaseValue_returnComplaint_whenTypeIsComplaint() {
         assertEquals("complaint", FeedbackType.COMPLAINT.databaseValue());
     }
+
+    @Test
+    @Tag("H4Y-131-AC-1")
+    void onFromDatabase_returnSuggestion_whenValueIsSuggestion() {
+        assertEquals(FeedbackType.SUGGESTION, FeedbackType.fromDatabase("suggestion"));
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-1")
+    void onFromDatabase_returnComplaint_whenValueIsComplaint() {
+        assertEquals(FeedbackType.COMPLAINT, FeedbackType.fromDatabase("complaint"));
+    }
 }

@@ -52,6 +52,9 @@ public class MainController {
     private Button feedbackButton;
 
     @FXML
+    private Button feedbackListButton;
+
+    @FXML
     private StackPane contentPane;
 
     /**
@@ -89,6 +92,8 @@ public class MainController {
         roomServiceButton.setVisible(facade.canUse(user, Permission.REGISTER_ROOM_SERVICE));
         feedbackButton.managedProperty().bind(feedbackButton.visibleProperty());
         feedbackButton.setVisible(facade.canUse(user, Permission.REGISTER_FEEDBACK));
+        feedbackListButton.managedProperty().bind(feedbackListButton.visibleProperty());
+        feedbackListButton.setVisible(facade.canUse(user, Permission.VIEW_FEEDBACK));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
         if (facade.canUse(user, Permission.MANAGE_RESERVATIONS)) {
@@ -148,6 +153,12 @@ public class MainController {
     private void onFeedbackClicked() {
         Parent feedbackScreen = new ScreenLoader(facade).load("feedback.fxml");
         contentPane.getChildren().setAll(feedbackScreen);
+    }
+
+    @FXML
+    private void onFeedbackListClicked() {
+        Parent feedbackListScreen = new ScreenLoader(facade).load("feedback-list.fxml");
+        contentPane.getChildren().setAll(feedbackListScreen);
     }
 
     @FXML

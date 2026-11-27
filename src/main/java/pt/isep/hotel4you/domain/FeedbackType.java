@@ -1,5 +1,7 @@
 package pt.isep.hotel4you.domain;
 
+import java.util.Locale;
+
 /** The kind of a client feedback (RF-27). */
 public enum FeedbackType {
 
@@ -30,6 +32,17 @@ public enum FeedbackType {
      * @return "suggestion" or "complaint"
      */
     public String databaseValue() {
-        return name().toLowerCase();
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Returns the type of a value of the column {@code feedback.type}.
+     *
+     * @param value "suggestion" or "complaint"
+     * @return the feedback type
+     * @throws IllegalArgumentException if the value is not known
+     */
+    public static FeedbackType fromDatabase(String value) {
+        return valueOf(value.toUpperCase(Locale.ROOT));
     }
 }
