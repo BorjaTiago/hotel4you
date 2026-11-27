@@ -64,6 +64,8 @@ H4Y-57 (RF-22, Q-05, Q-36) adds the permanent delete of a reservation before the
 
 H4Y-91 (RF-08) adds the room items. A `RoomItem` links one room to one stock item, with a quantity from 1 to 255. `RoomRepository` reads the items of a room (`findItems`), saves an item with its quantity (`saveItem`: it updates the row, or inserts it when no row exists, in one transaction) and removes an item (`deleteItem`: it returns false when the database refuses the delete with SQL error 547). `RoomService` takes `ItemRepository` as its fourth dependency. `configureItem(room, item, quantity, actor)` adds an item or changes its quantity (AC-1, AC-6). `removeItem(room, item, actor)` throws `RoomItemInUseException` when `deleteItem` returns false (AC-2, AC-4). `listRoomItems(room, actor)` gives the items of one room. `parseQuantity(text)` accepts text of one to three digits and returns the number, so "0" gives 0. It refuses null, blank text and text that is not one to three digits, including a negative number, with "A quantidade é inválida." (AC-7). `configureItem` refuses a quantity below 1 and above 255 with the same message. An unknown room gives "O quarto não existe." (AC-3). An item that is not in the catalogue gives "O item não existe no catálogo." (AC-8). A user without `MANAGE_ROOMS` gets `AccessDeniedException` (AC-5). No new `Permission` value is added. `HotelFacade` has `configureRoomItem`, `removeRoomItem`, `listRoomItems` and `parseRoomItemQuantity`, with the same rules. The item part of `RoomController` is the section "Itens do quarto". It shows only for `MANAGE_ROOMS`. Its table shows the item and the quantity. "Guardar item" adds an item or changes its quantity (`configureRoomItem`). "Remover item" asks for a confirmation, then calls `removeRoomItem`.
 
+H4Y-111 (RF-27, Q-18) adds the record of a client suggestion or complaint. The menu button "Sugestões e reclamações" shows for users with `Permission.REGISTER_FEEDBACK` (receptionist and manager; the manager may use every function, H4Y-23). The screen `feedback.fxml` (`FeedbackController`) has the type (Sugestão or Reclamação), an optional client from `HotelFacade.listClients` (button "Sem cliente" clears it) and the text. `FeedbackService.save(client, type, description, actor)` checks the permission first and throws `AccessDeniedException` ("Não tem permissão para registar sugestões ou reclamações.", AC-4). Then it refuses no type ("Escolha o tipo: sugestão ou reclamação."), an empty text ("Escreva o texto da sugestão ou reclamação.", AC-3) and a text above 500 characters ("O texto tem no máximo 500 caracteres."). It trims the text. `JdbcFeedbackRepository.save` inserts one row in `feedback` (`database/v19-create-feedback.sql`) with `created_at = SYSDATETIME()` and reads the id and the time with `OUTPUT`. No client gives `customer_id` NULL. SQL error 547 (the client was removed at the same moment) throws `IllegalArgumentException`. The screen shows the type, the date and time and the client. The manager list of feedback (`listFeedback`, `onListFeedbackClicked`) is another story and stays future. `HotelFacade` takes `FeedbackService` as its twelfth constructor parameter, after `RoomServiceRequestService`.
+
 H4Y-92 (RF-11, RF-18) adds the restaurant and the pool to a new reservation. Tab "3. Confirmar" of "Reservar quarto" has one check box for each zone with `requires_reservation = 1` (in the reference data v4: "Restaurante" and "Piscina"), not selected by default. `LocationService.listReservableZones` (and `HotelFacade.listReservableZones`) gives these zones to a user with `MANAGE_RESERVATIONS`. Each check box keeps the zone id. `ReservationService.create` and `HotelFacade.createReservation` get `locationIds`: `Reservation.locationIds` holds both ids, one of them or none (AC-1 to AC-3). The id, not the name, identifies the zone, so the manager can rename a zone and the reservation still saves. `JdbcReservationRepository.save` inserts the reservation and one `reservation_locations` row per id in one transaction. It checks the id with `requires_reservation = 1`. If a zone does not exist or no longer needs a reservation, the save stops and nothing is saved. Only this SQL checks `requires_reservation = 1`: `ReservationService` and the in-memory test repository do not check it. `create` treats a null list as empty and keeps each id once (`distinct`), so a repeated id does not break the primary key of `reservation_locations`. Only `save` fills `Reservation.locationIds`: `findById`, `findByRoom` and `findByRooms` do not read the zones, so the list is empty there. `findActive` gives the current names in `ReservationSummary.locations` (`STRING_AGG`, "" when none), and the screen "Reservas" shows them in the column "Locais". `delete` deletes the `reservation_locations` rows first, in the same transaction, because the foreign keys have no CASCADE (Q-36). To change the zones after the create is not in the statement, so the planned `addLocation` and `removeLocation` stay planned. The card check (RF-18) is in the final delivery.
 
 ```mermaid
@@ -97,6 +99,7 @@ classDiagram
         -onPricesClicked() void
         -onExtraPricesClicked() void
         -onStockClicked() void
+        -onRoomServiceClicked() void
         -onLogoutClicked() void
         -openLogin() void
     }
@@ -209,8 +212,20 @@ classDiagram
         -onRegisterMovementClicked() void
     }
     class FeedbackController {
-        +onSaveFeedbackClicked() void
-        +onListFeedbackClicked() void
+        -facade: HotelFacade
+        -typeBox: ComboBox~FeedbackType~
+        -clientBox: ComboBox~Client~
+        -descriptionArea: TextArea
+        -messageLabel: Label
+        +FeedbackController(facade: HotelFacade)
+        -initialize() void
+        -onNoClientClicked() void
+        -onSaveFeedbackClicked() void
+        -showMessage(text: String, success: boolean) void
+        ~clientText(client: Client) String$
+        ~confirmationText(feedback: Feedback) String$
+        %% future: manager list of feedback (other story)
+        -onListFeedbackClicked() void
     }
     class FloorController {
         -initialize() void
@@ -241,7 +256,8 @@ classDiagram
     %% LAYER 2: BUSINESS - FACADE
     %% ==========================================
     class HotelFacade {
-        +HotelFacade(authService: AuthService, staffService: StaffService, locationService: LocationService, roomService: RoomService, stockService: StockService, clientService: ClientService, reservationService: ReservationService, extraPriceService: ExtraPriceService, cardAccessService: CardAccessService, cardQueryService: CardQueryService)
+        +HotelFacade(authService: AuthService, staffService: StaffService, locationService: LocationService, roomService: RoomService, stockService: StockService, clientService: ClientService, reservationService: ReservationService, extraPriceService: ExtraPriceService, cardAccessService: CardAccessService, cardQueryService: CardQueryService, roomServiceRequestService: RoomServiceRequestService, feedbackService: FeedbackService)
+        +registerRoomService(roomNumber: String, type: RoomServiceType, actor: User) RoomServiceRequest
         +listMasterCards(actor: User) List~MagneticCard~
         +blockMasterCard(number: String, actor: User) MagneticCard
         +replaceMasterCard(oldNumber: String, actor: User) IssuedCard
@@ -306,7 +322,8 @@ classDiagram
         +listItems(actor: User) List~StockItem~
         +registerMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
         +parseQuantity(text: String) int
-        +saveFeedback(client: Client, type: FeedbackType, description: String) Feedback
+        +saveFeedback(client: Client, type: FeedbackType, description: String, actor: User) Feedback
+        %% future: manager list of feedback (other story)
         +listFeedback() List~Feedback~
         +listFloors(actor: User) List~Floor~
         +findFloor(number: int, actor: User) Floor
@@ -461,8 +478,19 @@ classDiagram
         +applyMovement(item: StockItem, type: MovementType, quantity: int, exitReason: ExitReason, user: User) StockMovement
     }
     class FeedbackService {
-        +save(client: Client, type: FeedbackType, description: String) Feedback
+        +FeedbackService(repository: FeedbackRepository)
+        +save(client: Client, type: FeedbackType, description: String, actor: User) Feedback
+        %% future: manager list of feedback (other story)
         +list() List~Feedback~
+    }
+    class FeedbackRepository {
+        <<interface>>
+        +save(client: Client, type: FeedbackType, description: String) Feedback
+    }
+    class JdbcFeedbackRepository {
+        -FOREIGN_KEY_ERROR: int$
+        +JdbcFeedbackRepository(database: Database)
+        +save(client: Client, type: FeedbackType, description: String) Feedback
     }
     class LoginFailedException {
         <<exception>>
@@ -943,6 +971,65 @@ classDiagram
     }
 
     %% ==========================================
+    %% ROOM SERVICE REQUESTS (H4Y-110, RF-15, Q-33)
+    %% ==========================================
+    class RoomServiceController {
+        -facade: HotelFacade
+        -roomLabel: Label
+        -roomField: TextField
+        -typeLabel: Label
+        -typeBox: ComboBox~RoomServiceType~
+        -messageLabel: Label
+        +RoomServiceController(facade: HotelFacade)
+        -initialize() void
+        -onRegisterClicked() void
+        -showMessage(text: String, success: boolean) void
+        ~confirmationText(request: RoomServiceRequest) String$
+    }
+    class RoomServiceRequestService {
+        -repository: RoomServiceRequestRepository
+        +RoomServiceRequestService(repository: RoomServiceRequestRepository)
+        +register(roomNumber: String, type: RoomServiceType, actor: User) RoomServiceRequest
+        -parseRoomNumber(text: String) int$
+    }
+    class RoomNotOccupiedException {
+        +RoomNotOccupiedException(roomNumber: int)
+    }
+    class RoomServiceRequestRepository {
+        <<interface>>
+        +save(roomNumber: int, type: RoomServiceType) Optional~RoomServiceRequest~
+    }
+    class JdbcRoomServiceRequestRepository {
+        -database: Database
+        +JdbcRoomServiceRequestRepository(database: Database)
+        +save(roomNumber: int, type: RoomServiceType) Optional~RoomServiceRequest~
+    }
+    class RoomServiceRequest {
+        -id: long
+        -reservationId: long
+        -roomNumber: int
+        -type: RoomServiceType
+        -unitPrice: BigDecimal
+        -requestedAt: LocalDateTime
+        +getId() long
+        +getReservationId() long
+        +getRoomNumber() int
+        +getType() RoomServiceType
+        +getUnitPrice() BigDecimal
+        +getRequestedAt() LocalDateTime
+    }
+    class RoomServiceType {
+        <<enumeration>>
+        FOOD
+        DRINK
+        LAUNDRY
+        -displayName: String
+        -catalogueName: String
+        +displayName() String
+        +catalogueName() String
+    }
+
+    %% ==========================================
     %% LAYER 3: DOMAIN - STOCK
     %% ==========================================
     class StockItem {
@@ -973,9 +1060,17 @@ classDiagram
     %% LAYER 3: DOMAIN - FEEDBACK
     %% ==========================================
     class Feedback {
+        +MAX_DESCRIPTION_LENGTH: int$
+        -id: long
+        -client: Client
         -type: FeedbackType
         -description: String
         -createdAt: LocalDateTime
+        +getId() long
+        +getClient() Client
+        +getType() FeedbackType
+        +getDescription() String
+        +getCreatedAt() LocalDateTime
     }
 
     %% ==========================================
@@ -1003,8 +1098,10 @@ classDiagram
         MANAGE_CLIENTS
         SEARCH_ROOMS
         MANAGE_RESERVATIONS
+        REGISTER_FEEDBACK
         DELETE_RESERVATIONS
         MANAGE_CARDS
+        REGISTER_ROOM_SERVICE
         -allowedRoles: Set~Role~
         +allows(actor: User) boolean
     }
@@ -1041,6 +1138,9 @@ classDiagram
         <<enumeration>>
         SUGGESTION
         COMPLAINT
+        -displayName: String
+        +displayName() String
+        +databaseValue() String
     }
     class MovementType {
         <<enumeration>>
@@ -1293,10 +1393,31 @@ classDiagram
     ExtraService --> ExtraType : classifies
     Main ..> ExtraPriceService : creates
     Main ..> JdbcExtraPriceRepository : creates
+    Main ..> RoomServiceRequestService : creates
+    Main ..> JdbcRoomServiceRequestRepository : creates
+    MainController ..> RoomServiceController : opens
+    RoomServiceController ..> HotelFacade : uses
+    HotelFacade ..> RoomServiceRequestService : uses
+    RoomServiceRequestService ..> RoomServiceRequestRepository : saves
+    RoomServiceRequestService ..> Permission : checks reception
+    RoomServiceRequestService ..> RoomNotOccupiedException : throws
+    JdbcRoomServiceRequestRepository ..|> RoomServiceRequestRepository
+    JdbcRoomServiceRequestRepository ..> Database : connects
+    RoomServiceRequestRepository ..> RoomServiceRequest : returns
+    RoomServiceRequest --> RoomServiceType : classifies
     RoomService ..> Permission : uses
     LocationService ..> Permission : uses
     StockService ..> Permission : uses
     ClientService ..> Permission : uses
+    FeedbackService ..> Permission : checks REGISTER_FEEDBACK
+    FeedbackService ..> FeedbackRepository : saves
+    JdbcFeedbackRepository ..|> FeedbackRepository
+    JdbcFeedbackRepository ..> Database : connects
+    FeedbackRepository ..> Feedback : returns
+    Feedback --> FeedbackType : has
+    Main ..> FeedbackService : creates
+    Main ..> JdbcFeedbackRepository : creates
+    MainController ..> FeedbackController : opens feedback.fxml
     Permission ..> Role : uses
 
     %% ==========================================
@@ -1379,3 +1500,16 @@ A refresh failure after a successful save gives an explicit warning that the pri
 Access rules stay in ExtraPriceService; shared amount rules stay in PriceRules.
 
 Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-82 check-in and check-out by Claude Code (claude-opus-5-5), 2026-11-08; H4Y-82 PR #55 review fixes by Claude Code (claude-opus-5-5), 2026-11-08; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09 (sync with 6faf8f8); rename by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09.; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06; merge with main after H4Y-82 by Claude Code (claude-opus-5-5), 2026-11-09; screen rename to "Reservar quarto" by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 edit staff account by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 rebase on main after H4Y-82 and review fixes by Claude Code (claude-opus-5-5), 2026-11-10; H4Y-85 rebase on main after H4Y-80 and H4Y-81 by Claude Code (claude-opus-5-5), 2026-11-11; H4Y-57 delete reservation by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13; docs, Claude Code (claude-haiku-5-5), 2026-11-13; docs, Claude Code (claude-haiku-5-5), 2026-11-17; H4Y-94 access rule by zone, Claude Code (claude-opus-5-5), 2026-11-18; H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16; H4Y-90 PR #65 review fixes by Claude Code (claude-opus-5-5), 2026-11-17; merge of main into H4Y-90 by Claude Code (claude-opus-5-5), 2026-11-19; H4Y-90 PR #65 second review fixes by Claude Code (claude-opus-5-5), 2026-11-19; H4Y-90 merge of main (H4Y-93) by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-89 find staff account by Claude Code (claude-opus-5-5), 2026-11-17; H4Y-89 review changes by Claude Code (claude-opus-5-5), 2026-11-19; H4Y-89 merge with main after H4Y-93 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-89 merge with main after H4Y-90 by Claude Code (claude-opus-5-5), 2026-11-20; Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 zone id after review by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 review by antonioprmartinho by Claude Code (claude-opus-5-5), 2026-11-20; tdd-guide, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-132 card access service by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-133 card login by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-122 card screens by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-135 room rule by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-136 reserved zones by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-137 restricted places by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-152 master card by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-150 passages by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-153 master card block by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-122 into H4Y-154 by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-154 new master card by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-154 into the card test branch by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-155 places of a card by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-156 passes of a room by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-156 into the card test branch by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-134 card at the check-in by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-151 card at the check-out by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-151 into the card test branch by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-133 card login by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24.; H4Y-134 card at the check-in by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24.; H4Y-106 stock use and exit by Claude Code (claude-opus-5-5), 2026-11-22. Reviewed by: pending.
+## H4Y-110 room service request (RF-15, Q-33)
+
+The receptionist registers a food, drink or laundry request for a room with check-in. This story does not open doors (Q-08).
+`RoomServiceType` has only `FOOD`, `DRINK` and `LAUNDRY` (Q-33). `catalogueName()` gives the matching `extra_prices` row: "Comida", "Bebidas", "Lavandaria".
+`Permission.REGISTER_ROOM_SERVICE` allows the receptionist and the manager. The manager may use every function (H4Y-23 AC-1), so only restaurant staff and a user without login get "Não tem permissão para registar pedidos de serviço de quarto." (AC-4).
+`RoomServiceRequestService.register(roomNumber, type, actor)` checks the permission first. Then it refuses a blank room number ("Indique o número do quarto."), a number that is not 1 to 5 digits or is above `Room.MAX_NUMBER` ("O número do quarto é inválido.") and a missing type ("Escolha o tipo de serviço: comida, bebida ou lavandaria.", AC-3). Invalid data saves nothing.
+`RoomServiceRequestRepository.save(roomNumber, type)` returns empty when the room has no reservation in the state CHECKED_IN. The service then throws `RoomNotOccupiedException` ("O quarto 202 não está ocupado. Só um quarto com check-in pode pedir serviço de quarto.", AC-2).
+`JdbcRoomServiceRequestRepository.save` reads the `extra_prices` row of the type (none gives "O catálogo não tem o serviço X. Execute o script v14."). Then one `INSERT ... OUTPUT ... SELECT TOP (1)` adds one `reservation_services` row only for the `checked_in` reservation of the room. Bad data with two `checked_in` reservations still gives one row. So the check-in check and the insert are one step. `unit_price` is a copy of the catalogue price (can be NULL). `used_at` is `SYSDATETIME()`, the request time (AC-1). SQL: `database/v18-create-reservation-services.sql`.
+This service replaces the planned `ReservationService.addExtra` for RF-15. `addExtra` stays planned for the extras of a reservation (RF-07, RF-09).
+`HotelFacade` takes `RoomServiceRequestService` as its eleventh constructor parameter, after `CardQueryService`, and has `registerRoomService(roomNumber, type, actor)`.
+The screen "Serviço de quarto" (`room-service.fxml`, `RoomServiceController`) has the field "Número do quarto", the list "Tipo de serviço" and the button "Registar pedido". The menu button shows only for `REGISTER_ROOM_SERVICE`. After the save, the static `confirmationText(request)` shows "Pedido registado: Comida para o quarto 202, em 24/11/2026 às 21:05." and the form is cleared. Every runtime error shows in the message label, as in `StockController`.
+
+Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-17; doc-updater, Claude Code (claude-haiku-5-5), 2026-10-19; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; merge-conflict resolution by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; doc-updater, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-27 staff account update, Claude Code (claude-opus-5-5), 2026-10-23; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; first-manager removal by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; Floor record note by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-28 zone merge by doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-26; H4Y-60 role permission rule, Claude Code (claude-opus-5-5), 2026-10-27; PR #33 review change, Claude Code (claude-opus-5-5), 2026-10-27; merge with main by Claude Code (claude-opus-5-5), 2026-10-27; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-25 merge with latest main, OpenAI Codex (GPT-6), 2026-10-28; H4Y-25 review corrections, OpenAI Codex (gpt-6.1-sol), 2026-10-29; statement room constants review, OpenAI Codex (gpt-6.1-sol), 2026-10-29; room read permission and JDBC review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-28 floors permission by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-27; H4Y-26 base price by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-26 review fix by pr-fixer, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-25 room type integration, OpenAI Codex (gpt-6.1-sol), 2026-10-30; H4Y-25 entity and room type integration review, OpenAI Codex (gpt-6.1-sol), 2026-10-30; prepare signature fix by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room list by doc-updater, Claude Code (claude-opus-5-5), 2026-10-29; H4Y-50 merge with main after H4Y-25 and H4Y-26 (room list) by Claude Code (claude-opus-5-5), 2026-10-30; Database.prepare with Object values by Claude Code (claude-opus-5-5), 2026-10-30; H4Y-61 role display name by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 main window header and no-session check by main session, Claude Code (claude-opus-5-5), 2026-10-27; H4Y-61 review fixes by main session, Claude Code (claude-opus-5-5), 2026-10-30; H4Y-50 merged rooms screen by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; H4Y-50 room removal and clear by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-30; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-03; room-availability-implementation, OpenAI Codex (gpt-6.1-sol), 2026-11-03; merge with main after H4Y-72 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 merge with main after H4Y-68 and H4Y-73 review by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-70 review fixes by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 merge with main after H4Y-68 by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-73 v9 reservations and one-query search by ecc:doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-04; H4Y-56 merge with H4Y-73 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 create reservation by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review fixes by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-73 merge with main after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-56 merge with H4Y-73 after H4Y-52 by Claude Code (claude-opus-5-5), 2026-11-06; PR #51 review round 2 by Claude Code (claude-opus-5-5), 2026-11-06; H4Y-82 check-in and check-out by Claude Code (claude-opus-5-5), 2026-11-08; H4Y-82 PR #55 review fixes by Claude Code (claude-opus-5-5), 2026-11-08; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09 (sync with 6faf8f8); rename by general-purpose agent, Claude Code (claude-haiku-5-5), 2026-11-09; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-09.; doc-updater, Claude Code (claude-haiku-5-5), 2026-11-06; merge with main after H4Y-82 by Claude Code (claude-opus-5-5), 2026-11-09; screen rename to "Reservar quarto" by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 edit staff account by Claude Code (claude-opus-5-5), 2026-11-09; H4Y-85 rebase on main after H4Y-82 and review fixes by Claude Code (claude-opus-5-5), 2026-11-10; H4Y-85 rebase on main after H4Y-80 and H4Y-81 by Claude Code (claude-opus-5-5), 2026-11-11; H4Y-57 delete reservation by Claude Code (claude-opus-5-5), 2026-11-12; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; Created by: antonioprmartinho. Updated by: antonioprmartinho. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-11-13; pr-fixer merge by Claude Code (claude-sonnet-5-5), 2026-11-13; docs, Claude Code (claude-haiku-5-5), 2026-11-13; docs, Claude Code (claude-haiku-5-5), 2026-11-17; H4Y-94 access rule by zone, Claude Code (claude-opus-5-5), 2026-11-18; H4Y-90 stock entry by Claude Code (claude-opus-5-5), 2026-11-16; H4Y-90 PR #65 review fixes by Claude Code (claude-opus-5-5), 2026-11-17; merge of main into H4Y-90 by Claude Code (claude-opus-5-5), 2026-11-19; H4Y-90 PR #65 second review fixes by Claude Code (claude-opus-5-5), 2026-11-19; H4Y-90 merge of main (H4Y-93) by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-89 find staff account by Claude Code (claude-opus-5-5), 2026-11-17; H4Y-89 review changes by Claude Code (claude-opus-5-5), 2026-11-19; H4Y-89 merge with main after H4Y-93 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-89 merge with main after H4Y-90 by Claude Code (claude-opus-5-5), 2026-11-20; Created by: antonioprmartinho. Updated by: BorjaTiago. AI use: Claude Code, claude-sonnet-5-5, 2026-10-16; H4Y-92 restaurant and pool in a reservation, Claude Code (claude-opus-5-5), 2026-11-18; merge with main for H4Y-92 by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 zone id after review by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-92 review by antonioprmartinho by Claude Code (claude-opus-5-5), 2026-11-20; tdd-guide, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-132 card access service by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-133 card login by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-122 card screens by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-135 room rule by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-136 reserved zones by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-137 restricted places by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-152 master card by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-150 passages by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-153 master card block by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-122 into H4Y-154 by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-154 new master card by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-154 into the card test branch by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-155 places of a card by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-156 passes of a room by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-156 into the card test branch by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-134 card at the check-in by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-151 card at the check-out by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; merge of H4Y-151 into the card test branch by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-133 card login by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24.; H4Y-134 card at the check-in by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24.; H4Y-106 stock use and exit by Claude Code (claude-opus-5-5), 2026-11-22; H4Y-110 room service request by Claude Code (claude-opus-5-5), 2026-11-24; merge with main after H4Y-106 by Claude Code (claude-opus-5-5), 2026-11-25; H4Y-111 suggestion and complaint by Claude Code (claude-opus-5-5), 2026-11-27; H4Y-111 merge of main by Claude Code (claude-opus-5-5), 2026-11-27; PR #90 merge of main, GitHub Copilot (claude-opus-5.5), 2026-11-27. Reviewed by: pending.

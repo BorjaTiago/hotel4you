@@ -126,7 +126,7 @@ class CardQueryServiceTest {
     void onGetPlacesByCard_readEntriesThroughFacade_whenManagerAsks() {
         MagneticCard card = card("12345", false);
         records.save(new CardAccessRecord(null, card.getId(), room202.getId(), null, FIRST));
-        HotelFacade facade = new HotelFacade(null, null, null, null, null, null, null, null, null, service);
+        HotelFacade facade = new HotelFacade(null, null, null, null, null, null, null, null, null, service, null, null);
 
         assertEquals(List.of(new CardEntry("12345", CardType.CLIENT, "Quarto 202", FIRST)),
                 facade.getPlacesByCard("12345", MANAGER));
@@ -215,7 +215,7 @@ class CardQueryServiceTest {
     void onGetPassesByRoom_readEntriesThroughFacade_whenManagerAsks() {
         MagneticCard card = card("12345", false);
         records.save(new CardAccessRecord(null, card.getId(), room301.getId(), null, FIRST));
-        HotelFacade facade = new HotelFacade(null, null, null, null, null, null, null, null, null, service);
+        HotelFacade facade = new HotelFacade(null, null, null, null, null, null, null, null, null, service, null, null);
 
         assertEquals(List.of(new CardEntry("12345", CardType.CLIENT, "Quarto 301", FIRST)),
                 facade.getPassesByRoom("301", MANAGER));

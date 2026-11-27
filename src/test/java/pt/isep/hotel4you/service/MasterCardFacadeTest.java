@@ -57,7 +57,7 @@ class MasterCardFacadeTest {
                 new InMemoryRoomRepository(), floors,
                 new LocationService(floors, new InMemoryLocationRepository()),
                 new CardNumberGenerator(cards), new AccessCodeGenerator(), authService, clock);
-        facade = new HotelFacade(null, null, null, null, null, null, null, null, service, null);
+        facade = new HotelFacade(null, null, null, null, null, null, null, null, service, null, null, null);
     }
 
     private MagneticCard masterCard() {

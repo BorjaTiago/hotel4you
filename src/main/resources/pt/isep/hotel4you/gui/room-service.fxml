@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.RoomServiceController">
+    <Label text="Serviço de quarto" styleClass="subtitle"/>
+    <Label text="Registe um pedido de comida, bebida ou lavandaria para um quarto com check-in."
+           wrapText="true"/>
+    <Label fx:id="roomLabel" text="Número do quarto"/>
+    <TextField fx:id="roomField" promptText="Ex.: 202" maxWidth="Infinity"/>
+    <Label fx:id="typeLabel" text="Tipo de serviço"/>
+    <ComboBox fx:id="typeBox" promptText="Escolha o tipo de serviço" maxWidth="Infinity"/>
+    <Button text="Registar pedido" onAction="#onRegisterClicked"
+            styleClass="primary-button" maxWidth="Infinity"/>
+    <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
+</VBox>

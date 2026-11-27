@@ -65,7 +65,7 @@ class CardCheckOutFacadeTest {
                 new CardNumberGenerator(cards), new AccessCodeGenerator(), authService,
                 Clock.systemDefaultZone());
         facade = new HotelFacade(authService, null, null, roomService, null, null,
-                reservationService, null, cardAccessService, null);
+                reservationService, null, cardAccessService, null, null, null);
     }
 
     private IssuedCard checkedInWithEntry() {

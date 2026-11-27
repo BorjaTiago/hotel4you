@@ -37,6 +37,10 @@
                     maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="roomPassesButton" text="Passagens de um quarto" onAction="#onRoomPassesClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button styleClass="navigation-button" fx:id="roomServiceButton" text="Serviço de quarto"
+                    onAction="#onRoomServiceClicked" maxWidth="Infinity" visible="false"/>
+            <Button styleClass="navigation-button" fx:id="feedbackButton" text="Sugestões e reclamações"
+                    onAction="#onFeedbackClicked" maxWidth="Infinity" visible="false"/>
         </VBox>
     </left>
 

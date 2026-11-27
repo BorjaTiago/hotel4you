@@ -63,7 +63,7 @@ class CardFacadeTest {
                 new LocationService(floors, new InMemoryLocationRepository()),
                 new CardNumberGenerator(cards), new AccessCodeGenerator(), authService,
                 Clock.systemDefaultZone());
-        facade = new HotelFacade(authService, null, null, null, null, null, null, null, cardService, null);
+        facade = new HotelFacade(authService, null, null, null, null, null, null, null, cardService, null, null, null);
         clientCard = cardService.issueCard(reservations.findById(1L).orElseThrow(), RECEPTIONIST);
     }
 

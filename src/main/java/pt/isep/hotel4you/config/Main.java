@@ -8,10 +8,12 @@ import pt.isep.hotel4you.data.JdbcCardAccessRecordRepository;
 import pt.isep.hotel4you.data.JdbcCardRepository;
 import pt.isep.hotel4you.data.JdbcClientRepository;
 import pt.isep.hotel4you.data.JdbcExtraPriceRepository;
+import pt.isep.hotel4you.data.JdbcFeedbackRepository;
 import pt.isep.hotel4you.data.JdbcFloorRepository;
 import pt.isep.hotel4you.data.JdbcItemRepository;
 import pt.isep.hotel4you.data.JdbcLocationRepository;
 import pt.isep.hotel4you.data.JdbcRoomRepository;
+import pt.isep.hotel4you.data.JdbcRoomServiceRequestRepository;
 import pt.isep.hotel4you.data.JdbcReservationRepository;
 import pt.isep.hotel4you.data.JdbcRoomTypeRepository;
 import pt.isep.hotel4you.data.JdbcUserRepository;
@@ -23,10 +25,12 @@ import pt.isep.hotel4you.service.CardNumberGenerator;
 import pt.isep.hotel4you.service.CardQueryService;
 import pt.isep.hotel4you.service.ClientService;
 import pt.isep.hotel4you.service.ExtraPriceService;
+import pt.isep.hotel4you.service.FeedbackService;
 import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.LocationService;
 import pt.isep.hotel4you.service.ReservationService;
 import pt.isep.hotel4you.service.RoomService;
+import pt.isep.hotel4you.service.RoomServiceRequestService;
 import pt.isep.hotel4you.service.StaffService;
 import pt.isep.hotel4you.service.StockService;
 
@@ -69,9 +73,13 @@ public class Main {
                     new AccessCodeGenerator(), authService, Clock.systemDefaultZone());
             CardQueryService cardQueryService = new CardQueryService(cardAccessService, cardRepository,
                     roomRepository, locationRepository);
+            RoomServiceRequestService roomServiceRequestService = new RoomServiceRequestService(
+                    new JdbcRoomServiceRequestRepository(database));
+            FeedbackService feedbackService = new FeedbackService(new JdbcFeedbackRepository(database));
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
                     stockService, clientService, reservationService,
-                    extraPriceService, cardAccessService, cardQueryService);
+                    extraPriceService, cardAccessService, cardQueryService, roomServiceRequestService,
+                    feedbackService);
 
             // Check now that the database works.
             database.check();

@@ -38,6 +38,18 @@ public enum Permission {
     /** Create reservations and list the reservations of a client. */
     MANAGE_RESERVATIONS(Role.RECEPTIONIST, Role.MANAGER),
 
+    /**
+     * Register a food, drink or laundry request for a room with check-in (RF-15, Q-33). The
+     * manager may use every function (H4Y-23).
+     */
+    REGISTER_ROOM_SERVICE(Role.RECEPTIONIST, Role.MANAGER),
+
+    /**
+     * Register a suggestion or a complaint of a client (RF-27, Q-18). The manager may use every
+     * function (H4Y-23).
+     */
+    REGISTER_FEEDBACK(Role.RECEPTIONIST, Role.MANAGER),
+
     /** Delete a reservation for good before the check-in (RF-22, Q-05). */
     DELETE_RESERVATIONS(Role.MANAGER),
 
