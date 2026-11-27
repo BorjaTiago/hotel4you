@@ -101,19 +101,25 @@ class JdbcReservationCheckInOutTest {
     @Test
     @Tag("H4Y-57-AC-1")
     void onDelete_deleteOnlyReservedRow_whenCalled() {
+        database.rows = 1;
+
         assertTrue(repository.delete(5L));
 
         assertTrue(sql().contains("DELETE FROM reservations WHERE id = ? AND status = 'reserved'"));
-        assertEquals(List.of(5L, 5L), database.bound);
-        assertEquals(List.of("statement", "statement", "connection"), database.closed);
+        assertTrue(database.statements.getFirst().contains("WITH (UPDLOCK, HOLDLOCK)"));
+        assertTrue(database.statements.get(1).contains("DELETE FROM reservation_extras"));
+        assertTrue(database.statements.get(2).contains("DELETE FROM reservation_locations"));
+        assertEquals(List.of(5L, 5L, 5L, 5L), database.bound);
+        assertEquals(List.of("result", "statement", "statement", "statement", "statement",
+                "connection"), database.closed);
     }
 
     @Test
     @Tag("H4Y-57-AC-1")
-    void onDelete_returnFalse_whenNoRowIsDeleted() {
-        database.updated = 0;
-
+    void onDelete_returnFalseWithoutDeletingChildren_whenReservationCannotBeLocked() {
         assertFalse(repository.delete(5L));
+        assertEquals(1, database.statements.size());
+        assertEquals(List.of(5L), database.bound);
     }
 
     @Test
