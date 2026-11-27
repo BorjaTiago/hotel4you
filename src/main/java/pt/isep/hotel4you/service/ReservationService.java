@@ -137,18 +137,20 @@ public class ReservationService {
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-in
+     * @return the reservation with the state CHECKED_IN
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws ReservationNotFoundException if the reservation does not exist
      * @throws IllegalStateException if the reservation is cancelled, already has a check-in or a
      *         check-out, today is outside the stay dates, changed state at the same moment, or the
      *         database is not available
      */
-    public void checkIn(long reservationId, User actor) {
+    public Reservation checkIn(long reservationId, User actor) {
         checkPermission(actor);
         findReservation(reservationId).checkCanCheckIn(LocalDate.now());
         if (!reservationRepository.checkIn(reservationId)) {
             throw new IllegalStateException(STATE_CHANGED);
         }
+        return findReservation(reservationId);
     }
 
     /**

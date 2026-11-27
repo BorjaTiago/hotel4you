@@ -66,13 +66,13 @@ class CardAccessServiceTest {
     private final InMemoryCardAccessRecordRepository records = new InMemoryCardAccessRecordRepository();
     private final InMemoryReservationRepository reservations = new InMemoryReservationRepository();
     private final InMemoryUserRepository users = new InMemoryUserRepository();
+    private final InMemoryRoomRepository rooms = new InMemoryRoomRepository();
     private final AuthService authService = new AuthService(users);
     private CardAccessService service;
 
     @BeforeEach
     void setUp() {
         InMemoryFloorRepository floors = new InMemoryFloorRepository();
-        InMemoryRoomRepository rooms = new InMemoryRoomRepository();
         rooms.addFloor(2);
         rooms.addRoomType("Duplo");
         rooms.save(ROOM_202, 10);
@@ -767,5 +767,328 @@ class CardAccessServiceTest {
         CardAccessRecord record = service.enter(card, room203);
 
         assertEquals(ROOM_203.getId(), record.getRoomId());
+    }
+
+    // --- open the room with the card (H4Y-135) ---
+
+    private EntryRefusedException refusedEntry(MagneticCard card, Room room, Location zone) {
+        EntryRefusedException error = assertThrows(EntryRefusedException.class,
+                () -> service.register(card, room, zone));
+        assertEquals("Entrada recusada.", error.getMessage());
+        return error;
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-1")
+    void onEnter_saveRoomEntry_whenRoomIsTheCheckedInReservationRoom() {
+        MagneticCard card = clientCard();
+        CardPlace room202 = service.listPlaces(card).get(0);
+
+        CardAccessRecord record = service.enter(card, room202);
+
+        assertEquals(ROOM_202.getId(), record.getRoomId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-2")
+    void onRegister_refuseWithReason_whenRoomIsNotTheReservationRoom() {
+        EntryRefusedException error = refusedEntry(clientCard(), ROOM_203, null);
+
+        assertEquals("Este quarto não é o da sua reserva.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-3")
+    void onRegister_refuseWithReason_whenCardNumberDoesNotExist() {
+        MagneticCard unknown = new MagneticCard(99L, "99999", CardType.CLIENT, 1L, null, true, null);
+
+        EntryRefusedException error = refusedEntry(unknown, ROOM_202, null);
+
+        assertEquals("Cartão desconhecido.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onRegister_refuseWithReason_whenCardWasDeactivatedAfterLogin() {
+        MagneticCard card = clientCard();
+        service.deactivateCard(card.getNumber(), RECEPTIONIST);
+
+        EntryRefusedException error = refusedEntry(card, ROOM_202, null);
+
+        assertEquals("O cartão não está ativo.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onRegister_refuseWithReason_whenCardWasBlockedAfterLogin() {
+        MagneticCard card = clientCard();
+        service.blockCard(card.getNumber(), MANAGER);
+
+        assertEquals("O cartão está bloqueado.", refusedEntry(card, ROOM_202, null).getReason());
+    }
+
+    @Test
+    @Tag("H4Y-135-AC-4")
+    void onRegister_refuseWithReason_whenReservationHasNoCheckIn() {
+        MagneticCard card = service.issueCard(reservationById(4L), RECEPTIONIST).card();
+
+        assertEquals("A reserva do cartão não tem check-in.", refusedEntry(card, ROOM_202, null).getReason());
+    }
+
+    // --- open the reserved restaurant and pool with the card (H4Y-136) ---
+
+    private MagneticCard poolCard() {
+        reservations.add(reservation(5L, ROOM_203, ReservationStatus.CHECKED_IN, List.of(POOL.getId())));
+        return service.issueCard(reservationById(5L), RECEPTIONIST).card();
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-1")
+    void onRegister_saveZoneEntry_whenReservationIncludesRestaurant() {
+        CardAccessRecord record = service.register(clientCard(), null, RESTAURANT);
+
+        assertEquals(RESTAURANT.getId(), record.getLocationId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-2")
+    void onRegister_saveZoneEntry_whenReservationIncludesPool() {
+        CardAccessRecord record = service.register(poolCard(), null, POOL);
+
+        assertEquals(POOL.getId(), record.getLocationId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-3")
+    void onRegister_refuseWithReason_whenReservationDoesNotIncludeRestaurant() {
+        EntryRefusedException error = refusedEntry(poolCard(), null, RESTAURANT);
+
+        assertEquals("A sua reserva não inclui este local.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-4")
+    void onRegister_refuseWithReason_whenReservationDoesNotIncludePool() {
+        EntryRefusedException error = refusedEntry(clientCard(), null, POOL);
+
+        assertEquals("A sua reserva não inclui este local.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-136-AC-5")
+    void onEnter_allowRestaurantThenRefusePoolWithReason_whenReservationIncludesOnlyRestaurant() {
+        MagneticCard card = clientCard();
+        List<CardPlace> places = service.listPlaces(card);
+        CardPlace restaurant = places.get(4);
+        CardPlace pool = places.get(5);
+
+        assertTrue(restaurant.allowed());
+        assertFalse(pool.allowed());
+        assertEquals(RESTAURANT.getId(), service.enter(card, restaurant).getLocationId());
+        EntryRefusedException error = assertThrows(EntryRefusedException.class, () -> service.enter(card, pool));
+        assertEquals("A sua reserva não inclui este local.", error.getReason());
+        assertEquals(1, records.count());
+    }
+
+    // --- refuse the card in places that are not for clients (H4Y-137) ---
+
+    private static final String NOT_FOR_CLIENTS = "Este local não é para clientes.";
+
+    @Test
+    @Tag("H4Y-137-AC-1")
+    void onRegister_refuseWithReason_whenClientCardEntersBar() {
+        EntryRefusedException error = refusedEntry(clientCard(), null, BAR);
+
+        assertEquals(NOT_FOR_CLIENTS, error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-137-AC-2")
+    void onRegister_refuseWithReason_whenClientCardEntersRestrictedPlace() {
+        MagneticCard card = clientCard();
+        List<Location> restricted = List.of(
+                new Location(2L, "Arrecadação", false, false),
+                new Location(6L, "Salas de conferência", false, false),
+                new Location(10L, "Piscina privada", false, false),
+                new Location(11L, "Spa", false, false),
+                GARAGE);
+
+        for (Location zone : restricted) {
+            assertEquals(NOT_FOR_CLIENTS, refusedEntry(card, null, zone).getReason(), zone.getName());
+        }
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-137-AC-3")
+    void onRegister_saveRoomEntry_whenRestrictedPlacesWereRefused() {
+        MagneticCard card = clientCard();
+        refusedEntry(card, null, BAR);
+
+        CardAccessRecord record = service.register(card, ROOM_202, null);
+
+        assertEquals(ROOM_202.getId(), record.getRoomId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-137-AC-4")
+    void onEnter_refuseWithReasonAndSaveNothing_whenClientClicksLockedBar() {
+        MagneticCard card = clientCard();
+        CardPlace bar = service.listPlaces(card).get(2);
+
+        assertEquals("Bar", bar.name());
+        assertFalse(bar.allowed());
+        EntryRefusedException error = assertThrows(EntryRefusedException.class, () -> service.enter(card, bar));
+        assertEquals(NOT_FOR_CLIENTS, error.getReason());
+        assertTrue(records.findByCardId(card.getId()).isEmpty());
+    }
+
+    // --- open all the places with the master card (H4Y-152) ---
+
+    @Test
+    @Tag("H4Y-152-AC-1")
+    void onRegister_saveRoomEntry_whenMasterCardOpensRoom301() {
+        rooms.addFloor(3);
+        Room room301 = rooms.save(new Room(null, 301, 3, "Duplo"), 10);
+
+        CardAccessRecord record = service.register(masterCard(), room301, null);
+
+        assertEquals(room301.getId(), record.getRoomId());
+        assertEquals(1, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-2")
+    void onRegister_saveZoneEntry_whenMasterCardOpensEveryZone() {
+        MagneticCard card = masterCard();
+        List<Location> zones = List.of(GARAGE, BAR, GARDEN, RESTAURANT, POOL);
+
+        for (Location zone : zones) {
+            assertEquals(zone.getId(), service.register(card, null, zone).getLocationId());
+        }
+        assertEquals(zones.size(), records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-3")
+    void onRegister_savePlaceAndTime_whenMasterCardEnters() {
+        MagneticCard card = masterCard();
+
+        CardAccessRecord record = service.register(card, null, BAR);
+
+        assertEquals(BAR.getId(), record.getLocationId());
+        assertEquals(NOW, record.getEntryDateTime());
+        assertEquals(1, records.findByCardId(card.getId()).size());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-4")
+    void onRegister_refuseWithReason_whenMasterCardIsBlocked() {
+        MagneticCard card = masterCard();
+        service.blockCard(card.getNumber(), MANAGER);
+
+        assertEquals("O cartão está bloqueado.", refusedEntry(card, ROOM_202, null).getReason());
+        assertEquals("O cartão está bloqueado.", refusedEntry(card, null, BAR).getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-4")
+    void onRegister_refuseWithReason_whenZoneWasRemoved() {
+        Location removed = new Location(12L, "Sauna", true, false);
+
+        EntryRefusedException error = refusedEntry(masterCard(), null, removed);
+
+        assertEquals("Este local já não existe.", error.getReason());
+        assertEquals(0, records.count());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-5")
+    void onEnter_savePassage_whenMasterCardLogsInAndClicksPlace() {
+        IssuedCard issued = service.issueMasterCard(MANAGER, MANAGER);
+        MagneticCard card = service.login(issued.card().getNumber(), issued.accessCode());
+        List<CardPlace> places = service.listPlaces(card);
+
+        assertTrue(places.stream().allMatch(CardPlace::allowed));
+        CardAccessRecord record = service.enter(card, places.get(places.size() - 1));
+        assertEquals(POOL.getId(), record.getLocationId());
+        assertEquals(NOW, record.getEntryDateTime());
+    }
+
+    @Test
+    @Tag("H4Y-152-AC-5")
+    void onLogin_throwAndSaveNothing_whenMasterCardIsBlocked() {
+        IssuedCard issued = service.issueMasterCard(MANAGER, MANAGER);
+        service.blockCard(issued.card().getNumber(), MANAGER);
+
+        assertThrows(CardBlockedException.class,
+                () -> service.login(issued.card().getNumber(), issued.accessCode()));
+        assertEquals(0, records.count());
+    }
+
+    // --- save the passages of the card (H4Y-150) ---
+
+    @Test
+    @Tag("H4Y-150-AC-1")
+    void onRegister_savePlaceAndTime_whenClientEntersRestaurant() {
+        MagneticCard card = clientCard();
+
+        service.register(card, null, RESTAURANT);
+
+        List<CardAccessRecord> saved = records.findByCardId(card.getId());
+        assertEquals(1, saved.size());
+        assertEquals(RESTAURANT.getId(), saved.get(0).getLocationId());
+        assertEquals(NOW, saved.get(0).getEntryDateTime());
+    }
+
+    @Test
+    @Tag("H4Y-150-AC-2")
+    void onRegister_savePlaceAndTime_whenClientEntersRoom202() {
+        MagneticCard card = clientCard();
+
+        service.register(card, ROOM_202, null);
+
+        List<CardAccessRecord> saved = records.findByCardId(card.getId());
+        assertEquals(1, saved.size());
+        assertEquals(ROOM_202.getId(), saved.get(0).getRoomId());
+        assertEquals(NOW, saved.get(0).getEntryDateTime());
+    }
+
+    @Test
+    @Tag("H4Y-150-AC-3")
+    void onRegister_saveNothing_whenClientIsRefusedAtBar() {
+        MagneticCard card = clientCard();
+
+        refusedEntry(card, null, BAR);
+
+        assertTrue(records.findByCardId(card.getId()).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-150-AC-4")
+    void onEnter_saveOnlyRoomPassage_whenClientClicksRoom202ThenBar() {
+        MagneticCard card = clientCard();
+        List<CardPlace> places = service.listPlaces(card);
+        CardPlace room202 = places.get(0);
+        CardPlace bar = places.get(2);
+
+        service.enter(card, room202);
+        assertThrows(EntryRefusedException.class, () -> service.enter(card, bar));
+
+        List<CardAccessRecord> saved = records.findByCardId(card.getId());
+        assertEquals(1, saved.size());
+        assertEquals(ROOM_202.getId(), saved.get(0).getRoomId());
+        assertEquals(NOW, saved.get(0).getEntryDateTime());
     }
 }

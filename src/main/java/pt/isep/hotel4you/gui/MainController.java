@@ -46,6 +46,15 @@ public class MainController {
     private Button stockButton;
 
     @FXML
+    private Button masterCardsButton;
+
+    @FXML
+    private Button cardPlacesButton;
+
+    @FXML
+    private Button roomPassesButton;
+
+    @FXML
     private Button roomServiceButton;
 
     @FXML
@@ -85,6 +94,12 @@ public class MainController {
         extraPricesButton.setVisible(facade.canUse(user, Permission.MANAGE_EXTRA_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
         stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
+        masterCardsButton.managedProperty().bind(masterCardsButton.visibleProperty());
+        masterCardsButton.setVisible(facade.canUse(user, Permission.MANAGE_CARDS));
+        cardPlacesButton.managedProperty().bind(cardPlacesButton.visibleProperty());
+        cardPlacesButton.setVisible(facade.canUse(user, Permission.MANAGE_CARDS));
+        roomPassesButton.managedProperty().bind(roomPassesButton.visibleProperty());
+        roomPassesButton.setVisible(facade.canUse(user, Permission.MANAGE_CARDS));
         roomServiceButton.managedProperty().bind(roomServiceButton.visibleProperty());
         roomServiceButton.setVisible(facade.canUse(user, Permission.REGISTER_ROOM_SERVICE));
         feedbackButton.managedProperty().bind(feedbackButton.visibleProperty());
@@ -136,6 +151,24 @@ public class MainController {
     private void onStockClicked() {
         Parent stockScreen = new ScreenLoader(facade).load("stock.fxml");
         contentPane.getChildren().setAll(stockScreen);
+    }
+
+    @FXML
+    private void onMasterCardsClicked() {
+        Parent screen = new ScreenLoader(facade).load("master-cards.fxml");
+        contentPane.getChildren().setAll(screen);
+    }
+
+    @FXML
+    private void onCardPlacesClicked() {
+        Parent screen = new ScreenLoader(facade).load("card-places.fxml");
+        contentPane.getChildren().setAll(screen);
+    }
+
+    @FXML
+    private void onRoomPassesClicked() {
+        Parent screen = new ScreenLoader(facade).load("room-passes.fxml");
+        contentPane.getChildren().setAll(screen);
     }
 
     @FXML

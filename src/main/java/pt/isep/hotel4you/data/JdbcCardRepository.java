@@ -40,6 +40,18 @@ public class JdbcCardRepository implements CardRepository {
     }
 
     @Override
+    public Optional<MagneticCard> findById(long id) {
+        String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE id = ?";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql, id);
+                ResultSet row = statement.executeQuery()) {
+            return row.next() ? Optional.of(read(row)) : Optional.empty();
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
     public boolean existsByNumber(String number) {
         String sql = "SELECT 1 FROM access_cards WHERE card_number = ?";
         try (Connection connection = database.connect();
@@ -68,6 +80,22 @@ public class JdbcCardRepository implements CardRepository {
         String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE user_id = ? ORDER BY id";
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, userId);
+                ResultSet row = statement.executeQuery()) {
+            List<MagneticCard> cards = new ArrayList<>();
+            while (row.next()) {
+                cards.add(read(row));
+            }
+            return cards;
+        } catch (SQLException e) {
+            throw new IllegalStateException(Database.NOT_AVAILABLE, e);
+        }
+    }
+
+    @Override
+    public List<MagneticCard> findMasters() {
+        String sql = "SELECT " + COLUMNS + " FROM access_cards WHERE is_master = 1 ORDER BY id";
+        try (Connection connection = database.connect();
+                PreparedStatement statement = Database.prepare(connection, sql);
                 ResultSet row = statement.executeQuery()) {
             List<MagneticCard> cards = new ArrayList<>();
             while (row.next()) {

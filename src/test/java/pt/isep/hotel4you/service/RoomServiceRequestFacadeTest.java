@@ -26,7 +26,7 @@ class RoomServiceRequestFacadeTest {
     void setUp() {
         repository = new InMemoryRoomServiceRequestRepository();
         repository.checkIn(202, 9L);
-        facade = new HotelFacade(null, null, null, null, null, null, null, null, null,
+        facade = new HotelFacade(null, null, null, null, null, null, null, null, null, null,
                 new RoomServiceRequestService(repository), null);
     }
 

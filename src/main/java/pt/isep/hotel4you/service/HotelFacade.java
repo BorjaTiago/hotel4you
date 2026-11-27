@@ -11,6 +11,7 @@ import pt.isep.hotel4you.data.RoomLimitExceededException;
 import pt.isep.hotel4you.data.RoomNotAvailableException;
 import pt.isep.hotel4you.domain.CardAccessRecord;
 import pt.isep.hotel4you.domain.CardPlace;
+import pt.isep.hotel4you.domain.CardEntry;
 import pt.isep.hotel4you.domain.Client;
 import pt.isep.hotel4you.domain.ReservationSummary;
 import pt.isep.hotel4you.domain.ClientReservation;
@@ -20,6 +21,7 @@ import pt.isep.hotel4you.domain.ExtraService;
 import pt.isep.hotel4you.domain.Feedback;
 import pt.isep.hotel4you.domain.FeedbackType;
 import pt.isep.hotel4you.domain.Floor;
+import pt.isep.hotel4you.domain.IssuedCard;
 import pt.isep.hotel4you.domain.Location;
 import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.domain.MovementType;
@@ -50,6 +52,7 @@ public class HotelFacade {
     private final ReservationService reservationService;
     private final ExtraPriceService extraPriceService;
     private final CardAccessService cardAccessService;
+    private final CardQueryService cardQueryService;
     private final RoomServiceRequestService roomServiceRequestService;
     private final FeedbackService feedbackService;
 
@@ -65,6 +68,7 @@ public class HotelFacade {
      * @param reservationService the reservation service
      * @param extraPriceService the extra price service
      * @param cardAccessService the card service
+     * @param cardQueryService the card query service
      * @param roomServiceRequestService the room service request service
      * @param feedbackService the suggestion and complaint service
      */
@@ -72,7 +76,8 @@ public class HotelFacade {
             LocationService locationService, RoomService roomService, StockService stockService,
             ClientService clientService, ReservationService reservationService,
             ExtraPriceService extraPriceService, CardAccessService cardAccessService,
-            RoomServiceRequestService roomServiceRequestService, FeedbackService feedbackService) {
+            CardQueryService cardQueryService, RoomServiceRequestService roomServiceRequestService,
+            FeedbackService feedbackService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -82,8 +87,53 @@ public class HotelFacade {
         this.reservationService = reservationService;
         this.extraPriceService = extraPriceService;
         this.cardAccessService = cardAccessService;
+        this.cardQueryService = cardQueryService;
         this.roomServiceRequestService = roomServiceRequestService;
         this.feedbackService = feedbackService;
+    }
+
+    /**
+     * Lists all master cards, blocked or not, for the screen of the master cards (H4Y-153).
+     *
+     * @param actor the logged-in user
+     * @return the master cards, the oldest first
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<MagneticCard> listMasterCards(User actor) {
+        return cardAccessService.listMasterCards(actor);
+    }
+
+    /**
+     * Blocks a lost master card at once (H4Y-153).
+     *
+     * @param number the number of the master card
+     * @param actor the logged-in user
+     * @return the blocked card
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no master card has this number
+     * @throws CardBlockedException if the card is already blocked
+     * @throws IllegalStateException if the database is not available
+     */
+    public MagneticCard blockMasterCard(String number, User actor) {
+        return cardAccessService.blockMasterCard(number, actor);
+    }
+
+    /**
+     * Issues a new master card after the block of the lost one (H4Y-154). The new card has a new
+     * number. The old card and its entries stay.
+     *
+     * @param oldNumber the number of the blocked master card
+     * @param actor the logged-in user
+     * @return the new card and its access code; show the code only once
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no card has this number
+     * @throws IllegalArgumentException if the card is not a master card
+     * @throws MasterCardActiveException if the old card is not blocked
+     * @throws IllegalStateException if the database is not available
+     */
+    public IssuedCard replaceMasterCard(String oldNumber, User actor) {
+        return cardAccessService.replaceMasterCard(oldNumber, actor);
     }
 
     /**
@@ -121,11 +171,41 @@ public class HotelFacade {
      * @param place the clicked place
      * @return the saved entry
      * @throws IllegalArgumentException if the card or the place is null
-     * @throws AccessDeniedException if the card may not enter the place; nothing is saved
+     * @throws EntryRefusedException if the card may not enter the place, with the reason; nothing is saved
      * @throws IllegalStateException if the database is not available
      */
     public CardAccessRecord enterPlace(MagneticCard card, CardPlace place) {
         return cardAccessService.enter(card, place);
+    }
+
+    /**
+     * Lists the places a card entered, with the time of each entry (RF-20, H4Y-155). Blocked cards
+     * can still be queried.
+     *
+     * @param number the card number
+     * @param actor the logged-in user
+     * @return the entries, the oldest first, or an empty list
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws CardNotFoundException if no card has this number
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardEntry> getPlacesByCard(String number, User actor) {
+        return cardQueryService.getPlacesByCard(number, actor);
+    }
+
+    /**
+     * Lists the cards that entered a room, with the time of each entry (RF-21, H4Y-156). Master card
+     * entries are included.
+     *
+     * @param roomNumber the room number
+     * @param actor the logged-in user
+     * @return the entries, the oldest first, or an empty list
+     * @throws AccessDeniedException if the actor is not a manager
+     * @throws RoomNotFoundException if no room has this number
+     * @throws IllegalStateException if the database is not available
+     */
+    public List<CardEntry> getPassesByRoom(String roomNumber, User actor) {
+        return cardQueryService.getPassesByRoom(roomNumber, actor);
     }
 
     /**
@@ -238,20 +318,32 @@ public class HotelFacade {
     }
 
     /**
-     * Does the check-in of a reservation.
+     * Does the check-in of a reservation and issues its card (RF-13, RF-16). The card is checked
+     * first: if the reservation already has a card, nothing is saved.
+     * The two steps are not in one transaction. If the database fails after the check-in, the
+     * reservation is CHECKED_IN without a card. The receptionist then issues the card again.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-in
+     * @return the new card and its access code, to show once
+     * @throws CardAlreadyIssuedException if the reservation already has a card
      * @throws AccessDeniedException if the actor may not manage reservations
      * @throws ReservationNotFoundException if the reservation does not exist
      * @throws IllegalStateException if the state does not allow the check-in or the database fails
      */
-    public void checkIn(long reservationId, User actor) {
-        reservationService.checkIn(reservationId, actor);
+    public IssuedCard checkIn(long reservationId, User actor) {
+        if (cardAccessService.findCardByReservation(reservationId).isPresent()) {
+            throw new CardAlreadyIssuedException();
+        }
+        Reservation reservation = reservationService.checkIn(reservationId, actor);
+        return cardAccessService.issueCard(reservation, actor);
     }
 
     /**
-     * Does the check-out of a reservation.
+     * Does the check-out of a reservation and deactivates its card, if it has one.
+     * A refused check-out does not change the card. The card entries stay saved.
+     * The two steps are not in one transaction. If the database fails after the check-out, the
+     * reservation is CHECKED_OUT and its card stays active until it is deactivated by hand.
      *
      * @param reservationId the reservation identifier
      * @param actor the logged-in user who does the check-out
@@ -261,6 +353,8 @@ public class HotelFacade {
      */
     public void checkOut(long reservationId, User actor) {
         reservationService.checkOut(reservationId, actor);
+        cardAccessService.findCardByReservation(reservationId).ifPresent(
+                card -> cardAccessService.deactivateCard(card.getNumber(), actor));
     }
 
     /**

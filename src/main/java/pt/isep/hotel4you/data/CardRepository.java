@@ -17,6 +17,15 @@ public interface CardRepository {
     Optional<MagneticCard> findByNumber(String number);
 
     /**
+     * Finds a card by its id.
+     *
+     * @param id the card id
+     * @return the card, or empty if no card has this id
+     * @throws IllegalStateException if the database is not available
+     */
+    Optional<MagneticCard> findById(long id);
+
+    /**
      * Checks if a card with this number exists. A number is never used twice.
      *
      * @param number the card number
@@ -42,6 +51,14 @@ public interface CardRepository {
      * @throws IllegalStateException if the database is not available
      */
     List<MagneticCard> findByUserId(long userId);
+
+    /**
+     * Finds all master cards, blocked or not, the oldest card first.
+     *
+     * @return the master cards, or an empty list
+     * @throws IllegalStateException if the database is not available
+     */
+    List<MagneticCard> findMasters();
 
     /**
      * Saves a new card with the hash of its access code.
