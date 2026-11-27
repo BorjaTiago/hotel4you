@@ -126,6 +126,18 @@ class PermissionTest {
     }
 
     @Test
+    @Tag("H4Y-110-AC-4")
+    void onAllows_returnTrue_whenReceptionistRegistersRoomService() {
+        assertTrue(Permission.REGISTER_ROOM_SERVICE.allows(RECEPTIONIST));
+    }
+
+    @Test
+    @Tag("H4Y-110-AC-4")
+    void onAllows_returnFalse_whenRestaurantStaffRegistersRoomService() {
+        assertFalse(Permission.REGISTER_ROOM_SERVICE.allows(RESTAURANT_STAFF));
+    }
+
+    @Test
     @Tag("H4Y-111-AC-1")
     void onAllows_returnTrue_whenReceptionistRegistersFeedback() {
         assertTrue(Permission.REGISTER_FEEDBACK.allows(RECEPTIONIST));

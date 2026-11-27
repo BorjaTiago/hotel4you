@@ -25,7 +25,7 @@ class FeedbackFacadeTest {
     @BeforeEach
     void setUp() {
         repository = new InMemoryFeedbackRepository();
-        facade = new HotelFacade(null, null, null, null, null, null, null, null,
+        facade = new HotelFacade(null, null, null, null, null, null, null, null, null, null,
                 new FeedbackService(repository));
     }
 

@@ -21,7 +21,7 @@ Responsável proposto: Antonio Martinho (a equipa decide).
 
 ## Checklist
 
-- [ ] Com a base de dados vazia, o script cria os 5 papéis do RF-02. Cliente e fornecedor não recebem conta (Q-13, Q-17).
+- [ ] Com a base de dados vazia, o script cria os 5 papéis do RF-02. Cliente e fornecedor não recebem conta de utilizador (Q-13, Q-17); o cliente entra com o cartão (H4Y-109).
 - [ ] O script cria uma conta de gestor. O nome de utilizador e a palavra-passe vêm da configuração local ou do ambiente. Nunca do código, do Git ou da documentação.
 - [ ] A palavra-passe é guardada só como hash. O valor em texto não aparece em nenhum log.
 - [ ] Sem os valores de configuração, o script para com uma mensagem clara. Não cria uma palavra-passe por omissão.
@@ -29,4 +29,4 @@ Responsável proposto: Antonio Martinho (a equipa decide).
 - [ ] O `.gitignore` cobre o ficheiro de configuração local. Um ficheiro de exemplo não tem nenhum valor real.
 - [ ] Teste JUnit da lógica do seed no repositório em memória.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: sprint-planner, Claude Code (claude-sonnet-5-5), 2026-10-16. Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19; Q-13 card login sync by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
