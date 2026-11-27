@@ -17,4 +17,8 @@
     <Button text="Entrar" onAction="#onLoginClicked" defaultButton="true"
             maxWidth="Infinity" styleClass="primary-button"/>
     <Label fx:id="messageLabel" wrapText="true" styleClass="message"/>
+    <Separator/>
+    <Label text="É cliente? Use o número e o código do seu cartão." wrapText="true" styleClass="subtitle"/>
+    <Button text="Entrar com cartão" onAction="#onCardLoginClicked"
+            maxWidth="Infinity" styleClass="secondary-button"/>
 </VBox>

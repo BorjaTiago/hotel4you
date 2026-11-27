@@ -25,7 +25,7 @@ A receção e o gestor registam um cliente depressa: registo mais reserva em 30 
 - Formulário curto e rápido.
 
 ## Fora do âmbito
-- Login de clientes (os clientes não iniciam sessão, Q-13).
+- Conta de utilizador para clientes. O cliente não tem conta; entra com o cartão (número do cartão e código de 6 caracteres, Q-13, H4Y-109).
 
 ## Atores
 - Rececionista.
@@ -45,4 +45,4 @@ Secções 2, 3c. RF-10, RNF-03. Q-12, Q-25, Q-54.
 ## Perguntas em aberto
 - Nenhuma. Q-27 respondida: o RF-10 está na 1.ª entrega.
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; client scope (Q-54) by docs agent, Claude Code (claude-sonnet-5-5), 2026-11-05. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; client scope (Q-54) by docs agent, Claude Code (claude-sonnet-5-5), 2026-11-05; Q-13 card login sync by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.

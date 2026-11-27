@@ -9,4 +9,13 @@ public class LoginFailedException extends RuntimeException {
     public LoginFailedException() {
         super("Credenciais inválidas");
     }
+
+    /**
+     * Creates the exception with a given message.
+     *
+     * @param message the message for the user; it does not tell which part was wrong
+     */
+    public LoginFailedException(String message) {
+        super(message);
+    }
 }

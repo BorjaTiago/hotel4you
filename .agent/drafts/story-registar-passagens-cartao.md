@@ -1,17 +1,17 @@
 ---
 type: story
-summary: Guardar cada passagem do cartão com local e hora
+summary: Registar as passagens do cartão
 parent: epic-magnetic-card-access
 requirements: [RF-19]
 points: 3
 points_suggested: 3
 status: approved
-jira_key:
+jira_key: H4Y-150
 labels: [access-control, final-delivery]
 sprint:
 ---
 
-# Título: Guardar cada passagem do cartão com local e hora
+# Título: Registar as passagens do cartão
 
 Como cliente,
 Eu quero que cada passagem do meu cartão fique registada com o local e a hora,
@@ -35,15 +35,21 @@ Para que o hotel tenha o registo das minhas entradas.
   Então o sistema recusa a entrada
   E não guarda um registo de entrada nesse local
 
+### Cenário AC-4: Fluxo completo
+  Dado que existe um cartão válido com acesso ao quarto 202 e sem acesso ao bar
+  Quando o cliente entra com o cartão, abre o ecrã "O meu cartão" e clica no quarto 202 e depois no bar
+  Então o serviço guarda na base de dados uma passagem do quarto 202 com a hora, e nenhuma do bar
+  E o ecrã mostra "entrada permitida" no quarto e "entrada recusada" no bar
+
 ## Critérios de aceite (checklist)
 
 - [ ] AC-1: Uma entrada permitida no restaurante guarda um registo com o local e a hora da entrada.
 - [ ] AC-2: Uma entrada no quarto do cliente guarda um registo com o quarto e a hora da entrada.
 - [ ] AC-3: Uma entrada recusada no bar é recusada e não guarda nenhum registo de entrada.
+- [ ] AC-4: Em "O meu cartão", clicar no quarto 202 e depois no bar guarda só a passagem do quarto 202 com a hora; o ecrã mostra "entrada permitida" no quarto e "entrada recusada" no bar.
 
 ## Notas
-Registo de cada passagem, incluindo quartos (Q-09, decisão da equipa). RF-19 fala só de entradas. Registar tentativas recusadas não está no enunciado: não foi assumido. Entrega final (Q-06).
-Dependências (auditoria 2026-10-16): nenhuma forte. Implementa `AccessLogger` (foundation T0), chamado por `AccessService` só em entradas permitidas. Construir e testar sozinha: cartões de teste (T4) e uma regra de teste que permite ou recusa; leitor simulado (T6). Não precisa das outras histórias de acesso.
+Registo de cada passagem, incluindo quartos. O RF-19 fala só de entradas; registar tentativas recusadas não está no enunciado e não foi assumido. Usa o CardAccessService (registar passagem) e a tabela de passagens da H4Y-109 e junta só a chamada do registo nas entradas permitidas e o ecrã. Não cria tabelas.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -55,4 +61,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; Jira sync (login and "O meu cartão" flow, H4Y-122) by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
