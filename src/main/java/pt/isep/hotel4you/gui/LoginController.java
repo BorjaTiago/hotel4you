@@ -46,4 +46,10 @@ public class LoginController {
             passwordField.clear();
         }
     }
+
+    @FXML
+    private void onCardLoginClicked() {
+        Stage stage = (Stage) messageLabel.getScene().getWindow();
+        stage.getScene().setRoot(new ScreenLoader(facade).load("card-login.fxml"));
+    }
 }

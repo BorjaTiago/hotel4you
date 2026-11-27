@@ -2,7 +2,10 @@ package pt.isep.hotel4you.config;
 
 import java.nio.file.Path;
 import javafx.application.Application;
+import java.time.Clock;
 import pt.isep.hotel4you.data.Database;
+import pt.isep.hotel4you.data.JdbcCardAccessRecordRepository;
+import pt.isep.hotel4you.data.JdbcCardRepository;
 import pt.isep.hotel4you.data.JdbcClientRepository;
 import pt.isep.hotel4you.data.JdbcExtraPriceRepository;
 import pt.isep.hotel4you.data.JdbcFloorRepository;
@@ -13,7 +16,10 @@ import pt.isep.hotel4you.data.JdbcReservationRepository;
 import pt.isep.hotel4you.data.JdbcRoomTypeRepository;
 import pt.isep.hotel4you.data.JdbcUserRepository;
 import pt.isep.hotel4you.gui.HotelApp;
+import pt.isep.hotel4you.service.AccessCodeGenerator;
 import pt.isep.hotel4you.service.AuthService;
+import pt.isep.hotel4you.service.CardAccessService;
+import pt.isep.hotel4you.service.CardNumberGenerator;
 import pt.isep.hotel4you.service.ClientService;
 import pt.isep.hotel4you.service.ExtraPriceService;
 import pt.isep.hotel4you.service.HotelFacade;
@@ -41,21 +47,28 @@ public class Main {
             JdbcUserRepository userRepository = new JdbcUserRepository(database);
             AuthService authService = new AuthService(userRepository);
             StaffService staffService = new StaffService(userRepository, authService);
+            JdbcFloorRepository floorRepository = new JdbcFloorRepository(database);
             LocationService locationService = new LocationService(
-                    new JdbcFloorRepository(database), new JdbcLocationRepository(database));
+                    floorRepository, new JdbcLocationRepository(database));
             JdbcRoomTypeRepository roomTypeRepository = new JdbcRoomTypeRepository(database);
             JdbcReservationRepository reservationRepository = new JdbcReservationRepository(database);
             JdbcItemRepository itemRepository = new JdbcItemRepository(database);
+            JdbcRoomRepository roomRepository = new JdbcRoomRepository(database);
             RoomService roomService = new RoomService(
-                    new JdbcRoomRepository(database), roomTypeRepository, reservationRepository, itemRepository);
+                    roomRepository, roomTypeRepository, reservationRepository, itemRepository);
             StockService stockService = new StockService(itemRepository);
             ClientService clientService = new ClientService(new JdbcClientRepository(database));
             ReservationService reservationService = new ReservationService(reservationRepository,
                     roomService, roomTypeRepository);
             ExtraPriceService extraPriceService = new ExtraPriceService(new JdbcExtraPriceRepository(database));
+            JdbcCardRepository cardRepository = new JdbcCardRepository(database);
+            CardAccessService cardAccessService = new CardAccessService(cardRepository,
+                    new JdbcCardAccessRecordRepository(database), reservationRepository, userRepository,
+                    roomRepository, floorRepository, locationService, new CardNumberGenerator(cardRepository),
+                    new AccessCodeGenerator(), authService, Clock.systemDefaultZone());
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
                     stockService, clientService, reservationService,
-                    extraPriceService);
+                    extraPriceService, cardAccessService);
 
             // Check now that the database works.
             database.check();

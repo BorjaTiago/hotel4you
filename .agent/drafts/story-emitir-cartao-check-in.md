@@ -1,17 +1,17 @@
 ---
 type: story
-summary: Emitir cartão com número ao fazer check-in
+summary: Emitir o cartão magnético no check-in
 parent: epic-magnetic-card-access
 requirements: [RF-13, RF-16]
 points: 3
 points_suggested: 3
 status: approved
-jira_key:
+jira_key: H4Y-134
 labels: [access-control, final-delivery]
 sprint:
 ---
 
-# Título: Emitir cartão com número ao fazer check-in
+# Título: Emitir o cartão magnético no check-in
 
 Como rececionista,
 Eu quero emitir um cartão magnético com número ao efetuar o check-in de uma reserva,
@@ -42,16 +42,22 @@ Para que o cliente receba o cartão que lhe dá acesso aos locais da reserva.
   Então o sistema recusa o check-in
   E não emite nenhum cartão
 
+### Cenário AC-5: Fluxo completo
+  Dado que existe uma reserva ativa sem cartão
+  Quando o rececionista abre o ecrã de check-in, escolhe a reserva e confirma o check-in
+  Então o serviço emite o cartão com um número único, guarda-o na base de dados associado à reserva e o ecrã mostra o número do cartão e o código de 6 caracteres uma única vez (o cliente usa-os para entrar na aplicação)
+  E, se a reserva já tem cartão ou não está ativa, o ecrã mostra a mensagem de erro e nada é guardado
+
 ## Critérios de aceite (checklist)
 
 - [ ] AC-1: O check-in de uma reserva ativa emite um cartão com número, associado a essa reserva.
 - [ ] AC-2: Cada novo cartão emitido tem um número diferente dos já emitidos.
 - [ ] AC-3: Emitir um segundo cartão para a mesma reserva é recusado com mensagem a indicar que já tem cartão.
 - [ ] AC-4: O check-in de uma reserva cancelada ou inexistente é recusado e nenhum cartão é emitido.
+- [ ] AC-5: O check-in no ecrã emite o cartão, guarda-o associado à reserva e mostra o número do cartão e o código de 6 caracteres uma única vez; em erro mostra a mensagem e nada é guardado.
 
 ## Notas
-Um cartão por reserva (Q-09, decisão da equipa). Entrega final (Q-06). Dependências (auditoria 2026-10-16): uma forte, story-check-in-check-out (o cartão é emitido dentro do mesmo fluxo; sprint 5 antes do sprint 9). Número do cartão: `CardNumberGenerator` (foundation T6). Testar com reservas de teste com e sem cartão (T4).
-Decisão da equipa (2026-10-16): no check-out o cartão deixa de funcionar e o registo fica guardado; o cenário está em story-check-in-check-out. O cartão emitido aqui só vale durante a estadia.
+Um cartão por reserva. O cartão emitido só vale durante a estadia. Usa o CardAccessService e o gerador de números da H4Y-109 (tabelas, serviço e gerador já existem) e junta só a emissão dentro do fluxo de check-in e o ecrã. Não cria tabelas. Depende do check-in da Sprint 5.
 
 points_suggested: 3
 reference: Registar um cliente (3)
@@ -63,4 +69,4 @@ ready: true
 dor_failed: []
 questions: []
 
-AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06. Updated by: BorjaTiago. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: story-writer, acceptance-criteria, Claude Code (claude-sonnet-5-5), 2026-10-16; refiner, Claude Code (claude-sonnet-5-5), 2026-10-16; estimator, Claude Code (claude-sonnet-5-5), 2026-10-16; Dependências note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; checklist by story-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; backlog-prioritizer, Claude Code (claude-sonnet-5-5), 2026-11-06; Jira sync (login and "O meu cartão" flow, H4Y-122) by story-writer, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.

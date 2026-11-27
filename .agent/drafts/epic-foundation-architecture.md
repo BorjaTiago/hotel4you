@@ -61,7 +61,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - `gui`: JavaFX (ecrãs, controladores, registo de navegação).
    - `config`: leitura da configuração (ligação à base de dados, conta inicial). Valores fora do Git.
 2. Classes de domínio essenciais (fonte: `docs/requirements` e o esquema H4Y-10 do PR #4, branch `chore/db-schema-update`):
-   - `Role` (enum de 5 tipos, RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT_STAFF, SUPPLIER; só os 3 do pessoal têm conta, Q-13, Q-17), `User`. O utilizador com sessão iniciada fica em `HotelApp.currentUser`.
+   - `Role` (enum de 5 tipos, RF-02: CLIENT, RECEPTIONIST, MANAGER, RESTAURANT_STAFF, SUPPLIER; só os 3 do pessoal têm conta de utilizador, Q-13, Q-17; o cliente e o gestor também entram com o cartão, `HotelApp.currentCard`), `User`. O utilizador com sessão iniciada fica em `HotelApp.currentUser`.
    - `Floor`, `Location` (zona: nome, piso, marca "exige reserva", Q-32), `RoomType`, `Room`, `RoomItem`.
    - `Customer`, `Reservation` (estado: RESERVED, CANCELLED, CHECKED_IN, CHECKED_OUT), locais incluídos na reserva.
    - `AdditionalService` (extras e serviços pagos, vista incluída, Q-37), `ReservationService` (extra ou pedido de serviço na reserva, preço copiado).
@@ -73,7 +73,7 @@ Primeira tarefa do sprint 2. Vem antes de todas as histórias e antes da tarefa 
    - Edifício e quartos: `BuildingService` (pisos, zonas), `RoomService` (quartos, tipos, preço base, itens do quarto).
    - Clientes e reservas: `CustomerService`, `RoomAvailability` (quartos livres e sobreposição de datas, uma só implementação), `ReservationService` (criar, cancelar, apagar, check-in, check-out, locais).
    - Preços: `PricingService` (preços extra, total), `ReservationExtrasService` (extras e serviços na reserva).
-   - Cartões e acesso: `CardService` (emitir, desativar, bloquear, novo mestre), `CardNumberGenerator`, `AccessService.enter(cartão, local)` que percorre uma lista de `AccessRule` e chama `AccessLogger` quando a entrada é permitida. Cada história de acesso acrescenta uma regra numa classe própria.
+   - Cartões e acesso: `CardAccessService` (emitir, ativar, desativar, bloquear, substituir o cartão mestre, `login(número, código)`, `canOpen`, `canOpenRoom`, `register`, `listPlaces(cartão)` e `enter(cartão, local)`), `CardNumberGenerator`, `AccessCodeGenerator`. `enter` chama `register`, que confere de novo a regra e guarda só as entradas permitidas; uma entrada recusada lança `AccessDeniedException` ("Entrada recusada.") e não guarda nada. Cada história de acesso muda só as regras em `canOpen` ou `canOpenRoom`.
    - Stock: `StockService` (catálogo, entrada, uso, saída), `XmlStockImporter`, `ImportReportService`.
    - Apoio ao cliente: `GuestSupportService` (pedidos de serviço de quarto, sugestões e reclamações).
    - Dados: um repositório por agregado (`UserRepository`, `RoomRepository`, `ReservationRepository`, `CardRepository`, `AccessLogRepository`, `StockRepository`, ...), com versão JDBC e versão em memória.
@@ -119,9 +119,19 @@ Dados fixos do enunciado que nenhuma história de ator cria.
 - [ ] O script corre duas vezes sem duplicar dados.
 - [ ] Os quartos não fazem parte destes dados: o gestor regista-os (story-register-rooms, RF-04).
 
-### T6: Leitor de cartão simulado e números de cartão (sprint 8, antes das histórias de cartão)
-- [ ] Um ecrã simples recebe um número de cartão e um local (quarto ou zona) e chama `AccessService.enter` (T0). Mostra "entrada permitida" ou "entrada recusada".
-- [ ] `CardNumberGenerator` dá sempre um número novo e único (RF-16, Q-26).
-- [ ] O gestor inicial (epic-authentication-users T2) recebe um cartão mestre ativo (Q-19: um cartão mestre por gestor). Ver pergunta nova no backlog sobre gestores criados depois.
+### T6: Base de cartões, login com o cartão e ecrã "O meu cartão" (H4Y-109, antes das histórias de cartão)
+Como developer, quero a base completa de cartões (tabelas, classes, serviço completo, gerador de números, login com o cartão, ecrã "O meu cartão" e primeiro cartão mestre do gestor), para que as histórias de cartões possam ser feitas sem hardware. O hotel não tem cartões físicos: o login com o cartão faz de leitor (Q-13, decisão de 2026-11-24).
 
-Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19. Reviewed by: pending.
+Sub-tarefas: H4Y-121 (tabelas e domínio), H4Y-132 (`CardAccessService`), H4Y-133 (login com o cartão), H4Y-122 (ecrãs "Entrar com cartão" e "O meu cartão").
+
+- [ ] AC-1 Tabelas e domínio: o script SQL v16 corre na BD local → existem as tabelas de cartões e de passagens, as classes de domínio e os repositórios.
+- [ ] AC-2 Números únicos: gerar vários números → cada um é único (RF-16, Q-26).
+- [ ] AC-3 Serviço completo (`CardAccessService`): emitir, ativar, desativar, bloquear ou substituir o cartão mestre, registar passagem, consultar por cartão ou por quarto → cada operação guarda o resultado correto e recusa os casos inválidos (cartão inexistente, cartão já bloqueado, cartão mestre ativo ao substituir).
+- [ ] AC-4 Login com o cartão: utilizador = número do cartão, palavra-passe = código de 6 caracteres (maiúsculas e números, sem 0, O, 1, I), criado ao emitir o cartão e mostrado uma vez no check-in, guardado cifrado como as palavras-passe → o login devolve o cartão ao `CardAccessService`; recusa cartão inexistente, código errado, cartão inativo (após check-out) ou bloqueado, com mensagens em português.
+- [ ] AC-5 Primeiro cartão mestre: o gestor inicial existe → o arranque com dados iniciais cria o cartão mestre do gestor (Q-19); nenhuma palavra-passe ou segredo em Git ou docs.
+- [ ] AC-6 Ecrã "O meu cartão": depois do login com o cartão → um botão por local (quarto da reserva e zonas); locais permitidos a verde, os outros com cadeado.
+- [ ] AC-7 Fluxo completo: abrir a app → entrar com o cartão → "O meu cartão" → clicar num local permitido mostra "Entrada permitida" e regista a entrada (local e hora); clicar num local com cadeado mostra "Entrada recusada" e não regista nada; o gestor com o cartão mestre vê todos os locais a verde.
+
+Notas: só se registam entradas (local e hora), sem saídas: uma entrada nova quer dizer que o cliente saiu do local anterior. Testes primeiro com `@Tag("H4Y-109-AC-n")`, Javadoc nas classes novas, docs/uml e docs/database no mesmo PR.
+
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; tasks T0, T4, T5, T6 and T2 schema note by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; doc-updater, Claude Code (claude-sonnet-5-5), 2026-10-19; T6 update to match H4Y-109 in Jira (card login) by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; Q-13 card login sync by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.

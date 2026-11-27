@@ -158,7 +158,7 @@ public class JdbcReservationRepository implements ReservationRepository {
                     result.getLong("room_id"), result.getDate("start_date").toLocalDate(),
                     result.getDate("end_date").toLocalDate(),
                     ReservationStatus.fromDatabase(result.getString("status")),
-                    result.getLong("created_by_user_id")));
+                    result.getLong("created_by_user_id"), findLocationIds(connection, id)));
         } catch (SQLException error) {
             throw new IllegalStateException("Não foi possível consultar as reservas.", error);
         }
@@ -233,6 +233,19 @@ public class JdbcReservationRepository implements ReservationRepository {
             }
         } catch (SQLException error) {
             throw new IllegalStateException("Não foi possível apagar a reserva.", error);
+        }
+    }
+
+    /** Reads the reserved zones of a reservation, in id order. */
+    private static List<Long> findLocationIds(Connection connection, long reservationId) throws SQLException {
+        String sql = "SELECT location_id FROM reservation_locations WHERE reservation_id = ? ORDER BY location_id";
+        try (PreparedStatement statement = Database.prepare(connection, sql, reservationId);
+                ResultSet result = statement.executeQuery()) {
+            List<Long> ids = new ArrayList<>();
+            while (result.next()) {
+                ids.add(result.getLong("location_id"));
+            }
+            return ids;
         }
     }
 

@@ -27,7 +27,7 @@ O pessoal do hotel, o pessoal do restaurante e os gestores iniciam sessão com n
 - Mesmo erro para palavra-passe errada e conta desconhecida.
 
 ## Fora do âmbito
-- Login de clientes e fornecedores (não iniciam sessão, Q-13, Q-17).
+- Login de fornecedores (não iniciam sessão, Q-17). O cliente não tem conta de utilizador; entra com o cartão (número do cartão e código de 6 caracteres, Q-13, H4Y-109).
 - Ecrãs de gestão de contas do pessoal (epic-staff-management).
 - Limites por piso e zona (epic-staff-access-rules).
 
@@ -49,7 +49,7 @@ Secções 2, 3a, 3b. RF-01, RF-02, RNF-01, RNF-02.
 - Mostrar apenas as funções permitidas a cada papel (ator: rececionista; RF-02)
 
 ## Perguntas em aberto
-- Nenhuma nova. Q-13, Q-17 e Q-23 são decisões da equipa, não confirmadas pelo professor.
+- Nenhuma nova. Q-13, Q-17 e Q-23 são decisões da equipa, não confirmadas pelo professor. A Q-13 mudou em 2026-11-24 (H4Y-109): o cliente entra com o cartão.
 
 ## Tarefas técnicas (candidatas a sub-tarefas)
 Decisão da equipa (2026-10-16): trabalho técnico sem ator de negócio é tarefa, não história. Fica ligado a esta épica.
@@ -63,11 +63,11 @@ Decisão da equipa (2026-10-16): trabalho técnico sem ator de negócio é taref
 
 ### T2: Dados iniciais: 5 papéis e a conta do primeiro gestor (RF-02, RF-01, RNF-02)
 Sprint 2, depois de epic-foundation-architecture T0 e T2 e depois de T1 (cifra). Antes das histórias de login. Decisão do utilizador (2026-10-16).
-- [ ] Com a base vazia, o script cria os 5 papéis do RF-02: cliente, rececionista, gestor, funcionário do restaurante, fornecedor. Cliente e fornecedor não recebem conta (Q-13, Q-17).
+- [ ] Com a base vazia, o script cria os 5 papéis do RF-02: cliente, rececionista, gestor, funcionário do restaurante, fornecedor. Cliente e fornecedor não recebem conta de utilizador (Q-13, Q-17); o cliente entra com o cartão (H4Y-109).
 - [ ] O script cria 1 conta de gestor. O nome de utilizador e a palavra-passe vêm da configuração local ou de variáveis de ambiente, nunca do código, do Git ou da documentação.
 - [ ] A palavra-passe fica guardada só como hash (T1). O valor em texto não aparece em logs.
 - [ ] Sem configuração da conta inicial, o script para com uma mensagem clara e não cria uma conta com palavra-passe por omissão.
 - [ ] O script corre duas vezes sem duplicar papéis nem a conta.
 - [ ] O gestor inicial cria as outras contas com story-create-staff-account (sprint 2).
 
-AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; task T2 by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: epic-writer, Claude Code (claude-sonnet-5-5), 2026-10-16; task T2 by backlog-prioritizer, Claude Code (claude-opus-5-5), 2026-10-16; Portuguese translation by general-purpose agent, Claude Code (claude-sonnet-5-5), 2026-10-16; Q-13 card login sync by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.
