@@ -6,7 +6,7 @@ This file explains each class in the class diagram. Use it to defend the design.
 
 1. One class per domain concept. `Room`, `Reservation` and `MagneticCard` each match one real thing in the hotel.
 2. The business layer never uses JavaFX. Controllers call `HotelFacade`. Services and domain classes have no GUI code (RNF-07).
-3. Prices are derived, not stored. `Reservation.calculateTotal()` builds the total from `RoomType.basePrice` and the extras.
+3. `ReservationPriceService.quote()` reads the room price, dates and saved extra charges. `ReservationPrice.total()` multiplies the nightly price by the stay length.
 4. `ReservationExtra` keeps the price at that time (`unitPrice`). A later price change does not change old bills.
 5. A card belongs to a reservation OR a staff user, never both. A card entry log has a room OR a location, never both.
 6. Rules live in services. Data lives in domain classes.

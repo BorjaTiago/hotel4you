@@ -128,7 +128,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v21-alte
 `v18-create-reservation-services.sql` from H4Y-110 creates the `reservation_services` table. A room service request (food, drink, laundry) is one row, with the request time in `used_at` (RF-15, Q-33). It needs v9 and v14 (`extra_prices`). Without it, the room service save fails. You can run it again: it skips what already exists.
 `v19-create-feedback.sql` from H4Y-111 creates the `feedback` table for the client suggestions and complaints (RF-27, Q-18). Run it after v8. You can run it again: it skips what already exists. Without it, the save on the screen "Sugestões e reclamações" fails.
 
-Run `v20-create-reservation-extras.sql` to save room extras with their agreed price (H4Y-107). In **Reservas**, select a reservation and open **Extras da reserva**. Run `v21-alter-reservation-services-included.sql` after v18 to include paid services in the reservation (H4Y-108).
+Run `v20-create-reservation-extras.sql` to save room extras with their agreed price (H4Y-107). In **Reservas**, select a reservation and open **Extras da reserva**. Run `v21-alter-reservation-services-included.sql` after v18 to include paid services in the reservation (H4Y-108). Open **Preço da reserva** from the main menu to see the breakdown and total (H4Y-130).
 
 `v5-create-room-types.sql` from H4Y-26 creates `individual`, `duplo` and `familiar`. Run it before `v6-create-rooms.sql`. The manager then uses "Quartos" to register rooms. The separate "Preços" screen sets base prices. No room registration requires a base price to be set.
 

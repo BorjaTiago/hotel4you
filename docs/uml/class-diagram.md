@@ -96,6 +96,7 @@ classDiagram
         -onFloorsClicked() void
         -onRoomsClicked() void
         -onReservationsListClicked() void
+        -onReservationPriceClicked() void
         -onPricesClicked() void
         -onExtraPricesClicked() void
         -onStockClicked() void
@@ -838,7 +839,6 @@ classDiagram
         +checkCanCheckOut() void
         +checkCanCancel() void
         +overlaps(start: LocalDate, end: LocalDate) boolean
-        +calculateTotal() BigDecimal
     }
     class ReservationExtra {
         +extraPriceId() long
@@ -869,11 +869,15 @@ classDiagram
         +remove(reservationId: long, extraPriceId: long, type: ExtraType) boolean
     }
     class JdbcReservationExtrasRepository
+    class ReservationPriceController {
+        -showPrice() void
+    }
     class ReservationPriceService {
         +quote(reservationId: long, actor: User) ReservationPrice
     }
     class ReservationPrice {
         +pricePerNight() BigDecimal
+        +total() BigDecimal
     }
     class MagneticCard {
         -id: Long
@@ -1224,6 +1228,7 @@ classDiagram
     ReservationExtra "*" --> "1" ExtraService : refers to
     ReservationsController --> ReservationExtrasController
     ReservationExtrasController --> HotelFacade
+    ReservationPriceController --> HotelFacade
     HotelFacade --> ReservationExtrasService
     HotelFacade --> ReservationServicesService
     ReservationServicesService --> ReservationExtrasService : uses shared rules
