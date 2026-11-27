@@ -5,6 +5,7 @@ import javafx.application.Application;
 import pt.isep.hotel4you.data.Database;
 import pt.isep.hotel4you.data.JdbcClientRepository;
 import pt.isep.hotel4you.data.JdbcExtraPriceRepository;
+import pt.isep.hotel4you.data.JdbcFeedbackRepository;
 import pt.isep.hotel4you.data.JdbcFloorRepository;
 import pt.isep.hotel4you.data.JdbcItemRepository;
 import pt.isep.hotel4you.data.JdbcLocationRepository;
@@ -16,6 +17,7 @@ import pt.isep.hotel4you.gui.HotelApp;
 import pt.isep.hotel4you.service.AuthService;
 import pt.isep.hotel4you.service.ClientService;
 import pt.isep.hotel4you.service.ExtraPriceService;
+import pt.isep.hotel4you.service.FeedbackService;
 import pt.isep.hotel4you.service.HotelFacade;
 import pt.isep.hotel4you.service.LocationService;
 import pt.isep.hotel4you.service.ReservationService;
@@ -53,9 +55,10 @@ public class Main {
             ReservationService reservationService = new ReservationService(reservationRepository,
                     roomService, roomTypeRepository);
             ExtraPriceService extraPriceService = new ExtraPriceService(new JdbcExtraPriceRepository(database));
+            FeedbackService feedbackService = new FeedbackService(new JdbcFeedbackRepository(database));
             HotelFacade facade = new HotelFacade(authService, staffService, locationService, roomService,
                     stockService, clientService, reservationService,
-                    extraPriceService);
+                    extraPriceService, feedbackService);
 
             // Check now that the database works.
             database.check();

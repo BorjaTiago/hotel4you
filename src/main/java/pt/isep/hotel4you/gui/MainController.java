@@ -46,6 +46,9 @@ public class MainController {
     private Button stockButton;
 
     @FXML
+    private Button feedbackButton;
+
+    @FXML
     private StackPane contentPane;
 
     /**
@@ -79,6 +82,8 @@ public class MainController {
         extraPricesButton.setVisible(facade.canUse(user, Permission.MANAGE_EXTRA_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
         stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
+        feedbackButton.managedProperty().bind(feedbackButton.visibleProperty());
+        feedbackButton.setVisible(facade.canUse(user, Permission.REGISTER_FEEDBACK));
         welcomeLabel.setText(
                 "Olá, " + user.getName() + " (" + user.getRole().displayName() + ")");
         if (facade.canUse(user, Permission.MANAGE_RESERVATIONS)) {
@@ -126,6 +131,12 @@ public class MainController {
     private void onStockClicked() {
         Parent stockScreen = new ScreenLoader(facade).load("stock.fxml");
         contentPane.getChildren().setAll(stockScreen);
+    }
+
+    @FXML
+    private void onFeedbackClicked() {
+        Parent feedbackScreen = new ScreenLoader(facade).load("feedback.fxml");
+        contentPane.getChildren().setAll(feedbackScreen);
     }
 
     @FXML
