@@ -52,13 +52,24 @@ public class AuthService {
         }
         User user = userRepository.findByUsername(username.trim())
                 .orElseThrow(LoginFailedException::new);
-        if (!isValidPassword(password, user.getPasswordHash())) {
+        if (!matchesPassword(password, user.getPasswordHash())) {
             throw new LoginFailedException();
         }
         return user;
     }
 
-    private boolean isValidPassword(String password, String passwordHash) {
+    /**
+     * Checks a plain secret against a hash made by {@link #hashPassword(String)}. The card code
+     * uses the same hash as the passwords.
+     *
+     * @param password the plain password or card code
+     * @param passwordHash the stored hash
+     * @return true if the secret matches the hash; false if not, or if a value is null
+     */
+    public boolean matchesPassword(String password, String passwordHash) {
+        if (password == null || passwordHash == null) {
+            return false;
+        }
         return BCrypt.verifyer(VERSION, LongPasswordStrategies.hashSha512(VERSION))
                 .verify(password.toCharArray(), passwordHash)
                 .verified;

@@ -138,6 +138,7 @@ erDiagram
         BIT is_master
         BIT active
         DATETIME2 blocked_at "nullable"
+        VARCHAR255 access_code_hash "nullable"
     }
     access_logs {
         INT id PK
@@ -155,4 +156,4 @@ erDiagram
     }
 ```
 
-Created by: BorjaTiago. Updated by: lukassperandio. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. H4Y-90 PR #65 review fixes by Claude Code (claude-opus-5-5), 2026-11-17; H4Y-90 merge of main (H4Y-93) by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-106 stock use and exit by Claude Code (claude-opus-5-5), 2026-11-22. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-28 floors view by doc-updater, Claude Code (claude-haiku-5-5), 2026-10-26; H4Y-52 client CRUD (Q-54) by Claude Code (claude-opus-5-5), 2026-11-04; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. H4Y-90 PR #65 review fixes by Claude Code (claude-opus-5-5), 2026-11-17; H4Y-90 merge of main (H4Y-93) by Claude Code (claude-opus-5-5), 2026-11-20; H4Y-132 access code column by doc-updater, GitHub Copilot (claude-opus-5.5), 2026-11-24; H4Y-106 stock use and exit by Claude Code (claude-opus-5-5), 2026-11-22. Reviewed by: pending.

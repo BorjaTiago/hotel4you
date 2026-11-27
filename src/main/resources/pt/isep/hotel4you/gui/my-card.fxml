@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="900" prefHeight="600" styleClass="app-view, main-window" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="pt.isep.hotel4you.gui.MyCardController">
+
+    <top>
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="top-bar">
+            <VBox HBox.hgrow="ALWAYS">
+                <Label text="O meu cartão" styleClass="title"/>
+                <Label fx:id="cardLabel" styleClass="subtitle"/>
+            </VBox>
+            <Button styleClass="secondary-button" text="Sair" onAction="#onLogoutClicked"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="16" styleClass="screen">
+            <padding>
+                <javafx.geometry.Insets top="16" right="24" bottom="16" left="24"/>
+            </padding>
+            <Label text="Clique num local para passar o cartão. Verde: pode entrar. Cadeado: sem acesso."
+                   wrapText="true" styleClass="subtitle"/>
+            <Label fx:id="resultLabel" wrapText="true" styleClass="card-result"/>
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="card-places-scroll">
+                <FlowPane fx:id="placesPane" hgap="16" vgap="16"/>
+            </ScrollPane>
+        </VBox>
+    </center>
+
+</BorderPane>

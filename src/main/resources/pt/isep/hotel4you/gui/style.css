@@ -244,3 +244,54 @@
     -fx-border-color: #d0d7de;
     -fx-border-width: 0 1 0 0;
 }
+
+/* Screen "O meu cartão" (H4Y-122): one big button per place. */
+.place-button {
+    -fx-min-width: 180;
+    -fx-min-height: 110;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+    -fx-content-display: top;
+    -fx-graphic-text-gap: 8;
+}
+
+.place-allowed {
+    -fx-background-color: #2e9e5b;
+    -fx-text-fill: white;
+}
+
+.place-allowed:hover {
+    -fx-background-color: #237a45;
+}
+
+.place-locked {
+    -fx-background-color: #e1e5ea;
+    -fx-text-fill: #5a6672;
+}
+
+.place-locked:hover {
+    -fx-background-color: #d1d7de;
+}
+
+.place-lock-icon {
+    -fx-fill: #5a6672;
+}
+
+.card-result {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.card-result-allowed {
+    -fx-text-fill: #2e9e5b;
+}
+
+.card-result-refused {
+    -fx-text-fill: #c0392b;
+}
+
+.card-places-scroll, .card-places-scroll > .viewport {
+    -fx-background-color: transparent;
+}

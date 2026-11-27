@@ -27,7 +27,7 @@ public enum Permission {
     LIST_ROOMS(Role.RECEPTIONIST, Role.MANAGER),
 
     /**
-     * Register, list, search, edit and remove clients. Clients do not log in (Q-13), so the
+     * Register, list, search, edit and remove clients. Clients have no user account (Q-13), so the
      * receptionist or the manager does it (Q-54).
      */
     MANAGE_CLIENTS(Role.RECEPTIONIST, Role.MANAGER),
@@ -39,6 +39,12 @@ public enum Permission {
     MANAGE_RESERVATIONS(Role.RECEPTIONIST, Role.MANAGER),
 
     /**
+     * Register a food, drink or laundry request for a room with check-in (RF-15, Q-33). The
+     * manager may use every function (H4Y-23).
+     */
+    REGISTER_ROOM_SERVICE(Role.RECEPTIONIST, Role.MANAGER),
+
+    /**
      * Register a suggestion or a complaint of a client (RF-27, Q-18). The manager may use every
      * function (H4Y-23).
      */
@@ -48,7 +54,10 @@ public enum Permission {
     VIEW_FEEDBACK(Role.MANAGER),
 
     /** Delete a reservation for good before the check-in (RF-22, Q-05). */
-    DELETE_RESERVATIONS(Role.MANAGER);
+    DELETE_RESERVATIONS(Role.MANAGER),
+
+    /** Block cards, issue or replace the master card and read the card entries (RF-19 to RF-21, RF-23). */
+    MANAGE_CARDS(Role.MANAGER);
 
     private final Set<Role> allowedRoles;
 

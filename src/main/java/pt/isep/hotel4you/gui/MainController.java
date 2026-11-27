@@ -46,6 +46,9 @@ public class MainController {
     private Button stockButton;
 
     @FXML
+    private Button roomServiceButton;
+
+    @FXML
     private Button feedbackButton;
 
     @FXML
@@ -85,6 +88,8 @@ public class MainController {
         extraPricesButton.setVisible(facade.canUse(user, Permission.MANAGE_EXTRA_PRICES));
         stockButton.managedProperty().bind(stockButton.visibleProperty());
         stockButton.setVisible(facade.canUse(user, Permission.MANAGE_STOCK));
+        roomServiceButton.managedProperty().bind(roomServiceButton.visibleProperty());
+        roomServiceButton.setVisible(facade.canUse(user, Permission.REGISTER_ROOM_SERVICE));
         feedbackButton.managedProperty().bind(feedbackButton.visibleProperty());
         feedbackButton.setVisible(facade.canUse(user, Permission.REGISTER_FEEDBACK));
         feedbackListButton.managedProperty().bind(feedbackListButton.visibleProperty());
@@ -136,6 +141,12 @@ public class MainController {
     private void onStockClicked() {
         Parent stockScreen = new ScreenLoader(facade).load("stock.fxml");
         contentPane.getChildren().setAll(stockScreen);
+    }
+
+    @FXML
+    private void onRoomServiceClicked() {
+        Parent roomServiceScreen = new ScreenLoader(facade).load("room-service.fxml");
+        contentPane.getChildren().setAll(roomServiceScreen);
     }
 
     @FXML

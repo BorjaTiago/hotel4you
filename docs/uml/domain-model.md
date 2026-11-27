@@ -74,10 +74,15 @@ classDiagram
         id: Long
         number: String
         type: CardType
+        reservationId: Long
+        userId: Long
         active: boolean
         blockedAt: LocalDateTime
     }
     class CardAccessRecord {
+        cardId: long
+        roomId: Long
+        locationId: Long
         entryDateTime: LocalDateTime
     }
     class StockItem {
@@ -191,8 +196,8 @@ classDiagram
 | Reservation | Booking of a room by a client for one or more nights. | startDate, endDate, status, checkedInAt, checkedOutAt |
 | ExtraService | Service that adds to the price (Extra service). | name, type, price |
 | ReservationExtra | Use of an extra service in a reservation. It keeps the price at the time. | quantity, unitPrice, usedAt |
-| MagneticCard | Magnetic card with a number. Type CLIENT or MASTER (Master magnetic card). | number, type, active, blockedAt |
-| CardAccessRecord | Saved record of a card entry (Card access record). | entryDateTime |
+| MagneticCard | Magnetic card with a number. Type CLIENT or MASTER (Master magnetic card). | number, type, reservationId, userId, active, blockedAt |
+| CardAccessRecord | Saved record of a card entry (Card access record). | cardId, roomId, locationId, entryDateTime |
 | StockItem | Material stored in the hotel (Stock). | name, unit, stockQuantity |
 | StockMovement | Entry, use or exit of a stock item. | type, quantity, dateTime, exitReason |
 | StockImport | Import of one supplier stock file (XML or JSON). | supplierName, importedAt, fileFormat |
@@ -227,4 +232,4 @@ or null before the manager sets it (RF-07, RF-09, Q-11). SQL v14 stores the cata
 The nine rows cover sea view, mountain view, drinks, laundry, food, cultural events,
 private pools, spa and conference rooms. This step does not attach extras to reservations.
 
-Created by: BorjaTiago. Updated by: pedrocostaisep. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12. Reviewed by: pending.
+Created by: BorjaTiago. Updated by: BorjaTiago. AI use: Claude Code agent, Claude Sonnet 5.5, 2026-10-16; PR-20 import decision review by sequence-diagram-editor, OpenAI Codex (GPT-6), 2026-10-22; H4Y-84 JSON stock import docs by Claude Code (claude-opus-5-5), 2026-11-12; tdd-guide, GitHub Copilot (claude-opus-5.5), 2026-11-24. Reviewed by: pending.

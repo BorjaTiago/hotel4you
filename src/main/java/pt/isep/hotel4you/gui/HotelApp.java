@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import pt.isep.hotel4you.domain.MagneticCard;
 import pt.isep.hotel4you.domain.User;
 import pt.isep.hotel4you.service.HotelFacade;
 
@@ -20,6 +21,9 @@ public class HotelApp extends Application {
 
     /** The user who is logged in, or null if nobody is. Set by the login screen. */
     public static User currentUser;
+
+    /** The card of the person who logged in with a card, or null. Set by the card login screen. */
+    public static MagneticCard currentCard;
 
     /**
      * Shows the login screen, or a popup if the start failed.
