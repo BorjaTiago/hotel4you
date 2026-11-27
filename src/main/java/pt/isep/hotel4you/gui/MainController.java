@@ -37,6 +37,9 @@ public class MainController {
     private Button reservationsListButton;
 
     @FXML
+    private Button reservationPriceButton;
+
+    @FXML
     private Button pricesButton;
 
     @FXML
@@ -88,6 +91,8 @@ public class MainController {
         roomsButton.setVisible(facade.canUse(user, Permission.LIST_ROOMS));
         reservationsListButton.managedProperty().bind(reservationsListButton.visibleProperty());
         reservationsListButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
+        reservationPriceButton.managedProperty().bind(reservationPriceButton.visibleProperty());
+        reservationPriceButton.setVisible(facade.canUse(user, Permission.MANAGE_RESERVATIONS));
         pricesButton.managedProperty().bind(pricesButton.visibleProperty());
         pricesButton.setVisible(facade.canUse(user, Permission.MANAGE_PRICES));
         extraPricesButton.managedProperty().bind(extraPricesButton.visibleProperty());
@@ -139,6 +144,12 @@ public class MainController {
     private void onPricesClicked() {
         Parent pricesScreen = new ScreenLoader(facade).load("prices.fxml");
         contentPane.getChildren().setAll(pricesScreen);
+    }
+
+    @FXML
+    private void onReservationPriceClicked() {
+        Parent screen = new ScreenLoader(facade).load("reservation-price.fxml");
+        contentPane.getChildren().setAll(screen);
     }
 
     @FXML

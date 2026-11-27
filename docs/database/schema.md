@@ -276,7 +276,7 @@ CREATE INDEX ix_stock_movements_item_time ON stock_movements (item_id, moved_at)
 2. **Overlap**: the backend checks overlap before the INSERT, in the same transaction. Overlap rule: `new.start_date < existing.end_date AND new.end_date > existing.start_date`, with `existing.status <> 'cancelled'`. No trigger. A transaction alone does not stop two parallel requests. Lock the room first in the same transaction, for example `SELECT id FROM rooms WITH (UPDLOCK, HOLDLOCK) WHERE id = @room_id`, or use `SERIALIZABLE`.
 3. **Stock**: the backend updates `items.stock_quantity` and inserts into `stock_movements` in one transaction. If a `use` or `out` makes the stock negative, the CHECK `stock_quantity >= 0` fails. The backend catches the error, does a rollback and shows a message.
 4. **Password hash size**: `VARCHAR(255)`. A `VARCHAR` stores only the real length, so this costs no extra space.
-5. **Price**: `reservations` has no price column. The backend computes the total from `room_types.base_price` and the `reservation_services` rows (`unit_price` is a copy). `base_price` and `price` can be NULL (not set yet). The backend treats NULL as no charge.
+5. **Price**: multiply the nights by the sum of the current room type base price, saved room extras and included paid services. A missing base price prevents the calculation. Room service requests are separate.
 6. **Cancelled after check-in**: not allowed. After check-in, the stay ends with a check-out, not a cancel.
 
 7. **Card number**: `card_number` is plain UNIQUE. A card number never repeats. The backend sets `active = 0` at check-out. A block sets `blocked_at`. The card row is never deleted, so `access_logs` stay as history (RF-30, Q-26, Q-31).

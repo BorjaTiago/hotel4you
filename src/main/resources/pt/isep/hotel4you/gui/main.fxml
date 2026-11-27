@@ -25,6 +25,8 @@
                     maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="reservationsListButton" text="Reservas" onAction="#onReservationsListClicked"
                     maxWidth="Infinity" visible="false"/>
+            <Button styleClass="navigation-button" fx:id="reservationPriceButton" text="Preço da reserva"
+                    onAction="#onReservationPriceClicked" maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="pricesButton" text="Preços" onAction="#onPricesClicked"
                     maxWidth="Infinity" visible="false"/>
             <Button styleClass="navigation-button" fx:id="extraPricesButton" text="Preços extra" onAction="#onExtraPricesClicked"

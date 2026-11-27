@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox styleClass="app-view, screen" spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pt.isep.hotel4you.gui.ReservationPriceController">
+    <Label text="Preço da reserva" styleClass="subtitle"/>
+    <HBox spacing="8" alignment="CENTER_LEFT">
+        <ComboBox fx:id="reservations" promptText="Escolher reserva" accessibleText="Reserva a consultar"
+                  maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+        <Button text="Atualizar preço" onAction="#showPrice" styleClass="secondary-button"/>
+    </HBox>
+    <Label fx:id="breakdown" wrapText="true"/>
+    <Label fx:id="total" styleClass="subtitle"/>
+    <Label fx:id="message" wrapText="true" styleClass="message"/>
+</VBox>

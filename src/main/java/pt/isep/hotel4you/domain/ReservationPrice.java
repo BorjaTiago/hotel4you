@@ -20,4 +20,12 @@ public record ReservationPrice(BigDecimal basePrice, BigDecimal extrasPerNight,
         return basePrice == null ? null : basePrice.add(extrasPerNight).add(servicesPerNight);
     }
 
+    /**
+     * Multiplies the price per night by the nights in the reservation.
+     * @return the total stay price, or null if the base price is unset
+     */
+    public BigDecimal total() {
+        BigDecimal nightly = pricePerNight();
+        return nightly == null ? null : nightly.multiply(BigDecimal.valueOf(nights));
+    }
 }
