@@ -88,6 +88,7 @@ docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MySt
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v15-alter-stock-movements-exit-reason.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v18-create-reservation-services.sql
 docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v19-create-feedback.sql
+docker compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i /database/v20-create-reservation-extras.sql
 ```
 
 Without Docker (`sqlcmd` comes with SQL Server, or open the files in SQL Server Management Studio and run them):
@@ -109,6 +110,7 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v13-crea
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v15-alter-stock-movements-exit-reason.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v18-create-reservation-services.sql
 sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v19-create-feedback.sql
+sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v20-create-reservation-extras.sql
 ```
 
 `v10-alter-customers.sql` from H4Y-52 adds the full client data (document type, birth date, phone, nationality, email, NIF; Q-54). Run it once, after v8. It stops with an error if the `customers` table has rows or if it already ran.
@@ -123,6 +125,8 @@ sqlcmd -S localhost -U sa -P "MyStrong-Password1!" -C -b -I -i database/v19-crea
 
 `v18-create-reservation-services.sql` from H4Y-110 creates the `reservation_services` table. A room service request (food, drink, laundry) is one row, with the request time in `used_at` (RF-15, Q-33). It needs v9 and v14 (`extra_prices`). Without it, the room service save fails. You can run it again: it skips what already exists.
 `v19-create-feedback.sql` from H4Y-111 creates the `feedback` table for the client suggestions and complaints (RF-27, Q-18). Run it after v8. You can run it again: it skips what already exists. Without it, the save on the screen "Sugestões e reclamações" fails.
+
+Run `v20-create-reservation-extras.sql` to save room extras with their agreed price (H4Y-107). In **Reservas**, select a reservation and open **Extras da reserva**.
 
 `v5-create-room-types.sql` from H4Y-26 creates `individual`, `duplo` and `familiar`. Run it before `v6-create-rooms.sql`. The manager then uses "Quartos" to register rooms. The separate "Preços" screen sets base prices. No room registration requires a base price to be set.
 

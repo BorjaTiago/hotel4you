@@ -267,11 +267,14 @@ classDiagram
         +enterPlace(card: MagneticCard, place: CardPlace) CardAccessRecord
         +createReservation(client: Client, room: Room, start: LocalDate, end: LocalDate, locationIds: List~Long~, actor: User) Reservation
         +quoteReservation(room: Room, start: LocalDate, end: LocalDate, actor: User) ReservationQuote
+        +listReservationExtraOptions(actor: User) List~ExtraService~
+        +listReservationExtras(reservationId: long, actor: User) List~ReservationExtra~
+        +addReservationExtra(reservationId: long, extraPriceId: long, actor: User) void
+        +removeReservationExtra(reservationId: long, extraPriceId: long, actor: User) void
+        +quoteReservationPrice(reservationId: long, actor: User) ReservationPrice
         +listClientReservations(client: Client, actor: User) List~ClientReservation~
         +cancelReservation(reservationId: long, actor: User) void
         +deleteReservation(reservationId: long, actor: User) void
-        +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
-        +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +addLocation(reservation: Reservation, location: Location) void
         +removeLocation(reservation: Reservation, location: Location) void
         +registerClient(client: Client, actor: User) Client
@@ -389,8 +392,6 @@ classDiagram
         +listClientReservations(client: Client, actor: User) List~ClientReservation~
         +cancel(reservationId: long, actor: User) void
         +delete(reservationId: long, actor: User) void
-        +addExtra(reservation: Reservation, service: ExtraService, quantity: int) ReservationExtra
-        +removeExtra(reservation: Reservation, extra: ReservationExtra) void
         +addLocation(reservation: Reservation, location: Location) void
         +removeLocation(reservation: Reservation, location: Location) void
         +checkIn(reservationId: long, actor: User) Reservation
@@ -840,9 +841,33 @@ classDiagram
         +calculateTotal() BigDecimal
     }
     class ReservationExtra {
-        -quantity: int
-        -unitPrice: BigDecimal
-        -usedAt: LocalDateTime
+        +extraPriceId() long
+        +name() String
+        +unitPrice() BigDecimal
+    }
+    class ReservationExtrasController {
+        ~selectReservation(selected: ReservationSummary) void
+        -onAddClicked() void
+        -onRemoveClicked() void
+    }
+    class ReservationExtrasService {
+        +listCatalogue(actor: User) List~ExtraService~
+        +listExtras(reservationId: long, actor: User) List~ReservationExtra~
+        +addExtra(reservationId: long, extraPriceId: long, actor: User) void
+        +removeExtra(reservationId: long, extraPriceId: long, actor: User) void
+    }
+    class ReservationExtrasRepository {
+        <<interface>>
+        +findByReservation(reservationId: long, type: ExtraType) List~ReservationExtra~
+        +add(reservationId: long, extra: ExtraService, replacedExtraId: Long) boolean
+        +remove(reservationId: long, extraPriceId: long, type: ExtraType) boolean
+    }
+    class JdbcReservationExtrasRepository
+    class ReservationPriceService {
+        +quote(reservationId: long, actor: User) ReservationPrice
+    }
+    class ReservationPrice {
+        +pricePerNight() BigDecimal
     }
     class MagneticCard {
         -id: Long
@@ -1191,6 +1216,14 @@ classDiagram
     User "1" --> "*" Reservation : creates
     Reservation "1" *-- "*" ReservationExtra : includes
     ReservationExtra "*" --> "1" ExtraService : refers to
+    ReservationsController --> ReservationExtrasController
+    ReservationExtrasController --> HotelFacade
+    HotelFacade --> ReservationExtrasService
+    HotelFacade --> ReservationPriceService
+    ReservationExtrasService --> ReservationExtrasRepository
+    ReservationPriceService --> ReservationExtrasRepository
+    ReservationPriceService --> ReservationPrice : returns
+    JdbcReservationExtrasRepository ..|> ReservationExtrasRepository
     Reservation "0..1" --> "0..1" MagneticCard : has
     User "0..1" --> "*" MagneticCard : owns
     MagneticCard "1" --> "*" CardAccessRecord : generates

@@ -51,6 +51,9 @@ public class ReservationsController {
     private List<ReservationSummary> loaded = List.of();
 
     @FXML
+    private ReservationExtrasController extrasEditorController;
+
+    @FXML
     private TableView<ReservationSummary> reservationTable;
 
     @FXML
@@ -254,7 +257,10 @@ public class ReservationsController {
         locationsColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().locations()));
         reservationTable.getSelectionModel().selectedItemProperty()
-                .addListener((value, before, chosen) -> updateButtons(chosen));
+                .addListener((value, before, chosen) -> {
+                    updateButtons(chosen);
+                    extrasEditorController.selectReservation(chosen);
+                });
         searchField.textProperty().addListener((value, before, text) -> applyFilter());
         filterGroup.selectedToggleProperty().addListener((value, before, chosen) -> applyFilter());
         deleteButton.managedProperty().bind(deleteButton.visibleProperty());

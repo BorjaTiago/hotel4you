@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<TitledPane fx:id="details" text="Extras da reserva" expanded="false" animated="false" disable="true"
+            xmlns:fx="http://javafx.com/fxml" fx:controller="pt.isep.hotel4you.gui.ReservationExtrasController">
+    <content>
+        <VBox spacing="8">
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <ComboBox fx:id="catalogue" promptText="Escolher extra" accessibleText="Extra a adicionar"
+                          maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                <Button fx:id="addButton" text="Adicionar" onAction="#onAddClicked" disable="true"
+                        styleClass="action-button, save-button"/>
+                <Button fx:id="removeButton" text="Remover selecionado" onAction="#onRemoveClicked"
+                        disable="true" styleClass="secondary-button"/>
+            </HBox>
+            <ListView fx:id="included" prefHeight="110" accessibleText="Extras incluídos na reserva">
+                <placeholder><Label text="Ainda não há extras incluídos."/></placeholder>
+            </ListView>
+            <Label fx:id="priceLabel"/>
+            <Label fx:id="extraMessage" styleClass="message" wrapText="true"/>
+        </VBox>
+    </content>
+</TitledPane>

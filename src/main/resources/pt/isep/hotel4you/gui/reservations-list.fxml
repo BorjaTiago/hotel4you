@@ -48,5 +48,6 @@
                 visible="false" styleClass="action-button, danger-button" maxWidth="Infinity" HBox.hgrow="ALWAYS"
                 accessibleText="Apagar de vez a reserva escolhida"/>
     </HBox>
+    <fx:include fx:id="extrasEditor" source="reservation-extras.fxml"/>
     <Label fx:id="messageLabel" styleClass="message" wrapText="true" maxWidth="Infinity"/>
 </VBox>

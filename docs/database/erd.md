@@ -23,6 +23,8 @@ erDiagram
     rooms ||--o{ reservations : "room_id"
     reservations ||--o{ reservation_services : "reservation_id"
     extra_prices ||--o{ reservation_services : "extra_price_id"
+    reservations ||--o{ reservation_extras : "reservation_id"
+    extra_prices ||--o{ reservation_extras : "extra_price_id"
     reservations |o--o{ access_cards : "reservation_id"
     access_cards ||--o{ access_logs : "access_card_id"
     locations |o--o{ access_logs : "location_id"
@@ -122,6 +124,11 @@ erDiagram
         NVARCHAR100 name UK
         VARCHAR20 type "ROOM_EXTRA or PAID_SERVICE"
         DECIMAL price "nullable, per night"
+    }
+    reservation_extras {
+        INT reservation_id PK,FK
+        SMALLINT extra_price_id PK,FK
+        DECIMAL unit_price "saved per night"
     }
     reservation_services {
         INT id PK

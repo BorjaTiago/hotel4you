@@ -268,6 +268,10 @@ Reservation 1: 3 nights x 90.00 = 270.00, plus services (sea view 15.00 and spa 
 
 Ids above show a fresh catalogue. Code uses saved identifiers and does not assume fixed ids.
 
+### reservation_extras
+
+SQL v20 stores each room extra at the agreed nightly price. The key combines the reservation and the catalogue entry. Selecting a new view replaces the old view in the same transaction.
+
 ### reservation_services
 **What:** The services of one reservation: included, used, or requested to the room.
 **Why:** The final bill needs them.
@@ -276,7 +280,7 @@ Ids above show a fresh catalogue. Code uses saved identifiers and does not assum
 - `unit_price` is copied, so old bills do not change. It can be NULL when the service has no price.
 - `used_at = NULL` means included but not used yet.
 - A room service request (food, drink, laundry) is a row here. `used_at` is the time of the request (Q-33). `database/v18-create-reservation-services.sql` creates the table (H4Y-110). The save adds the row only when the room has a reservation with check-in.
-- The view of the room is a row here too (sea view or mountain view). One per reservation.
+- Room views are saved in `reservation_extras`.
 - All FKs are `NO ACTION` (Q-36). To delete a reservation, the backend deletes these rows first, in the same transaction (RF-22).
 
 **Other option:** `quantity` in one row, and `ON DELETE CASCADE`. We did not. One row per use keeps each request time. No CASCADE means the database never deletes data by itself.

@@ -66,9 +66,9 @@ classDiagram
         PAID_SERVICE
     }
     class ReservationExtra {
-        quantity: int
+        extraPriceId: long
+        name: String
         unitPrice: BigDecimal
-        usedAt: LocalDateTime
     }
     class MagneticCard {
         id: Long
@@ -195,7 +195,7 @@ classDiagram
 | RoomItem | Quantity of a stock item set in a room (Room item). | quantity |
 | Reservation | Booking of a room by a client for one or more nights. | startDate, endDate, status, checkedInAt, checkedOutAt |
 | ExtraService | Service that adds to the price (Extra service). | name, type, price |
-| ReservationExtra | Use of an extra service in a reservation. It keeps the price at the time. | quantity, unitPrice, usedAt |
+| ReservationExtra | An included extra. It keeps the agreed price per night. | extraPriceId, name, unitPrice |
 | MagneticCard | Magnetic card with a number. Type CLIENT or MASTER (Master magnetic card). | number, type, reservationId, userId, active, blockedAt |
 | CardAccessRecord | Saved record of a card entry (Card access record). | cardId, roomId, locationId, entryDateTime |
 | StockItem | Material stored in the hotel (Stock). | name, unit, stockQuantity |
