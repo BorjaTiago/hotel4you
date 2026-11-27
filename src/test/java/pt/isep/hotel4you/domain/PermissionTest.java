@@ -138,6 +138,14 @@ class PermissionTest {
     }
 
     @ParameterizedTest
+    @EnumSource(Role.class)
+    @Tag("H4Y-131-AC-3")
+    void onAllows_onlyManager_whenViewingFeedback(Role role) {
+        User actor = new User(1L, "Utilizador", "user", "hash", role) { };
+        assertEquals(role == Role.MANAGER, Permission.VIEW_FEEDBACK.allows(actor));
+    }
+
+    @ParameterizedTest
     @EnumSource(Permission.class)
     @Tag("H4Y-23-AC-1")
     void onAllows_returnTrue_whenActorIsManager(Permission permission) {

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,9 @@ import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.User;
 
-/** Tests the rules to register a suggestion or a complaint (H4Y-111, RF-27). */
+/** Tests the rules to register and list the suggestions and complaints (H4Y-111, H4Y-131, RF-27). */
 class FeedbackServiceTest {
+    private static final User MANAGER = new Manager(1L, "Rui Costa", "rui", "hash");
     private static final User RECEPTIONIST = new Receptionist(2L, "Ana Silva", "ana", "hash");
     private static final User RESTAURANT_STAFF = new RestaurantStaff(3L, "Joao Lima", "joao", "hash");
     private static final Client CLIENT = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
@@ -144,5 +146,48 @@ class FeedbackServiceTest {
     @Tag("H4Y-111-AC-4")
     void onSave_checkPermissionFirst_whenDataIsAlsoInvalid() {
         assertThrows(AccessDeniedException.class, () -> service.save(null, null, "", RESTAURANT_STAFF));
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-1")
+    void onList_returnSuggestionAndComplaint_whenManagerOpensList() {
+        Feedback suggestion = service.save(CLIENT, FeedbackType.SUGGESTION, "Mais toalhas.", RECEPTIONIST);
+        Feedback complaint = service.save(null, FeedbackType.COMPLAINT, "Barulho.", RECEPTIONIST);
+
+        List<Feedback> list = service.list(MANAGER);
+
+        assertEquals(List.of(complaint, suggestion), list);
+        assertEquals(FeedbackType.COMPLAINT, list.get(0).getType());
+        assertEquals("Barulho.", list.get(0).getDescription());
+        assertEquals(InMemoryFeedbackRepository.NOW, list.get(0).getCreatedAt());
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-2")
+    void onList_returnEmptyList_whenNoFeedbackExists() {
+        assertTrue(service.list(MANAGER).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-3")
+    void onList_throwAccessDenied_whenActorIsReceptionist() {
+        service.save(null, FeedbackType.COMPLAINT, "Barulho.", RECEPTIONIST);
+
+        AccessDeniedException error = assertThrows(AccessDeniedException.class,
+                () -> service.list(RECEPTIONIST));
+
+        assertEquals("Não tem permissão para consultar sugestões ou reclamações.", error.getMessage());
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-3")
+    void onList_throwAccessDenied_whenActorIsRestaurantStaff() {
+        assertThrows(AccessDeniedException.class, () -> service.list(RESTAURANT_STAFF));
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-3")
+    void onList_throwAccessDenied_whenNoUserIsLoggedIn() {
+        assertThrows(AccessDeniedException.class, () -> service.list(null));
     }
 }

@@ -10,13 +10,15 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.data.InMemoryFeedbackRepository;
 import pt.isep.hotel4you.domain.FeedbackType;
+import pt.isep.hotel4you.domain.Manager;
 import pt.isep.hotel4you.domain.Permission;
 import pt.isep.hotel4you.domain.Receptionist;
 import pt.isep.hotel4you.domain.RestaurantStaff;
 import pt.isep.hotel4you.domain.User;
 
-/** Tests the suggestion and complaint registration at the facade boundary (H4Y-111). */
+/** Tests the suggestion and complaint record and list at the facade boundary (H4Y-111, H4Y-131). */
 class FeedbackFacadeTest {
+    private final User manager = new Manager(1L, "Rui Costa", "rui", "hash");
     private final User receptionist = new Receptionist(2L, "Ana Silva", "ana", "hash");
     private final User restaurantStaff = new RestaurantStaff(3L, "Joao Lima", "joao", "hash");
     private InMemoryFeedbackRepository repository;
@@ -58,5 +60,35 @@ class FeedbackFacadeTest {
     void onCanUse_showMenuOnlyToReception_whenFeedbackPermission() {
         assertTrue(facade.canUse(receptionist, Permission.REGISTER_FEEDBACK));
         assertFalse(facade.canUse(restaurantStaff, Permission.REGISTER_FEEDBACK));
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-4")
+    void onListFeedback_returnSavedRows_whenManagerOpensList() {
+        facade.saveFeedback(null, FeedbackType.SUGGESTION, "Mais toalhas.", receptionist);
+        facade.saveFeedback(null, FeedbackType.COMPLAINT, "Barulho.", receptionist);
+
+        assertEquals(repository.findAll(), facade.listFeedback(manager));
+        assertEquals(2, facade.listFeedback(manager).size());
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-4")
+    void onListFeedback_returnEmptyList_whenNoFeedbackExists() {
+        assertTrue(facade.listFeedback(manager).isEmpty());
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-3")
+    void onListFeedback_throwAccessDenied_whenActorIsReceptionist() {
+        assertThrows(AccessDeniedException.class, () -> facade.listFeedback(receptionist));
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-3")
+    void onCanUse_showListOnlyToManager_whenViewFeedbackPermission() {
+        assertTrue(facade.canUse(manager, Permission.VIEW_FEEDBACK));
+        assertFalse(facade.canUse(receptionist, Permission.VIEW_FEEDBACK));
+        assertFalse(facade.canUse(restaurantStaff, Permission.VIEW_FEEDBACK));
     }
 }

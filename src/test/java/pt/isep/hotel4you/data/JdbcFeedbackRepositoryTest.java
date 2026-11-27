@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +17,9 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import pt.isep.hotel4you.domain.Client;
@@ -24,7 +27,7 @@ import pt.isep.hotel4you.domain.DocumentType;
 import pt.isep.hotel4you.domain.Feedback;
 import pt.isep.hotel4you.domain.FeedbackType;
 
-/** Checks the feedback SQL with JDBC doubles (H4Y-111). */
+/** Checks the feedback SQL with JDBC doubles (H4Y-111, H4Y-131). */
 class JdbcFeedbackRepositoryTest {
     private static final LocalDateTime NOW = LocalDateTime.of(2026, 11, 27, 10, 5);
     private static final Client CLIENT = new Client(7L, "Maria Sousa", DocumentType.CC, "12345678",
@@ -86,11 +89,71 @@ class JdbcFeedbackRepositoryTest {
         assertSame(failure, error.getCause());
     }
 
+    @Test
+    @Tag("H4Y-131-AC-1")
+    void onFindAll_readRowsNewestFirstWithClient_whenRowsExist() {
+        LocalDateTime earlier = NOW.minusHours(1);
+        database.rows = List.of(
+                Map.ofEntries(Map.entry("id", 13L), Map.entry("type", "complaint"),
+                        Map.entry("description", "Barulho."), Map.entry("created_at", Timestamp.valueOf(NOW))),
+                Map.ofEntries(Map.entry("id", 12L), Map.entry("type", "suggestion"),
+                        Map.entry("description", "Mais toalhas."),
+                        Map.entry("created_at", Timestamp.valueOf(earlier)),
+                        Map.entry("customer_id", 7L), Map.entry("customer_name", "Maria Sousa"),
+                        Map.entry("document_type", "cc"), Map.entry("document", "12345678"),
+                        Map.entry("birth_date", Date.valueOf(LocalDate.of(1990, 5, 1))),
+                        Map.entry("phone", "912345678"), Map.entry("nationality", "PT")));
+
+        List<Feedback> list = repository.findAll();
+
+        String sql = database.sql.replaceAll("\\s+", " ");
+        assertTrue(sql.contains("FROM feedback f LEFT JOIN customers c ON c.id = f.customer_id"));
+        assertTrue(sql.contains("ORDER BY f.created_at DESC, f.id DESC"));
+        assertTrue(database.bound.isEmpty());
+        assertEquals(2, list.size());
+        Feedback complaint = list.get(0);
+        assertEquals(13L, complaint.getId());
+        assertEquals(FeedbackType.COMPLAINT, complaint.getType());
+        assertEquals("Barulho.", complaint.getDescription());
+        assertEquals(NOW, complaint.getCreatedAt());
+        assertNull(complaint.getClient());
+        Feedback suggestion = list.get(1);
+        assertEquals(FeedbackType.SUGGESTION, suggestion.getType());
+        assertEquals(earlier, suggestion.getCreatedAt());
+        assertEquals(7L, suggestion.getClient().getId());
+        assertEquals("Maria Sousa", suggestion.getClient().getName());
+        assertEquals(DocumentType.CC, suggestion.getClient().getDocumentType());
+        assertEquals(List.of("result", "statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-2")
+    void onFindAll_returnEmptyList_whenTableIsEmpty() {
+        database.rows = List.of();
+
+        assertTrue(repository.findAll().isEmpty());
+        assertEquals(List.of("result", "statement", "connection"), database.closed);
+    }
+
+    @Test
+    @Tag("H4Y-131-AC-4")
+    void onFindAll_throwNotAvailable_whenDatabaseFails() {
+        SQLException failure = new SQLException("down");
+        database.failure = failure;
+        database.rows = List.of();
+
+        IllegalStateException error = assertThrows(IllegalStateException.class, repository::findAll);
+
+        assertEquals(Database.NOT_AVAILABLE, error.getMessage());
+        assertSame(failure, error.getCause());
+    }
+
     private static class RecordingDatabase extends Database {
         private final List<String> closed = new ArrayList<>();
         private final List<Object> bound = new ArrayList<>();
         private String sql;
         private SQLException failure;
+        private List<Map<String, Object>> rows;
 
         RecordingDatabase() {
             super(null);
@@ -128,7 +191,7 @@ class JdbcFeedbackRepositoryTest {
                             if (failure != null) {
                                 throw failure;
                             }
-                            yield result();
+                            yield rows == null ? result() : rows(rows.iterator());
                         }
                         case "close" -> {
                             closed.add("statement");
@@ -144,6 +207,24 @@ class JdbcFeedbackRepositoryTest {
                         case "next" -> true;
                         case "getLong" -> 12L;
                         case "getTimestamp" -> Timestamp.valueOf(NOW);
+                        case "close" -> {
+                            closed.add("result");
+                            yield null;
+                        }
+                        default -> throw new UnsupportedOperationException(method.getName());
+                    });
+        }
+
+        private ResultSet rows(Iterator<Map<String, Object>> next) {
+            Map<?, ?>[] current = new Map<?, ?>[1];
+            return (ResultSet) Proxy.newProxyInstance(ResultSet.class.getClassLoader(),
+                    new Class<?>[] {ResultSet.class}, (proxy, method, args) -> switch (method.getName()) {
+                        case "next" -> {
+                            current[0] = next.hasNext() ? next.next() : null;
+                            yield current[0] != null;
+                        }
+                        case "getObject", "getLong", "getString", "getTimestamp", "getDate" ->
+                                current[0].get(args[0]);
                         case "close" -> {
                             closed.add("result");
                             yield null;
