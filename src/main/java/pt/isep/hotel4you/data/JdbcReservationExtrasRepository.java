@@ -26,7 +26,7 @@ public class JdbcReservationExtrasRepository implements ReservationExtrasReposit
     public List<ReservationExtra> findByReservation(long reservationId, ExtraType type) {
         String sql = "SELECT x.extra_price_id, p.name, x.unit_price FROM " + tableFor(type) + " x "
                 + "JOIN extra_prices p ON p.id = x.extra_price_id "
-                + "WHERE x.reservation_id = ?" + " ORDER BY x.extra_price_id";
+                + "WHERE x.reservation_id = ?" + includedOnly(type) + " ORDER BY x.extra_price_id";
         List<ReservationExtra> items = new ArrayList<>();
         try (Connection connection = database.connect();
                 PreparedStatement statement = Database.prepare(connection, sql, reservationId);
@@ -51,7 +51,7 @@ public class JdbcReservationExtrasRepository implements ReservationExtrasReposit
             }
             String sql = "INSERT INTO " + table + " (reservation_id, extra_price_id, unit_price) "
                     + "SELECT ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM " + table + " x "
-                    + "WHERE x.reservation_id = ? AND x.extra_price_id = ?" + ")";
+                    + "WHERE x.reservation_id = ? AND x.extra_price_id = ?" + includedOnly(type) + ")";
             try (PreparedStatement statement = Database.prepare(connection, sql,
                     reservationId, extra.getId(), extra.getPrice(), reservationId, extra.getId())) {
                 statement.executeUpdate();
@@ -67,7 +67,7 @@ public class JdbcReservationExtrasRepository implements ReservationExtrasReposit
     private static void deleteExtra(Connection connection, long reservationId, long extraPriceId, ExtraType type)
             throws SQLException {
         String sql = "DELETE x FROM " + tableFor(type) + " x WHERE x.reservation_id = ? "
-                + "AND x.extra_price_id = ?";
+                + "AND x.extra_price_id = ?" + includedOnly(type);
         try (PreparedStatement statement = Database.prepare(connection, sql, reservationId, extraPriceId)) {
             statement.executeUpdate();
         }
@@ -76,8 +76,12 @@ public class JdbcReservationExtrasRepository implements ReservationExtrasReposit
     private static String tableFor(ExtraType type) {
         return switch (type) {
             case ROOM_EXTRA -> "reservation_extras";
-            case PAID_SERVICE -> throw new IllegalArgumentException("Use a room extra.");
+            case PAID_SERVICE -> "reservation_services";
         };
+    }
+
+    private static String includedOnly(ExtraType type) {
+        return type == ExtraType.PAID_SERVICE ? " AND x.used_at IS NULL" : "";
     }
 
     private boolean edit(long reservationId, Change change) {

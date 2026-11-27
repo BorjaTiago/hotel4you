@@ -267,10 +267,10 @@ classDiagram
         +enterPlace(card: MagneticCard, place: CardPlace) CardAccessRecord
         +createReservation(client: Client, room: Room, start: LocalDate, end: LocalDate, locationIds: List~Long~, actor: User) Reservation
         +quoteReservation(room: Room, start: LocalDate, end: LocalDate, actor: User) ReservationQuote
-        +listReservationExtraOptions(actor: User) List~ExtraService~
-        +listReservationExtras(reservationId: long, actor: User) List~ReservationExtra~
-        +addReservationExtra(reservationId: long, extraPriceId: long, actor: User) void
-        +removeReservationExtra(reservationId: long, extraPriceId: long, actor: User) void
+        +listReservationExtraOptions(type: ExtraType, actor: User) List~ExtraService~
+        +listReservationExtras(reservationId: long, type: ExtraType, actor: User) List~ReservationExtra~
+        +addReservationExtra(reservationId: long, extraPriceId: long, type: ExtraType, actor: User) void
+        +removeReservationExtra(reservationId: long, extraPriceId: long, type: ExtraType, actor: User) void
         +quoteReservationPrice(reservationId: long, actor: User) ReservationPrice
         +listClientReservations(client: Client, actor: User) List~ClientReservation~
         +cancelReservation(reservationId: long, actor: User) void
@@ -856,6 +856,12 @@ classDiagram
         +addExtra(reservationId: long, extraPriceId: long, actor: User) void
         +removeExtra(reservationId: long, extraPriceId: long, actor: User) void
     }
+    class ReservationServicesService {
+        +listCatalogue(actor: User) List~ExtraService~
+        +listServices(reservationId: long, actor: User) List~ReservationExtra~
+        +addService(reservationId: long, extraPriceId: long, actor: User) void
+        +removeService(reservationId: long, extraPriceId: long, actor: User) void
+    }
     class ReservationExtrasRepository {
         <<interface>>
         +findByReservation(reservationId: long, type: ExtraType) List~ReservationExtra~
@@ -1219,6 +1225,8 @@ classDiagram
     ReservationsController --> ReservationExtrasController
     ReservationExtrasController --> HotelFacade
     HotelFacade --> ReservationExtrasService
+    HotelFacade --> ReservationServicesService
+    ReservationServicesService --> ReservationExtrasService : uses shared rules
     HotelFacade --> ReservationPriceService
     ReservationExtrasService --> ReservationExtrasRepository
     ReservationPriceService --> ReservationExtrasRepository
