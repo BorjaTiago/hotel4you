@@ -31,6 +31,8 @@ import pt.isep.hotel4you.domain.RoomSummary;
 import pt.isep.hotel4you.domain.RoomSearchResult;
 import pt.isep.hotel4you.domain.RoomType;
 import pt.isep.hotel4you.domain.StockItem;
+import pt.isep.hotel4you.domain.RoomServiceRequest;
+import pt.isep.hotel4you.domain.RoomServiceType;
 import pt.isep.hotel4you.domain.StockMovement;
 import pt.isep.hotel4you.domain.User;
 
@@ -46,6 +48,7 @@ public class HotelFacade {
     private final ReservationService reservationService;
     private final ExtraPriceService extraPriceService;
     private final CardAccessService cardAccessService;
+    private final RoomServiceRequestService roomServiceRequestService;
 
     /**
      * Creates the facade.
@@ -59,11 +62,13 @@ public class HotelFacade {
      * @param reservationService the reservation service
      * @param extraPriceService the extra price service
      * @param cardAccessService the card service
+     * @param roomServiceRequestService the room service request service
      */
     public HotelFacade(AuthService authService, StaffService staffService,
             LocationService locationService, RoomService roomService, StockService stockService,
             ClientService clientService, ReservationService reservationService,
-            ExtraPriceService extraPriceService, CardAccessService cardAccessService) {
+            ExtraPriceService extraPriceService, CardAccessService cardAccessService,
+            RoomServiceRequestService roomServiceRequestService) {
         this.authService = authService;
         this.staffService = staffService;
         this.locationService = locationService;
@@ -73,6 +78,7 @@ public class HotelFacade {
         this.reservationService = reservationService;
         this.extraPriceService = extraPriceService;
         this.cardAccessService = cardAccessService;
+        this.roomServiceRequestService = roomServiceRequestService;
     }
 
     /**
@@ -115,6 +121,23 @@ public class HotelFacade {
      */
     public CardAccessRecord enterPlace(MagneticCard card, CardPlace place) {
         return cardAccessService.enter(card, place);
+    }
+
+    /**
+     * Registers a food, drink or laundry request for a room with check-in.
+     *
+     * @param roomNumber the room number as typed, for example "202"
+     * @param type the service type
+     * @param actor the logged-in user
+     * @return the saved request with the date and time
+     * @throws AccessDeniedException if the actor may not register room service requests
+     * @throws IllegalArgumentException if the room number is missing or invalid, or the type is
+     *         missing
+     * @throws RoomNotOccupiedException if the room has no reservation with check-in
+     * @throws IllegalStateException if the database is not available
+     */
+    public RoomServiceRequest registerRoomService(String roomNumber, RoomServiceType type, User actor) {
+        return roomServiceRequestService.register(roomNumber, type, actor);
     }
 
     /**
